@@ -27,7 +27,33 @@ export default class Login extends Component {
   onResponseGoogle = (response) => {
     console.log(response);
     const token = response.accessToken;
+    axios.post('/auth', { token: token }).then((res) => {
+      // const tokenVerified = res.headers.get('x-auth-token');
+      console.log(res);
+    })
+
   }
+
+  googleResponse = (response) => {
+    const tokenBlob = new Blob([JSON.stringify({ access_token: response.accessToken }, null, 2)], { type: 'application/json' });
+    const options = {
+      method: 'POST',
+      body: tokenBlob,
+      mode: 'cors',
+      cache: 'default'
+    };
+    fetch('http://localhost:4000/api/v1/auth/google', options)
+      .then(r => {
+        const token = r.headers.get('x-auth-token');
+        r.json().then(user => {
+          if (token) {
+            this.setState({ isAuthenticated: true, user, token })
+          }
+        });
+      })
+  };
+
+  test = () => { axios.post("/test", {}); }
 
   render() {
 
@@ -47,6 +73,7 @@ export default class Login extends Component {
             onSuccess={responseInstagram}
             onFailure={responseInstagram}
           />
+          <button onClick={this.test}>test</button>
         </div>
         :
         <div>

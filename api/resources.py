@@ -1,4 +1,17 @@
 import json
+import logging, sys
+
+
+log = logging.getLogger(__name__)
+log.addHandler(logging.StreamHandler(sys.stdout))
+log.setLevel(logging.DEBUG)
+
+
+class Auth(object):
+    def on_post(self, req, resp):
+        log.info("Hey!")
+
+        resp.body = json.dumps(["Yo"])
 
 
 class Student(object):
