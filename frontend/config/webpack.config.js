@@ -604,7 +604,11 @@ module.exports = function (webpackEnv) {
     performance: false,
     devServer: {
       proxy: {
-        '/': 'http://0.0.0.0:5000'
+        '**': {
+          target: 'http://localhost:5000',
+          secure: false,
+          changeOrigin: true
+        }
       }
     }
   };
