@@ -2,6 +2,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import logging, sys
 import falcon
+from typing import List
 
 # (Receive token by HTTPS POST)
 # ...
@@ -37,9 +38,16 @@ def verify_token_gtoken(token):
 
 
 class AuthMiddleware:
+    def __init__(self, excluded_routes: List):
+        self.excluded_routes = excluded_routes
+
     def process_request(self, req, resp):
+        uri = req.forwarded_uri
+        for route in self.excluded_routes:
+            if uri.endswith(route):
+                return # We're excluded, so let them in.
+
         token = req.get_header('Authorization')
-        account_id = req.get_header('Account-ID')
 
         challenges = ['Token type="Fernet"']
 
