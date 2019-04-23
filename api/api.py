@@ -1,5 +1,6 @@
 import falcon
 from resources import Student, Auth
+from auth import AuthMiddleware
 from falcon_auth import FalconAuthMiddleware, JWTAuthBackend
 import os
 import json
@@ -15,7 +16,7 @@ auth_middleware = FalconAuthMiddleware(auth_backend,
                     exempt_routes=['/exempt', '/auth/google'], exempt_methods=['HEAD'])
 
 api = falcon.API(
-    middleware=[auth_middleware]
+    middleware=[AuthMiddleware(excluded_routes=["/auth/google"])]
 )
 
 students = Student()
