@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import { Exercise002MenuFunctions } from './exercises/exercise002MenuFunctions';
-import { FakeEmbed } from './annotate';
 import { Routes } from './routes';
 
 

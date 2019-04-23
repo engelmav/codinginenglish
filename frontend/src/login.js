@@ -3,6 +3,11 @@ import { GoogleLogin } from 'react-google-login';
 import InstagramLogin from 'react-instagram-login'
 import axios from 'axios';
 
+let axiosConfig = {
+  headers: {
+      'Content-Type': 'application/json;charset=UTF-8',
+  }
+}
 
 const responseInstagram = (response) => {
   console.log(response);
@@ -24,36 +29,19 @@ export default class Login extends Component {
     alert(error);
   }
 
-  onResponseGoogle = (response) => {
-    console.log(response);
-    const token = response.accessToken;
-    axios.post('/auth', { token: token }).then((res) => {
-      // const tokenVerified = res.headers.get('x-auth-token');
+  onGoogleSignIn = (response) => {
+    // console.log(response);
+    // const token = response.tokenId;
+    const token = response.getAuthResponse().id_token;
+    console.log("Got token:", token)
+    axios.post('/auth/google', { token: token }, axiosConfig).then((res) => {
       console.log(res);
     })
 
   }
 
-  googleResponse = (response) => {
-    const tokenBlob = new Blob([JSON.stringify({ access_token: response.accessToken }, null, 2)], { type: 'application/json' });
-    const options = {
-      method: 'POST',
-      body: tokenBlob,
-      mode: 'cors',
-      cache: 'default'
-    };
-    fetch('http://localhost:4000/api/v1/auth/google', options)
-      .then(r => {
-        const token = r.headers.get('x-auth-token');
-        r.json().then(user => {
-          if (token) {
-            this.setState({ isAuthenticated: true, user, token })
-          }
-        });
-      })
-  };
 
-  test = () => { axios.post("/test", {}); }
+  test = () => { axios.post("/auth/google", { token: "made you look" }, axiosConfig); }
 
   render() {
 
@@ -63,7 +51,7 @@ export default class Login extends Component {
           <GoogleLogin
             clientId="528855637927-cresrrae893u9928cpdun6hidim9jagh.apps.googleusercontent.com"
             buttonText="Login"
-            onSuccess={this.onResponseGoogle}
+            onSuccess={this.onGoogleSignIn}
             onFailure={this.onFailure}
             cookiePolicy={'single_host_origin'}
           />

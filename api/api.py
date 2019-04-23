@@ -12,10 +12,10 @@ with open(current_path + "/secrets") as s:
 user_loader = lambda username, password: { 'username': username }
 auth_backend = JWTAuthBackend(user_loader, secret)
 auth_middleware = FalconAuthMiddleware(auth_backend,
-                    exempt_routes=['/exempt'], exempt_methods=['HEAD'])
+                    exempt_routes=['/exempt', '/auth/google'], exempt_methods=['HEAD'])
 
 api = falcon.API(
-    # middleware=[auth_middleware]
+    middleware=[auth_middleware]
 )
 
 students = Student()
@@ -23,4 +23,4 @@ students = Student()
 
 
 api.add_route('/students', students)
-api.add_route('/test', Auth())
+api.add_route('/auth/google', Auth())
