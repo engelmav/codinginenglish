@@ -1,13 +1,9 @@
 import React, { Component } from 'react'
 import { GoogleLogin } from 'react-google-login';
 import InstagramLogin from 'react-instagram-login'
-import axios from 'axios';
+import { fetchClient } from './auth';
 
-let axiosConfig = {
-  headers: {
-      'Content-Type': 'application/json;charset=UTF-8',
-  }
-}
+const client = fetchClient();
 
 const responseInstagram = (response) => {
   console.log(response);
@@ -34,14 +30,14 @@ export default class Login extends Component {
     // const token = response.tokenId;
     const token = response.getAuthResponse().id_token;
     console.log("Got token:", token)
-    axios.post('/auth/google', { token: token }, axiosConfig).then((res) => {
+    client.post('/auth/google', { token: token }).then((res) => {
       console.log(res);
     })
 
   }
 
 
-  test = () => { axios.post("/auth/google", { token: "made you look" }, axiosConfig); }
+  test = () => { client.post("/auth/google", { token: "made you look" }); }
 
   render() {
 
