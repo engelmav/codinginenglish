@@ -13,7 +13,7 @@ log.setLevel(logging.DEBUG)
 
 GOOG_CLIENT_ID = "528855637927-cresrrae893u9928cpdun6hidim9jagh.apps.googleusercontent.com"
 
-def verify_token_gtoken(token):
+def verify_gtoken(token):
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOG_CLIENT_ID)
