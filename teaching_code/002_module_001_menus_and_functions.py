@@ -36,3 +36,8 @@ salaries = {
 
 salaries["manager"]
 salaries["chef"]
+
+
+
+menu["Pizza"]
+
