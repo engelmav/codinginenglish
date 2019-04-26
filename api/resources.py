@@ -3,7 +3,7 @@ import logging, sys
 from jose import jwk
 from jose.utils import base64url_decode
 from falcon import Request
-from auth import verify_token_gtoken
+from auth import verify_gtoken
 
 
 log = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class Auth(object):
         log.info("Hey!")
         token = json.load(req.bounded_stream)['token']
 
-        user_data = verify_token_gtoken(token)
+        user_data = verify_gtoken(token)
 
         log.info("We made it {}".format(str(user_data)))
 
