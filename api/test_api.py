@@ -1,9 +1,18 @@
-import falcon
 from falcon import testing
 from models import User
 import pytest
 
 from api import api
+
+
+TEST_USER = "Emiliano"
+
+
+@pytest.fixture(autouse=True)
+def delete_test_user():
+    yield
+    User.delete().where(User.first_name == TEST_USER).execute()
+
 
 
 @pytest.fixture
@@ -25,6 +34,6 @@ def test_db():
 
     now = datetime.now()
 
-    emiliano = User(first_name='Emiliano', last_name="Russo", created_date=now)
+    emiliano = User(first_name=TEST_USER, last_name="Russo", created_date=now)
     saved_id = emiliano.save()
     assert saved_id == 1

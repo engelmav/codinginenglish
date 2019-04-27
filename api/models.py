@@ -1,11 +1,12 @@
 from peewee import *
+from config import config
 
 
 db = MySQLDatabase("cie",
                        host="localhost",
                        port=3306,
                        user="appuser",
-                       password="appuser")
+                       password=config["cie.password"])
 
 
 class User(Model):
