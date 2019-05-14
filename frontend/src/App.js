@@ -1,36 +1,54 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Exercise002MenuFunctions } from './exercises/exercise002MenuFunctions';
-import { Routes } from './routes';
+import { BrowserRouter, Route, Link } from 'react-router-dom';
+import Home from './Home';
+import Classe from './Classe';
+import Login from './Login';
+import Auth from './auth/Auth';
+import makeRequiresAuth from './auth/RequiresAuth';
+import Callback from './auth/Auth0Callback';
 
 
+var auth = new Auth();
+var requiresAuth = makeRequiresAuth(auth);
+const ClasseProtected = requiresAuth(Classe);
 
-
+const handleAuthentication = ({location}) => {
+  if (/access_token|id_token|error/.test(location.hash)) {
+    auth.handleAuthentication();
+  }
+}
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tempLink: null,
-      youtubeLiveEmbed: null
-    };
+
+  goTo(route) {
+    this.props.history.replace(`/${route}`);
   }
 
-  setInterimLink = (e) => this.setState({ tempLink: e.target.value })
-  setLink = () => this.setState({ youtubeLiveEmbed: this.state.tempLink })
-  //https://github.com/zoom/sample-app-web/blob/master/Local/js/index.js
+  componentDidMount() {
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      auth.renewSession();
+    }
+  }
 
   render() {
-
     return (
-      <div className="">
-        <Routes />
-        <label>Set Youtube Live:</label>
-        <input type="text" value={this.state.tempLink} onChange={this.setInterimLink}></input>
-        <button onClick={this.setLink}>Set Link</button>
-        <iframe title="_" width="560" height="315" src={this.state.youtubeLiveEmbed} frameborder="0" allowfullscreen></iframe>
-
-        <Exercise002MenuFunctions />
-
+      <div>
+        <div>
+          I'm a header
+        </div>
+        <BrowserRouter>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/class">Class</Link></li>
+          </ul>
+          <Route exact path="/" component={() => <Home />} />
+          <Route exact path="/class" component={() => <ClasseProtected />} />
+          <Route path="/callback" render={(props) => {
+            handleAuthentication(props);
+            return <Callback {...props} /> 
+          }}/>
+        </BrowserRouter>
+        <Login auth={auth} />
       </div>
     );
   }

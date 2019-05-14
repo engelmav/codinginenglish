@@ -6,7 +6,7 @@ db = MySQLDatabase("cie",
                        host="localhost",
                        port=3306,
                        user="appuser",
-                       password=config["cie.password"])
+                       password=config["cie.db.password"])
 
 
 class User(Model):

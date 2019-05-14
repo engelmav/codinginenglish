@@ -14,7 +14,6 @@ def delete_test_user():
     User.delete().where(User.first_name == TEST_USER).execute()
 
 
-
 @pytest.fixture
 def client():
     return testing.TestClient(api)
@@ -37,3 +36,11 @@ def test_db():
     emiliano = User(first_name=TEST_USER, last_name="Russo", created_date=now)
     saved_id = emiliano.save()
     assert saved_id == 1
+
+"""
+client has not logged on
+client makes request to authenticate with google/instagram
+server verifies google/instagram token
+if token is valid, server sets a session token (sends back to client)
+
+"""

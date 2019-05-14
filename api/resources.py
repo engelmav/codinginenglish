@@ -2,7 +2,7 @@ import json
 import logging, sys
 from jose import jwk
 from jose.utils import base64url_decode
-from falcon import Request
+from falcon import Request, Response
 from auth import verify_gtoken
 
 
@@ -14,20 +14,14 @@ log.setLevel(logging.DEBUG)
 class Auth(object):
     def __init__(self, jwt_authenticator=None):
         pass
-    def on_post(self, req: Request, resp):
+    def on_post(self, req: Request, resp: Response):
         log.info("Hey!")
         token = json.load(req.bounded_stream)['token']
 
         user_data = verify_gtoken(token)
 
         log.info("We made it {}".format(str(user_data)))
-
-        session['profile'] = {
-            'user_id': userinfo['sub'],
-            'name': userinfo['name'],
-            'picture': userinfo['picture']
-        }
-
+        resp.set_cookie("cookie", "cookie value")
 
 
         resp.body = json.dumps(["Yo"])
