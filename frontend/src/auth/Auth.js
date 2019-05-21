@@ -3,6 +3,10 @@ import history from '../history'
 
 
 export default class Auth {
+  accessToken;
+  idToken;
+  expiresAt;
+
   auth0 = new auth0.WebAuth({
     domain: 'dev-nougy3g5.auth0.com',
     clientID: 'pyJiq82f4s6ik5dr9oNnyryW5127T965',
@@ -10,6 +14,15 @@ export default class Auth {
     responseType: 'token id_token',
     scope: 'openid'
   });
+
+  constructor() {
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
+    this.handleAuthentication = this.handleAuthentication.bind(this);
+    this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.renewSession = this.renewSession.bind(this);
+  }
+
 
   login() {
     this.auth0.authorize();
@@ -27,6 +40,7 @@ export default class Auth {
   }
 
   navigateToHomeRoute() {
+    console.log("Navigating to /home");
     history.push('/home');
   }
 
@@ -38,6 +52,7 @@ export default class Auth {
     this.accessToken = authResult.accessToken;
     this.idToken = authResult.idToken;
     this.expiresAt = expiresAt;
+    console.log("Token expiration set to", this.expiresAt);
 
     this.navigateToHomeRoute();
   }
@@ -59,7 +74,10 @@ export default class Auth {
   }
 
   isAuthenticated() {
-    return new Date().getTime() < this.expiresAt;
+    console.log("isAuth is checking against expiry of", this.expiresAt);
+    const isAuth = new Date().getTime() < this.expiresAt;
+    console.log("isAuth is", isAuth);
+    return isAuth;
   }
 
   renewSession() {

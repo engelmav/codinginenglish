@@ -1,20 +1,11 @@
 import React, { Component } from 'react'
-import Auth from './auth/Auth';
-
 
 export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isAuthenticated: false
-    }
-  }
-
-  componentWillMount() {
-    this.setState(
-      { isAuthenticated: this.props.auth.isAuthenticated() },
-      () => console.log("isAuthenticated set to", this.state.isAuthenticated)
-    );
+    };
   }
 
   login = () => {
@@ -25,20 +16,31 @@ export default class Login extends Component {
     this.props.auth.logout();
   }
 
-  render() {
+  componentDidMount() {
+    console.log("Running Login.componentDidMount()")
+    const { isAuthenticated, renewSession } = this.props.auth;
+    this.setState({ isAuthenticated: isAuthenticated() });
 
+  }
+  render() {
     return (
-      (!this.state.isAuthenticated) ?
-        <div>
-          <button onClick={this.login}>auth0 login</button>
-        </div>
-        :
-        <div>
-          <p>Authenticated.</p>
-          <button onClick={this.logout} className="button">
-            Log out
+      <>
+        {
+          !this.state.isAuthenticated &&
+          <>
+            <button onClick={this.login}>auth0 login</button>
+          </>
+        }
+        {
+          this.state.isAuthenticated &&
+          <>
+            <p>Authenticated.</p>
+            <button onClick={this.logout} className="button">
+              Log out
           </button>
-        </div>
+          </>
+        }
+      </>
     );
   }
 }

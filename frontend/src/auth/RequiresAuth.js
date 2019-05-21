@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import history from '../history';
 
 // make a function that takes an auth instance
 // and returns a RequiresAuth HOC
@@ -9,7 +10,7 @@ const makeRequiresAuth = (auth) => {
       componentWillMount(){
         if (!auth.isAuthenticated()){
           console.log("Not authenticated!");
-          auth.navigateToHomeRoute();
+          history.push('/');
         }
       }
       render(){
