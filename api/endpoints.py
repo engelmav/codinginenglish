@@ -5,7 +5,6 @@ from flask import Flask, render_template, jsonify
 import hashlib
 import hmac
 import base64
-import datetime
 
 
 app = Flask(__name__,
@@ -19,10 +18,8 @@ ZOOM_SECRET = config["cie.zoom.apisecret"]
 
 
 def generate_signature(data, ts):
-    # ts = int(round(datetime.datetime.utcnow().timestamp() * 1000))
     msg = data['apiKey'] + str(data['meetingNumber']) + str(ts) + str(data['role'])
     message = base64.b64encode(bytes(msg, 'utf-8'))
-    # message = message.decode("utf-8");
     secret = bytes(data['apiSecret'], 'utf-8')
     hash = hmac.new(secret, message, hashlib.sha256)
     hash = base64.b64encode(hash.digest())
