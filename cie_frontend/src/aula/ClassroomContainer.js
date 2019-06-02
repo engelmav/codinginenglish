@@ -19,7 +19,9 @@ export default class ClassroomContainer extends Component {
             height="450px" />
         </div>
         <div className="classroomview" id="slidesView">
-          Slides
+          <Iframe
+            url="http://slides.com/vincentengelmann/interview-strategy/embed" 
+              width="576" height="420" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
           Chat
