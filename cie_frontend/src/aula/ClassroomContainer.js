@@ -1,23 +1,34 @@
 import React, { Component } from 'react'
 import './ClassroomContainer.css';
+import Iframe from 'react-iframe';
+import Chat from '../Chat/Chat'
+
+
+const userData = {
+  name: "Vincenzo"
+}
 
 export default class ClassroomContainer extends Component {
   render() {
     return (
-      <>
+      <div className="classroomcontainer">
         <div className="classroomview" id="zoomView">
-          Zoom
+          <Iframe
+            url="http://0.0.0.0:5002/"
+            width="840"
+            height="450px" />
         </div>
         <div className="classroomview" id="slidesView">
           Slides
         </div>
         <div className="classroomview" id="chatView">
           Chat
+          <Chat userData={userData}/>
         </div>
         <div className="classroomview" id="codeView">
           Code
         </div>
-      </>
+      </div>
     )
   }
 }

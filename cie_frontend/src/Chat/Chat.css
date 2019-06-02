@@ -1,0 +1,11 @@
+#message-container {
+  display: grid;
+  max-height: 200px;
+  overflow: auto;
+  grid-template-columns: .2fr 1fr;
+  grid-gap: 3px;
+}
+
+.message__user-message > p {
+  text-align: right;
+}
