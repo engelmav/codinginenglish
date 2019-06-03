@@ -24,7 +24,6 @@ export default class ClassroomContainer extends Component {
               width="576" height="420" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
-          Chat
           <Chat userData={userData}/>
         </div>
         <div className="classroomview" id="codeView">

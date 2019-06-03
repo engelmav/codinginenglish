@@ -1,4 +1,18 @@
+*{
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 .classroomcontainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: min-content 100%;
+  justify-content: space-between;
+  background: yellow;
+}
+
+#chatView {
+  /* make sure chat view expands to bottom of grid cell */
+  background: red;
 }

@@ -26,20 +26,21 @@ const handleAuthentication = ({ location }) => {
 const makeRoutes = () => {
   return (
     <Router history={history}>
-      <div>
+      <div id="main-grid">
         <ul>
-        <li><Link to="/home">Home</Link></li>
-        <li><Link to="/class">Class</Link></li>
-        </ul> 
+          <li><Link to="/home">Home</Link></li>
+          <li><Link to="/class">Class</Link></li>
+        </ul>
+        <div>
+          <Route exact path="/" render={(props) => { return <Login auth={auth} {...props} />; }} />
 
-        <Route exact path="/"          render={(props) => { return <Login auth={auth} {...props} />; } }/>
-        
-        <Route exact path="/home"      component={(props) => <HomeProtected {...props} />} />
-        <Route exact path="/class"     component={(props) => <ClassroomContainer {...props} />} />
-        <Route       path="/callback"  render={(props) => {
-          handleAuthentication(props);
-          return <CallbackWithRouter {...props} />
-        }} />
+          <Route exact path="/home" component={(props) => <HomeProtected {...props} />} />
+          <Route exact path="/class" component={(props) => <ClassroomContainer {...props} />} />
+          <Route path="/callback" render={(props) => {
+            handleAuthentication(props);
+            return <CallbackWithRouter {...props} />
+          }} />
+        </div>
       </div>
     </Router>
   );

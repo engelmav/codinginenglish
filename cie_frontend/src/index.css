@@ -8,7 +8,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+#main-grid {
+  display: grid;
+  grid-gap: 0;
+  /* take up the whole height of browser */ 
+  height: calc(100vh - 4px);
+  background: green;
+  grid-template-columns: calc(100vw - 50px);
+  /* navbar is min height, the content area is all the remaining */
+  grid-template-rows: min-content 100%;
 }
