@@ -24,7 +24,11 @@ export default class ClassroomContainer extends Component {
               width="576" height="420" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
-          <Chat userData={userData}/>
+          {/* <Chat userData={userData}/> */}
+          <Iframe
+            url="https://codinginenglish.rocket.chat/channel/general?layout=embedded"
+            id="classroomcontainer__chat-iframe"
+          />
         </div>
         <div className="classroomview" id="codeView">
           Code

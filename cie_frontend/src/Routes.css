@@ -1,0 +1,14 @@
+#routes__navbar {
+  list-style-type: none;
+  overflow: hidden;
+}
+
+#routes__navbar > li {
+  display: inline-block;
+  padding: 16px;
+}
+
+#routes__navbar > li a {
+  text-align: center;
+  text-decoration: none;
+}

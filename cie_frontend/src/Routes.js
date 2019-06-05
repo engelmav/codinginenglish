@@ -9,6 +9,7 @@ import Auth from './auth/Auth';
 import makeRequiresAuth from './auth/RequiresAuth';
 import Callback from './auth/Auth0Callback';
 import ClassroomContainer from './aula/ClassroomContainer';
+import './Routes.css';
 
 
 var auth = new Auth();
@@ -27,11 +28,11 @@ const makeRoutes = () => {
   return (
     <Router history={history}>
       <div id="main-grid">
-        <ul>
+        <ul id="routes__navbar">
           <li><Link to="/home">Home</Link></li>
           <li><Link to="/class">Class</Link></li>
         </ul>
-        <div>
+        <>
           <Route exact path="/" render={(props) => { return <Login auth={auth} {...props} />; }} />
 
           <Route exact path="/home" component={(props) => <HomeProtected {...props} />} />
@@ -40,7 +41,7 @@ const makeRoutes = () => {
             handleAuthentication(props);
             return <CallbackWithRouter {...props} />
           }} />
-        </div>
+        </>
       </div>
     </Router>
   );
