@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
-import Chat from '../Chat/Chat'
 
 
 const userData = {
@@ -15,23 +14,32 @@ export default class ClassroomContainer extends Component {
         <div className="classroomview" id="zoomView">
           <Iframe
             url="http://0.0.0.0:5002/"
-            width="840"
-            height="450px" />
+            width="100%"
+            height="100%"
+          />
         </div>
-        <div className="classroomview" id="slidesView">
+        <div className="classroomview">
           <Iframe
-            url="http://slides.com/vincentengelmann/interview-strategy/embed" 
-              width="576" height="420" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
+            id="slidesView"
+            url="http://slides.com/vincentengelmann/interview-strategy/embed"
+            width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
           {/* <Chat userData={userData}/> */}
           <Iframe
             url="https://codinginenglish.rocket.chat/channel/general?layout=embedded"
             id="classroomcontainer__chat-iframe"
+            width="100%" height="100%"
           />
         </div>
         <div className="classroomview" id="codeView">
-          Code
+          <Iframe
+            width="100%"
+            height="100%"
+            src="https://repl.it/@VincentEngelman/Module002-MenusAndFunctions-Web?lite=true">
+
+          </Iframe>
+
         </div>
       </div>
     )

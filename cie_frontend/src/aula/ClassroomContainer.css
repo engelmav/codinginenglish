@@ -1,23 +1,28 @@
-*{
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+/* .classroomcontainer {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  background: lightgoldenrodyellow;
+} */
 
 .classroomcontainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: min-content 60%;
-  /* justify-content: space-between; */
-  background: yellow;
+  grid-template-rows: 1fr 1fr;
+  grid-gap: 2px;
+  height: calc(100% - 70px);
 }
 
-#chatView {
-  /* make sure chat view expands to bottom of grid cell */
-  background: red;
-  padding: 10px;
+.classroomview {
+  display: flex; 
+  flex-basis: calc(50% - 40px);  
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  border: solid;
+  padding: 3px;
 }
 
-#classroomcontainer__chat-iframe {
-  height: 100%; width: 100%; border: none;
+.classroomcontainer iframe {
+  border: none;
 }
