@@ -24,14 +24,15 @@ export default class Auth {
   }
 
 
-  login() {
+  login(cb) {
     this.auth0.authorize();
   }
 
-  handleAuthentication() {
+  handleAuthentication(cb) {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
+        cb();
       } else if (err) {
         this.navigateToHomeRoute();
         console.log(err);

@@ -1,0 +1,18 @@
+
+#routes__navbar {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#routes__navbar > li {
+  display: inline-block;
+  padding-right: 10px;
+}
+
+#routes__navbar > li a {
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: 'Roboto Mono', monospace;
+}

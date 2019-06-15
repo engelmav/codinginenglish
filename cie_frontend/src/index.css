@@ -14,8 +14,7 @@ html, body {
   grid-gap: 0;
   /* take up the whole height of browser */ 
   height: calc(100vh - 20px);
-  background: green;
   grid-template-columns: 100vw;
-  grid-auto-rows: 40px 100%;
+  grid-auto-rows: 20px 100%;
 
 }

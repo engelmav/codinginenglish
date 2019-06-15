@@ -1,43 +1,34 @@
 import React, { Component } from 'react'
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    console.log("Constructed Login")
-    this.state = {
-      isAuthenticated: false
-    };
-  }
+
 
   login = () => {
-    this.props.auth.login();
+    this.props.auth.login(this.props.onLogin);
   }
 
   logout = () => {
     this.props.auth.logout();
   }
 
-  componentDidMount() {
-    console.log("Running Login.componentDidMount()")
-    const { isAuthenticated, renewSession } = this.props.auth;
-    this.setState({ isAuthenticated: isAuthenticated() });
-
+  componentDidUpdate(){
+    console.log("Login component got isAuthenticated:", this.props.isAuthenticated);
   }
+
   render() {
     return (
       <div>
         {
-          !this.state.isAuthenticated &&
+          !this.props.isAuthenticated &&
           <div>
-            <button onClick={this.login}>auth0 login</button>
+            <button onClick={this.login}>login</button>
           </div>
         }
         {
-          this.state.isAuthenticated &&
+          this.props.isAuthenticated &&
           <div>
-            <p>Authenticated.</p>
             <button onClick={this.logout} className="button">
-              Log out
+              log out
           </button>
           </div>
         }

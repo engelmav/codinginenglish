@@ -10,14 +10,10 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   grid-gap: 2px;
-  height: calc(100% - 70px);
+  height: calc(100% - 20px);
 }
 
 .classroomview {
-  display: flex; 
-  flex-basis: calc(50% - 40px);  
-  justify-content: center;
-  flex-direction: column;
   border-radius: 5px;
   border: solid;
   padding: 3px;

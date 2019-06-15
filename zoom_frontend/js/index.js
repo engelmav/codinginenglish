@@ -21,26 +21,23 @@ const addZoom = () => {
           leaveUrl: 'http://127.0.0.1:5002/',
           isSupportAV: true,
           success() {
-            // add a timeout here somehow453605633333320
-            setTimeout(() => {
-              ZoomMtg.join(
-                {
-                  meetingNumber,
-                  userName,
-                  signature,
-                  apiKey,
-                  userEmail: 'email@gmail.com',
-                  passWord: '',
-                  success() {
-                    $('#nav-tool').hide();
-                    console.log('join meeting success');
-                  },
-                  error(res) {
-                    console.log(res);
-                  }
+            ZoomMtg.join(
+              {
+                meetingNumber,
+                userName,
+                signature,
+                apiKey,
+                userEmail: 'email@gmail.com',
+                passWord: '',
+                success() {
+                  $('#nav-tool').hide();
+                  console.log('join meeting success');
+                },
+                error(res) {
+                  console.log(res);
                 }
-              );
-            }, 5000);
+              }
+            );
           },
           error(res) {
             console.log(res);
