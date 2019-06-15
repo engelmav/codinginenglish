@@ -2,6 +2,8 @@ from config import config
 
 from flask import Flask, render_template, jsonify
 
+from flask_sse import sse
+
 import hashlib
 import hmac
 import base64
@@ -48,3 +50,7 @@ def get_signature(meeting_number, ts):
         "apiKey": ZOOM_API_KEY,
         "signature": signature
     })
+
+@app.route('/class/commands/')
+def publish_command():
+    sse.publish({"message": "hello!"}, type="Greeting")
