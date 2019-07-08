@@ -3,10 +3,6 @@ import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
 
 
-const userData = {
-  name: "Vincenzo"
-}
-
 export default class ClassroomContainer extends Component {
   render() {
     return (
@@ -25,7 +21,6 @@ export default class ClassroomContainer extends Component {
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
-          {/* <Chat userData={userData}/> */}
           <Iframe
             url="https://codinginenglish.rocket.chat/channel/general?layout=embedded"
             id="classroomcontainer__chat-iframe"

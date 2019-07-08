@@ -32,13 +32,24 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    const { renewSession } = auth;
+  // componentDidMount() {
+  //   const { renewSession } = auth;
 
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      renewSession();
+  //   if (localStorage.getItem('isLoggedIn') === 'true') {
+  //     renewSession();
+  //   }
+  // }
+
+  async componentDidMount() {
+    if (window.location.pathname.includes('/callback')) return;
+    try {
+      await auth.silentAuth();
+      this.forceUpdate();
+    } catch (err) {
+      if (err.error !== 'login_required') console.log(err.error);
     }
   }
+
  
 
   setIsAuthenticated = (isAuthenticated) => this.setState({ isAuthenticated })

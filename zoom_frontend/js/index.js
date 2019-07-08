@@ -52,6 +52,7 @@ class ZoomApp extends Component {
 
   componentWillMount() {
     addZoom();
+    const stream = new EventSource('/class/commands');
   }
 
   render() {
