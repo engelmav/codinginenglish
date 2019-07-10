@@ -41,7 +41,7 @@ export default class Auth {
   //   });
   // }
 
-  handleAuthentication() {
+  handleAuthentication(cb) {
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
         if (err) return reject(err);
@@ -49,6 +49,7 @@ export default class Auth {
           return reject(err);
         }
         this.setSession(authResult);
+        cb();
         this.navigateToHomeRoute();
         resolve();
       });

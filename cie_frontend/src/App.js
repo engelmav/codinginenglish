@@ -13,12 +13,11 @@ import './Routes.css';
 
 
 var auth = new Auth();
-const handleAuthentication = ({ location }, isAuthenticatedCb) => {
+const handleAuthentication = ({ location }, cb) => {
   if (/access_token|id_token|error/.test(location.hash)) {
-    auth.handleAuthentication(isAuthenticatedCb);
+    auth.handleAuthentication(cb);
   }
 }
-
 
 var requiresAuth = makeRequiresAuth(auth);
 const ClassRoomProtected = requiresAuth(ClassroomContainer);
@@ -32,14 +31,6 @@ class App extends Component {
     };
   }
 
-  // componentDidMount() {
-  //   const { renewSession } = auth;
-
-  //   if (localStorage.getItem('isLoggedIn') === 'true') {
-  //     renewSession();
-  //   }
-  // }
-
   async componentDidMount() {
     if (window.location.pathname.includes('/callback')) return;
     try {
@@ -50,11 +41,10 @@ class App extends Component {
     }
   }
 
- 
-
-  setIsAuthenticated = (isAuthenticated) => this.setState({ isAuthenticated })
+  setIsAuthenticated = () => this.setState({ isAuthenticated: true })
 
   render() {
+    console.log("isAuthenticated() in render method for nav bar:", auth.isAuthenticated());
     return (
       <Router history={history}>
         <div id="main-grid">
