@@ -29,18 +29,6 @@ export default class Auth {
     this.auth0.authorize();
   }
 
-  // handleAuthentication(cb) {
-  //   this.auth0.parseHash((err, authResult) => {
-  //     if (authResult && authResult.accessToken && authResult.idToken) {
-  //       this.setSession(authResult);
-  //       cb();
-  //     } else if (err) {
-  //       this.navigateToHomeRoute();
-  //       console.log(err);
-  //     }
-  //   });
-  // }
-
   handleAuthentication(cb) {
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
@@ -81,7 +69,6 @@ export default class Auth {
   }
 
   navigateToHomeRoute() {
-    console.log("Navigating to /home");
     history.push('/home');
   }
 
@@ -102,9 +89,7 @@ export default class Auth {
   }
 
   isAuthenticated() {
-    console.log("isAuth is checking against expiry of", this.expiresAt);
     const isAuth = new Date().getTime() < this.expiresAt;
-    console.log("isAuth is", isAuth);
     return isAuth;
   }
 

@@ -16,3 +16,6 @@ Ensure you're in an environment with Python >= 3.6.
 
 0. `cie.auth.google.clientsecret` - Your Google Log-in OAuth secret
 1. `ciedb.password` - the database password (see `api/db/README.md`, or refer to your hosted service)
+
+## Redis
+``docker run --name cie-redis -d -p 6379:6379 redis``

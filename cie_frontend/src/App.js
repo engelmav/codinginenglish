@@ -9,7 +9,6 @@ import Auth from './auth/Auth';
 import makeRequiresAuth from './auth/RequiresAuth';
 import Callback from './auth/Auth0Callback';
 import ClassroomContainer from './aula/ClassroomContainer';
-import './Routes.css';
 
 
 var auth = new Auth();
@@ -44,7 +43,6 @@ class App extends Component {
   setIsAuthenticated = () => this.setState({ isAuthenticated: true })
 
   render() {
-    console.log("isAuthenticated() in render method for nav bar:", auth.isAuthenticated());
     return (
       <Router history={history}>
         <div id="main-grid">

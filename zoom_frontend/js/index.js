@@ -33,14 +33,14 @@ const addZoom = () => {
                   $('#nav-tool').hide();
                   console.log('join meeting success');
                 },
-                error(res) {
-                  console.log(res);
+                error(err) {
+                  console.log(err);
                 }
               }
             );
           },
-          error(res) {
-            console.log(res);
+          error(err) {
+            console.log(err);
           }
         });
       });
@@ -49,10 +49,13 @@ const addZoom = () => {
 
 
 class ZoomApp extends Component {
-
   componentWillMount() {
     addZoom();
-    const stream = new EventSource('/class/commands');
+    const source = new EventSource('/stream');
+    source.addEventListener('greeting', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Event data!:', data);
+    }, false);
   }
 
   render() {
