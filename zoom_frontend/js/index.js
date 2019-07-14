@@ -49,13 +49,13 @@ const addZoom = () => {
 
 
 class ZoomApp extends Component {
-  componentWillMount() {
+  componentDidMount() {
+    console.log('ZoomApp component mounted');
     addZoom();
     const source = new EventSource('/stream');
-    source.addEventListener('greeting', (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Event data!:', data);
-    }, false);
+    source.onmessage = (event) => {
+      console.log(event.data);
+    };
   }
 
   render() {

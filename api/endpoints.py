@@ -39,7 +39,7 @@ def event_stream():
     pubsub = red.pubsub()
     pubsub.subscribe('cie')
     for message in pubsub.listen():
-        print(message)
+        print("Yielding message: ", message)
         yield 'data: %s\n\n' % message['data']
 
 # https://lincolnloop.com/blog/architecting-realtime-applications/
@@ -54,7 +54,10 @@ def send_sse():
 
 @app.route('/stream')
 def stream_sse():
-    return flask.Response(event_stream(), mimetype="text/event-stream")
+    stream_message = event_stream()
+    sse_message = flask.Response(stream_message, mimetype="text/event-stream")
+    print("/stream is returning", sse_message)
+    return sse_message
 
 
 @app.route('/',)
