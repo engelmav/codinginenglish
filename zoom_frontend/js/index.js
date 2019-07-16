@@ -9,41 +9,45 @@ console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 ZoomMtg.preLoadWasm();
 ZoomMtg.prepareJssdk();
 
+function joinMeeting(meetingNumber) {
+  axios.get(`/zoom/signature/${meetingNumber}/${Date.now()}`)
+    .then((res) => {
+      const { signature, apiKey } = res.data;
+      const userName = document.getElementById('display_name').value;
+      ZoomMtg.init({
+        leaveUrl: 'http://127.0.0.1:5002/',
+        isSupportAV: true,
+        success() {
+          ZoomMtg.join(
+            {
+              meetingNumber,
+              userName,
+              signature,
+              apiKey,
+              userEmail: 'email@gmail.com',
+              passWord: '',
+              success() {
+                $('#nav-tool').hide();
+                console.log('join meeting success');
+              },
+              error(err) {
+                console.log(err);
+              }
+            }
+          );
+        },
+        error(err) {
+          console.log(err);
+        }
+      });
+    });
+}
+
 const addZoom = () => {
   document.getElementById('join_meeting').addEventListener('click', (e) => {
     e.preventDefault();
     const meetingNumber = parseInt(document.getElementById('meeting_number').value, 10);
-    axios.get(`/zoom/signature/${meetingNumber}/${Date.now()}`)
-      .then((res) => {
-        const { signature, apiKey } = res.data;
-        const userName = document.getElementById('display_name').value;
-        ZoomMtg.init({
-          leaveUrl: 'http://127.0.0.1:5002/',
-          isSupportAV: true,
-          success() {
-            ZoomMtg.join(
-              {
-                meetingNumber,
-                userName,
-                signature,
-                apiKey,
-                userEmail: 'email@gmail.com',
-                passWord: '',
-                success() {
-                  $('#nav-tool').hide();
-                  console.log('join meeting success');
-                },
-                error(err) {
-                  console.log(err);
-                }
-              }
-            );
-          },
-          error(err) {
-            console.log(err);
-          }
-        });
-      });
+    joinMeeting(meetingNumber);
   });
 };
 
@@ -54,7 +58,8 @@ class ZoomApp extends Component {
     addZoom();
     const source = new EventSource('/stream');
     source.onmessage = (event) => {
-      console.log(event.data);
+      const eventData = event.data;
+      console.log(eventData);
     };
   }
 

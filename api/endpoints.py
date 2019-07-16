@@ -7,6 +7,8 @@ import hashlib
 import hmac
 import base64
 
+import json
+
 import redis
 
 
@@ -16,7 +18,6 @@ app = Flask(__name__,
             template_folder='../zoom_frontend')
 
 red = redis.StrictRedis()
-
 
 ZOOM_API_KEY = config["cie.zoom.apikey"]
 ZOOM_SECRET = config["cie.zoom.apisecret"]
@@ -40,15 +41,17 @@ def event_stream():
     pubsub.subscribe('cie')
     for message in pubsub.listen():
         print("Yielding message: ", message)
-        yield 'data: %s\n\n' % message['data']
+        message_data = message['data']
+        if message_data != None and type(message_data).__name__ == 'bytes':
+            message_data = message_data.decode('utf8')
+        yield 'data: %s\n\n' % message_data
 
-# https://lincolnloop.com/blog/architecting-realtime-applications/
-# https://stackoverflow.com/questions/12232304/how-to-implement-server-push-in-flask-framework/12236019
-# https://github.com/jakubroztocil/chat/blob/master/app.py
+
 @app.route('/send', methods=['POST'])
 def send_sse():
     j = request.get_json(force=True)
-    res = red.publish('cie', j['message'])
+    message = j['message']
+    res = red.publish('cie', message)
     return jsonify(res)
 
 
