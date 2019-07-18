@@ -13,7 +13,8 @@ function joinMeeting(meetingNumber) {
   axios.get(`/zoom/signature/${meetingNumber}/${Date.now()}`)
     .then((res) => {
       const { signature, apiKey } = res.data;
-      const userName = document.getElementById('display_name').value;
+      const userName = 'Vincenz'; // document.getElementById('display_name').value;
+      console.log(`Joining user ${userName} to zoom ID ${meetingNumber}`);
       ZoomMtg.init({
         leaveUrl: 'http://127.0.0.1:5002/',
         isSupportAV: true,
@@ -60,6 +61,9 @@ class ZoomApp extends Component {
     source.onmessage = (event) => {
       const eventData = event.data;
       console.log(eventData);
+      if (eventData !== '1') {
+        joinMeeting(eventData);
+      }
     };
   }
 
