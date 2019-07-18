@@ -13,7 +13,7 @@ export default class Auth {
     clientID: CLIENT_ID,
     redirectUri: 'http://localhost:3000/callback',
     responseType: 'token id_token',
-    scope: 'openid'
+    scope: 'openid email profile'
   });
 
   constructor() {
@@ -47,6 +47,7 @@ export default class Auth {
   setSession(authResult) {
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
+    console.log("setSession() authResult:", authResult);
     // set the time that the id token will expire at
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
   }
