@@ -5,11 +5,15 @@ import Iframe from 'react-iframe';
 
 export default class ClassroomContainer extends Component {
   render() {
+    let userFirstName = null;
+    if (this.props.authData !== null){
+      userFirstName = this.props.authData.idTokenPayload.given_name;
+    }
     return (
       <div className="classroomcontainer">
         <div className="classroomview" id="zoomView">
           <Iframe
-            url="http://0.0.0.0:5002/"
+            url={`http://0.0.0.0:5002?userName=${userFirstName}`}
             width="100%"
             height="100%"
           />
