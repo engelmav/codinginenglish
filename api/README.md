@@ -18,4 +18,4 @@ Ensure you're in an environment with Python >= 3.6.
 1. `ciedb.password` - the database password (see `api/db/README.md`, or refer to your hosted service)
 
 ## Redis
-``docker run --name cie-redis -d -p 6379:6379 redis``
+``docker run --name cie-redis -d -p 6379:6379 redis`` or to restart ``docker start cie-redis``
