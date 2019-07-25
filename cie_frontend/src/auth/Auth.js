@@ -36,15 +36,15 @@ export default class Auth {
         if (!authResult || !authResult.idToken) {
           return reject(err);
         }
-        this.setSession(authResult);
-        cb();
+        this.setSession(authResult, cb);;
         this.navigateToHomeRoute();
         resolve();
       });
     })
   }
 
-  setSession(authResult) {
+  setSession(authResult, cb) {
+    cb(authResult);
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     console.log("setSession() authResult:", authResult);
@@ -59,11 +59,11 @@ export default class Auth {
     });
   }
 
-  silentAuth() {
+  silentAuth(cb) {
     return new Promise((resolve, reject) => {
       this.auth0.checkSession({}, (err, authResult) => {
         if (err) return reject(err);
-        this.setSession(authResult);
+        this.setSession(authResult, cb);
         resolve();
       });
     });
