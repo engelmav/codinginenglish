@@ -83,6 +83,10 @@ def get_signature(meeting_number, ts):
     })
 
 
+@app.route('/zoom/current',)
+def set_current_zoom():
+    pass
+
 
 @app.route("/site-map")
 def site_map():

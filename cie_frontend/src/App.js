@@ -57,12 +57,12 @@ class App extends Component {
         <div id="main-grid">
           <ul id="routes__navbar">
             <li><Link to="/home">Home</Link></li>
-            {auth.isAuthenticated() &&
+            {this.state.authData &&
               <li>
                 <Link to="/class">Class</Link>
               </li>
             }
-            <li><Login auth={auth} isAuthenticated={auth.isAuthenticated()} /></li>
+            <li><Login auth={auth} isAuthenticated={this.state.authData} /></li>
           </ul>
           <>
             <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.state.authData} {...props} />} />
