@@ -1,5 +1,6 @@
 from database.database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -22,3 +23,6 @@ class UserModRegistration(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
+
+    user = relationship("User", foreign_keys=[user_id])
+    cie_modules = relationship("User", foreign_keys=[cie_module_id])
