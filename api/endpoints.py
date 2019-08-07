@@ -1,4 +1,5 @@
 from config import config
+from database.database import db_session
 
 from flask import Flask, render_template, jsonify, request
 import flask
@@ -21,6 +22,11 @@ red = redis.StrictRedis()
 
 ZOOM_API_KEY = config["cie.zoom.apikey"]
 ZOOM_SECRET = config["cie.zoom.apisecret"]
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 
 def generate_signature(data, ts):
