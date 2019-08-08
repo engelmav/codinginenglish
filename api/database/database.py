@@ -6,11 +6,24 @@ from config import config
 
 
 db_password = config["cie.database.password"]
-engine = create_engine(f'mysql+pymysql://appuser:{db_password}@localhost/cie', convert_unicode=True)
+engine = create_engine(f'mysql+pymysql://appuser:{db_password}@localhost/cie')
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
-Base = declarative_base()
-Base.query = db_session.query_property()
+
+class CustomBase(object):
+    session = db_session
+    query = db_session.query_property()
+
+    def add(self):
+        db_session.add(self)
+        self._commit()
+
+    def _commit(self):
+        db_session.commit()
+        db_session.remove()
+
+
+Base = declarative_base(cls=CustomBase)
 
 
 def init_db():
