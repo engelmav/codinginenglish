@@ -26,6 +26,11 @@ class User(Base):
         cascade='all, delete, delete-orphan'
     )
 
+    def add_to_mod(self, cie_module: 'CieModule'):
+        user_mod_reg = UserModRegistration(user_id=self.id, cie_module_id=cie_module.id)
+        user_mod_reg.add()
+
+
 
 class UserSchema(ModelSchema):
     class Meta:
@@ -43,3 +48,7 @@ class CieModule(Base):
         backref='CieModule',
         cascade='all, delete, delete-orphan',
     )
+
+    def add_user(self, user: User):
+        user_mod_reg = UserModRegistration(user_id=user.id, cie_module_id=self.id)
+        user_mod_reg.add()

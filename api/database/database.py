@@ -20,7 +20,6 @@ class CustomBase(object):
 
     def _commit(self):
         db_session.commit()
-        db_session.remove()
 
 
 Base = declarative_base(cls=CustomBase)

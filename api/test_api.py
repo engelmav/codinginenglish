@@ -7,14 +7,25 @@ def test_add_user():
 
 
 def test_add_module():
+    mod_name = "Cie Module Creation Test"
     mod = CieModule(
-        name="Cie Module Creation Test"
+        name=mod_name
     )
     mod.add()
+    m = CieModule.query.filter(CieModule.name == mod_name).one()
+    assert m.name == mod_name
 
 
 def test_add_user_to_module():
-    ...
+    user = User(firstname='Test', lastname='User')
+    user.add()
+    mod_name = "Test Module - Add User"
+    mod = CieModule(
+        name=mod_name
+    )
+    mod.add()
+    m = CieModule.query.filter(CieModule.name == mod_name).one()
+    m.add_user(user)
 
 
 def test_get_modules():
