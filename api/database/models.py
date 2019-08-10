@@ -38,7 +38,7 @@ class CieModule(Base):
     __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
-    registered_modules = relationship(
+    registered_users = relationship(
         'UserModRegistration',
         backref='CieModule',
         cascade='all, delete, delete-orphan',

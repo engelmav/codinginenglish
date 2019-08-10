@@ -9,6 +9,7 @@ import Auth from './auth/Auth';
 import makeRequiresAuth from './auth/RequiresAuth';
 import Callback from './auth/Auth0Callback';
 import ClassroomContainer from './aula/ClassroomContainer';
+import Welcome from './Welcome';
 
 
 var auth = new Auth();
@@ -56,15 +57,19 @@ class App extends Component {
       <Router history={history}>
         <div id="main-grid">
           <ul id="routes__navbar">
-            <li><Link to="/home">Home</Link></li>
+            <li><Link to="/">Main</Link></li>
             {this.state.authData &&
-              <li>
-                <Link to="/class">Class</Link>
-              </li>
+              <React.Fragment>
+                <li><Link to="/home">Home</Link></li>
+                <li>
+                  <Link to="/class">Class</Link>
+                </li>
+              </React.Fragment>
             }
             <li><Login auth={auth} isAuthenticated={this.state.authData} /></li>
           </ul>
           <>
+            <Route exact path="/" component={(props) => <Welcome auth={auth} authData={this.state.authData} {...props} />} />
             <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.state.authData} {...props} />} />
             <Route exact path="/class" component={(props) => <ClassRoomProtected authData={this.state.authData} {...props} />} />
             <Route path="/callback" render={(props) => {

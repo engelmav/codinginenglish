@@ -7,7 +7,6 @@ import hashlib
 import hmac
 import base64
 
-
 import redis
 
 
@@ -49,6 +48,11 @@ def event_stream():
 def _get(key, default=None):
     j = request.get_json()
     return j.get(key, default)
+
+
+@app.route('/classes')
+def get_classes():
+    ...
 
 
 @app.route('/users', methods=['POST'])

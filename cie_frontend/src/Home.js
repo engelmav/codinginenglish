@@ -18,6 +18,10 @@ export default class Home extends Component {
               </h4>
             )
         }
+        <p>Your class is in session. Go there now!</p>
+        <p>Your next classes</p>
+        <p>Find More Classes</p>
+        <p>Words for me to learn</p>
       </div>
     )
   }
