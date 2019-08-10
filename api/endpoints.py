@@ -1,5 +1,4 @@
 from config import config
-from database.database import db_session
 
 from flask import Flask, render_template, jsonify, request
 import flask
@@ -8,7 +7,6 @@ import hashlib
 import hmac
 import base64
 
-import json
 
 import redis
 
@@ -22,11 +20,6 @@ red = redis.StrictRedis()
 
 ZOOM_API_KEY = config["cie.zoom.apikey"]
 ZOOM_SECRET = config["cie.zoom.apisecret"]
-
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
 
 
 def generate_signature(data, ts):
@@ -53,6 +46,16 @@ def event_stream():
         yield 'data: %s\n\n' % message_data
 
 
+def _get(key, default=None):
+    j = request.get_json()
+    return j.get(key, default)
+
+
+@app.route('/users', methods=['POST'])
+def create_user():
+    ...
+
+
 @app.route('/send', methods=['POST'])
 def send_sse():
     j = request.get_json(force=True)
@@ -69,7 +72,7 @@ def stream_sse():
     return sse_message
 
 
-@app.route('/',)
+@app.route('/', )
 def get_index():
     return render_template('index.html')
 
@@ -89,7 +92,7 @@ def get_signature(meeting_number, ts):
     })
 
 
-@app.route('/zoom/current',)
+@app.route('/zoom/current', )
 def set_current_zoom():
     pass
 
