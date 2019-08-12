@@ -9,36 +9,46 @@ class CieApi {
     console.log("Signing up to class", name);
     // Assume logged in.
   }
-  async classList(){
+  async classList() {
+    let res;
     try {
-      await axios.get('/classes');
+      res = await axios.get('/modules');
     } catch {
       console.log("Failed to get classes.");
     }
-    return [
-      'Dev Teams and Loops',
-      'Restaurants and Functions'
-    ]
+    return res.data;
   }
 }
 
 var cieApi = new CieApi();
 
 export default class Welcome extends Component {
-  render() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      classList: []
+    };
+  }
 
+  async componentWillMount() {
+    let classList = await cieApi.classList()
+    this.setState({ classList });
+  }
+  render() {
+    let { classList } = this.state;
     return (
       <div>
         <h1>coding_in_english</h1>
         <div>
-          {cieApi.classList().map((c, i) => <ClassCard key={i} name={c} />)}        
+          {classList.map((c, i) => <ClassCard key={i} name={c.name} />)}
         </div>
       </div>
     );
   }
 }
 
-const ClassCard = ({name}) => {
+// https://codepen.io/Kalyan_Lahkar/pen/wpeaJx
+const ClassCard = ({ name }) => {
   const onClick = () => cieApi.startSignup(name);
   return <div><p>{name}</p><button onClick={onClick}>SIGN UP</button></div>;
 }

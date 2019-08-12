@@ -1,4 +1,7 @@
 from database.models import User, CieModule
+from endpoints import app
+
+test_client = app.test_client()
 
 
 def test_add_user():
@@ -21,6 +24,7 @@ def test_add_user_to_module():
     user.add()
     mod_name = "Test Module - Add User"
     mod = CieModule(
+        description="Test Desc",
         name=mod_name
     )
     mod.add()
@@ -31,6 +35,18 @@ def test_add_user_to_module():
 def test_get_modules():
     all = CieModule.query.all()
     print(all)
+
+
+def test_get_modules_endpoint():
+    mod_name = "Cie Module Creation Test"
+    mod = CieModule(
+        name=mod_name,
+        description="Test Desc"
+    )
+    mod.add()
+    res = test_client.get('/modules').json
+    print(res)
+
 
 def test_add_module_to_user():
     pass

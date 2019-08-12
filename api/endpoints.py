@@ -9,6 +9,8 @@ import base64
 
 import redis
 
+import database.models as m
+
 
 app = Flask(__name__,
             static_url_path='',
@@ -50,9 +52,15 @@ def _get(key, default=None):
     return j.get(key, default)
 
 
-@app.route('/classes')
-def get_classes():
-    ...
+def serialize(data, clazz, many=False):
+    schema = clazz(many=many)
+    return jsonify(schema.dump(data).data)
+
+
+@app.route('/modules')
+def get_modules():
+    res = m.CieModule.query.all()
+    return serialize(res, m.CieModuleSchema, many=True)
 
 
 @app.route('/users', methods=['POST'])

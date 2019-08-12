@@ -43,6 +43,7 @@ class CieModule(Base):
     __table_args__ = {'extend_existing': True}
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+    description = Column(String(255))
     registered_users = relationship(
         'UserModRegistration',
         backref='CieModule',
@@ -52,3 +53,9 @@ class CieModule(Base):
     def add_user(self, user: User):
         user_mod_reg = UserModRegistration(user_id=user.id, cie_module_id=self.id)
         user_mod_reg.add()
+
+
+class CieModuleSchema(ModelSchema):
+    class Meta:
+        model = CieModule
+        sqla_session = db_session
