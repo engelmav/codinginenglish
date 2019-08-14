@@ -1,5 +1,5 @@
 from database.database import Base, db_session
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from marshmallow_sqlalchemy import ModelSchema
@@ -10,9 +10,8 @@ class UserModRegistration(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
+    date = Column(DateTime)
 
-    # user = relationship("User", foreign_keys=[user_id])
-    # cie_modules = relationship("User", foreign_keys=[cie_module_id])
 
 class User(Base):
     __tablename__ = 'users'
@@ -29,7 +28,6 @@ class User(Base):
     def add_to_mod(self, cie_module: 'CieModule'):
         user_mod_reg = UserModRegistration(user_id=self.id, cie_module_id=cie_module.id)
         user_mod_reg.add()
-
 
 
 class UserSchema(ModelSchema):
@@ -59,3 +57,10 @@ class CieModuleSchema(ModelSchema):
     class Meta:
         model = CieModule
         sqla_session = db_session
+
+
+class ModuleDates(Base):
+    __tablename__ = 'module_dates'
+    id = Column(Integer, primary_key=True)
+    cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
+    module_date = Column(DateTime)
