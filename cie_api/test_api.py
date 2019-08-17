@@ -1,5 +1,7 @@
-from database.models import User, CieModule
+from database.models import User, CieModule, ModuleSession
 from endpoints import app
+
+from datetime import datetime
 
 test_client = app.test_client()
 
@@ -29,7 +31,9 @@ def test_add_user_to_module():
     )
     mod.add()
     m = CieModule.query.filter(CieModule.name == mod_name).one()
-    m.add_user(user)
+    sess = ModuleSession(cie_module_id=m.id, session_datetime=datetime(2015, 6, 5, 8, 10, 10, 10))
+    sess.add()
+    m.add_user(user, sess)
 
 
 def test_get_modules():
