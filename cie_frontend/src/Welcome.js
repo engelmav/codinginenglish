@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
+import { DateTime } from 'luxon';
 
 
 class CieApi {
@@ -9,10 +10,10 @@ class CieApi {
     console.log("Signing up to class", name);
     // Assume logged in.
   }
-  async classList() {
+  async scheduledSessions() {
     let res;
     try {
-      res = await axios.get('/modules');
+      res = await axios.get('/module-sessions');
     } catch {
       console.log("Failed to get classes.");
     }
@@ -30,8 +31,8 @@ export default class Welcome extends Component {
     };
   }
 
-  async componentWillMount() {
-    let classList = await cieApi.classList()
+  async componentDidMount() {
+    let classList = await cieApi.scheduledSessions()
     this.setState({ classList });
   }
   render() {
@@ -40,15 +41,27 @@ export default class Welcome extends Component {
       <div>
         <h1>coding_in_english</h1>
         <div>
-          {classList.map((c, i) => <ClassCard key={i} name={c.name} />)}
+          {classList.map((sessionData, i) => <ClassCard key={i} sessionData={sessionData} />)}
         </div>
       </div>
     );
   }
 }
 
-// https://codepen.io/Kalyan_Lahkar/pen/wpeaJx
-const ClassCard = ({ name }) => {
-  const onClick = () => cieApi.startSignup(name);
-  return <div><p>{name}</p><button onClick={onClick}>SIGN UP</button></div>;
+
+class ClassCard extends Component {
+  onClick = () => cieApi.startSignup(this.props.sessionData.id, 1);
+  render(){
+    let { cie_module, session_datetime } = this.props.sessionData;
+    console.log("UTC from server:", session_datetime);
+    var local = DateTime.fromISO(session_datetime);
+    const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
+    return (
+      <div>
+        <p>{cie_module.name}</p>
+        <p>{localDateTime}</p>
+        <button onClick={this.onClick}>SIGN UP</button>
+      </div>
+    );
+  }
 }

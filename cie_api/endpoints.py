@@ -57,10 +57,48 @@ def serialize(data, clazz, many=False):
     return jsonify(schema.dump(data).data)
 
 
-@app.route('/modules')
+def deserialize(data, clazz):
+    schema = clazz()
+    loaded =  schema.load(data)
+    return loaded.data
+
+
+@app.route('/modules', methods=['POST'])
+def create_modules():
+    """
+    [
+        {
+            'name': 'value',
+            'description': 'value'
+        }
+    ]
+    :return:
+    {
+    "description": "value",
+    "id": 6,
+    "name": "value"
+}
+    """
+    j = request.get_json()
+    for obj in j:
+        inst = m.CieModuleSchema().make_instance(obj)
+        inst.add()
+    return serialize(inst, m.CieModuleSchema)
+
+
+@app.route('/module-session/<session_id>/users', methods=['POST'])
+def add_users_to_session(session_id):
+    j = request.get_json()
+    user_id = j['user_id']
+    user = m.User.query.filter_by(id=user_id).one()
+    sess = m.ModuleSession.query.filter_by(id=session_id).one()
+    m.add_user(user, sess)
+
+
+@app.route('/module-sessions')
 def get_modules():
-    res = m.CieModule.query.all()
-    return serialize(res, m.CieModuleSchema, many=True)
+    res = m.ModuleSession.query.all()
+    return serialize(res, m.ModuleSessionSchema, many=True)
 
 
 @app.route('/users', methods=['POST'])
