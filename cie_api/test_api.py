@@ -4,8 +4,14 @@ from endpoints import app
 
 from datetime import datetime
 
+import uuid
+
 
 test_client = app.test_client()
+
+
+def _uuid():
+    return str(uuid.uuid4())[:8]
 
 
 def _create_module(name):
@@ -16,9 +22,17 @@ def _create_module(name):
     return mod
 
 
+def _create_user(firstname=None, lastname=None):
+    if firstname is None:
+        firstname = _uuid()
+    if lastname is None:
+        lastname = _uuid()
+    user = User(firstname=firstname, lastname=lastname)
+    return user
+
+
 def test_add_user(yo):
-    user = User(firstname='Francesco', lastname='Saudino')
-    user.add()
+    u = _create_user()
 
 
 def test_add_module():
@@ -26,6 +40,14 @@ def test_add_module():
     _create_module(mod_name)
     m = CieModule.query.filter(CieModule.name == mod_name).one()
     assert m.name == mod_name
+
+
+def test_add_session_to_module():
+    mod_name = "Cie Module Creation Test" + _uuid()
+    mod =_create_module(mod_name)
+    res = test_client.post(f'/cie-modules/{mod.id}/sessions', json={'session_datetime': datetime(2019, 6, 5, 8, 10, 10, 10)})
+    res_j =res.json
+    print(res_j)
 
 
 def test_create_module_endpoint():
@@ -51,8 +73,9 @@ def test_add_user_to_module():
     m.add_user(user, sess)
 
 
-def test_add_user_to_module_endpoint():
-    ...
+# def test_add_user_to_module_session_endpoint():
+#     user = _create_user()
+#     res = test_client.post(f'/module-sessions/{session_id}/users', json=)
 
 
 def test_get_modules():

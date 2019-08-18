@@ -86,6 +86,13 @@ def create_modules():
     return serialize(inst, m.CieModuleSchema)
 
 
+@app.route('/cie-modules/<cie_module_id>/sessions', methods=['POST'])
+def add_session_to_module(cie_module_id):
+    sess = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
+    new_sess = sess.add()
+    return serialize(new_sess, m.ModuleSessionSchema)
+
+
 @app.route('/module-session/<session_id>/users', methods=['POST'])
 def add_users_to_session(session_id):
     j = request.get_json()
