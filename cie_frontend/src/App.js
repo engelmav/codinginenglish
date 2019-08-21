@@ -56,18 +56,21 @@ class App extends Component {
     return (
       <Router history={history}>
         <div id="main-grid">
-          <ul id="routes__navbar">
-            <li><Link to="/">Main</Link></li>
-            {this.state.authData &&
-              <React.Fragment>
-                <li><Link to="/home">Home</Link></li>
-                <li>
-                  <Link to="/class">Class</Link>
-                </li>
-              </React.Fragment>
-            }
-            <li><Login auth={auth} isAuthenticated={this.state.authData} /></li>
-          </ul>
+          <header className="cie-header">
+            <h1 className="cie-header-text">coding_in_english</h1>
+            <ul className="routes__navbar">
+              <li><Link to="/">Main</Link></li>
+              {this.state.authData &&
+                <React.Fragment>
+                  <li><Link to="/home">Home</Link></li>
+                  <li onClick={()=>alert()}>
+                    <Link to="/class">Class</Link>
+                  </li>
+                </React.Fragment>
+              }
+              <li><Login auth={auth} isAuthenticated={this.state.authData} /></li>
+            </ul>
+          </header>
           <>
             <Route exact path="/" component={(props) => <Welcome auth={auth} authData={this.state.authData} {...props} />} />
             <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.state.authData} {...props} />} />

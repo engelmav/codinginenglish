@@ -38,12 +38,11 @@ export default class Welcome extends Component {
   render() {
     let { classList } = this.state;
     return (
-      <div>
-        <h1>coding_in_english</h1>
+      <main>
         <div>
           {classList.map((sessionData, i) => <ClassCard key={i} sessionData={sessionData} />)}
         </div>
-      </div>
+      </main>
     );
   }
 }

@@ -45,8 +45,8 @@ def test_add_module():
 def test_add_session_to_module():
     mod_name = "Cie Module Creation Test" + _uuid()
     mod =_create_module(mod_name)
-    res = test_client.post(f'/cie-modules/{mod.id}/sessions', json={'session_datetime': datetime(2019, 6, 5, 8, 10, 10, 10)})
-    res_j =res.json
+    res = test_client.post(f'/cie-modules/{mod.id}/sessions', json={'session_datetime': datetime(2019, 6, 5, 8, 10, 10, 10).isoformat()})
+    res_j = res.json
     print(res_j)
 
 
