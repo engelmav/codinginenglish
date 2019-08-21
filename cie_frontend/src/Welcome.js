@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import { DateTime } from 'luxon';
+import './Welcome.css';
 
 
 class CieApi {
@@ -39,7 +40,7 @@ export default class Welcome extends Component {
     let { classList } = this.state;
     return (
       <main>
-        <div>
+        <div className="modules-grid">
           {classList.map((sessionData, i) => <ClassCard key={i} sessionData={sessionData} />)}
         </div>
       </main>

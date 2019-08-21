@@ -11,10 +11,11 @@
 }
 
 .cie-header-text {
-  /* border-bottom: 1px solid; */
-
   font-family: 'Roboto Mono', monospace;
-
+  background: rgb(75, 74, 74);
+  color: white;
+  padding: 10px;
+  text-shadow: 0 0px 10px rgba(119, 95, 255, 0.5)
 }
 
 .routes__navbar {
