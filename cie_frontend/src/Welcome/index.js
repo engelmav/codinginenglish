@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import { DateTime } from 'luxon';
-import './Welcome.css';
-
+import './styles.css';
 
 class CieApi {
   startSignup(name) {
@@ -41,7 +40,10 @@ export default class Welcome extends Component {
     return (
       <main>
         <div className="modules-grid">
-          {classList.map((sessionData, i) => <ClassCard key={i} sessionData={sessionData} />)}
+          {
+            classList.map((sessionData, i) =>
+              <ModuleCard key={i} sessionData={sessionData} />)
+          }
         </div>
       </main>
     );
@@ -49,15 +51,17 @@ export default class Welcome extends Component {
 }
 
 
-class ClassCard extends Component {
+class ModuleCard extends Component {
   onClick = () => cieApi.startSignup(this.props.sessionData.id, 1);
-  render(){
+  render() {
     let { cie_module, session_datetime } = this.props.sessionData;
     console.log("UTC from server:", session_datetime);
     var local = DateTime.fromISO(session_datetime);
     const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
+    const image = require(`../images/${cie_module.image_path}`);
     return (
-      <div>
+      <div className="module-card">
+        <img src={image} />
         <p>{cie_module.name}</p>
         <p>{localDateTime}</p>
         <button onClick={this.onClick}>SIGN UP</button>

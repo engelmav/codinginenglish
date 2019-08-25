@@ -1,0 +1,19 @@
+main {
+  padding-top: 50px;
+  margin: 0 auto;
+  width: 80%;
+}
+.modules-grid {
+  display: grid;
+  grid-auto-rows: auto;
+  grid-template-columns: repeat(auto-fill, 250px);  
+  grid-gap: 10px; 
+}
+
+.module-card {
+  border: 1px solid;
+  border-radius: 4px;
+  width: 250px;
+  padding: 12px;
+}
+

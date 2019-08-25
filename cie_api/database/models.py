@@ -43,6 +43,7 @@ class CieModule(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     description = Column(String(255))
+    image_path = Column(String(255))
 
     def add_user(self, user: User, session: 'ModuleSession'):
         reg = UserModuleRegistration(user_id=user.id, module_session_id=session.id)
