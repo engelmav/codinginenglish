@@ -58,10 +58,9 @@ class ModuleCard extends Component {
     console.log("UTC from server:", session_datetime);
     var local = DateTime.fromISO(session_datetime);
     const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
-    const image = require(`../images/${cie_module.image_path}`);
     return (
       <div className="module-card">
-        <img src={image} />
+        <img src={cie_module.image_path} />
         <p>{cie_module.name}</p>
         <p>{localDateTime}</p>
         <button onClick={this.onClick}>SIGN UP</button>

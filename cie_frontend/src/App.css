@@ -15,7 +15,7 @@
   background: rgb(75, 74, 74);
   color: white;
   padding: 10px;
-  text-shadow: 0 0px 3px rgb(186, 230, 27)
+  text-shadow: 0 0px 3px #ff3e00;
 }
 
 .routes__navbar {
