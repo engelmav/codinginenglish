@@ -17,8 +17,19 @@ main {
   width: 250px;
   padding: 12px;
   display: grid;
-
+  font-family: 'Roboto', serif;
 }
+
+.module-card h1 {
+  font-size: 88%;
+  justify-self: center;
+  font-weight: 500;
+}
+
+.module-card .datetime {
+  font-size: 80%;
+}
+
 .module-card img {
   width: 200px;
   justify-self: center;

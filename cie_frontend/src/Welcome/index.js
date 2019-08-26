@@ -61,7 +61,7 @@ class ModuleCard extends Component {
     return (
       <div className="module-card">
         <img src={cie_module.image_path} />
-        <p>{cie_module.name}</p>
+        <h1>{cie_module.name}</h1>
         <p>{localDateTime}</p>
         <button onClick={this.onClick}>SIGN UP</button>
       </div>
