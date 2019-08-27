@@ -17,22 +17,18 @@ class Login extends Component {
 
   render() {
     return (
-      <div>
+      <>
         {
           !this.props.isAuthenticated &&
-          <div>
             <button onClick={this.login}>login</button>
-          </div>
         }
         {
           this.props.isAuthenticated &&
-          <div>
             <button onClick={this.logout} className="button">
               log out
           </button>
-          </div>
         }
-      </div>
+      </>
     );
   }
 }

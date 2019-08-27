@@ -31,8 +31,15 @@
 }
 
 .routes__navbar > li a {
+  color: #3d3636;
+  font-weight: 900;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   font-family: 'Roboto Mono', monospace;
+}
+
+.routes__navbar > li a:hover {
+  background-color: #ff3e00;
+  color: white;
 }

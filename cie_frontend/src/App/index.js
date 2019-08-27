@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import './App.css';
+import './styles.css';
 import { Router, Route, Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
-import history from './history';
-import Login from './Login';
-import Home from './Home';
-import Auth from './auth/Auth';
-import makeRequiresAuth from './auth/RequiresAuth';
-import Callback from './auth/Auth0Callback';
-import ClassroomContainer from './aula/ClassroomContainer';
-import Welcome from './Welcome';
+import history from '../history';
+import Login from '../Login';
+import Home from '../Home';
+import Auth from '../auth/Auth';
+import makeRequiresAuth from '../auth/RequiresAuth';
+import Callback from '../auth/Auth0Callback';
+import ClassroomContainer from '../aula/ClassroomContainer';
+import Welcome from '../Welcome';
 
 
 var auth = new Auth();
@@ -59,12 +59,12 @@ class App extends Component {
           <header className="cie-header">
             <h1 className="cie-header-text">coding_in_english</h1>
             <ul className="routes__navbar">
-              <li><Link to="/">Main</Link></li>
+              <li><Link to="/">Modules</Link></li>
               {this.state.authData &&
                 <React.Fragment>
-                  <li><Link to="/home">Home</Link></li>
+                  <li><Link to="/home">Dashboard</Link></li>
                   <li onClick={()=>alert()}>
-                    <Link to="/class">Class</Link>
+                    <Link to="/class">Session!</Link>
                   </li>
                 </React.Fragment>
               }
