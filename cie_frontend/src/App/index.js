@@ -3,13 +3,13 @@ import './styles.css';
 import { Router, Route, Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import history from '../history';
-import Login from '../Login';
 import Home from '../Home';
 import Auth from '../auth/Auth';
 import makeRequiresAuth from '../auth/RequiresAuth';
 import Callback from '../auth/Auth0Callback';
 import ClassroomContainer from '../aula/ClassroomContainer';
 import Welcome from '../Welcome';
+import Header from '../Header';
 
 
 var auth = new Auth();
@@ -28,7 +28,8 @@ class App extends Component {
     super(props);
     this.state = {
       isAuthenticated: false,
-      authData: null
+      authData: null,
+      shrinkNav: false
     };
   }
 
@@ -52,29 +53,25 @@ class App extends Component {
     );
   }
 
+  shrinkNav = () => {
+    this.setState({
+      shrinkNav: !this.state.shrinkNav
+    });
+  }
+
   render() {
+    const { state: { authData } } = this;
     return (
       <Router history={history}>
         <div id="main-grid">
-          <header className="cie-header">
-            <h1 className="cie-header-text">coding_in_english</h1>
-            <ul className="routes__navbar">
-              <li><Link to="/">Modules</Link></li>
-              {this.state.authData &&
-                <React.Fragment>
-                  <li><Link to="/home">Dashboard</Link></li>
-                  <li onClick={()=>alert()}>
-                    <Link to="/class">Session!</Link>
-                  </li>
-                </React.Fragment>
-              }
-              <li><Login auth={auth} isAuthenticated={this.state.authData} /></li>
-            </ul>
-          </header>
+          <Header authData={authData} auth={auth} />
           <>
             <Route exact path="/" component={(props) => <Welcome auth={auth} authData={this.state.authData} {...props} />} />
             <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.state.authData} {...props} />} />
-            <Route exact path="/class" component={(props) => <ClassRoomProtected authData={this.state.authData} {...props} />} />
+            <Route exact path="/class" component={(props) => {
+              return <ClassRoomProtected authData={this.state.authData} {...props} />;
+            }} />
+            }
             <Route path="/callback" render={(props) => {
               handleAuthentication(props, this.setIsAuthenticated);
               return <CallbackWithRouter {...props} />

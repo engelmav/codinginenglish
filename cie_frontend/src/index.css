@@ -18,14 +18,15 @@ html, body {
   grid-auto-rows: min-content 100%;
 }
 
-.button {
+button {
   background-color: white;
   border: 1px solid #ff3e00;
   color: #ff3e00;
   padding: 8px;
 }
 
-.button:hover {
+button:hover {
   color: white;
   background-color: #ff3e00;
 }
+

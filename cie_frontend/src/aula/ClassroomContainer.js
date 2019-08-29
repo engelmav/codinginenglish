@@ -4,6 +4,12 @@ import Iframe from 'react-iframe';
 
 
 export default class ClassroomContainer extends Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  componentDidMount() {
+  }
   render() {
     let userFirstName = null;
     if (this.props.authData !== null){
