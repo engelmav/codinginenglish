@@ -8,8 +8,6 @@ export default class ClassroomContainer extends Component {
     super(props);
   }
   
-  componentDidMount() {
-  }
   render() {
     let userFirstName = null;
     if (this.props.authData !== null){

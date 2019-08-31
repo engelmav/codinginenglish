@@ -3,7 +3,7 @@ import history from '../history'
 
 
 var CLIENT_ID = 'pyJiq82f4s6ik5dr9oNnyryW5127T965';
-export default class Auth {
+class Auth {
   accessToken;
   idToken;
   expiresAt;
@@ -107,3 +107,7 @@ export default class Auth {
   }
 
 }
+
+var auth = new Auth();
+
+export { auth };
