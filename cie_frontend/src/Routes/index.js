@@ -43,12 +43,9 @@ class Routes extends Component {
       <>
         <Route exact path="/" component={(props) => <Welcome auth={auth} authData={this.props.authData} {...props} />} />
         <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.props.authData} {...props} />} />
-        <Route exact path="/class" component={(props) => {
-          
-          return <ClassRoomProtected authData={this.props.authData} {...props} setShrinkNav={this.props.setShrinkNav} />;
-        }} />
-        }
-      <Route path="/callback" render={(props) => {
+        <Route exact path="/class" component={(props) =>
+          <ClassRoomProtected authData={this.props.authData} {...props} />} />
+        <Route path="/callback" render={(props) => {
           handleAuthentication(props, this.props.setIsAuthenticated);
           return <CallbackWithRouter {...props} />
         }} />
