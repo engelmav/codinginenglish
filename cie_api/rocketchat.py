@@ -16,13 +16,15 @@ class RocketChatAuth(AuthBase):
     TODO: determine token expiry.
     """
     def __init__(self, username, password):
-        resp = requests.post(urljoin(api_url, '/api/v1/login'), json={
+        self.full_url = urljoin(api_url, '/api/v1/login')
+        resp = requests.post(self.full_url, json={
             "user": username,
             "password": password
         })
         resp_json = resp.json()
         self.token = resp_json["data"]["authToken"]
         self.user_id = resp_json["data"]["userId"]
+
 
     def __call__(self, r):
         """
@@ -33,3 +35,10 @@ class RocketChatAuth(AuthBase):
         r.headers['X-TokenAuth'] = self.token
         r.headers['X-User-Id'] = self.user_id
         return r
+
+    def user_list(self):
+        ...
+
+
+
+
