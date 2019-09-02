@@ -1,14 +1,18 @@
-from rocketchat import RocketChatAuth
-from unittest.mock import patch
+from services.rocketchat_service import RocketChatService
+from config import config
+
+from urllib.parse import urljoin
+
 
 import responses
 
 
 @responses.activate
-def test_urljoin():
+def test_auth_headers():
+    base_url = config['cie.rocketchat.api_url']
     responses.add(
         responses.POST,
-        "https://codinginenglish.rocket.chat/api/v1/login",
+        urljoin(base_url, '/api/v1/login'),
         json={
             "status": "success",
             "data": {
@@ -18,6 +22,6 @@ def test_urljoin():
         }
     )
 
-    r = RocketChatAuth('user', 'pass')
-    assert r.user_id == "romanosofia"
-    assert r.token == "vienenpronto"
+    r = RocketChatService('user', 'pass', base_url)
+    assert r.session.headers['X-TokenAuth'] == "vienenpronto"
+    assert r.session.headers['X-User-Id'] == "romanosofia"

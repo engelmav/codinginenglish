@@ -10,12 +10,15 @@ import base64
 import redis
 
 import database.models as m
+from rocketchat_endpoints import rocketchat
 
 
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
+app.register_blueprint(rocketchat)
+
 
 red = redis.StrictRedis()
 

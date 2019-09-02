@@ -1,6 +1,6 @@
 from database.models import User, CieModule, ModuleSession
 
-from endpoints import app
+from main import app
 
 from datetime import datetime
 
