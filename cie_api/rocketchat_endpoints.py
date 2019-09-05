@@ -19,3 +19,9 @@ rocketchat_service = RocketChatService(username, password, api_url)
 def get_users():
     res = rocketchat_service.user_list()
     return jsonify(res)
+
+@rocketchat.route('/rocket_chat_auth_get')
+def get_auth_token():
+    ...
+    # https://pythonhosted.org/Flask-Session/
+    # https://mohammedlakkadshaw.com/blog/embedding-rocket-chat-using-iframe-auth.html/
