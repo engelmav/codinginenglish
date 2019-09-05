@@ -6,12 +6,13 @@ import './styles.css';
 
 
 class Header extends Component {
-  componentDidUpdate(prevProps) {
 
-  }
   render() {
-    const { shrinkNav, auth, authData } = this.props;
-    const className = classNames('cie-header', { 'shrink-nav': shrinkNav });
+    const {
+      auth,
+      authData
+    } = this.props;
+    const className = classNames('cie-header');
 
     const links = (
       <ul className="routes__navbar">
