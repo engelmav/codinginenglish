@@ -1,7 +1,9 @@
 from config import config
 from urllib.parse import urljoin
+import json
 
 import requests
+from requests.exceptions import HTTPError
 
 
 api_url = config['cie.rocketchat.api_url']
@@ -20,6 +22,7 @@ class SessionB(requests.Session):
 
 
 class RocketChatService(requests.Session):
+    LOGIN_URI = '/api/v1/login'
     def __init__(self, username, password, api_url):
         self.session = None
         self._authenticate(username, password, api_url)
@@ -31,7 +34,7 @@ class RocketChatService(requests.Session):
         :return: None
         """
         self.session = SessionB(api_url)
-        resp = self.session.post('/api/v1/login', json={
+        resp = self.session.post(RocketChatService.LOGIN_URI, json={
             "user": username,
             "password": password
         })
@@ -42,18 +45,51 @@ class RocketChatService(requests.Session):
         }
         self.session.headers.update(headers)
 
-    def _get(self, uri):
-        resp = self.session.get(uri)
+    def _get(self, uri, params=None):
+        resp = self.session.get(uri, params=params)
         return resp.json()
 
-    def _post(self, uri):
-        resp = self.session.post(uri)
+    def _post(self, uri, json=None):
+        resp = self.session.post(uri, json=json)
         return resp.json()
 
-    def user_list(self):
-        return self._get('/api/v1/users.list')
+    def get_user(self, username):
+        # requests' urlencoding with a params arg causes double backslash escaping, which the API doesn't like
+        resp = self._get(
+            '/api/v1/users.list?fields={ "username":1 }&query={ "username": "%s" }' % username)
+        return resp
 
-    def user_create(self, user_data):
-        return self._post('/api/v1/users.create')
+    def create_user(self, username, name, email, password):
+        resp = self._post('/api/v1/users.create',
+                          json={
+                              "name": name,
+                              "email": email,
+                              "password": password,
+                              "username": username
+                          })
+        return resp
+
+    def delete_user(self, username):
+        resp = self._post('/api/v1/users.delete',
+                          json={
+                              "username": username
+                          })
+        return resp
+
+    def login_user(self, email, password):
+        resp = self._post(RocketChatService.LOGIN_URI, json={
+            "user": email,
+            "password": password
+        })
+        return resp
+
+    def create_or_login_user(self, username, name, email, password):
+        user = self.get_user(username)
+        if len(user['users']) == 0:
+            # user doesn't exist - create it!
+            user = self.create_user(username, name, email, password)
+        return user['users']
+
+
 
 
