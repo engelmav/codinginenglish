@@ -54,8 +54,8 @@ class RocketChatService(requests.Session):
         return resp.json()
 
     def get_user(self, username):
-        # requests' urlencoding with a params arg causes double backslash escaping, which the API doesn't like
         resp = self._get(
+            # requests' urlencoding with a params arg causes double backslash escaping, which the API doesn't like
             '/api/v1/users.list?fields={ "username":1 }&query={ "username": "%s" }' % username)
         return resp
 
@@ -88,8 +88,4 @@ class RocketChatService(requests.Session):
         if len(user['users']) == 0:
             # user doesn't exist - create it!
             user = self.create_user(username, name, email, password)
-        return user['users']
-
-
-
-
+        return self.login_user(email, password)

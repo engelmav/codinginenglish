@@ -1,13 +1,10 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, session
 from services.rocketchat_service import RocketChatService
 from config import config
 from operator import itemgetter
-from flask_session import Session
 
 
 rocketchat = Blueprint('rocketchat_endpoints', __name__)
-
-Session(rocketchat)
 
 username, password, api_url = itemgetter(
     "cie.rocketchat.user",
@@ -18,13 +15,41 @@ username, password, api_url = itemgetter(
 rocketchat_service = RocketChatService(username, password, api_url)
 
 
-@rocketchat.route('/login')
+@rocketchat.route('/login', methods=['POST'])
 def login_rocketchat_user():
+    user = request.get_json()
 
+    username, name, email, password = itemgetter(
+        "username", "name", "email", "password"
+    )(user)
+    resp = rocketchat_service.create_or_login_user(username, name, email, password)
+
+    user['rocketchatAuthToken'] = resp['data']['authToken']
+    user['rocketchatUserId'] = resp['data']['userId']
+
+    session['user'] = user
+
+    return jsonify({'message': 'Login successful!'})
 
 
 @rocketchat.route('/rocket_chat_auth_get')
 def get_auth_token():
+    if ('user' in session and 'rocketchatAuthToken' in session['user']):
+        return jsonify(
+            {
+                'loginToken': session['user']['rocketchatAuthToken']
+            }
+        )
+    else:
+        return jsonify({'message': 'User not logged in.'}), 401
 
-    # https://pythonhosted.org/Flask-Session/
-    # https://mohammedlakkadshaw.com/blog/embedding-rocket-chat-using-iframe-auth.html/
+
+@rocketchat.route('/rocket_chat_iframe')
+def login_token_event():
+    if 'user' in session and 'rocketchatAuthToken' in session['user']:
+        auth_token = session['user']['rocketchatAuthToken']
+        chat_server = api_url
+        return_script = \
+            "<script>window.parent.postMessage({ event: 'login-with-token', loginToken: '%s' }, '%s');  </script>" % \
+                (auth_token, chat_server)
+        return jsonify(return_script)
