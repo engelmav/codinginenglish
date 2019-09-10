@@ -1,7 +1,7 @@
-from config import config
-
 from flask import Flask, render_template, jsonify, request
 import flask
+from flask_kvsession import KVSessionExtension
+from simplekv.memory.redisstore import RedisStore
 
 import hashlib
 import hmac
@@ -11,16 +11,22 @@ import redis
 
 import database.models as m
 from rocketchat_endpoints import rocketchat
+from config import config
 
 
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
-app.register_blueprint(rocketchat)
 
+app.register_blueprint(rocketchat)
+app.secret_key = config["cie.api.session.key"]
 
 red = redis.StrictRedis()
+redis_store = RedisStore(red)
+
+KVSessionExtension(redis_store, app)
+
 
 ZOOM_API_KEY = config["cie.zoom.apikey"]
 ZOOM_SECRET = config["cie.zoom.apisecret"]

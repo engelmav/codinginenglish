@@ -17,6 +17,7 @@ rocketchat_service = RocketChatService(username, password, api_url)
 
 @rocketchat.route('/login', methods=['POST'])
 def login_rocketchat_user():
+    # https: // mohammedlakkadshaw.com / blog / embedding - rocket - chat - using - iframe - auth.html /
     user = request.get_json()
 
     username, name, email, password = itemgetter(
