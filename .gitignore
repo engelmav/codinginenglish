@@ -2,3 +2,8 @@ secrets.json
 *.min.js
 *.crt
 *.key
+*.pem
+*.crt
+*.srl
+*.ext
+*.csr

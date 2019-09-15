@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, jsonify, request, session, render_template
 from services.rocketchat_service import RocketChatService
 from config import config
 from operator import itemgetter
+from flask_cors import cross_origin
 
 
 rocketchat = Blueprint('rocketchat_endpoints', __name__)
@@ -34,6 +35,7 @@ def login_rocketchat_user():
 
 
 @rocketchat.route('/rocket_chat_auth_get')
+@cross_origin(origins="https://codinginenglish.rocketchat.com")
 def get_auth_token():
     if ('user' in session and 'rocketchatAuthToken' in session['user']):
         return jsonify(
@@ -42,15 +44,20 @@ def get_auth_token():
             }
         )
     else:
-        return jsonify({'message': 'User not logged in.'}), 401
+        return jsonify({'message': 'User not logged in (rocket_chat_auth_get).'}), 401
 
 
 @rocketchat.route('/rocket_chat_iframe')
+@cross_origin(origins="https://codinginenglish.rocketchat.com")
 def login_token_event():
-    if 'user' in session and 'rocketchatAuthToken' in session['user']:
-        auth_token = session['user']['rocketchatAuthToken']
-        chat_server = api_url
-        return_script = \
-            "<script>window.parent.postMessage({ event: 'login-with-token', loginToken: '%s' }, '%s');  </script>" % \
-                (auth_token, chat_server)
-        return jsonify(return_script)
+    # if 'user' in session and 'rocketchatAuthToken' in session['user']:
+    #     auth_token = session['user']['rocketchatAuthToken']
+    #     chat_server = api_url
+    #     return_script = \
+    #         "<script>window.parent.postMessage({ event: 'login-with-token', loginToken: '%s' }, '%s');</script>" % \
+    #             (auth_token, chat_server)
+    #     return jsonify(return_script)
+    # else:
+    #     return 'User not logged in (rocket_chat_iframe).', 401
+    return render_template('rocketchat_login.html')
+

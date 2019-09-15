@@ -128,7 +128,7 @@
       "react-app"
     ]
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "https://localhost:5000",
   "devDependencies": {
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",

@@ -11,7 +11,7 @@ class Auth {
   auth0 = new auth0.WebAuth({
     domain: 'dev-nougy3g5.auth0.com',
     clientID: CLIENT_ID,
-    redirectUri: 'http://localhost:3000/callback',
+    redirectUri: 'http://localhost:8080/callback',
     responseType: 'token id_token',
     scope: 'openid email profile'
   });
@@ -54,7 +54,7 @@ class Auth {
 
   signOut() {
     this.auth0.logout({
-      returnTo: 'http://localhost:3000',
+      returnTo: 'http://localhost:8080',
       clientID: CLIENT_ID,
     });
   }

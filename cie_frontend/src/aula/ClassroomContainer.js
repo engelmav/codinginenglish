@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
+import ChatView from './ChatView';
 
 
 export default class ClassroomContainer extends Component {
@@ -29,11 +30,7 @@ export default class ClassroomContainer extends Component {
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
-          <Iframe
-            url="https://codinginenglish.rocket.chat/channel/general?layout=embedded"
-            id="classroomcontainer__chat-iframe"
-            width="100%" height="100%"
-          />
+          <ChatView />
         </div>
         <div className="classroomview" id="codeView">
           <Iframe
