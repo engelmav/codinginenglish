@@ -1,8 +1,7 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
 import flask
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
-from flask_cors import CORS
 
 import hashlib
 import hmac
@@ -13,6 +12,9 @@ import redis
 import database.models as m
 from rocketchat_endpoints import rocketchat
 from config import config
+from database.models import User
+
+from operator import itemgetter
 
 
 app = Flask(__name__,
@@ -144,6 +146,40 @@ def stream_sse():
 @app.route('/', )
 def get_index():
     return render_template('index.html')
+
+
+@app.route('/profile')
+def login():
+    """
+    Captures user profile information for use in RocketChat and settings.
+    :return:
+    """
+    req = request.get_json()
+    # req['idTokenPayload']
+    """
+    class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True)
+    firstname = Column(String(50))
+    lastname = Column(String(50))
+    email = Column(String(120), unique=True)
+    registered_modules = relationship(
+        'UserModuleRegistration',
+        backref='User',
+        cascade='all, delete, delete-orphan'
+    )
+    """
+    given_name, family_name, email = itemgetter(
+        "given_name", "family_name", "email"
+    )(req['idTokenPayload'])
+
+    user = User(
+        firstname=given_name,
+        lastname=family_name,
+        email=email
+    )
+    return jsonify({})
+
 
 
 @app.route('/zoom/signature/<meeting_number>/<ts>')

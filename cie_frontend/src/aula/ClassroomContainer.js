@@ -30,7 +30,7 @@ export default class ClassroomContainer extends Component {
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </div>
         <div className="classroomview" id="chatView">
-          <ChatView />
+          <ChatView authData={this.props.authData} />
         </div>
         <div className="classroomview" id="codeView">
           <Iframe
