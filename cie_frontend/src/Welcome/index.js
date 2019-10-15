@@ -14,10 +14,11 @@ class CieApi {
     let res;
     try {
       res = await axios.get('/module-sessions');
+      return res.data;
     } catch {
       console.log("Failed to get classes.");
     }
-    return res.data;
+    return [];
   }
 }
 

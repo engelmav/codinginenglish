@@ -12,17 +12,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      shrinkNav: false,
       isAuthenticated: false,
       authData: null,
     };
   }
 
-  setShrinkNav = () => {
-    this.setState({
-      shrinkNav: !this.state.shrinkNav
-    });
-  }
 
   setIsAuthenticated = (authData) => {
     console.log("authData from setIsAuthenticated:", authData);
@@ -35,7 +29,7 @@ class App extends Component {
   }
 
   render() {
-    const { state: { authData, shrinkNav }, setShrinkNav } = this;
+    const { state: { authData } } = this;
     return (
       <Router history={history}>
         <>
