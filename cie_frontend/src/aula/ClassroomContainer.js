@@ -2,11 +2,14 @@ import React, { Component } from 'react'
 import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
 import ChatView from './ChatView';
+import RFB from '@novnc/novnc/core/rfb'
 
 
 export default class ClassroomContainer extends Component {
   constructor(props) {
     super(props);
+    this.rfb = new RFB(document.getElementById('screen'), "vnc://localhost:5901",
+                      { credentials: { password: 'ciecieci' } });
   }
   
   render() {
@@ -33,12 +36,6 @@ export default class ClassroomContainer extends Component {
           <ChatView authData={this.props.authData} />
         </div>
         <div className="classroomview" id="codeView">
-          <Iframe
-            width="100%"
-            height="100%"
-            src="https://repl.it/@VincentEngelman/Module002-MenusAndFunctions-Web?lite=true">
-
-          </Iframe>
 
         </div>
       </div>
