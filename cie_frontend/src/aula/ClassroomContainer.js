@@ -6,6 +6,7 @@ import RFB from '@novnc/novnc/core/rfb'
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { FaGripLines } from 'react-icons/fa'
 
 export default class ClassroomContainer extends Component {
   constructor(props) {
@@ -18,37 +19,62 @@ export default class ClassroomContainer extends Component {
     if (this.props.authData !== null) {
       userFirstName = this.props.authData.idTokenPayload.given_name;
     }
+
+    const DragHandle = () =>
+      <div className="dragHandleClassName">
+        <span className="text">
+          <FaGripLines />
+        </span>
+      </div>;
+
     return (
       <GridLayout
         className="layout"
         cols={12}
         rowHeight={100}
-        width={1200}
+        width={2000}
         isResizable={true}
         autoSize={true}
-        draggableHandle={true}
+        draggableHandle=".dragHandleClassName"
+        containerPadding={[10, 10]}
       >
         <div key="a" data-grid={{ x: 0, y: 0, w: 5, h: 5 }} isResizable={true} draggableHandle={true}
-          autoSize={true}>
-
-          <Iframe
-            url={`http://0.0.0.0:9999?userName=${userFirstName}`}
-            width="100%"
-            height="100%"
-          />
-
+          autoSize={true}
+        >
+          <DragHandle />
+          <div style={{
+            height: "calc(100% - 35px)",
+            width: "calc(100% - 25px)"
+          }}>
+            <Iframe
+              url={`http://0.0.0.0:9999?userName=${userFirstName}`}
+              width="100%"
+              height="100%"
+            />
+          </div>
         </div>
-        <div key="b" data-grid={{ x: 1, y: 0, w: 3, h: 2 }} isResizable={true}
+        <div key="b" data-grid={{ x: 1, y: 0, w: 5, h: 5 }} isResizable={true}
           autoSize={true}>
-
+          <DragHandle />
+          <div style={{
+            height: "calc(100% - 35px)",
+            width: "calc(100% - 25px)"
+          }}>
           <Iframe
             id="slidesView"
             url="http://slides.com/vincentengelmann/interview-strategy/embed"
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
+            </div>
 
         </div>
-        <div key="c" data-grid={{ x: 4, y: 0, w: 1, h: 2 }}>
+        <div key="c" data-grid={{ x: 0, y: 1, w: 1, h: 2 }}>
+        <DragHandle />
+          <div style={{
+            height: "calc(100% - 35px)",
+            width: "calc(100% - 25px)"
+          }}>
           <ChatView authData={this.props.authData} />
+          </div>
         </div>
       </GridLayout>
     )
