@@ -26,7 +26,7 @@ function getUserName() {
 }
 
 
-function joinMeeting(meetingNumber) {
+function joinMeeting(meetingNumber, password) {
   let userName = getUserName();
   if (userName === null) {
     userName = document.getElementById('display_name').value;
@@ -38,7 +38,7 @@ function joinMeeting(meetingNumber) {
       const { signature, apiKey } = res.data;
       console.log(`Joining user ${userName} to zoom ID ${meetingNumber}`);
       ZoomMtg.init({
-        leaveUrl: 'http://127.0.0.1:5002/',
+        leaveUrl: 'http://127.0.0.1:5000/',
         isSupportAV: true,
         success() {
           ZoomMtg.join(
@@ -48,7 +48,7 @@ function joinMeeting(meetingNumber) {
               signature,
               apiKey,
               userEmail: 'email@gmail.com',
-              passWord: '',
+              passWord: password,
               success() {
                 $('#nav-tool').hide();
                 console.log('join meeting success');
@@ -82,8 +82,9 @@ class ZoomApp extends Component {
     source.onmessage = (event) => {
       const eventData = event.data;
       console.log(eventData);
+      const [meetingNumber, password] = eventData.split(',')
       if (eventData !== '1') {
-        joinMeeting(eventData);
+        joinMeeting(meetingNumber, password);
       }
     };
   }

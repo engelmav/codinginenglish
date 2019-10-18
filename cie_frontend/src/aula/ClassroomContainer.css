@@ -6,6 +6,10 @@
   height: 100%;
 }
 
+html,body {
+  height:100%;
+}
+
 .classroomview {
   border-radius: 5px;
   border: solid;
