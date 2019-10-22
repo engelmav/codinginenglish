@@ -7,6 +7,7 @@ import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { FaGripLines } from 'react-icons/fa'
+import { Rnd } from 'react-rnd';
 
 
 export default class ClassroomContainer extends Component {
@@ -30,64 +31,58 @@ export default class ClassroomContainer extends Component {
 
     return (
       <>
-        <GridLayout
-          className="layout"
-          cols={12}
-          rowHeight={100}
-          width={2000}
-          isResizable={true}
-          autoSize={true}
-          draggableHandle=".dragHandleClassName"
-          containerPadding={[10, 10]}
+        <div style={{border: "1px solid black"}}>test thing</div>
+        <Rnd
+          default={{
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 400
+          }}
         >
-          <div key="a" data-grid={{ x: 0, y: 0, w: 4, h: 4 }} isResizable={true} draggableHandle={true}
-            autoSize={true}
-          >
-            <DragHandle />
-            <div style={{
-              height: "calc(100% - 35px)",
-              width: "calc(100% - 25px)"
-            }}>
-              <Iframe
-                url={`https://localhost:5000?userName=${userFirstName}`}
-                width="100%"
-                height="100%"
-              />
-            </div>
-          </div>
-          <div key="b" data-grid={{ x: 1, y: 0, w: 4, h: 4 }} isResizable={true}
-            autoSize={true}>
-            <DragHandle />
-            <div style={{
-              height: "calc(100% - 35px)",
-              width: "calc(100% - 25px)"
-            }}>
-              <Iframe
-                id="slidesView"
-                url="http://slides.com/vincentengelmann/001-devteamsloops/embed"
-                width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
-            </div>
-
-          </div>
-          <div key="c" data-grid={{ x: 0, y: 1, w: 4, h: 4 }}>
-            <DragHandle />
-            <div style={{
-              height: "calc(100% - 35px)",
-              width: "calc(100% - 25px)"
-            }}>
-              <ChatView authData={this.props.authData} />
-            </div>
-          </div>
-        <div key="d" data-grid={{ x: 1, y: 1, w: 4, h: 4 }}>
-            <DragHandle />
-            <div style={{
-              height: "calc(100% - 35px)",
-              width: "calc(100% - 25px)"
-            }}>
-              <VncDisplay authData={this.props.authData} />
-            </div>
-          </div>
-        </GridLayout>
+          <div style={{background: "white"}}><FaGripLines />Slides</div>
+          <Iframe
+            id="slidesView"
+            url="http://slides.com/vincentengelmann/001-devteamsloops/embed"
+            width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
+        </Rnd>
+        <Rnd
+          default={{
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 400
+          }}
+        >
+          <div><FaGripLines />Chat</div>
+          <ChatView authData={this.props.authData} />
+        </Rnd>
+        <Rnd
+          default={{
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 400
+          }}
+        >
+          <div><FaGripLines />Video</div>
+          <Iframe
+            url={`https://localhost:5000?userName=${userFirstName}`}
+            width="100%"
+            height="100%"
+          />
+        </Rnd>
+        <Rnd
+          default={{
+            x: 605,
+            y: 0,
+            width: 800,
+            height: 600
+          }}
+        >
+          <div><FaGripLines />Dev</div>
+          <VncDisplay authData={this.props.authData} />
+        </Rnd>
       </>
     )
   }
