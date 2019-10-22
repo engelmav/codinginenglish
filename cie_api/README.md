@@ -1,3 +1,16 @@
+# Start with Compose
+
+```bash
+$ sudo docker-compose up --build
+```
+
+# Start API with Docker
+
+```
+docker build -t cie-api:latest .
+```
+
+
 # Set up the Coding in English Backend
 
 Follow these steps in order; feel free to modify as desired (e.g., swap out database or skip that step and point to a hosted instance).

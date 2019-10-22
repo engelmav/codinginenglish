@@ -10,6 +10,7 @@
   color: white;
   padding: 10px;
   text-shadow: 0 0px 3px #ff3e00;
+  align-self: center;
 }
 
 .shrink-nav.cie-header-text {

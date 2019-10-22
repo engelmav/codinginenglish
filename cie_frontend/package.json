@@ -53,6 +53,7 @@
     "react-icons": "^3.7.0",
     "react-iframe": "^1.8.0",
     "react-reveal": "^1.2.2",
+    "react-rnd": "^10.1.1",
     "react-router-dom": "^5.0.0",
     "react-vnc-display": "^2.0.1",
     "resolve": "1.10.0",

@@ -16,7 +16,7 @@ html, body {
   /* take up the whole height of browser */ 
   height: 100vh;
   grid-template-columns: 100vw;
-  grid-auto-rows: min-content 1fr;
+  grid-template-rows: min-content 1fr;
 }
 
 button {

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request
 import flask
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -21,11 +21,17 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
+
 app.config['EXPLAIN_TEMPLATE_LOADING']
 
 
 app.register_blueprint(rocketchat)
 app.secret_key = config["cie.api.session.key"]
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    m.db_session.remove()
 
 red = redis.StrictRedis()
 redis_store = RedisStore(red)

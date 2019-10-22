@@ -6,9 +6,13 @@ import requests
 from requests.exceptions import HTTPError
 
 
+import logging
+
+
 api_url = config['cie.rocketchat.api_url']
 username = config['cie.rocketchat.user']
 password = config['cie.rocketchat.password']
+LOG = logging.getLogger(__name__)
 
 
 class SessionB(requests.Session):
@@ -34,10 +38,14 @@ class RocketChatService(requests.Session):
         :return: None
         """
         self.session = SessionB(api_url)
-        resp = self.session.post(RocketChatService.LOGIN_URI, json={
-            "user": username,
-            "password": password
-        })
+        try:
+            resp = self.session.post(RocketChatService.LOGIN_URI, json={
+                "user": username,
+                "password": password
+            })
+        except requests.exceptions.ConnectionError:
+            LOG.error("Unable to authenticate with RocketChatService. Leaving down.")
+            return
         resp_json = resp.json()
         headers = {
             'X-Auth-Token': resp_json["data"]["authToken"],

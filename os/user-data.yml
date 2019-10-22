@@ -1,0 +1,7 @@
+#cloud-config
+runcmd:
+  - [ systemctl, daemon-reload ]
+  - [ systemctl, enable, vncserver@1.service ]
+  - [ systemctl, start, --no-block, vncserver@1.service ]
+  - [ systemctl, enable, websockify@1.service ]
+  - [ systemctl, start, --no-block, websockify@1.service ]
