@@ -1,0 +1,66 @@
+version: '3.2'
+services:
+  cie_api:
+    container_name: cie-api
+    # tells Compose where to look for a Dockerfile to build the image 
+    # for the service.
+    build: ./cie_api
+    # tells the container to keep running even when there’s no daemon 
+    # specified via CMD in the Dockerfile. Otherwise, it’ll shut down 
+    # right after provisioning 
+    tty: true
+    expose:
+      - 5000
+    # defines where to put the server-side code in the container / Volumes 
+    # are a storage mechanism within containers.
+    # volumes:
+    #   - './cie_api/:/home/cieuser'
+    depends_on:
+      - cie-db
+  
+  cie-db:
+    container_name: cie-db
+    build: ./cie_api/database
+    volumes:
+      - ./cie_api/database/schema.sql:/tmp/schema.sql
+      - ./cie_api/database/import.sh:/tmp/import.sh
+      - ./cie_api/databases/schema.sql:/docker-entrypoint-initdb.d
+    ports:
+      - "33006:3306"
+    environment:
+      MYSQL_DATABASE: "cie"
+      MYSQL_USER: "appuser"
+      MYSQL_PASSWORD: "appuser"
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  
+  # backend2:
+  #   build: ./backend
+  #   tty: true
+  #   volumes:
+  #     - './backend/src:/backend-dir-inside-container'
+  
+  # backend3:
+  #   build: ./backend
+  #   tty: true
+  #   volumes:
+  #     - './backend/src:/backend-dir-inside-container'
+  
+  loadbalancer:
+    container_name: cie_nginx_lb
+    build: ./loadbalancer
+    tty: true
+    ports:
+      - 1337:80
+    depends_on:
+      - cie_api
+    # makes sure the loadbalancer service doesn’t start unless the backend services 
+    # have started. And it allows backend1 , backend2 and backend3 to be used as 
+    # references within loadbalancer, which is used in nginx.conf
+    links:
+      - cie_api
+
+volumes:
+  backend:
+  db-data:
