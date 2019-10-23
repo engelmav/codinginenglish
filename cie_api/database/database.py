@@ -6,7 +6,7 @@ from config import config
 
 
 db_password = config["cie.database.password"]
-engine = create_engine(f'mysql+pymysql://appuser:{db_password}@localhost/cie')
+engine = create_engine(f'mysql+pymysql://appuser:{db_password}@localhost/cie:33006')
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 

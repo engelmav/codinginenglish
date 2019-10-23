@@ -2,7 +2,7 @@ FROM nginx
 
 LABEL cie load balancer
 
-COPY nginx.conf /etc/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 8080
 

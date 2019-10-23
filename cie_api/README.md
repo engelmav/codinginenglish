@@ -10,6 +10,21 @@ $ sudo docker-compose up --build
 docker build -t cie-api:latest .
 ```
 
+# Start DB with Docker
+
+```
+$ docker pull mysql/mysql-server:8.0
+```
+
+
+```
+$ docker run --name=cie-mysql \
+  --mount type=bind,src=./cie_api/database/my.cnf,dst=/etc/my.cnf \
+  --mount type=bind,src=$CIE_DATA_DIR,dst=/var/lib/mysql \
+  --mount type=bind,src=./cie_api/database/,dst=/docker-entrypoint-initdb.d/ \
+  -d mysql/mysql-server:tag
+```
+
 
 # Set up the Coding in English Backend
 
