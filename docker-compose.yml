@@ -20,11 +20,7 @@ services:
   
   cie-db:
     container_name: cie-db
-    build: ./cie_api/database
-    volumes:
-      - ./cie_api/database/schema.sql:/tmp/schema.sql
-      - ./cie_api/database/import.sh:/tmp/import.sh
-      - ./cie_api/databases/schema.sql:/docker-entrypoint-initdb.d
+    image: mysql/mysql-server:8.0
     ports:
       - "33006:3306"
     environment:
@@ -34,18 +30,8 @@ services:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_ROOT_HOST: "%"
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-  
-  # backend2:
-  #   build: ./backend
-  #   tty: true
-  #   volumes:
-  #     - './backend/src:/backend-dir-inside-container'
-  
-  # backend3:
-  #   build: ./backend
-  #   tty: true
-  #   volumes:
-  #     - './backend/src:/backend-dir-inside-container'
+    volumes:
+      - ./cie_api/database/:/docker-entrypoint-initdb.d
   
   loadbalancer:
     container_name: cie_nginx_lb
