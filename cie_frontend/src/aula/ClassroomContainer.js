@@ -22,13 +22,6 @@ export default class ClassroomContainer extends Component {
       userFirstName = this.props.authData.idTokenPayload.given_name;
     }
 
-    const DragHandle = () =>
-      <div className="dragHandleClassName">
-        <span className="text">
-          <FaGripLines />
-        </span>
-      </div>;
-
     return (
       <>
         <div style={{border: "1px solid black"}}>test thing</div>
@@ -67,7 +60,7 @@ export default class ClassroomContainer extends Component {
         >
           <div><FaGripLines />Video</div>
           <Iframe
-            url={`https://localhost:5000?userName=${userFirstName}`}
+            url={`https://localhost:5000/?userName=${userFirstName}`}
             width="100%"
             height="100%"
           />
