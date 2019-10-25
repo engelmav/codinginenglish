@@ -42,7 +42,7 @@ services:
     depends_on:
       - cie_api
     # makes sure the loadbalancer service doesn’t start unless the backend services 
-    # have started. And it allows backend1 , backend2 and backend3 to be used as 
+    # have started. Allows linked services to be used as 
     # references within loadbalancer, which is used in nginx.conf
     links:
       - cie_api
