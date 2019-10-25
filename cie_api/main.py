@@ -22,9 +22,6 @@ app = Flask(__name__,
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
 
-app.config['EXPLAIN_TEMPLATE_LOADING']
-
-
 app.register_blueprint(rocketchat)
 app.secret_key = config["cie.api.session.key"]
 
@@ -161,20 +158,6 @@ def login():
     :return:
     """
     req = request.get_json()
-    # req['idTokenPayload']
-    """
-    class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    firstname = Column(String(50))
-    lastname = Column(String(50))
-    email = Column(String(120), unique=True)
-    registered_modules = relationship(
-        'UserModuleRegistration',
-        backref='User',
-        cascade='all, delete, delete-orphan'
-    )
-    """
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
