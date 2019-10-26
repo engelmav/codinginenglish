@@ -119,7 +119,7 @@ def add_users_to_session(session_id):
     m.add_user(user, sess)
 
 
-@app.route('/module-sessions')
+@app.route('/api/module-sessions')
 def get_modules():
     res = m.ModuleSession.query.all()
     return serialize(res, m.ModuleSessionSchema, many=True)
