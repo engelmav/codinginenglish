@@ -3,7 +3,6 @@ import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
 import ChatView from './ChatView';
 import VncDisplay from './VncDisplay';
-import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { FaGripLines } from 'react-icons/fa'

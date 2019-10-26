@@ -11,14 +11,13 @@ class CieApi {
     // Assume logged in.
   }
   async scheduledSessions() {
-    let res;
+    let res = [];
     try {
-      res = await axios.get('/module-sessions');
-      return res.data;
+      res = await axios.get('/api/module-sessions');
     } catch {
       console.log("Failed to get classes.");
     }
-    return [];
+    return res;
   }
 }
 
@@ -33,11 +32,20 @@ export default class Welcome extends Component {
   }
 
   async componentDidMount() {
-    let classList = await cieApi.scheduledSessions()
+    let classList;
+    try {
+      classList = await cieApi.scheduledSessions();
+    } catch {
+      console.log("Failed to assign class list.");
+      classList = [];
+    }
     this.setState({ classList });
   }
+
   render() {
     let { classList } = this.state;
+    console.log("classList in render function:");
+    console.log(classList);
     return (
       <main>
         <div className="modules-grid">

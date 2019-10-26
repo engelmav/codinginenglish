@@ -33,12 +33,26 @@ services:
     volumes:
       - ./cie_api/database/:/docker-entrypoint-initdb.d
   
-  loadbalancer:
-    container_name: cie_nginx_lb
-    build: ./loadbalancer
+  # lb and frontend integrated
+  # loadbalancer:
+  #   container_name: cie_nginx_lb
+  #   build: ./loadbalancer
+  #   tty: true
+  #   ports:
+  #     - 1337:80
+  #   depends_on:
+  #     - cie_api
+  #   # makes sure the loadbalancer service doesn’t start unless the backend services 
+  #   # have started. Allows linked services to be used as 
+  #   # references within loadbalancer, which is used in nginx.conf
+  #   links:
+  #     - cie_api
+  web:
+    container_name: cie_web
+    build: ./cie_frontend
     tty: true
     ports:
-      - 1337:80
+      - 80:80
     depends_on:
       - cie_api
     # makes sure the loadbalancer service doesn’t start unless the backend services 
