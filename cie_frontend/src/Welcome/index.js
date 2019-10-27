@@ -11,13 +11,14 @@ class CieApi {
     // Assume logged in.
   }
   async scheduledSessions() {
-    let res = [];
+    let scheduledSessions = [];
     try {
-      res = await axios.get('/api/module-sessions');
+      const res = await axios.get('/api/module-sessions');
+      scheduledSessions = res.data;
     } catch {
       console.log("Failed to get classes.");
     }
-    return res;
+    return scheduledSessions;
   }
 }
 
