@@ -32,6 +32,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - ./cie_api/database/:/docker-entrypoint-initdb.d
+      # - /var/lib/mysql:/var/lib/mysql
   
   # lb and frontend integrated
   # loadbalancer:
