@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Blueprint
 import flask
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -80,7 +80,7 @@ def deserialize(data, clazz):
     return loaded.data
 
 
-@app.route('/modules', methods=['POST'])
+@app.route('/api/modules', methods=['POST'])
 def create_modules():
     """
     [
@@ -103,14 +103,14 @@ def create_modules():
     return serialize(inst, m.CieModuleSchema)
 
 
-@app.route('/cie-modules/<cie_module_id>/sessions', methods=['POST'])
+@app.route('/api/cie-modules/<cie_module_id>/sessions', methods=['POST'])
 def add_session_to_module(cie_module_id):
     sess = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
     new_sess = sess.add()
     return serialize(new_sess, m.ModuleSessionSchema)
 
 
-@app.route('/module-session/<session_id>/users', methods=['POST'])
+@app.route('/api/module-session/<session_id>/users', methods=['POST'])
 def add_users_to_session(session_id):
     j = request.get_json()
     user_id = j['user_id']
@@ -125,12 +125,12 @@ def get_modules():
     return serialize(res, m.ModuleSessionSchema, many=True)
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/api/users', methods=['POST'])
 def create_user():
     ...
 
 
-@app.route('/send', methods=['POST'])
+@app.route('/api/send', methods=['POST'])
 def send_sse():
     j = request.get_json(force=True)
     message = j['message']
@@ -138,7 +138,7 @@ def send_sse():
     return jsonify(res)
 
 
-@app.route('/stream')
+@app.route('/api/stream')
 def stream_sse():
     stream_message = event_stream()
     sse_message = flask.Response(stream_message, mimetype="text/event-stream")
@@ -151,7 +151,7 @@ def get_index():
     return render_template('index.html')
 
 
-@app.route('/profile')
+@app.route('/api/profile')
 def login():
     """
     Captures user profile information for use in RocketChat and settings.
@@ -171,7 +171,7 @@ def login():
 
 
 
-@app.route('/zoom/signature/<meeting_number>/<ts>')
+@app.route('/api/zoom/signature/<meeting_number>/<ts>')
 def get_signature(meeting_number, ts):
     data = {'apiKey': ZOOM_API_KEY,
             'apiSecret': ZOOM_SECRET,
@@ -186,12 +186,12 @@ def get_signature(meeting_number, ts):
     })
 
 
-@app.route('/zoom/current', )
+@app.route('/api/zoom/current', )
 def set_current_zoom():
     pass
 
 
-@app.route("/site-map")
+@app.route("/api/site-map")
 def site_map():
     links = []
     for rule in app.url_map.iter_rules():
