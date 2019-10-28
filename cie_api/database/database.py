@@ -28,12 +28,12 @@ db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind
 
 
 @event.listens_for(Pool, "checkout")
-def on_conn_checkout(dbapi_con):
+def on_conn_checkout(dbapi_con, _arg1, _arg2):
     """
     This is a manual version of pessimistic connection ping. Necessary for mysql.
     http://docs.sqlalchemy.org/en/rel_0_8/core/pooling.html#disconnect-handling-pessimistic
     """
-    cursor = dbapi_con.cursor(buffered=True)
+    cursor = dbapi_con.cursor()
     try:
         cursor.execute("SELECT 1") # dbapi_con.ping() equivalent
     except exc.OperationalError as ex:
