@@ -53,7 +53,7 @@ services:
     build: ./cie_frontend
     tty: true
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
       - cie_api
     # makes sure the loadbalancer service doesn’t start unless the backend services 
