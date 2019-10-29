@@ -33,7 +33,7 @@ function joinMeeting(meetingNumber, password) {
   }
   console.log('joinMeeting() got userName', userName);
 
-  axios.get(`/zoom/signature/${meetingNumber}/${Date.now()}`)
+  axios.get(`/api/zoom/signature/${meetingNumber}/${Date.now()}`)
     .then((res) => {
       const { signature, apiKey } = res.data;
       console.log(`Joining user ${userName} to zoom ID ${meetingNumber}`);
