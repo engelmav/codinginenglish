@@ -19,7 +19,7 @@ gevent==1.4.0
 google-auth==1.6.3
 greenlet==0.4.15
 gunicorn==19.9.0
-httpie==1.0.2
+httpie==1.0.3
 idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10.1
