@@ -16,7 +16,7 @@ from database.models import User
 
 from operator import itemgetter
 
-
+    
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',

@@ -4,15 +4,23 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import QueuePool, Pool
 from sqlalchemy import exc, event
 import pymysql
+import logging
 
 from config import config
 
+
+LOG = logging.getLogger(__name__)
+
 def get_conn():
-    cnx = pymysql.connect(
-        user="appuser",
-        password=db_password,
-        host="cie-db",
-        database="cie")
+    cnx = None
+    try:
+        cnx = pymysql.connect(
+            user="appuser",
+            password=db_password,
+            host="cie-db",
+            database="cie")
+    except:
+        LOG.error("Could not connect to database.")
     return cnx
 
 pool = QueuePool(

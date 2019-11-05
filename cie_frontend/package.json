@@ -33,13 +33,15 @@
     "html-webpack-plugin": "4.0.0-alpha.2",
     "identity-obj-proxy": "3.0.0",
     "immutability-helper": "^3.0.0",
+    "jQuery": "^1.7.4",
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.2",
     "jest-resolve": "23.6.0",
     "jest-watch-typeahead": "^0.2.1",
-    "jquery": "^3.4.1",
+    "location": "0.0.1",
     "luxon": "^1.17.2",
     "mini-css-extract-plugin": "0.5.0",
+    "navigator": "^1.0.1",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -66,7 +68,9 @@
     "webpack": "4.28.3",
     "webpack-dev-server": "3.1.14",
     "webpack-manifest-plugin": "2.0.4",
-    "workbox-webpack-plugin": "3.6.3"
+    "workbox-webpack-plugin": "3.6.3",
+    "xmlhttprequest": "^1.8.0",
+    "zoomus-jssdk": "^1.6.0"
   },
   "scripts": {
     "start": "PORT=8080 node scripts/start.js",
@@ -133,7 +137,7 @@
       "react-app"
     ]
   },
-  "proxy": "https://localhost:5000",
+  "proxy": "http://localhost:5000",
   "devDependencies": {
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",

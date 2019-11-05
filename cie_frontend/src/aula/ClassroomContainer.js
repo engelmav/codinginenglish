@@ -59,7 +59,7 @@ export default class ClassroomContainer extends Component {
         >
           <div><FaGripLines />Video</div>
           <Iframe
-            url={`/zoom/index.html?userName=${userFirstName}`}
+            url={`./zoomIndex.html?userName=${userFirstName}`}
             width="100%"
             height="100%"
           />

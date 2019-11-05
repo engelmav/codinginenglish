@@ -42,6 +42,7 @@ Ensure you're in an environment with Python >= 3.6.
 
 0. You will need to provide a follow with the name `secrets.json` either in the root of the project (ADD TO YOUR .gitignore!) or elsewhere. If you put it somewhere else, specify its location by setting the environnment variable `CIE_SECRETS`.
 
+
 0. `cie.auth.google.clientsecret` - Your Google Log-in OAuth secret
 1. `ciedb.password` - the database password (see `api/db/README.md`, or refer to your hosted service)
 

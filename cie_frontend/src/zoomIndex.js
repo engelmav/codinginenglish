@@ -2,9 +2,11 @@ import { ZoomMtg } from 'zoomus-jssdk';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import $ from 'jQuery';
 
 console.log('checkSystemRequirements');
 console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
+ZoomMtg.setZoomJSLib('https://jssdk.zoomus.cn/1.6.0/lib', '/av'); // use jssdk.zoomus.cn   
 
 ZoomMtg.preLoadWasm();
 ZoomMtg.prepareJssdk();
@@ -78,10 +80,11 @@ const addZoom = () => {
 class ZoomApp extends Component {
   componentDidMount() {
     addZoom();
-    const source = new EventSource('/stream');
+    const source = new EventSource('/api/stream');
+    console.log("Zoom component connected to event source", source);
     source.onmessage = (event) => {
       const eventData = event.data;
-      console.log(eventData);
+      console.log("Zoom component received event data:", eventData);
       const [meetingNumber, password] = eventData.split(',')
       if (eventData !== '1') {
         joinMeeting(meetingNumber, password);
@@ -98,4 +101,4 @@ class ZoomApp extends Component {
   }
 }
 
-ReactDOM.render(<ZoomApp />, document.getElementById('root'));
+ReactDOM.render(<ZoomApp />, document.getElementById('zmmtg-root'));
