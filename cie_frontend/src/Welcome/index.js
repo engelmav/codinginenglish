@@ -45,8 +45,6 @@ export default class Welcome extends Component {
 
   render() {
     let { classList } = this.state;
-    console.log("classList in render function:");
-    console.log(classList);
     return (
       <main>
         <div className="modules-grid">

@@ -22,7 +22,7 @@ services:
     container_name: cie-db
     image: mysql/mysql-server:8.0
     ports:
-      - "33006:3306"
+      - "3306:3306"
     environment:
       MYSQL_DATABASE: "cie"
       MYSQL_USER: "appuser"

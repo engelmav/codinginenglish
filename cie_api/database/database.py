@@ -5,11 +5,14 @@ from sqlalchemy.pool import QueuePool, Pool
 from sqlalchemy import exc, event
 import pymysql
 import logging
+import os
 
 from config import config
 
 
 LOG = logging.getLogger(__name__)
+db_host = os.getenv("CIE_DB_HOST", "cie-db")
+
 
 def get_conn():
     cnx = None
@@ -17,10 +20,11 @@ def get_conn():
         cnx = pymysql.connect(
             user="appuser",
             password=db_password,
-            host="cie-db",
+            host=db_host,
+            port=3306,
             database="cie")
-    except:
-        LOG.error("Could not connect to database.")
+    except Exception:
+        LOG.error("Could not connect to database:", exc_info=True)
     return cnx
 
 pool = QueuePool(
