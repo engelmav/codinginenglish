@@ -24,8 +24,9 @@ def get_conn():
             port=3306,
             database="cie")
     except Exception:
-        LOG.error("Could not connect to database:", exc_info=True)
+        LOG.error("Could not connect to database. See exception below.", exc_info=True)
     return cnx
+
 
 pool = QueuePool(
     creator=get_conn,

@@ -34,20 +34,42 @@ services:
       - ./cie_api/database/:/docker-entrypoint-initdb.d
       # - /var/lib/mysql:/var/lib/mysql
   
-  # lb and frontend integrated
-  # loadbalancer:
-  #   container_name: cie_nginx_lb
-  #   build: ./loadbalancer
-  #   tty: true
-  #   ports:
-  #     - 1337:80
-  #   depends_on:
-  #     - cie_api
-  #   # makes sure the loadbalancer service doesn’t start unless the backend services 
-  #   # have started. Allows linked services to be used as 
-  #   # references within loadbalancer, which is used in nginx.conf
-  #   links:
-  #     - cie_api
+  mongo:
+    image: mongo:3.2
+    restart: unless-stopped
+    volumes:
+     - ./data/db:/data/db
+     #- ./data/dump:/dump
+    command: mongod --smallfiles --oplogSize 128 --replSet rs0
+    labels:
+      - "traefik.enable=false"
+    ports:
+      - "27017:27017"
+
+  # this container's job is just run the command to initialize the replica set.
+  # it will run the command and remove itself (it will not stay running)
+  mongo-init-replica:
+    image: mongo:4.0
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          mongo mongo/rocketchat --eval \"
+            rs.initiate({
+              _id: 'rs0',
+              members: [ { _id: 0, host: 'mongo:27017' } ]})\" &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 secs...\";
+          sleep 5;
+        done; (exit $$s)"
+    depends_on: 
+      - mongo
+
+  rocketchat:
+    build: ../Rocket.Chat
+    # command: 'sleep 99999'
+    depends_on: 
+      - mongo
+
   web:
     container_name: cie_web
     build: ./cie_frontend

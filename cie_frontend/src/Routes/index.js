@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Home from '../Home';
+import MyDashboard from '../Home';
 import { auth } from '../auth/Auth';
 import makeRequiresAuth from '../auth/RequiresAuth';
 import Callback from '../auth/Auth0Callback';
@@ -41,7 +41,7 @@ class Routes extends Component {
     return (
       <>
         <Route exact path="/" component={(props) => <Welcome auth={auth} authData={this.props.authData} {...props} />} />
-        <Route exact path="/home" component={(props) => <Home auth={auth} authData={this.props.authData} {...props} />} />
+        <Route exact path="/my-dashboard" component={(props) => <MyDashboard auth={auth} authData={this.props.authData} {...props} />} />
         <Route exact path="/class" component={(props) =>
           <ClassRoomProtected authData={this.props.authData} {...props} />} />
         <Route path="/callback" render={(props) => {

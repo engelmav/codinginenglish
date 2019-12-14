@@ -35,6 +35,7 @@ class App extends Component {
         <>
           <Header authData={authData} auth={auth} shrinkNav={this.shrinkNav} />
           <Routes authData={authData} setIsAuthenticated={this.setIsAuthenticated} auth={auth} />
+          <footer><i><bold>Made with love in Encinitas, California.</bold></i></footer>
         </>
       </Router>
     );

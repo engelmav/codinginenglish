@@ -30,3 +30,14 @@ button:hover {
   color: white;
   background-color: #ff3e00;
 }
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff3e00;
+  text-align: center;
+  color: white;
+  height: 200px;
+
+}

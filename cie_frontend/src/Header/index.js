@@ -16,12 +16,12 @@ class Header extends Component {
 
     const links = (
       <ul className="routes__navbar">
-        <li><Link to="/">Modules</Link></li>
+        <li><Link to="/">classes</Link></li>
         {authData &&
           <React.Fragment>
-            <li><Link to="/home">Dashboard</Link></li>
+            <li><Link to="/my-dashboard">my_dashboard</Link></li>
             <li onClick={() => alert()}>
-              <Link to="/class">Session!</Link>
+              <Link to="/class">in_session!</Link>
             </li>
           </React.Fragment>
         }

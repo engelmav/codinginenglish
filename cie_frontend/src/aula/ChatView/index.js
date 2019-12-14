@@ -26,9 +26,10 @@ class ChatView extends Component {
     return (
       <>
         {rocketchatAuthToken && <Iframe
-          url={`http://localhost:3000/channel/general?layout=embedded&authToken=${rocketchatAuthToken}`}
+          // url={`http://localhost:3000/channel/general?layout=embedded&authToken=${rocketchatAuthToken}`}
+          url={'https://deadsimplechat.com/xJyCTBrACu'}
           id="classroomcontainer__chat-iframe"
-          width="100%" height="100%"
+          width="100%" height="500px"
         />}
       </>
     );

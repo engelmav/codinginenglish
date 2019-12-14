@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class Home extends Component {
+export default class MyDashboard extends Component {
   // this.state.authData
   render() {
     const { isAuthenticated } = this.props.auth;
