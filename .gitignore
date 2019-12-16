@@ -1,3 +1,4 @@
+data/
 secrets.json
 *.min.js
 *.crt
