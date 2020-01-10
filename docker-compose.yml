@@ -2,9 +2,12 @@ version: '3.2'
 services:
   cie_api:
     container_name: cie-api
+    image: vengelmann/docker-repo:cie-api
     # tells Compose where to look for a Dockerfile to build the image 
     # for the service.
-    build: ./cie_api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     # tells the container to keep running even when there’s no daemon 
     # specified via CMD in the Dockerfile. Otherwise, it’ll shut down 
     # right after provisioning 
@@ -14,7 +17,7 @@ services:
     # defines where to put the server-side code in the container / Volumes 
     # are a storage mechanism within containers.
     # volumes:
-    #   - './cie_api/:/home/cieuser'
+    #   - './api/:/home/cieuser'
     depends_on:
       - cie-db
   
@@ -31,11 +34,14 @@ services:
       MYSQL_ROOT_HOST: "%"
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
-      - ./cie_api/database/:/docker-entrypoint-initdb.d
+      - ./api/database/:/docker-entrypoint-initdb.d
       # - /var/lib/mysql:/var/lib/mysql
   
   mongo:
-    image: mongo:3.2
+    # image: vengelmann/docker-repo:mongo-with-replica
+    build: 
+      context: ../Rocket.Chat
+      dockerfile: Dockerfile-mongo
     restart: unless-stopped
     volumes:
      - ./data/db:/data/db
@@ -46,33 +52,21 @@ services:
     ports:
       - "27017:27017"
 
-  # this container's job is just run the command to initialize the replica set.
-  # it will run the command and remove itself (it will not stay running)
-  mongo-init-replica:
-    image: mongo:4.0
-    command: >
-      bash -c
-        "for i in `seq 1 30`; do
-          mongo mongo/rocketchat --eval \"
-            rs.initiate({
-              _id: 'rs0',
-              members: [ { _id: 0, host: 'mongo:27017' } ]})\" &&
-          s=$$? && break || s=$$?;
-          echo \"Tried $$i times. Waiting 5 secs...\";
-          sleep 5;
-        done; (exit $$s)"
-    depends_on: 
-      - mongo
-
   rocketchat:
-    build: ../Rocket.Chat
+    # image: vengelmann/docker-repo:rocketchat-custom
+    build: ../Rocket.Chat/Dockerfile
     # command: 'sleep 99999'
     depends_on: 
       - mongo
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
 
   web:
     container_name: cie_web
-    build: ./cie_frontend
+    # image: vengelmann/docker-repo:cie_web
+    build: ./frontend/Dockerfile
     tty: true
     ports:
       - 8080:80

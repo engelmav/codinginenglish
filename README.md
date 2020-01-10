@@ -11,3 +11,11 @@ The ReactJS frontend.
 ## zoom_frontend
 
 A ring-fenced Zoom JS SDK.
+
+
+### Start Dev Compose
+
+
+```
+sudo docker-compose --compatibility up
+```

@@ -14,7 +14,6 @@ RUN venv/bin/pip install gunicorn
 
 COPY database database
 COPY services services
-COPY templates templates
 COPY config.py main.py rocketchat_endpoints.py secrets.json run_cie_api.sh ./
 RUN chmod +x run_cie_api.sh
 
