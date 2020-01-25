@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: cie-frontend
+    labels:
+        app: cie-frontend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: cie-frontend
+    template:
+            metadata:
+                labels:
+                    app: cie-frontend
+            spec:
+                containers:
+                    - name: cie-frontend
+                      image: vengelmann/cie-frontend
+                      ports:
+                        - containerPort: 80

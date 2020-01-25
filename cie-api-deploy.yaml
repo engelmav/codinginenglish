@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-api
+spec:
+  selector:
+    app: cie-api
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cie-api
+spec:
+  selector:
+    matchLabels:
+      app: cie-api
+      tier: backend
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cie-api
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: cie-api
+          image: vengelmann/cie-api
+          ports:
+            - name: http
+              containerPort: 80
