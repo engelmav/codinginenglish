@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cie-frontend
+  name: cie-frontend-svc
 spec:
+  type: LoadBalancer
   selector:
     app: cie-frontend
   ports:
     - name: http
       port: 80
       targetPort: 80
-      nodePort: 30000
-  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
