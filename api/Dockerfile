@@ -1,11 +1,10 @@
-FROM python:3.7-slim-buster
+FROM python:3.7-buster
 
-RUN useradd -ms /bin/bash cieuser
+# RUN useradd -ms /bin/bash cieuser
 
 RUN apt-get update \
   && apt-get install -y default-libmysqlclient-dev build-essential
 
-WORKDIR /home/cieuser
 
 COPY requirements.txt requirements.txt
 RUN python -m venv venv
@@ -19,8 +18,8 @@ RUN chmod +x run_cie_api.sh
 
 ENV FLASK_APP main.py
 
-RUN chown -R cieuser:cieuser ./
-USER cieuser
+# RUN chown -R cieuser:cieuser ./
+# USER cieuser
 
 EXPOSE 5000
 ENTRYPOINT ["./run_cie_api.sh"]
