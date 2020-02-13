@@ -38,7 +38,7 @@ services:
       # - /var/lib/mysql:/var/lib/mysql
   
   mongo:
-    # image: vengelmann/docker-repo:mongo-with-replica
+    image: vengelmann/docker-repo:mongo-with-replica
     build: 
       context: ../Rocket.Chat
       dockerfile: Dockerfile-mongo
@@ -53,9 +53,10 @@ services:
       - "27017:27017"
 
   rocketchat:
-    # image: vengelmann/docker-repo:rocketchat-custom
-    build: ../Rocket.Chat/Dockerfile
-    # command: 'sleep 99999'
+    image: vengelmann/docker-repo:rocketchat-custom
+    build: 
+      context: ../Rocket.Chat/
+      dockerfile: Dockerfile
     depends_on: 
       - mongo
     deploy:
@@ -65,8 +66,10 @@ services:
 
   web:
     container_name: cie_web
-    # image: vengelmann/docker-repo:cie_web
-    build: ./frontend/Dockerfile
+    image: vengelmann/docker-repo:cie_web
+    build: 
+      context: ./frontend/
+      dockerfile: Dockerfile
     tty: true
     ports:
       - 8080:80

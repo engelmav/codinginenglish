@@ -11,7 +11,7 @@ class Auth {
   auth0 = new auth0.WebAuth({
     domain: 'dev-nougy3g5.auth0.com',
     clientID: CLIENT_ID,
-    redirectUri: 'http://localhost:8080/callback',
+    redirectUri: 'http://192.168.1.43/callback',
     responseType: 'token id_token',
     scope: 'openid email profile'
   });
