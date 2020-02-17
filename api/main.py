@@ -146,11 +146,6 @@ def stream_sse():
     return sse_message
 
 
-@app.route('/', )
-def get_index():
-    return render_template('index.html')
-
-
 @app.route('/api/profile')
 def login():
     """
@@ -168,7 +163,6 @@ def login():
         email=email
     )
     return jsonify({})
-
 
 
 @app.route('/api/zoom/signature/<meeting_number>/<ts>')
