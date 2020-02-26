@@ -11,7 +11,6 @@ from config import config
 
 
 LOG = logging.getLogger(__name__)
-db_host = os.getenv("CIE_DB_HOST", "cie-db")
 
 
 def get_conn():
@@ -36,6 +35,7 @@ pool = QueuePool(
     recycle=299)       # refresh the pool ever 299 seconds
 
 db_password = config["cie.database.password"]
+db_host = config["cie.database.host"]
 engine = create_engine('mysql+pymysql://', pool=pool)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
