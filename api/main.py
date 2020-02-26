@@ -11,6 +11,7 @@ import redis
 
 import database.models as m
 from rocketchat_endpoints import rocketchat
+from payment_endpoints import stripe
 from config import config
 from database.models import User
 
@@ -23,12 +24,14 @@ app = Flask(__name__,
             template_folder='../zoom_frontend')
 
 app.register_blueprint(rocketchat)
+app.register_blueprint(stripe)
 app.secret_key = config["cie.api.session.key"]
 
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     m.db_session.remove()
+
 
 red = redis.StrictRedis()
 redis_store = RedisStore(red)
