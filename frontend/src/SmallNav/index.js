@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import Login from '../Login'
+import { auth } from '../auth/Auth';
+
 
 class Header extends Component {
   render() {
