@@ -4,7 +4,7 @@ import { auth } from '../auth/Auth';
 import makeRequiresAuth from '../auth/RequiresAuth';
 import Callback from '../auth/Auth0Callback';
 import ClassroomContainer from '../aula/ClassroomContainer';
-import Welcome from '../Welcome';
+import { Welcome } from '../Welcome';
 import { withRouter, Route } from 'react-router-dom';
 import VncDisplay from '../aula/VncDisplay';
 
