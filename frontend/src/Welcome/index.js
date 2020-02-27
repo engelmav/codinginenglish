@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import { DateTime } from 'luxon';
 import Modal from 'react-modal';
-import { Elements, CardElement } from '@stripe/react-stripe-js';
+import { ElementsConsumer, Elements, CardElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
 import './styles.css';
@@ -62,25 +62,97 @@ class Welcome extends Component {
   }
 }
 
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#424770',
+      '::placeholder': {
+        color: '#aab7c4',
+      },
+    },
+    invalid: {
+      color: '#9e2146',
+    }
+  }
+};
+const stripePromise = loadStripe('pk_test_JJ1eMdKN0Hp4UFJ6kWXWO4ix00jtXzq5XG');
+
+function CardSelection() {
+  return (
+    <label>
+      Card details
+      <CardElement options={CARD_ELEMENT_OPTIONS} />
+    </label>
+  )
+};
+
+
+class CheckoutForm extends Component {
+  handleSubmit = async (event) => {
+    // disable default form submission
+    event.preventDefault();
+
+    const { stripe, elements } = this.props;
+
+    if (!stripe || !elements) {
+      // stripe isn't loaded yet
+      return;
+    }
+    const paymentMethod = {
+      payment_method: {
+        card: elements.getElement(CardElement),
+        billing_details: {
+          // TODO: change to field inputs
+          name: 'Jenny Rosen'
+        },
+      }
+    }
+    const intentParams = {
+      // TODO: CIE class passed back here, lookup to be performed on backend.
+      item: 1,
+      // TODO: Where do I get this from?
+      currency: 'EUR'
+    }
+    // TODO: disable form while confirmPayment() is in progress (show spinner).
+    try {
+      const clientSecret = await axios.post('/payment/create-payment-intent', intentParams);
+    } catch {
+      alert("Something went wrong! You have not been charged, and we are looking into the issue right now.");
+      return;
+    }
+    const result = await stripe.confirmPayment('{CLIENT_SECRET}', paymentMethod);
+
+    if (result.error) {
+      // TODO: turn into modal
+      alert(result.error.message);
+    } else {
+      // The payment was processed.
+      if (result.paymentIntent.status === 'succeeeded') {
+        // TOOD: turn into modal.
+        alert("Class purchased successfully!");
+      }
+    }
+  }
+}
+
 
 class ModuleCard extends Component {
-  constructor(){
+  constructor() {
     super();
     this.state = {
       modalIsOpen: false
     };
-    this.stripePromise = loadStripe('pk_test_JJ1eMdKN0Hp4UFJ6kWXWO4ix00jtXzq5XG');
-
   }
   handleSignupClick = () => {
-    this.setState({modalIsOpen: true});
+    this.setState({ modalIsOpen: true });
     cieApi.startSignup(this.props.sessionData.id, 1);
   }
-  afterOpenModal= () => {
+  afterOpenModal = () => {
     // ?
   }
   closeModal = () => {
-    this.setState({modalIsOpen: false});
+    this.setState({ modalIsOpen: false });
   }
   render() {
     let { cie_module, session_datetime } = this.props.sessionData;
@@ -99,29 +171,27 @@ class ModuleCard extends Component {
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}>
-            <h1>Do they speak English in What?</h1>
-            <Elements stripe={this.stripePromise}>
-              <CardElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: '16px',
-                      color: '#424770',
-                      '::placeholder': {
-                        color: '#aab7c4',
-                      },
-                    },
-                    invalid : {
-                      color: '#9e2146',
-                    }
-                  }
-                }}
-              />
-            </Elements>
+          <h1>Do they speak English in What?</h1>
+          <Elements stripe={stripePromise}>
+            <form>
+              <CardSelection />
+              <button disabled={!this.props.stripe}>Confirm</button>
+            </form>
+          </Elements>
         </Modal>
       </div>
     );
   }
+}
+
+function InjectedCheckoutForm() {
+  return (
+    <ElementsConsumer>
+      {({ stripe, elements }) =>
+        <CheckoutForm stripe={stripe} elements={elements} />
+      }
+    </ElementsConsumer>
+  )
 }
 
 export { Welcome, ModuleCard };

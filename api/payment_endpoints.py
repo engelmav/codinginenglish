@@ -6,7 +6,7 @@ from config import config
 
 stripe = Blueprint('stripe_payments', __name__)
 stripe_secret = config.get('cie.api.stripe.secretkey"')
-stripe_publishable_key =  config.get('cie.api.stripe.publishableKey')
+stripe_publishable_key = config.get('cie.api.stripe.publishableKey')
 
 
 def calc_order_amount(item):
@@ -18,6 +18,7 @@ def calc_order_amount(item):
 def create_payment():
     data = request.data.get_json()
     intent = stripe.PaymentIntent.create(
+        # TODO: turn this into a lookup. CIE classes may have different costs
         amount=calc_order_amount(data.get('item')),
         currency=data.get('currency')
     )
