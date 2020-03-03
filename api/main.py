@@ -11,7 +11,7 @@ import redis
 
 import database.models as m
 from rocketchat_endpoints import rocketchat
-from payment_endpoints import stripe
+from payment_endpoints import stripe_bp
 from config import config
 from database.models import User
 
@@ -24,7 +24,7 @@ app = Flask(__name__,
             template_folder='../zoom_frontend')
 
 app.register_blueprint(rocketchat)
-app.register_blueprint(stripe)
+app.register_blueprint(stripe_bp)
 app.secret_key = config["cie.api.session.key"]
 
 
