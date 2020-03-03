@@ -1,9 +1,10 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import axios from 'axios';
 import { DateTime } from 'luxon';
 import Modal from 'react-modal';
-import { ElementsConsumer, Elements, CardElement } from '@stripe/react-stripe-js';
+import { ElementsConsumer, Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { MetroSpinner } from 'react-spinners-kit';
 
 import './styles.css';
 
@@ -76,9 +77,9 @@ const CARD_ELEMENT_OPTIONS = {
     }
   }
 };
-const stripePromise = loadStripe('pk_test_JJ1eMdKN0Hp4UFJ6kWXWO4ix00jtXzq5XG');
+const stripePromise = loadStripe('pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP');
 
-function CardSelection() {
+function CardSection() {
   return (
     <label>
       Card details
@@ -87,13 +88,14 @@ function CardSelection() {
   )
 };
 
-
-class CheckoutForm extends Component {
-  handleSubmit = async (event) => {
+function CheckoutForm(props) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isLoading, setLoading] = useState(false);
+  const [isComplete, setComplete] = useState(false);
+  const handleSubmit = async (event) => {
     // disable default form submission
     event.preventDefault();
-
-    const { stripe, elements } = this.props;
 
     if (!stripe || !elements) {
       // stripe isn't loaded yet
@@ -115,27 +117,49 @@ class CheckoutForm extends Component {
       currency: 'EUR'
     }
     // TODO: disable form while confirmPayment() is in progress (show spinner).
+    let clientSecret;
     try {
-      const clientSecret = await axios.post('/payment/create-payment-intent', intentParams);
-    } catch {
-      alert("Something went wrong! You have not been charged, and we are looking into the issue right now.");
+      setLoading(true);
+      const resp = await axios.post('/payment/create-payment-intent', intentParams);
+      clientSecret = resp.data.clientSecret;
+      console.log(resp.data)
+    } catch (error) {
+      alert("We couldn't process your order. You have not been charged. We are looking into the issue right now.");
+      console.log("Error attempting to process credit card payment:");
+      setLoading(false);
       return;
     }
-    const result = await stripe.confirmPayment('{CLIENT_SECRET}', paymentMethod);
+    const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
 
     if (result.error) {
       // TODO: turn into modal
+      console.log(result);
       alert(result.error.message);
     } else {
       // The payment was processed.
-      if (result.paymentIntent.status === 'succeeeded') {
+      console.log("Payment processed resut object:");
+      console.log(result);
+      if (result.paymentIntent.status === 'succeeded') {
         // TOOD: turn into modal.
-        alert("Class purchased successfully!");
+        setComplete(true);
       }
     }
   }
+  return (
+    <>
+      {isComplete ?
+        <p>Your purchase is complete. See you in there!</p> :
+        <form onSubmit={handleSubmit}>
+          <CardSection />
+          <button onClick={handleSubmit} disabled={!stripe || isLoading}>
+            {isLoading ?
+              <MetroSpinner loading={true} size={15} color="#ff3e00" /> :
+              "PURCHASE"}
+          </button>
+        </form>}
+    </>
+  );
 }
-
 
 class ModuleCard extends Component {
   constructor() {
@@ -156,7 +180,6 @@ class ModuleCard extends Component {
   }
   render() {
     let { cie_module, session_datetime } = this.props.sessionData;
-    console.log("UTC from server:", session_datetime);
     var local = DateTime.fromISO(session_datetime);
     const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
     const { modalIsOpen } = this.state;
@@ -168,15 +191,15 @@ class ModuleCard extends Component {
         <p className="datetime">Starts {localDateTime}</p>
         <button onClick={this.handleSignupClick}>SIGN UP</button>
         <Modal
+          ariaHideApp={false}
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}>
-          <h1>Do they speak English in What?</h1>
+          <h1>{cie_module.name}</h1>
+          <p>Starts {localDateTime}</p>
+          <p>{cie_module.description}</p>
           <Elements stripe={stripePromise}>
-            <form>
-              <CardSelection />
-              <button disabled={!this.props.stripe}>Confirm</button>
-            </form>
+            <CheckoutForm />
           </Elements>
         </Modal>
       </div>
