@@ -6,6 +6,8 @@ import { ElementsConsumer, Elements, CardElement, useStripe, useElements } from 
 import { loadStripe } from '@stripe/stripe-js';
 import { MetroSpinner } from 'react-spinners-kit';
 
+import { AlertMessage } from '../UtilComponents/AlertMessage';
+
 import './styles.css';
 
 class CieApi {
@@ -93,6 +95,7 @@ function CheckoutForm(props) {
   const elements = useElements();
   const [isLoading, setLoading] = useState(false);
   const [isComplete, setComplete] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const handleSubmit = async (event) => {
     // disable default form submission
     event.preventDefault();
@@ -132,12 +135,10 @@ function CheckoutForm(props) {
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
 
     if (result.error) {
-      // TODO: turn into modal
       console.log(result);
-      alert(result.error.message);
+      setErrorMsg(result.error.message);
     } else {
       // The payment was processed.
-      console.log("Payment processed resut object:");
       console.log(result);
       if (result.paymentIntent.status === 'succeeded') {
         // TOOD: turn into modal.
@@ -155,7 +156,7 @@ function CheckoutForm(props) {
             {isLoading ?
               <MetroSpinner loading={true} size={15} color="#ff3e00" /> :
               "PURCHASE"}
-          </button>
+          </button>{errorMsg && <AlertMessage text={errorMsg} />}
         </form>}
     </>
   );
@@ -217,4 +218,4 @@ function InjectedCheckoutForm() {
   )
 }
 
-export { Welcome, ModuleCard };
+export { Welcome, ModuleCard, CheckoutForm };
