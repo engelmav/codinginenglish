@@ -10,10 +10,10 @@ import { Rnd } from 'react-rnd';
 
 
 export default class ClassroomContainer extends Component {
-  constructor(props) {
-    super(props);
+  // constructor(props) {
+  //   super(props);
 
-  }
+  // }
 
   render() {
     let userFirstName = null;
