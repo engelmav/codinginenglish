@@ -47,15 +47,3 @@ main {
   border-radius: 3px;
 }
 
-/* TODO: move to higher level */
-button:disabled,
-button[disabled]{
-  border: 1px solid #ff4000;
-  background-color: white;
-  color: #ff3e00;
-}
-
-.module-card button:hover {
-  color: white;
-  background-color: #ff3e00;
-}
