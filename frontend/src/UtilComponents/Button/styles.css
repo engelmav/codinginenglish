@@ -25,10 +25,6 @@
   border-radius: 7px;
 }
   
-.cie-btn-blk:hover {
-    color: black;
-    background-color: white;
-}
 
 .cie-btn-blk:disabled,
 .cie-btn[disabled]{
