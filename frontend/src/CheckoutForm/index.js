@@ -3,6 +3,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { MetroSpinner } from 'react-spinners-kit';
 import React, { useState } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
+
 
 import { Button } from '../UtilComponents/Button';
 import { AlertMessage } from '../UtilComponents/AlertMessage';
@@ -36,6 +38,17 @@ function CardSection() {
     </label>
   )
 };
+
+
+const BuyButton = styled(Button)`
+  border-color: black;
+  background-color: black;
+  color: white;
+  &:hover {
+    color: black;
+    background-color: white;
+  }
+`;
 
 
 function CheckoutFormConsumer(props) {
@@ -105,11 +118,11 @@ function CheckoutFormConsumer(props) {
         :
           <form onSubmit={handleSubmit}>
             <CardSection />
-            <Button btnType="cie-btn-blk" onClick={handleSubmit} disabled={!stripe || isLoading}>
+            <BuyButton onClick={handleSubmit} disabled={!stripe || isLoading}>
               {isLoading ?
                 <MetroSpinner loading={true} size={15} color="#ff3e00" /> :
                 "PURCHASE"}
-            </Button>
+            </BuyButton>
             {errorMsg && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
           </form>}
     </>
