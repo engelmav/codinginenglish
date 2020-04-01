@@ -9,11 +9,41 @@ import { FaGripLines } from 'react-icons/fa'
 import { Rnd } from 'react-rnd';
 
 
-export default class ClassroomContainer extends Component {
-  // constructor(props) {
-  //   super(props);
+/**
+ * Refocuses the iframe containing Guacamole if the user is not already
+ * focusing another non-body element on the page.
+ */
+// var refocusGuacamole = function refocusGuacamole() {
 
-  // }
+//   // Do not refocus if focus is on an input field
+//   var focused = document.activeElement;
+//   if (focused && focused !== document.body)
+//       return;
+
+//   // Ensure iframe is focused
+//   var iframe = document.getElementById('guac-view');
+//   iframe.focus();
+
+// };
+
+// // Attempt to refocus iframe upon click or keydown
+// document.addEventListener('click', refocusGuacamole);
+// document.addEventListener('keydown', refocusGuacamole);
+
+
+export default class ClassroomContainer extends Component {
+  constructor(props) {
+    super(props);
+
+    this.setGuacViewerRef = element => {
+      this.guacViewer = element;
+    };
+
+    this.focusGuacViewer = () => {
+      if (this.guacViewer) this.guacViewer.focus();
+    }
+
+  }
 
   render() {
     let userFirstName = null;
@@ -23,7 +53,7 @@ export default class ClassroomContainer extends Component {
 
     return (
       <>
-        <div style={{border: "1px solid black"}}>test thing</div>
+        <div style={{ border: "1px solid black" }}>test thing</div>
         <Rnd
           default={{
             x: 0,
@@ -32,7 +62,7 @@ export default class ClassroomContainer extends Component {
             height: 400
           }}
         >
-          <div style={{background: "white"}}><FaGripLines />Slides</div>
+          <div style={{ background: "white" }}><FaGripLines />Slides</div>
           <Iframe
             id="slidesView"
             url="http://slides.com/vincentengelmann/001-devteamsloops/embed"
@@ -73,7 +103,16 @@ export default class ClassroomContainer extends Component {
           }}
         >
           <div><FaGripLines />Dev</div>
-          <VncDisplay authData={this.props.authData} />
+          <Iframe
+            ref={this.setGuacViewerRef}
+            onClick={this.focusGuacViewer}
+            id="guac-view"
+            url="http://localhost:8081/guacamole/"
+            width="100%"
+            height="100%"
+            scrolling="auto"
+            frameborder="10"
+          />
         </Rnd>
       </>
     )
