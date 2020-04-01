@@ -36,14 +36,3 @@ main {
   width: 100%;
   justify-self: center;
 }
-
-.module-card button {
-  justify-self: end; 
-  background-color: white;
-  border: 1px solid #ff3e00;
-  color: #ff3e00;
-  padding: 8px;
-  margin: 8px;
-  border-radius: 3px;
-}
-
