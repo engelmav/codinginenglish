@@ -39,6 +39,11 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+const auth0CbHost = 
+  process.env.DEV_SERVER ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback';
+
+console.log("Using Auth0 callback host", auth0CbHost);
+
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -155,7 +160,7 @@ module.exports = function (webpackEnv) {
     // This means they will be the "root" imports that are included in JS bundle.
     entry: {
       mainApp: entryList.filter(Boolean),
-      zoomApp: './src/zoomIndex.js'
+      // zoomApp: './src/zoomIndex.js'
     },
     output: {
       // The build folder.
@@ -478,6 +483,10 @@ module.exports = function (webpackEnv) {
       // during a production build.
       // Otherwise React will be compiled in the very slow development mode.
       new webpack.DefinePlugin(env.stringified),
+      new webpack.DefinePlugin({
+        __VERSION__: JSON.stringify('1.0.0.' + Date.now()),
+        __AUTHZERO_CB_HOST__: JSON.stringify(auth0CbHost)
+      }),
       // This is necessary to emit hot updates (currently CSS only):
       isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
       // Watcher doesn't work well if you mistype casing in a path so we use
