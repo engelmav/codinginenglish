@@ -1,6 +1,5 @@
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { MetroSpinner } from 'react-spinners-kit';
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
@@ -8,8 +7,7 @@ import styled from 'styled-components';
 
 import { Button } from '../UtilComponents/Button';
 import { AlertMessage } from '../UtilComponents/AlertMessage';
-
-import styles from './styles.css';
+import { Spinner } from '../UtilComponents/Spinner';
 
 
 const CARD_ELEMENT_OPTIONS = {
@@ -119,11 +117,10 @@ function CheckoutFormConsumer(props) {
           <form onSubmit={handleSubmit}>
             <CardSection />
             <BuyButton onClick={handleSubmit} disabled={!stripe || isLoading}>
-              {isLoading ?
-                <MetroSpinner loading={true} size={15} color="#ff3e00" /> :
-                "PURCHASE"}
+              PURCHASE
             </BuyButton>
-            {errorMsg && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
+            {isLoading && <Spinner />}
+            {(!isLoading && errorMsg) && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
           </form>}
     </>
   );
