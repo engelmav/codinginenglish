@@ -1,4 +1,4 @@
 ```js
-<Button btnType="cie-btn">I'm a button!</Button>
-<Button btnType="cie-btn-blk">I'm a button!</Button>
+<Button mr={2}>I'm a button!</Button>
+<Button>I'm a button!</Button>
 ```
