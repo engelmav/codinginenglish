@@ -8,7 +8,7 @@ cffi==1.12.3
 chardet==3.0.4
 Click==7.0
 cryptography==2.7
-ecdsa==0.13.2
+ecdsa==0.13.3
 Flask==1.0.3
 Flask-Cors==3.0.8
 Flask-KVSession==0.6.2
