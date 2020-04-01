@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
+// import { Button } from '../UtilComponents/Button';
+
 
 class Login extends Component {
-
 
   login = () => {
     this.props.auth.login(this.props.onLogin);
@@ -24,7 +25,7 @@ class Login extends Component {
         }
         {
           this.props.isAuthenticated &&
-            <button onClick={this.logout} className="button">
+            <button onClick={this.logout}>
               log out
           </button>
         }
