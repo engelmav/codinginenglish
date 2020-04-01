@@ -1,10 +1,8 @@
-import React from 'react';
-// import styles from './styles.css';
 import styled from 'styled-components';
-import { color, space } from 'styled-system';
+import { space, flexbox } from 'styled-system';
 
 
-const Button = styled.div`
+const Button = styled.button`
   font-family: 'Roboto', serif;
   background-color: white;
   border: solid #ff3e00;
@@ -17,6 +15,8 @@ const Button = styled.div`
     background-color: #ff3e00;
   }
   ${space}
+  ${flexbox}
 `
 
+/** @component */
 export { Button };
