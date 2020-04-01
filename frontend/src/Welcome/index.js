@@ -4,8 +4,12 @@ import { DateTime } from 'luxon';
 import Modal from 'react-modal';
 
 import { CheckoutForm } from '../CheckoutForm';
+import { Button } from '../UtilComponents/Button';
 
 import './styles.css';
+
+
+/* global __VERSION__ */
 
 
 class CieApi {
@@ -36,6 +40,7 @@ class Welcome extends Component {
     this.state = {
       classList: []
     };
+    console.log(`Version ${__VERSION__}`);
   }
 
   async componentDidMount() {
@@ -97,7 +102,12 @@ class ModuleCard extends Component {
         <img src={cie_module.image_path} alt={cie_module.name} />
         <h1>{cie_module.name}</h1>
         <p className="datetime">Starts {localDateTime}</p>
-        <button onClick={this.handleSignupClick}>SIGN UP</button>
+        <Button 
+          onClick={this.handleSignupClick}
+          justifySelf='end'
+          m={2}>
+            REGISTER
+        </Button>
         <Modal
           ariaHideApp={false}
           isOpen={modalIsOpen}
