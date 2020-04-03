@@ -6,7 +6,7 @@ const YAML = require('json-to-pretty-yaml');
 const argv = require('yargs').argv;
 
 
-const deploy_env = argv.env;
+const deployEnv = argv.env;
 const COMPONENT_NAME = "cie-api";
 
 let apiSvc = new Service({
@@ -56,7 +56,7 @@ let apiDeploy = new Deployment({
                     new Container({
                         name: COMPONENT_NAME,
                         image: "vengelmann/cie-api",
-                        env: [{ name: "CIE_ENV", value: deploy_env }],
+                        env: [{ name: "CIE_ENV", value: deployEnv }],
                         ports: [{ name: "http", containerPort: 80 }]
                     })
                 ]

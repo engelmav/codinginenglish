@@ -1,21 +1,3 @@
 # Coding in English Online Learning Platform
 
-## cie_api
-
-The backend and API of the Coding in English platform.
-
-## cie_frontend
-
-The ReactJS frontend.
-
-## zoom_frontend
-
-A ring-fenced Zoom JS SDK.
-
-
-### Start Dev Compose
-
-
-```
-sudo docker-compose --compatibility up
-```
+Welcome to the Coding in English platform! Contributors can head over to our [wiki](https://github.com/engelmav/cie_platform/wiki) to get started.
