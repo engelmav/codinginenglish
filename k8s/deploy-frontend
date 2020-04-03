@@ -1,0 +1,30 @@
+#! /usr/bin/node
+
+const { createLoadBalancer, createDeployment } = require('./util');
+
+const YAML = require('json-to-pretty-yaml');
+const argv = require('yargs').argv;
+
+
+let frontEndLB = createLoadBalancer(
+    "cie-frontend",
+    "frontend",
+    argv.externalIP || "192.168.1.43",
+    80,
+    80
+);
+frontEndLB.validate();
+
+
+
+let deployment = createDeployment(
+    "cie-frontend",
+    "backend",
+    "stable",
+    [{ name: "CIE_ENV" }],
+    [{ "containerPort": 80 }]
+);
+
+console.log(YAML.stringify(frontEndLB));
+console.log("---");
+console.log(YAML.stringify(deployment));
