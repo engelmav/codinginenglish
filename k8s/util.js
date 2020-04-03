@@ -7,7 +7,7 @@ const {
 
 
 function createLoadBalancer(
-  componentName, tier, loadBalancerIP, port, targetPort
+  componentName, loadBalancerIP, port, targetPort
 ) {
   return new Service({
     metadata: {
@@ -18,7 +18,6 @@ function createLoadBalancer(
       loadBalancerIP: loadBalancerIP,
       selector: {
         app: componentName,
-        tier: tier
       },
       ports: [
         new ServicePort({
@@ -33,7 +32,7 @@ function createLoadBalancer(
 
 
 function createDeployment(
-  componentName, tier, track, imageName, envVars, ports
+  componentName, imageName, envVars, ports
 ) {
   let deployment = new Deployment({
     metadata: {
@@ -43,8 +42,6 @@ function createDeployment(
       selector: {
         matchLabels: {
           app: componentName,
-          tier: tier,
-          track: track
         }
       },
       replicas: 1,
@@ -52,8 +49,6 @@ function createDeployment(
         metadata: {
           labels: {
             app: componentName,
-            tier: "backend",
-            track: "stable"
           }
         },
         spec: {
