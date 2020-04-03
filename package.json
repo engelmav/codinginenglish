@@ -1,0 +1,26 @@
+{
+  "name": "cie_platform",
+  "version": "1.0.0",
+  "description": "## cie_api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/engelmav/cie_platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/engelmav/cie_platform/issues"
+  },
+  "homepage": "https://github.com/engelmav/cie_platform#readme",
+  "dependencies": {
+    "i": "^0.3.6",
+    "json-to-pretty-yaml": "^1.2.2",
+    "kubernetes-models": "^0.7.3",
+    "npm": "^6.14.4",
+    "yargs": "^15.3.1"
+  }
+}
