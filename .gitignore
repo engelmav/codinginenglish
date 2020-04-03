@@ -9,3 +9,5 @@ secrets.json
 *.ext
 *.csr
 .env
+.vscode
+node_modules/
