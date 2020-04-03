@@ -27,6 +27,8 @@ let apiSvc = new Service({
         ]
     }
 });
+apiSvc.validate();
+
 
 let apiDeploy = new Deployment({
     metadata: {
@@ -62,17 +64,17 @@ let apiDeploy = new Deployment({
         })
     }
 });
+// annoying hack
 apiDeploy.apiVersion = "apps/v1";
-
+// the below fails because ofbecause of
+// aforementioned annoying hack:
+// apiDeploy.validate();
 
 
 const svcYml = YAML.stringify(apiSvc);
-apiSvc.validate();
 console.log(svcYml);
-
 console.log("---")
 const deployYml = YAML.stringify(apiDeploy);
-// apiDeploy.validate();
 console.log(deployYml);
 
 
