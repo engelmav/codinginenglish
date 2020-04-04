@@ -6,9 +6,11 @@ const YAML = require('json-to-pretty-yaml');
 const argv = require('yargs').argv;
 const deployEnv = argv.env;
 
+const COMPONENT_NAME = 'cie-frontend';
+
 
 let frontEndLB = createLoadBalancer(
-    'cie-frontend',
+    COMPONENT_NAME,
     argv.externalIP || '192.168.1.43',
     80,
     80
@@ -18,7 +20,7 @@ frontEndLB.validate();
 
 
 let deployment = createDeployment(
-    'cie-frontend',
+    COMPONENT_NAME,
     'vengelmann/cie-frontend',
     [{ name: 'CIE_ENV', value: deployEnv}],
     [{ 'containerPort': 80 }]

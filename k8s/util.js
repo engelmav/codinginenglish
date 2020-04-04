@@ -6,6 +6,28 @@ const {
 } = require('kubernetes-models/extensions/v1beta1');
 
 
+function createService(
+  componentName, port, targetPort
+) {
+  return new Service({
+    metadata: {
+      name: componentName
+    },
+    spec: {
+      selector: {
+        app: componentName,
+      },
+      ports: [
+        new ServicePort({
+          protocol: "TCP",
+          port: port,
+          targetPort: targetPort
+        })
+      ]
+    }
+  });
+}
+
 function createLoadBalancer(
   componentName, loadBalancerIP, port, targetPort
 ) {
@@ -71,6 +93,7 @@ function createDeployment(
 
 
 module.exports = {
+  createDeployment,
   createLoadBalancer,
-  createDeployment
+  createService
 };
