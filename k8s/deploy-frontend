@@ -1,13 +1,13 @@
 #! /usr/bin/node
 
-const { createLoadBalancer, createDeployment } = require('./util');
+const { createLoadBalancer, createDeployment, argv } = require('./util');
 
 const YAML = require('json-to-pretty-yaml');
-const argv = require('yargs').argv;
-const deployEnv = argv.env;
 
+
+  
+const deployEnv = argv.e;
 const COMPONENT_NAME = 'cie-frontend';
-
 
 let frontEndLB = createLoadBalancer(
     COMPONENT_NAME,

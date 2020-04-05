@@ -1,10 +1,9 @@
 #! /usr/bin/node
-const { createService, createDeployment } = require('./util');
+const { createService, createDeployment, argv } = require('./util');
 const YAML = require('json-to-pretty-yaml');
-const argv = require('yargs').argv;
 
 
-const deployEnv = argv.env;
+const deployEnv = argv.e;
 const COMPONENT_NAME = "cie-api";
 
 let apiSvc = createService(

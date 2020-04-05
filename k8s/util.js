@@ -5,6 +5,14 @@ const {
   Deployment, DeploymentSpec
 } = require('kubernetes-models/extensions/v1beta1');
 
+const argv = require('yargs')
+  .usage('$0 [options]')
+  .demandOption(['e'])
+  .alias('e', 'environment')
+  .nargs('e', 1)
+  .describe('e', 'loads config for the specified environment')
+  .argv;
+
 
 function createService(
   componentName, port, targetPort
@@ -95,5 +103,6 @@ function createDeployment(
 module.exports = {
   createDeployment,
   createLoadBalancer,
-  createService
+  createService,
+  argv
 };
