@@ -13,7 +13,7 @@ RUN venv/bin/pip install gunicorn
 
 COPY database database
 COPY services services
-COPY config.py main.py rocketchat_endpoints.py secrets.json run_cie_api.sh ./
+COPY *.py secrets.json run_cie_api.sh ./
 RUN chmod +x run_cie_api.sh
 
 ENV FLASK_APP main.py
