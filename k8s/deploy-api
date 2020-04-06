@@ -14,12 +14,13 @@ let apiSvc = createService(
 apiSvc.validate();
 
 
-let apiDeploy = createDeployment(
-    COMPONENT_NAME,
-    "vengelmann/cie-api",
-    [{ name: "CIE_ENV", value: deployEnv }],
-    [{ name: "http", containerPort: 80 }]
-);
+let apiDeploy = createDeployment({
+    componentName: COMPONENT_NAME,
+    imageName: "vengelmann/cie-api",
+    envVars: [{ name: "CIE_ENV", value: deployEnv }],
+    ports: [{ name: "http", containerPort: 80 }],
+    secrets: "regcred"
+});
 
 const svcYml = YAML.stringify(apiSvc);
 console.log(svcYml);
