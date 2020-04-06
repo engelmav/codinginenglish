@@ -1,10 +1,7 @@
 from config import config
 from urllib.parse import urljoin
-import json
 
 import requests
-from requests.exceptions import HTTPError
-
 
 import logging
 
@@ -27,6 +24,7 @@ class SessionB(requests.Session):
 
 class RocketChatService(requests.Session):
     LOGIN_URI = '/api/v1/login'
+
     def __init__(self, username, password, api_url):
         self.session = None
         self._authenticate(username, password, api_url)
@@ -43,7 +41,7 @@ class RocketChatService(requests.Session):
                 "user": username,
                 "password": password
             })
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.RequestException as e:
             LOG.error("Unable to authenticate with RocketChatService. Leaving down.")
             return
         resp_json = resp.json()
