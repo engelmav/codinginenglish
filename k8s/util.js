@@ -61,9 +61,8 @@ function createLoadBalancer(
 }
 
 
-function createDeployment(
-  componentName, imageName, envVars, ports
-) {
+function createDeployment(params) {
+  const { componentName, imageName, envVars, ports, secrets } = params;
   let deployment = new Deployment({
     metadata: {
       name: componentName
@@ -94,6 +93,9 @@ function createDeployment(
       })
     }
   });
+  if (secrets) {
+    deployment.spec.template.spec.imagePullSecrets = [{name: secrets}]
+  }
   // annoying hack (breaks the validate() method)
   deployment.apiVersion = "apps/v1";
   return deployment;
