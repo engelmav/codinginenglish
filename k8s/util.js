@@ -9,6 +9,7 @@ const argv = require('yargs')
   .usage('$0 [options]')
   .demandOption(['e'])
   .alias('e', 'environment')
+  .choices('e', ['local', 'prod'])
   .nargs('e', 1)
   .describe('e', 'loads config for the specified environment')
   .argv;
@@ -36,9 +37,11 @@ function createService(
   });
 }
 
+
 function createLoadBalancer(
   componentName, loadBalancerIP, port, targetPort
 ) {
+  //   const { componentName, loadBalancerIP, port, targetPort } = params;
   return new Service({
     metadata: {
       name: componentName
