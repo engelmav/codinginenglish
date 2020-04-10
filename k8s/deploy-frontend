@@ -1,31 +1,40 @@
 #! /usr/bin/node
 
-const { createLoadBalancer, createDeployment, argv } = require('./util');
+const { createLoadBalancer, createService, createDeployment, argv } = require('./util');
 
 const YAML = require('json-to-pretty-yaml');
 
 
-  
 const deployEnv = argv.e;
 const COMPONENT_NAME = 'cie-frontend';
 
-let frontEndLB = createLoadBalancer(
-    COMPONENT_NAME,
-    argv.externalIP || '192.168.1.43',
-    80,
-    80
-);
-frontEndLB.validate();
+let service;
+if (deployEnv === 'local') {
+    // if dev, create an LB for use with MetalLB
+    service = createLoadBalancer(
+        COMPONENT_NAME,
+        argv.externalIP || '192.168.1.43',
+        80,
+        80
+    );
+} else if (deployEnv === 'prod') {
+    // if prod, use a simple service
+    service = createService(
+        COMPONENT_NAME,
+        80,
+        80
+    );
+}
+service.validate();
 
 
+let deployment = createDeployment({
+    componentName: COMPONENT_NAME,
+    imageName: 'vengelmann/cie-frontend',
+    envVars: [{ name: 'CIE_ENV', value: deployEnv }],
+    ports: [{ 'containerPort': 80 }]
+});
 
-let deployment = createDeployment(
-    COMPONENT_NAME,
-    'vengelmann/cie-frontend',
-    [{ name: 'CIE_ENV', value: deployEnv}],
-    [{ 'containerPort': 80 }]
-);
-
-console.log(YAML.stringify(frontEndLB));
+console.log(YAML.stringify(service));
 console.log('---');
 console.log(YAML.stringify(deployment));

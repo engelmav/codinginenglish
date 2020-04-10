@@ -22,6 +22,7 @@ let apiDeploy = createDeployment({
     secrets: "regcred"
 });
 
+
 const svcYml = YAML.stringify(apiSvc);
 console.log(svcYml);
 console.log("---")
