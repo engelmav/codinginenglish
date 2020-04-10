@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: cie-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - www.codinginenglish.com
+    secretName: cie-tls
+  rules:
+  - host: www.codinginenglish.com
+    http:
+      paths:
+      - backend:
+          serviceName: cie-frontend
+          servicePort: 80
