@@ -1,3 +1,5 @@
+# Contains the actual ingress deployment definition, configmaps
+# and permissioning for loadbalancing, routing, and encryption
 apiVersion: v1
 kind: Namespace
 metadata:

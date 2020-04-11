@@ -1,3 +1,5 @@
+# Purpose: to apply a real TLS certificate to the nginx ingress pod
+# and route codinginenglish.com -> www.codinginenglish.com
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -5,11 +7,13 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/server-alias: "codinginenglish.com"  
+    nginx.ingress.kubernetes.io/server-alias: "codinginenglish.com"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   tls:
   - hosts:
     - www.codinginenglish.com
+    - codinginenglish.com
     secretName: cie-tls
   rules:
   - host: www.codinginenglish.com

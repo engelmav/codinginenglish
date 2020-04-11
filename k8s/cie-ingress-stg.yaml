@@ -1,3 +1,5 @@
+# Purpose: to apply an unsigned TLS certificate to the nginx ingress
+# pod
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
