@@ -7,13 +7,14 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/server-alias: "codinginenglish.com"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:
   - hosts:
     - www.codinginenglish.com
-    - codinginenglish.com
+    - remote.codinginenglish.com
     secretName: cie-tls
   rules:
   - host: www.codinginenglish.com
@@ -21,4 +22,11 @@ spec:
       paths:
       - backend:
           serviceName: cie-frontend
+          servicePort: 80
+  - host: remote.codinginenglish.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cie-guac
           servicePort: 80
