@@ -52,8 +52,12 @@ module.exports = function (webpackEnv) {
   
   if (webpackEnv === 'production'){
     auth0CbHost = 'https://www.codinginenglish.com/callback';
+    guacUrl = 'https://remote.codinginenglish.com/guacamole';
+  } else {
+    guacUrl = 'http://localhost:8081/guacamole/';
   }
-  console.log("Using Auth0 callback host", auth0CbHost);
+  console.log("Auth0 callback host", auth0CbHost);
+  console.log("Guac URL:", guacUrl);
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -488,7 +492,8 @@ module.exports = function (webpackEnv) {
       new webpack.DefinePlugin(env.stringified),
       new webpack.DefinePlugin({
         __VERSION__: JSON.stringify('1.0.0.' + Date.now()),
-        __AUTHZERO_CB_HOST__: JSON.stringify(auth0CbHost)
+        __AUTHZERO_CB_HOST__: JSON.stringify(auth0CbHost),
+        __GUAC_URL__: JSON.stringify(guacUrl)
       }),
       // This is necessary to emit hot updates (currently CSS only):
       isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
