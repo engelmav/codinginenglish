@@ -39,7 +39,8 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
-const auth0CbHost = 
+
+let auth0CbHost = // will be overridden for production
   process.env.DEV_SERVER ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback';
 
 console.log("Using Auth0 callback host", auth0CbHost);
@@ -51,6 +52,10 @@ module.exports = function (webpackEnv) {
   console.log("Building for environment", webpackEnv);
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
+  
+  if (webpackEnv === 'production'){
+    auth0CbHost = 'https://www.codinginenglish.com/callback';
+  }
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
