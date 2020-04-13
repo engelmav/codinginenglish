@@ -9,26 +9,7 @@ import { FaGripLines } from 'react-icons/fa'
 import { Rnd } from 'react-rnd';
 
 
-/**
- * Refocuses the iframe containing Guacamole if the user is not already
- * focusing another non-body element on the page.
- */
-// var refocusGuacamole = function refocusGuacamole() {
-
-//   // Do not refocus if focus is on an input field
-//   var focused = document.activeElement;
-//   if (focused && focused !== document.body)
-//       return;
-
-//   // Ensure iframe is focused
-//   var iframe = document.getElementById('guac-view');
-//   iframe.focus();
-
-// };
-
-// // Attempt to refocus iframe upon click or keydown
-// document.addEventListener('click', refocusGuacamole);
-// document.addEventListener('keydown', refocusGuacamole);
+/* global __AUTHZERO_CB_HOST__ */
 
 
 export default class ClassroomContainer extends Component {
@@ -107,7 +88,7 @@ export default class ClassroomContainer extends Component {
             ref={this.setGuacViewerRef}
             onClick={this.focusGuacViewer}
             id="guac-view"
-            url="http://localhost:8081/guacamole/"
+            url={__GUAC_URL__}
             width="100%"
             height="100%"
             scrolling="auto"
