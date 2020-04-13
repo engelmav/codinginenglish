@@ -9,7 +9,7 @@ const deployEnv = argv.e;
 const COMPONENT_NAME = 'cie-frontend';
 
 let service;
-if (deployEnv === 'local') {
+if (deployEnv == 'local' || deployEnv == 'dev') {
     // if dev, create an LB for use with MetalLB
     service = createLoadBalancer(
         COMPONENT_NAME,
