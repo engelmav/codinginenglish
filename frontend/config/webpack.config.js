@@ -42,6 +42,7 @@ const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 let auth0CbHost = // will be overridden for production
   process.env.DEV_SERVER ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback';
+let guacUrl;
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
