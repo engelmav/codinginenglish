@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rocket-storage-pv
+  labels:
+    types: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 300Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/rocket-chat/storage"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: rocket-storage-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 300Mi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-storage-pv
+  labels:
+    types: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 300Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/rocket-chat/storage"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongodb-storage-pv-claim
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 300Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:latest
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: ""
+            - name: MONGO_INITDB_DATABASE
+              value: rocketchat
+          command: ["mongod", --"smallfiles", "--nojournal", "--bind_ip_all"]
+          resources:
+            limits: { memory: "100Mi", cpu: "100m" }
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db
+          readinessProbe:
+            exec:
+              command:
+                - mongo
+                - --eval
+                - "db.adminCommand('ping')"
+            timeoutSeconds: 5
+      volumes:
+      - name: mongodb-storage
+        persistentVolumeClaim:
+          claimName: mongodb-storage-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+# NOTE:omitting type: LoadBalancer
+  selector:
+    app: mongodb
+  ports:
+    - port: 27017
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocket-chat
+  labels:
+    app: rocket-chat
+spec:
+  selector:
+    matchLabels:
+      app: rocket-chat
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rocket-chat
+    spec:
+      containers:
+        - name: rocket-chat
+          image: rocket.chat:latest
+          env:
+            - name: PORT
+              value: "3000"
+            - name: MONGO_URL
+              value: mongodb://root@mongodb:27017/rocketchat
+            - name: INSTANCE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          resources:
+            requests: { memory: "190Mi", cpu: "190m" }
+            limits: { memory: "600Mi", cpu: "190m" }
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+          - name: rocket-storage
+            mountPath: /app/uploads
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 15
+      volumes:
+        - name: rocket-storage
+          persistentVolumeClaim:
+            claimName: rocket-storage-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocket-chat
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.47
+  selector:
+    app: rocket-chat
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
