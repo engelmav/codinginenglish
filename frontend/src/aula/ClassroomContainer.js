@@ -2,14 +2,13 @@ import React, { Component } from 'react'
 import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
 import ChatView from './ChatView';
-import VncDisplay from './VncDisplay';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { FaGripLines } from 'react-icons/fa'
 import { Rnd } from 'react-rnd';
 
 
-/* global __AUTHZERO_CB_HOST__ */
+/* global __GUAC_URL__ */
 
 
 export default class ClassroomContainer extends Component {
@@ -23,7 +22,6 @@ export default class ClassroomContainer extends Component {
     this.focusGuacViewer = () => {
       if (this.guacViewer) this.guacViewer.focus();
     }
-
   }
 
   render() {
