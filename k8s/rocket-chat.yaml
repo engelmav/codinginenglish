@@ -57,24 +57,29 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: mongodb
+  name: mongo
   labels:
-    app: mongodb
+    app: mongo
 spec:
+  serviceName: "mongo"
+  replicas: 1
   selector:
     matchLabels:
-      app: mongodb
-  strategy:
-    type: Recreate
+      app: mongo
+  # strategy:
+  #   type: Recreate
   template:
     metadata:
       labels:
-        app: mongodb
+        app: mongo
+        role: mongo
+        environment: test
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
-        - name: mongodb
+        - name: mongo
           image: vengelmann/mongo-rs0:latest
           env:
             # - name: MONGO_INITDB_ROOT_USERNAME
@@ -83,7 +88,7 @@ spec:
             #   value: passwd
             - name: MONGO_INITDB_DATABASE
               value: rocketchat
-          command: ["mongod", "--nojournal", "--bind_ip_all", "--replSet", "rs0"]
+          command: ["mongod", "--nojournal", "--bind_ip_all", "--replSet", "rs0", "--bind_ip", "0.0.0.0"]
           resources:
             limits: { memory: "100Mi", cpu: "100m" }
           ports:
@@ -98,6 +103,11 @@ spec:
                 - --eval
                 - "db.adminCommand('ping')"
             timeoutSeconds: 5
+        - name: mongo-sidecar
+          image: cvallance/mongo-k8s-sidecar
+          env:
+            - name: MONGO_SIDECAR_POD_LABELS
+              value: "role=mongo,environment=test"
       volumes:
       - name: mongodb-storage
         persistentVolumeClaim:
@@ -107,11 +117,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: mongo
 spec:
 # NOTE:omitting type: LoadBalancer
   selector:
-    app: mongodb
+    app: mongo
   ports:
     - port: 27017
 
@@ -140,7 +150,7 @@ spec:
             - name: PORT
               value: "3000"
             - name: MONGO_URL
-              value: mongodb://mongodb:27017/rocketchat
+              value: mongodb://mongo-0:27017/rocketchat
             - name: INSTANCE_IP
               valueFrom:
                 fieldRef:
