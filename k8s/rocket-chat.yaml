@@ -19,6 +19,7 @@ apiVersion: v1
 metadata:
   name: rocket-storage-pv-claim
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
@@ -47,8 +48,9 @@ apiVersion: v1
 metadata:
   name: mongodb-storage-pv-claim
 spec:
+  storageClassName: manual
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 300Mi
@@ -73,15 +75,15 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:latest
+          image: vengelmann/mongo-rs0:latest
           env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: root
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: ""
+            # - name: MONGO_INITDB_ROOT_USERNAME
+            #   value: root
+            # - name: MONGO_INITDB_ROOT_PASSWORD
+            #   value: passwd
             - name: MONGO_INITDB_DATABASE
               value: rocketchat
-          command: ["mongod", --"smallfiles", "--nojournal", "--bind_ip_all"]
+          command: ["mongod", "--nojournal", "--bind_ip_all", "--replSet", "rs0"]
           resources:
             limits: { memory: "100Mi", cpu: "100m" }
           ports:
@@ -138,14 +140,14 @@ spec:
             - name: PORT
               value: "3000"
             - name: MONGO_URL
-              value: mongodb://root@mongodb:27017/rocketchat
+              value: mongodb://mongodb:27017/rocketchat
             - name: INSTANCE_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
           resources:
-            requests: { memory: "190Mi", cpu: "190m" }
-            limits: { memory: "600Mi", cpu: "190m" }
+            requests: { memory: "400Mi", cpu: "190m" }
+            limits: { memory: "1024Mi", cpu: "190m" }
           ports:
             - containerPort: 3000
           volumeMounts:
