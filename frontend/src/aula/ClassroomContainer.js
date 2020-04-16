@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
-import ChatView from './ChatView';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { FaGripLines } from 'react-icons/fa'
@@ -44,7 +43,7 @@ export default class ClassroomContainer extends Component {
           <div style={{ background: "white" }}><FaGripLines />Slides</div>
           <Iframe
             id="slidesView"
-            url="http://slides.com/vincentengelmann/001-devteamsloops/embed"
+            url="https://slides.com/vincentengelmann/001-devteamsloops/embed"
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </Rnd>
         <Rnd
@@ -56,7 +55,11 @@ export default class ClassroomContainer extends Component {
           }}
         >
           <div><FaGripLines />Chat</div>
-          <ChatView authData={this.props.authData} />
+          <Iframe
+            url="https://chat.codinginenglish.com/channel/general?layout=embedded"
+            id="classroomcontainer__chat-iframe"
+            width="100%" height="500px"
+          />
         </Rnd>
         <Rnd
           default={{
