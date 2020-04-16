@@ -15,6 +15,7 @@ spec:
   - hosts:
     - www.codinginenglish.com
     - remote.codinginenglish.com
+    - chat.codinginenglish.com
     secretName: cie-tls
   rules:
   - host: www.codinginenglish.com
@@ -29,4 +30,10 @@ spec:
       - path: /
         backend:
           serviceName: cie-guac
+          servicePort: 80
+  - host: chat.codinginenglish.com
+    http:
+      paths:
+      - backend:
+          serviceName: rocketchat-rocketchat
           servicePort: 80
