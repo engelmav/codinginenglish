@@ -40,25 +40,12 @@ const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
-let auth0CbHost = // will be overridden for production
-  process.env.DEV_SERVER ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback';
-let guacUrl;
-
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
 module.exports = function (webpackEnv) {
   console.log("Building for environment", webpackEnv);
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
-  
-  if (webpackEnv === 'production'){
-    auth0CbHost = 'https://www.codinginenglish.com/callback';
-    guacUrl = 'https://remote.codinginenglish.com/guacamole';
-  } else {
-    guacUrl = 'http://localhost:8081/guacamole/';
-  }
-  console.log("Auth0 callback host", auth0CbHost);
-  console.log("Guac URL:", guacUrl);
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -493,8 +480,8 @@ module.exports = function (webpackEnv) {
       new webpack.DefinePlugin(env.stringified),
       new webpack.DefinePlugin({
         __VERSION__: JSON.stringify('1.0.0.' + Date.now()),
-        __AUTHZERO_CB_HOST__: JSON.stringify(auth0CbHost),
-        __GUAC_URL__: JSON.stringify(guacUrl)
+        __ENVIRONMENT__: JSON.stringify(webpackEnv),
+        __DEV_SERVER__: JSON.stringify(process.env.DEV_SERVER)
       }),
       // This is necessary to emit hot updates (currently CSS only):
       isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),

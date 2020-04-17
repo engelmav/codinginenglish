@@ -5,9 +5,11 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { FaGripLines } from 'react-icons/fa'
 import { Rnd } from 'react-rnd';
+import settings from '../settings';
 
 
-/* global __GUAC_URL__ */
+let channelName = "general";
+let slideName = '001-devteamsloops';
 
 
 export default class ClassroomContainer extends Component {
@@ -43,7 +45,7 @@ export default class ClassroomContainer extends Component {
           <div style={{ background: "white" }}><FaGripLines />Slides</div>
           <Iframe
             id="slidesView"
-            url="https://slides.com/vincentengelmann/001-devteamsloops/embed"
+            url={`${settings.slidesUrl}/${slideName}/embed}`}
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </Rnd>
         <Rnd
@@ -54,9 +56,13 @@ export default class ClassroomContainer extends Component {
             height: 400
           }}
         >
-          <div><FaGripLines />Chat</div>
+          <div style={
+            {
+              border: "1px solid black"
+            }
+          }><FaGripLines />Chat</div>
           <Iframe
-            url="https://chat.codinginenglish.com/channel/general?layout=embedded"
+            url={`${settings.rocketchatUrl}/${channelName}?layout=embedded`}
             id="classroomcontainer__chat-iframe"
             width="100%" height="500px"
           />
@@ -89,7 +95,7 @@ export default class ClassroomContainer extends Component {
             ref={this.setGuacViewerRef}
             onClick={this.focusGuacViewer}
             id="guac-view"
-            url={__GUAC_URL__}
+            url={settings.guacUrl}
             width="100%"
             height="100%"
             scrolling="auto"
