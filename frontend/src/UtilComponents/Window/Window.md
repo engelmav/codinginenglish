@@ -1,5 +1,5 @@
 ```js
-<Window windowName="Dev Environment">
+<Window title="Dev Environment">
 I am a window!
 </Window>
 ```

@@ -3,9 +3,12 @@ import './ClassroomContainer.css';
 import Iframe from 'react-iframe';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { Window } from '../UtilComponents/Window';
+import { Button } from '../UtilComponents/Button';
 import { FaGripLines } from 'react-icons/fa'
 import { Rnd } from 'react-rnd';
 import settings from '../settings';
+
 
 
 let channelName = "general";
@@ -16,6 +19,10 @@ export default class ClassroomContainer extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      guacViewer: true
+    };
+
     this.setGuacViewerRef = element => {
       this.guacViewer = element;
     };
@@ -25,15 +32,22 @@ export default class ClassroomContainer extends Component {
     }
   }
 
+  toggleGuacViewer = () => {
+    this.setState({ guacViewer: !this.state.guacViewer})
+  }
+
   render() {
+    const { guacViewer } = this.state;
+    const { toggleGuacViewer } = this;
     let userFirstName = null;
     if (this.props.authData !== null) {
       userFirstName = this.props.authData.idTokenPayload.given_name;
     }
 
     return (
-      <>
-        <div style={{ border: "1px solid black" }}>test thing</div>
+      <div>
+        {!guacViewer && <Button>Dev Environment</Button>}
+        {guacViewer && <p>Coding in English</p>}
         <Rnd
           default={{
             x: 0,
@@ -82,7 +96,7 @@ export default class ClassroomContainer extends Component {
             height="100%"
           />
         </Rnd>
-        <Rnd
+        {guacViewer && <Rnd
           default={{
             x: 605,
             y: 0,
@@ -90,7 +104,7 @@ export default class ClassroomContainer extends Component {
             height: 600
           }}
         >
-          <div><FaGripLines />Dev</div>
+          <Window title="Dev Environment" onClose={toggleGuacViewer}/>
           <Iframe
             ref={this.setGuacViewerRef}
             onClick={this.focusGuacViewer}
@@ -100,9 +114,11 @@ export default class ClassroomContainer extends Component {
             height="100%"
             scrolling="auto"
             frameborder="10"
+            style={{border: "10px solid black"}}
           />
-        </Rnd>
-      </>
+          <div style={{border: "1px solid black"}}>thing</div>
+        </Rnd>}
+      </div>
     )
   }
 }
