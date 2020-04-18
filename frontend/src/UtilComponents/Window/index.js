@@ -7,20 +7,19 @@ const TitleBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-`;
-const CloseBox = styled.div`
-  margin: 6px;
+  background-color: white;
+  border-radius: 2px;
 `;
 
 const Window = (props) => {
-  const { title, onClose } = props;
+  const { title, onClose, hideClose } = props;
   return (
       <TitleBar>
         <FaGripLines style={{marginLeft: "6px"}}/>
         <div>{title}</div>
-        <FaRegWindowClose style={{marginRight: "3px", cursor: "pointer"}}
+        {!hideClose ? <FaRegWindowClose style={{marginRight: "3px", cursor: "pointer"}}
           onClick={onClose}
-        />
+        />: <div></div>}
       </TitleBar>
   );
 };
