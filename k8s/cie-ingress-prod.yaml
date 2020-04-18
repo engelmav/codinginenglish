@@ -13,6 +13,7 @@ metadata:
 spec:
   tls:
   - hosts:
+    - codinginenglish.com
     - www.codinginenglish.com
     - remote.codinginenglish.com
     - chat.codinginenglish.com
