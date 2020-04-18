@@ -40,19 +40,9 @@ spec:
       containers:
       - image: mysql/mysql-server:8.0
         name: cie-db
-        env:
-        - name: MYSQL_DATABASE
-          value: cie
-        - name: MYSQL_USER
-          value: root
-        - name: MYSQL_PASSWORD
-          value: appuser
-        - name: MYSQL_ROOT_PASSWORD
-          value: root
-        - name: MYSQL_ROOT_HOST
-          value: "%"
-        - name: MYSQL_ALLOW_EMPTY_PASSWORD
-          value: "yes"
+        envFrom:
+        - secretRef:
+          name: cie-db-user-creds
         ports:
         - containerPort: 3306
           name: cie-db
