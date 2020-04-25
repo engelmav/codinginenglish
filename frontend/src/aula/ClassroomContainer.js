@@ -10,10 +10,11 @@ import { Rnd } from 'react-rnd';
 import settings from '../settings';
 
 
-
 let channelName = "general";
-let slideName = '001-devteamsloops';
+let prezzieName = '001-devteamsloops';
 const rocketChatUrl = `${settings.rocketchatUrl}${channelName}?layout=embedded`;
+const slidesUrl = `${settings.slidesUrl}/${prezzieName}/embed?postMessageEvents=true}`
+console.log(`Using slides url ${slidesUrl}`);
 console.log(`Using rocketchat url ${rocketChatUrl}`);
 const slidesWindowTop = "slidesWindow";
 const videoWindowTop = "videoWindow";
@@ -76,7 +77,6 @@ export default class ClassroomContainer extends Component {
           {guacWindow && chatWindow && videoWindow && <p>Coding in English</p>}
         </Taskbar>
 
-
         <Rnd
           default={{
             x: 0,
@@ -90,7 +90,7 @@ export default class ClassroomContainer extends Component {
           <Window title="Slides" hideClose={true} />
           <Iframe
             id="slidesView"
-            url={`${settings.slidesUrl}/${slideName}/embed}`}
+            url={slidesUrl}
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </Rnd>
         {chatWindow && <Rnd
@@ -153,8 +153,8 @@ export default class ClassroomContainer extends Component {
               left: 0,
               height: "100%"
             }}
-            style={{zIndex: (onTop === slidesWindow) ? 200: 0}}
-            onClick={() => this.setState({onTop: slidesWindow})}
+            style={{zIndex: (onTop === guacWindowTop) ? 200: 0}}
+            onClick={() => this.setState({onTop: guacWindowTop})}
           />
         </Rnd>}
       </div>
