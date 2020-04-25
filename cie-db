@@ -1,0 +1,4 @@
+#!/bin/bash
+
+kubectl get pods | grep cie-db | awk '{ print $1 }'  
+

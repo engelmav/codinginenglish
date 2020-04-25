@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { space, flexbox } from 'styled-system';
+import { font } from '../sharedStyles';
 
 
 const Button = styled.button`
-  font-family: 'Roboto', serif;
+  ${font}
   background-color: white;
   border: solid #ff3e00;
   border-width: 2px;

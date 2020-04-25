@@ -5,6 +5,7 @@ import settings from '../settings';
 
 
 var CLIENT_ID = 'pyJiq82f4s6ik5dr9oNnyryW5127T965';
+console.log(`Using auth0 callback ${settings.auth0Host}`);
 
 class Auth {
   accessToken;

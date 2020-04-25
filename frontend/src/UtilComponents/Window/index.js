@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { font } from '../sharedStyles';
 import { FaGripLines, FaRegWindowClose } from 'react-icons/fa'
 
 const TitleBar = styled.div`
+  ${font}
   border: 1px solid black;
   display: flex;
   justify-content: space-between;

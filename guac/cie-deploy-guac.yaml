@@ -13,6 +13,19 @@ spec:
       port: 8080
       targetPort: 8080
 ---
+# Service for Tomcat server @ 8080
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "cie-guac"
+spec:
+  selector:
+    app: "cie-guac"
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
+---
 # Guacamole Tomcat server deployment
 apiVersion: apps/v1
 kind: Deployment
@@ -31,7 +44,7 @@ spec:
         app: cie-guac
     spec:
       containers:
-      - image:  guacamole/guacamole
+      - image:  vengelmann/guac-openid
         name: cie-guac
         env:
         - name: GUACD_HOSTNAME
@@ -43,18 +56,6 @@ spec:
         ports:
         - containerPort: 8080
           name: cie-guac
-        volumeMounts:
-        - name: guac-lib-storage
-          mountPath: /guac-home/extensions
-        - name: guac-settings-storage
-          mountPath: /guac-home
-      volumes:
-      - name: guac-lib-storage
-        persistentVolumeClaim:
-          claimName: guac-pv-claim
-      - name: guac-settings-storage
-        configMap:
-          name: guac-settings-config
 ---
 # This is to access the guacd component
 apiVersion: v1
@@ -64,7 +65,6 @@ metadata:
 spec:
   selector:
     app: "cie-guacd"
-    tier: "backend"
   ports:
     - protocol: TCP
       port: 4822
@@ -92,43 +92,3 @@ spec:
         image: guacamole/guacd
         ports:
           - containerPort: 4822
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: guac-pv-volume
-  labels:
-    types: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/guaclib/extensions"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: guac-pv-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: guac-settings-config
-data:
-  guacamole.properties: |-
-    openid-authorization-endpoint=https://dev-nougy3g5.auth0.com/authorize
-    openid-jwks-endpoint=https://dev-nougy3g5.auth0.com/.well-known/jwks.json
-    openid-issuer=https://dev-nougy3g5.auth0.com/
-    openid-redirect-uri=http://192.168.1.45:8080/guacamole
-    openid-client-id=pyJiq82f4s6ik5dr9oNnyryW5127T965
-    openid-some-dummy=nothing

@@ -99,7 +99,7 @@ class UserG(SQLAlchemyObjectType):
 
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
-    all_users = SQLAlchemyConnectionField(UserG.connection)
+    # all_users = SQLAlchemyConnectionField(User.connection)
 
 
 gql_schema = graphene.Schema(query=Query)

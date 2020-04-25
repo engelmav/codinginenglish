@@ -16,6 +16,7 @@ spec:
     - codinginenglish.com
     - www.codinginenglish.com
     - remote.codinginenglish.com
+    - remote-admin.codinginenglish.com
     - chat.codinginenglish.com
     secretName: cie-tls
   rules:
@@ -31,6 +32,13 @@ spec:
       - path: /
         backend:
           serviceName: cie-guac
+          servicePort: 80
+  - host: remote-admin.codinginenglish.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cie-guac-admin
           servicePort: 80
   - host: chat.codinginenglish.com
     http:

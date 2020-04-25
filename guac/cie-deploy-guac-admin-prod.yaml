@@ -1,0 +1,65 @@
+# This is a "duplicate" guacamole instance pointed only at
+# the mysql service, for the sole purpose of accessing the
+# administrative console. (The instance of guacamole that uses
+# OpenID does not have access to the admin console).
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-guac-admin
+spec:
+  selector:
+    app: cie-guac-admin
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+---
+# Guacamole Tomcat server deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cie-guac-admin
+  labels:
+    app: cie-guac-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cie-guac-admin
+  template:
+    metadata:
+      labels:
+        app: cie-guac-admin
+    spec:
+      containers:
+      - image:  guacamole/guacamole
+        name: cie-guac-admin
+        env:
+        - name: GUACD_HOSTNAME
+          value: "cie-guacd"
+        - name: GUACD_PORT
+          value: "4822"
+        - name: GUACAMOLE_HOME
+          value: "/guac-home"
+        - name: MYSQL_HOSTNAME
+          value: cie-db
+        - name: MYSQL_DATABASE
+          value: guacamole_db
+        envFrom:
+        - secretRef:
+            name: cie-db-guac-creds
+        ports:
+        - containerPort: 8080
+          name: cie-guac-admin
+        volumeMounts:
+        - name: guac-lib-storage
+          mountPath: /guac-home/extensions
+        - name: guac-settings-storage
+          mountPath: /guac-home
+      volumes:
+      - name: guac-lib-storage
+        persistentVolumeClaim:
+          claimName: guac-pv-claim
+      - name: guac-settings-storage
+        configMap:
+          name: guac-settings-config

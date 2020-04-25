@@ -42,22 +42,17 @@ spec:
         name: cie-db
         envFrom:
         - secretRef:
-          name: cie-db-user-creds
+            name: cie-db-user-creds
         ports:
         - containerPort: 3306
           name: cie-db
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
-        - name: mysql-initdb-volume
-          mountPath: /docker-entrypoint-initdb.d
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
           claimName: mysql-pv-claim
-      - name: mysql-initdb-volume
-        configMap:
-          name: mysql-initdb-config
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -85,11 +80,3 @@ spec:
   resources:
     requests:
       storage: 5Gi
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-initdb-config
-data:
-  initdb.sql: |-
-    CREATE USER 'appuser'@'%' IDENTIFIED BY 'appuser';
