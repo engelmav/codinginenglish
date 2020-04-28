@@ -6,10 +6,6 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow.fields import Nested
 from marshmallow import post_load
 
-from graphene import relay
-import graphene
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-
 
 class UserModuleRegistration(Base):
     __tablename__ = 'user_module_registration'
@@ -89,20 +85,6 @@ class ModuleSessionSchema(ModelSchema):
     class Meta:
         model = ModuleSession
         sqla_session = db_session
-
-
-class UserG(SQLAlchemyObjectType):
-    class Meta:
-        model = User
-        interfaces = (relay.Node, )
-
-
-class Query(graphene.ObjectType):
-    node = relay.Node.Field()
-    # all_users = SQLAlchemyConnectionField(User.connection)
-
-
-gql_schema = graphene.Schema(query=Query)
 
 
 
