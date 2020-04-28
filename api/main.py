@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, Blueprint
+from flask import Flask, jsonify, request
 import flask
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -10,7 +10,6 @@ import base64
 import redis
 
 import database.models as m
-from rocketchat_endpoints import rocketchat
 from payment_endpoints import stripe_bp
 from config import config
 from database.models import User
@@ -22,7 +21,6 @@ app = Flask(__name__,
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
 
-app.register_blueprint(rocketchat)
 app.register_blueprint(stripe_bp)
 app.secret_key = config["cie.api.session.key"]
 
