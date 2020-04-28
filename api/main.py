@@ -17,7 +17,6 @@ from database.models import User
 
 from operator import itemgetter
 
-    
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
@@ -37,7 +36,6 @@ red = redis.StrictRedis()
 redis_store = RedisStore(red)
 
 KVSessionExtension(redis_store, app)
-
 
 ZOOM_API_KEY = config["cie.zoom.apikey"]
 ZOOM_SECRET = config["cie.zoom.apisecret"]
@@ -79,7 +77,7 @@ def serialize(data, clazz, many=False):
 
 def deserialize(data, clazz):
     schema = clazz()
-    loaded =  schema.load(data)
+    loaded = schema.load(data)
     return loaded.data
 
 
@@ -88,8 +86,8 @@ def create_modules():
     """
     [
         {
-            'name': 'value',
-            'description': 'value'
+            "name": "Dev Teams and Loops",
+            "description": "Development teams, roles, salaries"
         }
     ]
     :return:
@@ -108,6 +106,13 @@ def create_modules():
 
 @app.route('/api/cie-modules/<cie_module_id>/sessions', methods=['POST'])
 def add_session_to_module(cie_module_id):
+    """
+    {
+	    "session_datetime": "2020-05-20 18:00:00"
+    }
+    :param cie_module_id: str. integer id of module.
+    :return: ModuleSessionSchema object.
+    """
     sess = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
     new_sess = sess.add()
     return serialize(new_sess, m.ModuleSessionSchema)
