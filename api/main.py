@@ -70,7 +70,7 @@ def _get(key, default=None):
 
 def serialize(data, clazz, many=False):
     schema = clazz(many=many)
-    return jsonify(schema.dump(data).data)
+    return jsonify(schema.dump(data))
 
 
 def deserialize(data, clazz):
@@ -95,10 +95,8 @@ def create_modules():
     "name": "value"
 }
     """
-    j = request.get_json()
-    for obj in j:
-        inst = m.CieModuleSchema().make_instance(obj)
-        inst.add()
+    inst = m.CieModuleSchema().make_instance(request.get_json())
+    inst.add()
     return serialize(inst, m.CieModuleSchema)
 
 
