@@ -5,6 +5,10 @@ import Modal from 'react-modal';
 
 import { CheckoutForm } from '../CheckoutForm';
 import { Button } from '../UtilComponents/Button';
+import { FaGripLines, FaRegWindowClose } from 'react-icons/fa';
+import { font } from '../UtilComponents/sharedStyles';
+import styled from 'styled-components';
+
 
 import './styles.css';
 
@@ -70,6 +74,11 @@ class Welcome extends Component {
 }
 
 
+const ClassModalTitle = styled.h1`
+  ${font}
+`
+
+
 class ModuleCard extends Component {
   constructor() {
     super();
@@ -90,7 +99,7 @@ class ModuleCard extends Component {
   closeModal = () => {
     this.setState({ modalIsOpen: false });
   }
-  
+
   render() {
     let { cie_module, session_datetime } = this.props.sessionData;
     var local = DateTime.fromISO(session_datetime);
@@ -100,23 +109,30 @@ class ModuleCard extends Component {
     return (
       <div className="module-card">
         <img src={cie_module.image_path} alt={cie_module.name} />
-        <h1>{cie_module.name}</h1>
+        <ClassModalTitle>{cie_module.name}</ClassModalTitle>
         <p className="datetime">Starts {localDateTime}</p>
-        <Button 
+        <Button
           onClick={this.handleSignupClick}
           justifySelf='end'
           m={2}>
-            REGISTER
+          REGISTER
         </Button>
         <Modal
+          style={{
+            content: { top: '45%', left: '50%', transform: 'translate(-50%,-50%)', width: '45%' }
+          }}
           ariaHideApp={false}
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}>
+          <FaRegWindowClose size="20" style={{ cursor: "pointer", float: 'right' }}
+            onClick={closeModal}
+          />
           <h1>{cie_module.name}</h1>
           <p>Starts {localDateTime}</p>
           <p>{cie_module.description}</p>
-            <CheckoutForm onCloseClick={closeModal} />
+
+          <CheckoutForm onCloseClick={closeModal} />
         </Modal>
       </div>
     );
