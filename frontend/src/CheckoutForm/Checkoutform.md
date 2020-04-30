@@ -1,0 +1,3 @@
+```js
+<CheckoutForm pizza="🍕" />
+```
