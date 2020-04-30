@@ -29,7 +29,7 @@ class Auth {
   }
 
 
-  login(cb) {
+  login() {
     this.auth0.authorize();
   }
 
@@ -40,15 +40,14 @@ class Auth {
         if (!authResult || !authResult.idToken) {
           return reject(err);
         }
-        this.setSession(authResult, cb);;
+        this.setSession(authResult, cb);
         this.navigateToHomeRoute();
         resolve();
       });
     })
   }
 
-  setSession(authResult, cb) {
-    cb(authResult);
+  setSession(authResult) {
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
@@ -56,7 +55,7 @@ class Auth {
 
   signOut() {
     this.auth0.logout({
-      returnTo: 'http://localhost:8080',
+      returnTo: settings.auth0LogoutUrl,
       clientID: CLIENT_ID,
     });
   }
