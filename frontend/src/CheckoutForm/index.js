@@ -1,4 +1,9 @@
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  Elements, CardElement, useStripe, useElements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement
+} from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -8,6 +13,13 @@ import styled from 'styled-components';
 import { Button } from '../UtilComponents/Button';
 import { AlertMessage } from '../UtilComponents/AlertMessage';
 import { Spinner } from '../UtilComponents/Spinner';
+import { TextInput } from '../UtilComponents/TextInput';
+import { font } from '../UtilComponents/sharedStyles';
+
+import styles from './styles.css';
+
+/* global window */
+window.enablePayments = true;
 
 
 const CARD_ELEMENT_OPTIONS = {
@@ -28,17 +40,30 @@ const CARD_ELEMENT_OPTIONS = {
 const stripePromise = loadStripe('pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP');
 
 
-function CardSection() {
-  return (
-    <label>
-      Card details
-      <CardElement options={CARD_ELEMENT_OPTIONS} />
-    </label>
-  )
-};
-
-
+const CustomerInfo = styled.div`
+  ${font}
+  display: grid;
+  grid-template-columns: .25fr fit-content(600px);
+  grid-gap: 0.3em;
+  align-items: center;
+  grid-auto-flow: dense;
+`;
+const NameField = styled(TextInput)`
+  grid-column: 2 / 3;
+  width: auto;
+  margin: 0;
+  border: none;
+  outline: none;
+`;
+const PmtFormLabel = styled.label`
+  text-align: right;
+  width: auto;
+  padding: 0;
+  margin: 0;
+  font-size: 85%;
+`;
 const BuyButton = styled(Button)`
+  grid-column: 2 / 3;
   border-color: black;
   background-color: black;
   color: white;
@@ -46,6 +71,17 @@ const BuyButton = styled(Button)`
     color: black;
     background-color: white;
   }
+  margin-top: 6px;
+`;
+const CurrencyMenu = () => {
+  return (
+    <select><option>EUR</option><option>USD</option></select>
+  )
+};
+
+
+const Form = styled.form`
+
 `;
 
 
@@ -87,6 +123,7 @@ function CheckoutFormConsumer(props) {
     } catch (error) {
       setErrorMsg("We couldn't process your order. You have not been charged. We are looking into the issue right now.");
       setLoading(false);
+      console.log(error);
       // TODO: capture failure at backend
       return;
     }
@@ -114,14 +151,20 @@ function CheckoutFormConsumer(props) {
           <button onClick={onCloseClick}>CLOSE</button>
         </>
         :
-          <form onSubmit={handleSubmit}>
-            <CardSection />
+        <Form onSubmit={handleSubmit}>
+          <CustomerInfo className="FormGroup">
+            <PmtFormLabel>Name</PmtFormLabel><NameField placeholder="Marcus Aurelius" />
+            <PmtFormLabel>Card Number</PmtFormLabel><CardNumberElement />
+            <PmtFormLabel>Expires</PmtFormLabel><CardExpiryElement />
+            <PmtFormLabel>CVC</PmtFormLabel><CardCvcElement />
+            <PmtFormLabel>Currency</PmtFormLabel><CurrencyMenu />
             <BuyButton onClick={handleSubmit} disabled={!stripe || isLoading}>
               PURCHASE
             </BuyButton>
-            {isLoading && <Spinner />}
-            {(!isLoading && errorMsg) && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
-          </form>}
+          </CustomerInfo>
+          {isLoading && <Spinner />}
+          {(!isLoading && errorMsg) && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
+        </Form>}
     </>
   );
 }
@@ -130,7 +173,7 @@ function CheckoutFormConsumer(props) {
 function CheckoutForm() {
   return (
     <Elements stripe={stripePromise}>
-      <CheckoutFormConsumer />
+      {window.enablePayments ? <CheckoutFormConsumer /> : <div>payments disabled</div>}
     </Elements>
   )
 }
