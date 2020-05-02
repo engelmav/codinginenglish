@@ -13,6 +13,7 @@ import database.models as m
 from payment_endpoints import stripe_bp
 from config import config
 from database.models import User
+from sqlalchemy import and_
 
 from operator import itemgetter
 
@@ -69,6 +70,13 @@ def _get(key, default=None):
 
 
 def serialize(data, clazz, many=False):
+    """
+    JSON-serialize a SQLAlchemy instance using a corresponding Marshmallow schema.
+    :param data: an instance of a SQLAlchemy model
+    :param clazz: the schema class corresponding to the SQLAlchemy model
+    :param many: bool. many or single.
+    :return: json string
+    """
     schema = clazz(many=many)
     return jsonify(schema.dump(data))
 
@@ -129,11 +137,6 @@ def get_modules():
     return serialize(res, m.ModuleSessionSchema, many=True)
 
 
-@app.route('/api/users', methods=['POST'])
-def create_user():
-    ...
-
-
 @app.route('/api/send', methods=['POST'])
 def send_sse():
     j = request.get_json(force=True)
@@ -150,23 +153,88 @@ def stream_sse():
     return sse_message
 
 
-@app.route('/api/profile')
-def login():
+@app.route('/api/users', methods=['POST'])
+def add_user():
+    # TODO: pair down to what we need for unique user identification.
     """
-    Captures user profile information for use in RocketChat and settings.
+    {
+      "accessToken": "<access token>",
+      "idToken": "<id token>",
+      "idTokenPayload": {
+        "given_name": "Vincent",
+        "family_name": "Engelmann",
+        "nickname": "vincent.engelmann1",
+        "name": "Vincent Engelmann",
+        "picture": "https://lh3.googleusercontent.com/a-/AOh14GgKqVpfftmWc9CHGjm6v27b6OnLjsKihXIyU5IsFg",
+        "locale": "en",
+        "updated_at": "2020-04-29T21:43:12.198Z",
+        "email": "some email",
+        "email_verified": true,
+        "iss": "auth0 issuer",
+        "sub": "identity provider id",
+        "aud": "pyJiq82f4s6ik5dr9oNnyryW5127T965",
+        "iat": 1588294030,
+        "exp": 1588297630,
+        "at_hash": "jRyAMA2mBD8pZUzj5nwFcg",
+        "nonce": "0q-BJ_tYoHEJ8YEifjyYech~U_oUUw7F"
+      },
+      "appState": "7v.YFlCBROwgpCxa0YjIQAH700zQCFaE",
+      "refreshToken": null,
+      "state": "7v.YFlCBROwgpCxa0YjIQAH700zQCFaE",
+      "expiresIn": 7200,
+      "tokenType": "Bearer",
+      "scope": "openid profile email"
+    }
+    Captures users logged on via Auth0 for use in registration and view permissions.
     :return:
     """
+
     req = request.get_json()
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
 
-    user = User(
+    existing_user = User.query.filter(
+        and_(
+            User.firstname == given_name,
+            User.lastname == family_name,
+            User.email == email)
+    ).one_or_none()
+
+    if existing_user:
+        return serialize(existing_user, m.UserSchema)
+
+    _user = User(
         firstname=given_name,
         lastname=family_name,
         email=email
     )
-    return jsonify({})
+    _user.add()
+
+    return serialize(_user, m.UserSchema)
+
+
+@app.route('/api/users/<int:user_id>/module-sessions', methods=['GET'])
+def get_user_sessions(user_id):
+    """
+    Get the sessions for which a user is registered.
+    :return:
+    """
+    registered_modules = User.query.filter_by(id=user_id).one().registered_modules
+    return serialize(registered_modules, m.UserModuleRegistrationSchema, many=True)
+
+
+@app.route('/api/users/<int:user_id>/module-sessions', methods=['POST'])
+def register_user_to_session(user_id):
+    """
+    Register a user to a session
+    :return:
+    """
+    user = User.query.filter_by(id=user_id).one()
+    module_session_json = request.get_json()
+    module_session = m.ModuleSession.query.filter_by(id=module_session_json.get('module_session_id')).one()
+    user.add_to_module_session(module_session)
+    return jsonify(success=True)
 
 
 @app.route('/api/zoom/signature/<meeting_number>/<ts>')
