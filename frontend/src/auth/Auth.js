@@ -1,6 +1,7 @@
 import auth0 from 'auth0-js';
 import history from '../history'
 import settings from '../settings';
+import { storeNewUser } from '../services'
 
 
 
@@ -51,6 +52,7 @@ class Auth {
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
+    storeNewUser(authResult);
   }
 
   signOut() {
