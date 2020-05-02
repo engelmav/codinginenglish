@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "5611ea8b-7e25-4cc5-8b56-758cf6708723",
+		"name": "cie api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get module sessions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{cie_api}}/api/module-sessions",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"module-sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add module",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Dev Teams and Loops\",\n    \"description\": \"Development teams, roles, salaries\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{cie_api}}/api/modules",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"modules"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add module session",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"session_datetime\": \"2020-05-20 18:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{cie_api}}/api/cie-modules/19/sessions",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"cie-modules",
+						"19",
+						"sessions"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "add module session",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"session_datetime\": \"2020-05-20 18:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{cie_api}}/api/cie-modules/19/sessions",
+							"protocol": "http",
+							"host": [
+								"{{cie_api}}"
+							],
+							"path": [
+								"api",
+								"cie-modules",
+								"19",
+								"sessions"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn/19.9.0"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 27 Apr 2020 17:47:08 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3"
+						}
+					],
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "add user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"session_datetime\": \"2020-05-20 18:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{cie_api}}/api/users",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "add module session",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"session_datetime\": \"2020-05-20 18:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{cie_api}}/api/cie-modules/19/sessions",
+							"protocol": "http",
+							"host": [
+								"{{cie_api}}"
+							],
+							"path": [
+								"api",
+								"cie-modules",
+								"19",
+								"sessions"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn/19.9.0"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 27 Apr 2020 17:47:08 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3"
+						}
+					],
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "add user to module session",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"module_session_id\": \"9\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{cie_api}}/api/users/10/module-sessions",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"10",
+						"module-sessions"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "add module session",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"session_datetime\": \"2020-05-20 18:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{cie_api}}/api/cie-modules/19/sessions",
+							"protocol": "http",
+							"host": [
+								"{{cie_api}}"
+							],
+							"path": [
+								"api",
+								"cie-modules",
+								"19",
+								"sessions"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn/19.9.0"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 27 Apr 2020 17:47:08 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "3"
+						}
+					],
+					"cookie": [],
+					"body": "{}"
+				}
+			]
+		},
+		{
+			"name": "get user sessions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{cie_api}}/api/users/10/module-sessions",
+					"protocol": "http",
+					"host": [
+						"{{cie_api}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"10",
+						"module-sessions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
