@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 
 import { CheckoutForm } from '../CheckoutForm';
 import { Button } from '../UtilComponents/Button';
-import { FaGripLines, FaRegWindowClose } from 'react-icons/fa';
+import { FaRegWindowClose } from 'react-icons/fa';
 import { font } from '../UtilComponents/sharedStyles';
 import styled from 'styled-components';
 

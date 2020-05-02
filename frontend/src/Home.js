@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
+import { userRegistrations } from './services/cieApi';
 
 export default class MyDashboard extends Component {
-  // this.state.authData
+  constructor(props){
+    super(props);
+    this.state = {
+      userRegistrations: userRegistrations(props.userId)
+    }
+  }
   render() {
     const { isAuthenticated } = this.props.auth;
     let userFirstName = null;
