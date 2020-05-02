@@ -1,7 +1,7 @@
 import auth0 from 'auth0-js';
 import history from '../history'
 import settings from '../settings';
-import { storeNewUser } from '../services'
+import { storeNewUser } from '../services/cieApi'
 
 
 
@@ -30,29 +30,35 @@ class Auth {
   }
 
 
-  login() {
+  login(cb) {
     this.auth0.authorize();
   }
 
   handleAuthentication(cb) {
+    /*
+      The cb param here is used by Routes/index.js to call setIsAuthenticated()
+    */
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
         if (err) return reject(err);
         if (!authResult || !authResult.idToken) {
           return reject(err);
         }
-        this.setSession(authResult, cb);
         this.navigateToHomeRoute();
         resolve();
+        this.setSession(authResult, cb);
       });
     })
   }
 
-  setSession(authResult) {
+  setSession(authResult, cb) {
+    // storeNewUser(authResult) is a promise that, when resolved, will
+    // provide the calling code with the user's representation on the backend.
+    cb(authResult, storeNewUser(authResult));
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
-    storeNewUser(authResult);
+    
   }
 
   signOut() {
@@ -73,7 +79,7 @@ class Auth {
   }
 
   navigateToHomeRoute() {
-    history.push('/home');
+    history.push('/my-dashboard');
   }
 
   logout() {
