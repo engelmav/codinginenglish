@@ -26,8 +26,8 @@ class User(Base):
         cascade='all, delete, delete-orphan'
     )
 
-    def add_to_mod(self, cie_module: 'CieModule'):
-        user_mod_reg = UserModuleRegistration(user_id=self.id, cie_module_id=cie_module.id)
+    def add_to_module_session(self, module_session: 'ModuleSession'):
+        user_mod_reg = UserModuleRegistration(user_id=self.id, module_session_id=module_session.id)
         user_mod_reg.add()
 
 
@@ -84,6 +84,14 @@ class ModuleSessionSchema(ModelSchema):
 
     class Meta:
         model = ModuleSession
+        sqla_session = db_session
+
+
+class UserModuleRegistrationSchema(ModelSchema):
+    # This strangely produces an extra `User: <id>` field in the serialized JSON.
+    class Meta:
+        include_fk = True
+        model = UserModuleRegistration
         sqla_session = db_session
 
 
