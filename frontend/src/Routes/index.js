@@ -6,7 +6,6 @@ import Callback from '../auth/Auth0Callback';
 import ClassroomContainer from '../aula/ClassroomContainer';
 import { Welcome } from '../Welcome';
 import { withRouter, Route } from 'react-router-dom';
-import VncDisplay from '../aula/VncDisplay';
 
 
 var requiresAuth = makeRequiresAuth(auth);
@@ -48,7 +47,6 @@ class Routes extends Component {
           handleAuthentication(props, this.props.setIsAuthenticated);
           return <CallbackWithRouter {...props} />
         }} />
-        <Route path="/vnc" component={() => <VncDisplay />} />
       </>
     );
   }
