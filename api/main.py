@@ -16,6 +16,9 @@ from database.models import User
 from sqlalchemy import and_
 
 from operator import itemgetter
+import logging
+
+LOG = logging.getLogger(__name__)
 
 app = Flask(__name__,
             static_url_path='',
@@ -122,35 +125,10 @@ def add_session_to_module(cie_module_id):
     return serialize(new_sess, m.ModuleSessionSchema)
 
 
-@app.route('/api/module-session/<session_id>/users', methods=['POST'])
-def add_users_to_session(session_id):
-    j = request.get_json()
-    user_id = j['user_id']
-    user = m.User.query.filter_by(id=user_id).one()
-    sess = m.ModuleSession.query.filter_by(id=session_id).one()
-    m.add_user(user, sess)
-
-
 @app.route('/api/module-sessions')
 def get_modules():
     res = m.ModuleSession.query.all()
     return serialize(res, m.ModuleSessionSchema, many=True)
-
-
-@app.route('/api/send', methods=['POST'])
-def send_sse():
-    j = request.get_json(force=True)
-    message = j['message']
-    res = red.publish('cie', message)
-    return jsonify(res)
-
-
-@app.route('/api/stream')
-def stream_sse():
-    stream_message = event_stream()
-    sse_message = flask.Response(stream_message, mimetype="text/event-stream")
-    print("/stream is returning", sse_message)
-    return sse_message
 
 
 @app.route('/api/users', methods=['POST'])
@@ -193,7 +171,6 @@ def add_user():
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
-
     existing_user = User.query.filter(
         and_(
             User.firstname == given_name,
@@ -202,6 +179,7 @@ def add_user():
     ).one_or_none()
 
     if existing_user:
+        LOG.debug("User with email {} exists already, returning".format(existing_user.email))
         return serialize(existing_user, m.UserSchema)
 
     _user = User(
@@ -210,6 +188,7 @@ def add_user():
         email=email
     )
     _user.add()
+    LOG.info("New user registered with email address: {}".format(_user.email))
 
     return serialize(_user, m.UserSchema)
 
@@ -255,6 +234,23 @@ def get_signature(meeting_number, ts):
 @app.route('/api/zoom/current', )
 def set_current_zoom():
     pass
+
+
+# MESSAGING TO FRONTEND
+@app.route('/api/send', methods=['POST'])
+def send_sse():
+    j = request.get_json(force=True)
+    message = j['message']
+    res = red.publish('cie', message)
+    return jsonify(res)
+
+
+@app.route('/api/stream')
+def stream_sse():
+    stream_message = event_stream()
+    sse_message = flask.Response(stream_message, mimetype="text/event-stream")
+    print("/stream is returning", sse_message)
+    return sse_message
 
 
 @app.route("/api/site-map")
