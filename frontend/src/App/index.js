@@ -18,7 +18,8 @@ class App extends Component {
   }
 
 
-  setIsAuthenticated = (authData) => {
+  setIsAuthenticated = (authData, storeToBackendPromise) => {
+    storeToBackendPromise.then((res) => this.setState({userData: res}))
     console.log("authData from setIsAuthenticated:", authData);
     this.setState(
       {
