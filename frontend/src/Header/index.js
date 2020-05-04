@@ -4,20 +4,23 @@ import { Link, Route, Switch } from 'react-router-dom';
 import classNames from 'classnames';
 import './styles.css';
 
+import { observer } from 'mobx-react';
 
+
+@observer
 class Header extends Component {
 
   render() {
     const {
       auth,
-      authData
+      appStore
     } = this.props;
     const className = classNames('cie-header');
 
     const links = (
       <ul className="routes__navbar">
         <li><Link to="/">classes</Link></li>
-        {authData &&
+        {appStore.authData &&
           <React.Fragment>
             <li><Link to="/my-dashboard">my_dashboard</Link></li>
             <li onClick={() => alert()}>
@@ -25,7 +28,7 @@ class Header extends Component {
             </li>
           </React.Fragment>
         }
-        <li><Login auth={auth} isAuthenticated={authData} /></li>
+        <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>
       </ul>
     );
 

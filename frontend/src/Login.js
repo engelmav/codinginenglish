@@ -12,10 +12,6 @@ class Login extends Component {
     this.props.auth.logout();
   }
 
-  componentDidUpdate(){
-    console.log("Login component got isAuthenticated:", this.props.isAuthenticated);
-  }
-
   render() {
     return (
       <>

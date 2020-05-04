@@ -1,7 +1,7 @@
 import auth0 from 'auth0-js';
 import history from '../history'
 import settings from '../settings';
-import { storeNewUser } from '../services/cieApi'
+import { appStore } from '../stores/AppStore';
 
 
 
@@ -34,10 +34,8 @@ class Auth {
     this.auth0.authorize();
   }
 
-  handleAuthentication(cb) {
-    /*
-      The cb param here is used by Routes/index.js to call setIsAuthenticated()
-    */
+  handleAuthentication() {
+
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
         if (err) return reject(err);
@@ -46,15 +44,13 @@ class Auth {
         }
         this.navigateToHomeRoute();
         resolve();
-        this.setSession(authResult, cb);
+        this.setSession(authResult);
       });
     })
   }
 
-  setSession(authResult, cb) {
-    // storeNewUser(authResult) is a promise that, when resolved, will
-    // provide the calling code with the user's representation on the backend.
-    cb(authResult, storeNewUser(authResult));
+  setSession(authResult) {
+    appStore.storeUser(authResult);
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
@@ -68,11 +64,11 @@ class Auth {
     });
   }
 
-  silentAuth(cb) {
+  silentAuth() {
     return new Promise((resolve, reject) => {
       this.auth0.checkSession({}, (err, authResult) => {
         if (err) return reject(err);
-        this.setSession(authResult, cb);
+        this.setSession(authResult);
         resolve();
       });
     });

@@ -9,6 +9,8 @@ import { Button } from '../UtilComponents/Button';
 import { Rnd } from 'react-rnd';
 import settings from '../settings';
 
+import { observer } from 'mobx-react';
+
 
 let channelName = "general";
 let prezzieName = '001-devteamsloops';
@@ -28,7 +30,9 @@ const Taskbar = styled.div`
   padding: 4px;
 `;
 
-export default class ClassroomContainer extends Component {
+
+@observer
+class ClassroomContainer extends Component {
   constructor(props) {
     super(props);
     this.slidesWindow = React.createRef();
@@ -63,9 +67,10 @@ export default class ClassroomContainer extends Component {
   render() {
     const { guacWindow, chatWindow, slidesWindow, videoWindow, onTop } = this.state;
     const { toggleGuac, toggleChat, toggleVideo } = this;
+    const { appStore } = this.props;
     let userFirstName = null;
     if (this.props.authData !== null) {
-      userFirstName = this.props.authData.idTokenPayload.given_name;
+      userFirstName = appStore.authData.idTokenPayload.given_name;
     }
 
     return (
@@ -161,3 +166,5 @@ export default class ClassroomContainer extends Component {
     )
   }
 }
+
+export default ClassroomContainer;
