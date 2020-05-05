@@ -16,34 +16,16 @@ import { Spinner } from '../UtilComponents/Spinner';
 import { TextInput } from '../UtilComponents/TextInput';
 import { font } from '../UtilComponents/sharedStyles';
 
-import styles from './styles.css';
 
 /* global window */
 window.enablePayments = true;
 
-
-const CARD_ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#424770',
-      '::placeholder': {
-        color: '#aab7c4',
-      },
-    },
-    invalid: {
-      color: '#9e2146',
-    }
-  }
-};
-
 const stripePromise = loadStripe('pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP');
 
-
-const CustomerInfo = styled.div`
+const PaymentInfo = styled.div`
   ${font}
   display: grid;
-  grid-template-columns: .25fr fit-content(600px);
+  grid-template-columns: .25fr auto;
   grid-gap: 0.3em;
   align-items: center;
   grid-auto-flow: dense;
@@ -72,10 +54,15 @@ const BuyButton = styled(Button)`
     background-color: white;
   }
   margin-top: 6px;
+  justify-self: start;
+`;
+
+const CcyMenu = styled.select`
+  justify-self: start;
 `;
 const CurrencyMenu = () => {
   return (
-    <select><option>EUR</option><option>USD</option></select>
+    <CcyMenu><option>EUR</option><option>USD</option></CcyMenu>
   )
 };
 
@@ -152,16 +139,14 @@ function CheckoutFormConsumer(props) {
         </>
         :
         <Form onSubmit={handleSubmit}>
-          <CustomerInfo className="FormGroup">
+          <PaymentInfo className="FormGroup">
             <PmtFormLabel>Name</PmtFormLabel><NameField placeholder="Marcus Aurelius" />
-            <PmtFormLabel>Card Number</PmtFormLabel><CardNumberElement />
-            <PmtFormLabel>Expires</PmtFormLabel><CardExpiryElement />
-            <PmtFormLabel>CVC</PmtFormLabel><CardCvcElement />
+            <PmtFormLabel>Card Details</PmtFormLabel><CardElement />
             <PmtFormLabel>Currency</PmtFormLabel><CurrencyMenu />
             <BuyButton onClick={handleSubmit} disabled={!stripe || isLoading}>
               PURCHASE
             </BuyButton>
-          </CustomerInfo>
+          </PaymentInfo>
           {isLoading && <Spinner />}
           {(!isLoading && errorMsg) && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
         </Form>}

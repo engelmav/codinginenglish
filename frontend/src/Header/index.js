@@ -19,7 +19,7 @@ class Header extends Component {
 
     const links = (
       <ul className="routes__navbar">
-        <li><Link to="/">classes</Link></li>
+        <li><Link to="/">upcoming_classes</Link></li>
         {appStore.authData &&
           <React.Fragment>
             <li><Link to="/my-dashboard">my_dashboard</Link></li>
@@ -37,7 +37,8 @@ class Header extends Component {
         <Route path="/class"><div></div></Route>
         <Route path="*">
           <header className={className}>
-            <h1 className="cie-header-text">coding_in_english</h1>
+            {/* <h1 className="cie-header-text">coding_in_english</h1> */}
+            <img src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></img>
             {links}
           </header>
         </Route>

@@ -14,7 +14,7 @@ stripe.api_key = stripe_secret
 
 def calc_order_amount(item):
     # TODO: pull from database
-    return 1
+    return 5
 
 
 @stripe_bp.route('/payment/create-payment-intent', methods=['POST'])
@@ -22,10 +22,10 @@ def create_payment():
     data = request.get_json()
     LOG.info("Creating payment: %s" % str(data))
     intent = stripe.PaymentIntent.create(
-        # TODO: turn this into a lookup. CIE classes may have different costs
         amount=calc_order_amount(data.get('item')),
         currency=data.get('currency')
     )
+    LOG.info("Processing payment id {} currency {}.".format(intent.stripe_id, intent.currency))
     return jsonify(
         {
             'publishableKey': stripe_publishable_key,

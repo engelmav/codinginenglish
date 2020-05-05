@@ -30,7 +30,7 @@ class Auth {
   }
 
 
-  login(cb) {
+  login() {
     this.auth0.authorize();
   }
 
