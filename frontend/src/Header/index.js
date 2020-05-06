@@ -9,7 +9,6 @@ import { observer } from 'mobx-react';
 
 @observer
 class Header extends Component {
-
   render() {
     const {
       auth,
@@ -19,7 +18,8 @@ class Header extends Component {
 
     const links = (
       <ul className="routes__navbar">
-        <li><Link to="/">upcoming_classes</Link></li>
+        <li><Link to="/">home</Link></li>
+        <li><Link to="/classes">upcoming_classes</Link></li>
         {appStore.authData &&
           <React.Fragment>
             <li><Link to="/my-dashboard">my_dashboard</Link></li>
@@ -38,7 +38,7 @@ class Header extends Component {
         <Route path="*">
           <header className={className}>
             {/* <h1 className="cie-header-text">coding_in_english</h1> */}
-            <img src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></img>
+            <img alt="cie logo" src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></img>
             {links}
           </header>
         </Route>
