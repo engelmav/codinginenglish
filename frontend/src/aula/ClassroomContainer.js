@@ -89,8 +89,8 @@ class ClassroomContainer extends Component {
             width: 600,
             height: 400
           }}
-          style={{zIndex: (onTop === slidesWindowTop) ? 200: 0}}
-          onClick={() => this.setState({onTop: slidesWindowTop})}
+          style={{ zIndex: (onTop === slidesWindowTop) ? 200 : 0 }}
+          onClick={() => this.setState({ onTop: slidesWindowTop })}
         >
           <Window title="Slides" hideClose={true} />
           <Iframe
@@ -105,8 +105,8 @@ class ClassroomContainer extends Component {
             width: 600,
             height: 400
           }}
-          style={{zIndex: (onTop === chatWindowTop) ? 200: 0}}
-          onClick={() => this.setState({onTop: chatWindowTop})}
+          style={{ zIndex: (onTop === chatWindowTop) ? 200 : 0 }}
+          onClick={() => this.setState({ onTop: chatWindowTop })}
         >
           <Window title="CIE Chat" onClose={toggleChat} />
           <Iframe
@@ -122,8 +122,8 @@ class ClassroomContainer extends Component {
             width: 600,
             height: 400
           }}
-          style={{zIndex: (onTop === videoWindowTop) ? 200: 0}}
-          onClick={() => this.setState({onTop: videoWindowTop})}
+          style={{ zIndex: (onTop === videoWindowTop) ? 200 : 0 }}
+          onClick={() => this.setState({ onTop: videoWindowTop })}
         >
           <Window title="Video" onClose={toggleVideo} />
           <Iframe
@@ -139,27 +139,20 @@ class ClassroomContainer extends Component {
             width: 800,
             height: 600
           }}
-          style={{zIndex: (onTop === guacWindowTop) ? 200: 0}}
-          onClick={() => this.setState({onTop: guacWindowTop})}
+          style={{ zIndex: (onTop === guacWindowTop) ? 200 : 0 }}
+          onClick={() => this.setState({ onTop: guacWindowTop })}
         >
           <Window title="Dev Environment" onClose={toggleGuac} />
           <Iframe
             ref={this.setGuacViewerRef}
-            onClick={this.focusGuacViewer}
             id="guac-view"
             url={settings.guacUrl}
             width="100%"
             height="100%"
             scrolling="yes"
             frameborder="10"
-            style={{
-              border: "10px solid black",
-              top: 0,
-              left: 0,
-              height: "100%"
-            }}
-            style={{zIndex: (onTop === guacWindowTop) ? 200: 0}}
-            onClick={() => this.setState({onTop: guacWindowTop})}
+            style={{ zIndex: (onTop === guacWindowTop) ? 200 : 0 }}
+            onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
           />
         </Rnd>}
       </div>
