@@ -1,8 +1,5 @@
 import {
-  Elements, CardElement, useStripe, useElements,
-  CardNumberElement,
-  CardExpiryElement,
-  CardCvcElement
+  Elements, CardElement, useStripe, useElements
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import React, { useState } from 'react';
@@ -25,8 +22,8 @@ const stripePromise = loadStripe('pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP');
 const PaymentInfo = styled.div`
   ${font}
   display: grid;
-  grid-template-columns: .25fr auto;
-  grid-gap: 0.3em;
+  grid-template-columns: min-content auto;
+  grid-gap: 0.6em;
   align-items: center;
   grid-auto-flow: dense;
 `;
@@ -38,11 +35,16 @@ const NameField = styled(TextInput)`
   outline: none;
 `;
 const PmtFormLabel = styled.label`
+  align-self: start;
   text-align: right;
   width: auto;
   padding: 0;
+  padding-top: 1px;
   margin: 0;
   font-size: 85%;
+  font-weight: 600;
+  white-space: nowrap;
+
 `;
 const BuyButton = styled(Button)`
   grid-column: 2 / 3;
@@ -71,11 +73,23 @@ const Form = styled.form`
 
 `;
 
+const EmailNote = styled.p`
+  font-style: italic;
+  font-size: .8em;
+  margin: 0;
+  padding-top: 1px;
+  padding-bottom: 1px;
+`;
+
 
 function CheckoutFormConsumer(props) {
-  const { onCloseClick } = props;
+  const { onCloseClick, appStore } = props;
   const stripe = useStripe();
   const elements = useElements();
+  const [name, setName] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [email, setEmail] = useState('');
+  const [currency, setCurrency] = useState('');
   const [isLoading, setLoading] = useState(false);
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -100,7 +114,7 @@ function CheckoutFormConsumer(props) {
       // TODO: CIE class passed back here, lookup to be performed on backend.
       item: 1,
       // TODO: Where do I get this from?
-      currency: 'EUR'
+      currency: currency
     }
     let clientSecret;
     try {
@@ -140,9 +154,19 @@ function CheckoutFormConsumer(props) {
         :
         <Form onSubmit={handleSubmit}>
           <PaymentInfo className="FormGroup">
-            <PmtFormLabel>Name</PmtFormLabel><NameField placeholder="Marcus Aurelius" />
+            <PmtFormLabel>Name</PmtFormLabel><NameField placeholder="Marcus Aurelius" value={name} onChange={e => setName(e.target.value)} />
             <PmtFormLabel>Card Details</PmtFormLabel><CardElement />
+            <PmtFormLabel>Postal/Zip Code</PmtFormLabel><NameField placeholder="08000" value={postalCode} onChange={e => setPostalCode(e.target.value)} />
             <PmtFormLabel>Currency</PmtFormLabel><CurrencyMenu />
+            {!appStore.authData &&
+              <>
+                <PmtFormLabel>Email</PmtFormLabel>
+                <div>
+                  <NameField placeholder="marcus.aurelius@gmail.com" value={email} onChange={e => setEmail(e.target.value)} />
+                  <EmailNote>For receipt and account creation on your terms. We will NOT spam you.</EmailNote>
+                </div>
+              </>
+            }
             <BuyButton onClick={handleSubmit} disabled={!stripe || isLoading}>
               PURCHASE
             </BuyButton>
@@ -155,10 +179,11 @@ function CheckoutFormConsumer(props) {
 }
 
 
-function CheckoutForm() {
+function CheckoutForm(props) {
+
   return (
     <Elements stripe={stripePromise}>
-      {window.enablePayments ? <CheckoutFormConsumer /> : <div>payments disabled</div>}
+      {window.enablePayments ? <CheckoutFormConsumer appStore={props.appStore} /> : <div>payments disabled</div>}
     </Elements>
   )
 }
