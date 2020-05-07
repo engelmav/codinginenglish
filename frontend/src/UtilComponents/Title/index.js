@@ -1,10 +1,11 @@
 import styled from 'styled-components';
-import { typography } from 'styled-system';
-import { font } from '../sharedStyles';
+import { typography, space } from 'styled-system';
+import { font, fontColor } from '../sharedStyles';
 
 
 const Title = styled.h1`
-  color: #ff3e00; 
+  ${space}
+  ${fontColor}
   ${typography}
 `
 

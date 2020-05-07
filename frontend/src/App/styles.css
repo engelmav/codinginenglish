@@ -15,8 +15,9 @@ html, body {
   grid-gap: 0;
   /* take up the whole height of browser */ 
   height: 100vh;
-  grid-template-columns: 100vw;
+
   grid-template-rows: min-content 1fr;
+  max-width: 100%;
 }
 
 
@@ -30,4 +31,14 @@ footer {
   color: white;
   height: 200px;
 
+}
+
+
+
+.dark-gray {
+  color: #373737;
+}
+
+.light-gray {
+  color: #6e6e6e;
 }

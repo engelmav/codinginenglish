@@ -1,9 +1,22 @@
 import { css } from 'styled-components';
 
-
-const font = css`
-  font-family: 'Roboto', serif;
+// darkGray for copy
+const fontColor = css`
   color: #373737;
 `;
 
-export { font };
+
+const lightGray = css`
+  color: #6e6e6e;
+`;
+
+const font = css`
+  font-family: 'Roboto', serif;
+  ${fontColor}  
+`;
+
+export {
+  font,
+  fontColor,
+  lightGray
+ };

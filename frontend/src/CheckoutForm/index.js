@@ -6,11 +6,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
+import { 
+  AlertMessage,
+  Button,
+  Spinner,
+  TextInput,
+ } from '../UtilComponents';
 
-import { Button } from '../UtilComponents/Button';
-import { AlertMessage } from '../UtilComponents/AlertMessage';
-import { Spinner } from '../UtilComponents/Spinner';
-import { TextInput } from '../UtilComponents/TextInput';
 import { font } from '../UtilComponents/sharedStyles';
 
 
@@ -93,6 +95,7 @@ function CheckoutFormConsumer(props) {
   const [isLoading, setLoading] = useState(false);
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
   const handleSubmit = async (event) => {
     // disable default form submission
     event.preventDefault();
