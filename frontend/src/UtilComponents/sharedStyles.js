@@ -15,8 +15,13 @@ const font = css`
   ${fontColor}  
 `;
 
+const orangeBgColor = css`
+  background: #ff3e00;
+`;
+
 export {
   font,
   fontColor,
-  lightGray
+  lightGray,
+  orangeBgColor
  };
