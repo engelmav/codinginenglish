@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import { Button } from '../UtilComponents/Button';
+import { Button } from './UtilComponents/Button';
 
 
 class Login extends Component {
@@ -17,13 +17,13 @@ class Login extends Component {
       <>
         {
           !this.props.isAuthenticated &&
-            <button onClick={this.login}>login</button>
+            <Button onClick={this.login}>login</Button>
         }
         {
           this.props.isAuthenticated &&
-            <button onClick={this.logout}>
+            <Button onClick={this.logout}>
               log out
-          </button>
+          </Button>
         }
       </>
     );

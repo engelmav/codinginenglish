@@ -6,27 +6,3 @@
   justify-content: center;
 }
 
-.module-card {
-  border: 1px solid #ff3e00;
-  border-radius: 6px;
-  width: 250px;
-  background-color: white;
-  display: grid;
-  font-family: 'Roboto', serif;
-}
-
-.module-card h1 {
-  font-size: 88%;
-  justify-self: center;
-  font-weight: 850;
-}
-
-.module-card .datetime {
-  font-size: 80%;
-  justify-self: center;
-}
-
-.module-card img {
-  width: 100%;
-  justify-self: center;
-}
