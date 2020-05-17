@@ -17,12 +17,12 @@ class Login extends Component {
       <>
         {
           !this.props.isAuthenticated &&
-            <Button onClick={this.login}>login</Button>
+            <Button onClick={this.login}>sign in / sign up</Button>
         }
         {
           this.props.isAuthenticated &&
             <Button onClick={this.logout}>
-              log out
+              sign out
           </Button>
         }
       </>

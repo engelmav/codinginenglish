@@ -141,14 +141,17 @@ class ModuleCard extends Component {
     const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
     const { modalIsOpen } = this.state;
     const { afterOpenModal, closeModal } = this;
-    const { appStore } = this.props;
+    const { appStore, sessionData } = this.props;
     return (
       <ModuleCardContainer>
         <img src={
           // cie_module.image_path
           `${settings.assets}/lego-man-key-250.jpeg`
         }
-          alt={cie_module.name} />
+          alt={cie_module.name}
+          width="150"
+          height="150"
+        />
         <div className="title-desc">
           <Title p={0}>{cie_module.name}</Title>
           <p className="datetime">Course begins {localDateTime}</p>
@@ -166,7 +169,9 @@ class ModuleCard extends Component {
           ariaHideApp={false}
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
-          onRequestClose={closeModal}>
+          onRequestClose={closeModal}
+          shouldCloseOnOverlayClick={false}
+          >
           <FaRegWindowClose size="20" style={{ cursor: "pointer", float: 'right' }}
             onClick={closeModal}
           />
@@ -181,7 +186,7 @@ class ModuleCard extends Component {
                 </>
               }
             </ContentSection>
-            <CheckoutForm onCloseClick={closeModal} appStore={appStore} />
+            <CheckoutForm sessionData={sessionData} onCloseClick={closeModal} appStore={appStore} />
           </ModalContent>
         </Modal>
       </ModuleCardContainer>

@@ -6,12 +6,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
-import { 
+import {
   AlertMessage,
   Button,
   Spinner,
   TextInput,
- } from '../UtilComponents';
+} from '../UtilComponents';
 
 import { font } from '../UtilComponents/sharedStyles';
 
@@ -61,12 +61,13 @@ const BuyButton = styled(Button)`
   justify-self: start;
 `;
 
-const CcyMenu = styled.select`
+const CcySelect = styled.select`
   justify-self: start;
 `;
+
 const CurrencyMenu = () => {
   return (
-    <CcyMenu><option>EUR</option><option>USD</option></CcyMenu>
+    <CcySelect><option>EUR</option><option>USD</option></CcySelect>
   )
 };
 
@@ -85,13 +86,13 @@ const EmailNote = styled.p`
 
 
 function CheckoutFormConsumer(props) {
-  const { onCloseClick, appStore } = props;
+  const { appStore, onCloseClick, sessionData } = props;
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState('');
-  const [postalCode, setPostalCode] = useState('');
+  // const [postalCode, setPostalCode] = useState('');
   const [email, setEmail] = useState('');
-  const [currency, setCurrency] = useState('');
+  const [currency, setCurrency] = useState('EUR');
   const [isLoading, setLoading] = useState(false);
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -104,21 +105,25 @@ function CheckoutFormConsumer(props) {
       // stripe isn't loaded yet
       return;
     }
+
     const paymentMethod = {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          // TODO: change to field inputs
-          name: 'Jenny Rosen'
+          name,
+          email,
         },
       }
-    }
+    };
+
+
+
     const intentParams = {
-      // TODO: CIE class passed back here, lookup to be performed on backend.
-      item: 1,
-      // TODO: Where do I get this from?
+      item: sessionData.id,
       currency: currency
-    }
+    };
+
+
     let clientSecret;
     try {
       setLoading(true);
@@ -131,6 +136,8 @@ function CheckoutFormConsumer(props) {
       // TODO: capture failure at backend
       return;
     }
+
+
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
 
     if (result.error) {
@@ -152,15 +159,15 @@ function CheckoutFormConsumer(props) {
       {isComplete ?
         <>
           <p>Your purchase is complete. See you in there!</p>
-          <button onClick={onCloseClick}>CLOSE</button>
+          <Button onClick={onCloseClick}>CLOSE</Button>
         </>
         :
         <Form onSubmit={handleSubmit}>
           <PaymentInfo className="FormGroup">
             <PmtFormLabel>Name</PmtFormLabel><NameField placeholder="Marcus Aurelius" value={name} onChange={e => setName(e.target.value)} />
             <PmtFormLabel>Card Details</PmtFormLabel><CardElement />
-            <PmtFormLabel>Postal/Zip Code</PmtFormLabel><NameField placeholder="08000" value={postalCode} onChange={e => setPostalCode(e.target.value)} />
-            <PmtFormLabel>Currency</PmtFormLabel><CurrencyMenu />
+            {/* <PmtFormLabel>Postal/Zip Code</PmtFormLabel><NameField placeholder="08000" value={postalCode} onChange={e => setPostalCode(e.target.value)} /> */}
+            <PmtFormLabel>Currency</PmtFormLabel><CurrencyMenu value={currency} onChange={e => setCurrency(e.target.value)} />
             {!appStore.authData &&
               <>
                 <PmtFormLabel>Email</PmtFormLabel>
@@ -186,7 +193,8 @@ function CheckoutForm(props) {
 
   return (
     <Elements stripe={stripePromise}>
-      {window.enablePayments ? <CheckoutFormConsumer appStore={props.appStore} /> : <div>payments disabled</div>}
+      {window.enablePayments ? <CheckoutFormConsumer appStore={props.appStore} onCloseClick={props.onCloseClick} sessionData={props.sessionData}  />
+        : <div>payments disabled</div>}
     </Elements>
   )
 }

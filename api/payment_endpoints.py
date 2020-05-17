@@ -14,7 +14,7 @@ stripe.api_key = stripe_secret
 
 def calc_order_amount(item):
     # TODO: pull from database
-    return 5
+    return 100
 
 
 @stripe_bp.route('/payment/create-payment-intent', methods=['POST'])
@@ -23,7 +23,9 @@ def create_payment():
     LOG.info("Creating payment: %s" % str(data))
     intent = stripe.PaymentIntent.create(
         amount=calc_order_amount(data.get('item')),
-        currency=data.get('currency')
+        currency=data.get('currency'),
+        payment_method_types=['card'],
+        metadata={'integration_check': 'accept_a_payment'}
     )
     LOG.info("Processing payment id {} currency {}.".format(intent.stripe_id, intent.currency))
     return jsonify(

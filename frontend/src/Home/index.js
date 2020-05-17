@@ -5,17 +5,16 @@ import {
   Title,
   ContentSection
 } from '../UtilComponents';
+import { lightGray, orangeBgColor } from '../UtilComponents/sharedStyles'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-
-
-import { lightGray, orangeBgColor } from '../UtilComponents/sharedStyles'
 
 
 const MainLanding = styled(Main)`
   width: 40%;
   padding-bottom: 60px;
 `;
+
 
 const ContentSectionLanding = styled(ContentSection)`
   padding-bottom: 20px;
@@ -26,15 +25,17 @@ const ContentSectionLanding = styled(ContentSection)`
 const BlockQuote = styled.blockquote`
   ${lightGray}
   font-family: serif;
-  font-style: oblique;
   font-size: 1.5em;
 
-  background: #f9f9f9;
-  border-left: 10px solid #ccc;
-  margin: 1.5em 10px;
-  padding: 0.5em 10px;
+  p { 
+    background: #f9f9f9;
+    border-left: 10px solid #ccc;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    margin-bottom: 0;
+  }
 
-  &:before {
+  p:before {
     color: #ccc;
     content: open-quote;
     font-size: 2em;
@@ -42,6 +43,18 @@ const BlockQuote = styled.blockquote`
     margin-right: 0.25em;
     vertical-align: -0.4em;
   }
+  
+  footer {
+    font-size: .7em;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    margin-top: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
 `;
 
 
@@ -70,6 +83,7 @@ const RegisterLink = styled(Link)`
   }
 `;
 
+
 const RegisterButton = () => <div style={{textAlign:"center"}}><RegisterLink to="/classes">Go to classes >></RegisterLink></div>;
 
 
@@ -78,9 +92,12 @@ const Home = (props) => {
     <MainLanding>
       <Title fontFamily="Courier, Monaco, monospace" textAlign="center" fontSize='4em'>coding_in_english</Title>
       <ContentSection>
-        <BlockQuote>
-          "As a foreign student, learning any subject ... was extremely tough. In order to learn, I needed to understand a basic tool 
+        <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
+          <p>
+            "As a foreign student, learning any subject ... was extremely tough. In order to learn, I needed to understand a basic tool 
           first: English."
+          </p>
+          <footer>—Takeishi Kimoto, <cite><a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">Is English Language Really That Important in Learning Programming?</a></cite></footer>
         </BlockQuote>
         <Title textAlign="center" margin="35px">
           Jump into the global mainstream. Learn English while you learn to code.
@@ -107,11 +124,11 @@ const Home = (props) => {
         </p>
         <ImgContainer>
           {['react-logo-150.png', 'python-logo-150.png', 'mysql-logo-150.png'].map(src => 
-            <img style={{height: '150px'}} src={`${settings.assets}/${src}`} />)}
+            <img alt={src} style={{height: '150px'}} src={`${settings.assets}/${src}`} />)}
         </ImgContainer>
         <RegisterButton />
       </ContentSectionLanding>
-      <Title textAlign="center">Learn Vocabulary and Grammar in a Real Context</Title>
+      <Title textAlign="center">Learn Vocabulary and Grammar in Real Context</Title>
       <ContentSectionLanding>
         <p>
           We supplement all courses with grammar and vocabulary practices, tightly integrated into technical lessons.

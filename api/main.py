@@ -143,22 +143,9 @@ def add_user():
         "family_name": "Engelmann",
         "nickname": "vincent.engelmann1",
         "name": "Vincent Engelmann",
-        "picture": "https://lh3.googleusercontent.com/a-/AOh14GgKqVpfftmWc9CHGjm6v27b6OnLjsKihXIyU5IsFg",
-        "locale": "en",
-        "updated_at": "2020-04-29T21:43:12.198Z",
-        "email": "some email",
-        "email_verified": true,
-        "iss": "auth0 issuer",
-        "sub": "identity provider id",
-        "aud": "pyJiq82f4s6ik5dr9oNnyryW5127T965",
-        "iat": 1588294030,
-        "exp": 1588297630,
-        "at_hash": "jRyAMA2mBD8pZUzj5nwFcg",
-        "nonce": "0q-BJ_tYoHEJ8YEifjyYech~U_oUUw7F"
+        ...
       },
-      "appState": "7v.YFlCBROwgpCxa0YjIQAH700zQCFaE",
-      "refreshToken": null,
-      "state": "7v.YFlCBROwgpCxa0YjIQAH700zQCFaE",
+      ...
       "expiresIn": 7200,
       "tokenType": "Bearer",
       "scope": "openid profile email"

@@ -22,19 +22,6 @@ html, body {
 
 
 
-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ff3e00;
-  text-align: center;
-  color: white;
-  height: 200px;
-
-}
-
-
-
 .dark-gray {
   color: #373737;
 }

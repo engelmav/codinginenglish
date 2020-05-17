@@ -1,5 +1,6 @@
-import { action, computed, observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { storeNewUser, userRegistrations } from '../services/cieApi'
+import axios from 'axios';
 
 
 class AppStore {
@@ -8,6 +9,7 @@ class AppStore {
   @observable userId = null;
   @observable firstName = null;
   @observable userSessions = null;
+
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
   }
