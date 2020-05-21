@@ -53,6 +53,9 @@ class Routes extends Component {
           handleAuthentication(props);
           return <CallbackWithRouter {...props} />
         }} />
+        <Route path="/login" render={(props) => {
+          auth.login();
+        }} />
       </>
     );
   }
