@@ -182,7 +182,7 @@ class ClassroomContainer extends Component {
                 y: 0,
                 width: 800
               }}
-              style={{ zIndex: 200 }}
+              style={{ zIndex: 300 }}
 
             >
               <Window className="rnd-header" title="Vocab Exercise" onClose={toggleExercise} />
