@@ -27,6 +27,8 @@ app = Flask(__name__,
 
 app.register_blueprint(stripe_bp)
 app.secret_key = config["cie.api.session.key"]
+redis_pw = config["cie.redis.password"]
+redis_host = config["cie.redis.host"]
 
 
 @app.teardown_appcontext
@@ -34,7 +36,7 @@ def shutdown_session(exception=None):
     m.db_session.remove()
 
 
-red = redis.StrictRedis()
+red = redis.StrictRedis(host=redis_host, password=redis_pw, port=6379)
 redis_store = RedisStore(red)
 
 KVSessionExtension(redis_store, app)
@@ -64,7 +66,32 @@ def event_stream():
         message_data = message['data']
         if message_data != None and type(message_data).__name__ == 'bytes':
             message_data = message_data.decode('utf8')
-        yield 'data: %s\n\n' % message_data
+        event_str = "event: classUpdate\n"
+        event_str = event_str + 'data: %s\n\n' % message_data
+        yield event_str
+
+
+# MESSAGING TO FRONTEND
+@app.route('/api/send', methods=['POST'])
+def send_sse():
+    j = request.get_json(force=True)
+    message = j['message']
+    res = red.publish('cie', message)
+    return jsonify(res)
+
+
+@app.route('/api/stream')
+def stream_sse():
+    stream_message = event_stream()
+    LOG.debug("streaming message: {}".format(stream_message))
+    sse_message = flask.Response(
+        stream_message,
+        mimetype="text/event-stream",
+    )
+    # this tells any proxy not to compress server-sent events (SSEs)
+    sse_message.headers['Cache-Control'] = "no-transform"
+    print("/stream is returning", sse_message)
+    return sse_message
 
 
 def _get(key, default=None):
@@ -221,23 +248,6 @@ def get_signature(meeting_number, ts):
 @app.route('/api/zoom/current', )
 def set_current_zoom():
     pass
-
-
-# MESSAGING TO FRONTEND
-@app.route('/api/send', methods=['POST'])
-def send_sse():
-    j = request.get_json(force=True)
-    message = j['message']
-    res = red.publish('cie', message)
-    return jsonify(res)
-
-
-@app.route('/api/stream')
-def stream_sse():
-    stream_message = event_stream()
-    sse_message = flask.Response(stream_message, mimetype="text/event-stream")
-    print("/stream is returning", sse_message)
-    return sse_message
 
 
 @app.route("/api/site-map")

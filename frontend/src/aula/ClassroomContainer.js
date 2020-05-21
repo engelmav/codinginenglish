@@ -4,18 +4,19 @@ import Iframe from 'react-iframe';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components';
-import { Window } from '../UtilComponents/Window';
-import { Button } from '../UtilComponents/Button';
+import { Window, Button } from '../UtilComponents';
+import { MultipleChoice } from '../MultipleChoice';
 import { Rnd } from 'react-rnd';
 import settings from '../settings';
 
 import { observer } from 'mobx-react';
+import Bounce from 'react-reveal/Bounce';
 
 
 let channelName = "general";
-let prezzieName = '001-devteamsloops';
+let prezzieName = 'basic_session_02/live';
 const rocketChatUrl = `${settings.rocketchatUrl}${channelName}?layout=embedded`;
-const slidesUrl = `${settings.slidesUrl}/${prezzieName}/embed?postMessageEvents=true}`
+const slidesUrl = `${settings.slidesUrl}/${prezzieName}`
 console.log(`Using slides url ${slidesUrl}`);
 console.log(`Using rocketchat url ${rocketChatUrl}`);
 const slidesWindowTop = "slidesWindow";
@@ -42,8 +43,11 @@ class ClassroomContainer extends Component {
       chatWindow: true,
       slidesWindow: true,
       videoWindow: true,
-      onTop: null
+      exerciseWindow: true,
+      onTop: null,
     };
+
+    this.eventSource = new EventSource('/api/stream');
 
     this.setGuacViewerRef = element => {
       this.guacViewer = element;
@@ -53,20 +57,33 @@ class ClassroomContainer extends Component {
       if (this.guacViewer) this.guacViewer.focus();
     }
   }
-  // TODO: convert to hooks
+
+  componentDidMount() {
+    this.eventSource.addEventListener("classUpdate", e => {
+      console.log("received SSE event data:");
+      console.log(e.data);
+      this.toggleExercise();
+    });
+  }
+
+
+
   toggleGuac = () => {
-    this.setState({ guacWindow: !this.state.guacWindow })
+    this.setState({ guacWindow: !this.state.guacWindow });
   }
   toggleChat = () => {
-    this.setState({ chatWindow: !this.state.chatWindow })
+    this.setState({ chatWindow: !this.state.chatWindow });
   }
   toggleVideo = () => {
-    this.setState({ videoWindow: !this.state.videoWindow })
+    this.setState({ videoWindow: !this.state.videoWindow });
+  }
+  toggleExercise = () => {
+    this.setState({ exerciseWindow: !this.state.exerciseWindow });
   }
 
   render() {
-    const { guacWindow, chatWindow, slidesWindow, videoWindow, onTop } = this.state;
-    const { toggleGuac, toggleChat, toggleVideo } = this;
+    const { guacWindow, chatWindow, slidesWindow, videoWindow, exerciseWindow, onTop } = this.state;
+    const { toggleGuac, toggleChat, toggleVideo, toggleExercise } = this;
     const { appStore } = this.props;
     let userFirstName = null;
     if (this.props.authData !== null) {
@@ -75,6 +92,7 @@ class ClassroomContainer extends Component {
 
     return (
       <div>
+        <h1>{this.state.event}</h1>
         <Taskbar>
           {!guacWindow && <Button mr={2} onClick={() => this.toggleGuac()}>Dev Environment</Button>}
           {!chatWindow && <Button mr={2} onClick={() => this.toggleChat()}>Chat</Button>}
@@ -95,7 +113,8 @@ class ClassroomContainer extends Component {
           <Window title="Slides" hideClose={true} />
           <Iframe
             id="slidesView"
-            url={slidesUrl}
+            // url={slidesUrl}
+            url="https://slides.com/vincentengelmann/basic_session_02/live"
             width="100%" height="100%" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen />
         </Rnd>
         {chatWindow && <Rnd
@@ -155,6 +174,22 @@ class ClassroomContainer extends Component {
             onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
           />
         </Rnd>}
+        {exerciseWindow &&
+          <Bounce left>
+            <Rnd
+              default={{
+                x: 605,
+                y: 0,
+                width: 800
+              }}
+              style={{ zIndex: 200 }}
+
+            >
+              <Window className="rnd-header" title="Vocab Exercise" onClose={toggleExercise} />
+              <MultipleChoice onClose={toggleExercise}/>
+            </Rnd>
+          </Bounce>
+        }
       </div>
     )
   }
