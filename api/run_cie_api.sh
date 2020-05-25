@@ -1,3 +1,10 @@
 #!/bin/bash
 source venv/bin/activate
-exec gunicorn -b :80 --access-logfile - --error-logfile - main:app
+exec gunicorn -b :80 \
+  --worker-tmp-dir /dev/shm \
+  --access-logfile - \
+  --log-level DEBUG \
+  --workers=3 \
+  --threads=4 \
+  --worker-class=gevent \
+  main:app
