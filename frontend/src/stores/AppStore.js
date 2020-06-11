@@ -1,6 +1,5 @@
 import { action, observable } from 'mobx';
 import { storeNewUser, userRegistrations } from '../services/cieApi'
-import axios from 'axios';
 
 
 class AppStore {
