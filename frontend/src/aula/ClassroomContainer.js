@@ -11,6 +11,7 @@ import settings from '../settings';
 
 import { observer } from 'mobx-react';
 import Bounce from 'react-reveal/Bounce';
+import { browserDetect } from '../util';
 
 
 let channelName = "general";
@@ -43,7 +44,7 @@ class ClassroomContainer extends Component {
       chatWindow: true,
       slidesWindow: true,
       videoWindow: true,
-      exerciseWindow: true,
+      exerciseWindow: false,
       onTop: null,
     };
 
@@ -61,8 +62,11 @@ class ClassroomContainer extends Component {
   componentDidMount() {
     this.eventSource.addEventListener("classUpdate", e => {
       console.log("received SSE event data:");
-      console.log(e.data);
-      this.toggleExercise();
+      let { data } = e;
+      console.log(data);
+      if (data.hasOwnProperty('command') && data.command === 'SHOW_EXERCISE'){
+        this.toggleExercise();
+      }
     });
   }
 
@@ -82,7 +86,7 @@ class ClassroomContainer extends Component {
   }
 
   render() {
-    const { guacWindow, chatWindow, slidesWindow, videoWindow, exerciseWindow, onTop } = this.state;
+    const { guacWindow, chatWindow, videoWindow, exerciseWindow, onTop } = this.state;
     const { toggleGuac, toggleChat, toggleVideo, toggleExercise } = this;
     const { appStore } = this.props;
     let userFirstName = null;
@@ -162,7 +166,11 @@ class ClassroomContainer extends Component {
           onClick={() => this.setState({ onTop: guacWindowTop })}
         >
           <Window title="Dev Environment" onClose={toggleGuac} />
-          <Iframe
+         
+          {browserDetect.isSafari ?  <>
+          <p>It looks like you're using Safari. This probably won't work, but you can try. If it doesn't work, please use Firefox or Chrome.</p>
+          <button onClick={() => window.open("https://remote.codinginenglish.com/guacamole")}>Open Dev Environment</button></>
+          : <Iframe
             ref={this.setGuacViewerRef}
             id="guac-view"
             url={settings.guacUrl}
@@ -172,7 +180,7 @@ class ClassroomContainer extends Component {
             frameborder="10"
             style={{ zIndex: (onTop === guacWindowTop) ? 200 : 0 }}
             onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
-          />
+          />}
         </Rnd>}
         {exerciseWindow &&
           <Bounce left>
