@@ -4,9 +4,8 @@ import settings from '../settings';
 import { appStore } from '../stores/AppStore';
 
 
-
 var CLIENT_ID = 'pyJiq82f4s6ik5dr9oNnyryW5127T965';
-console.log(`Using auth0 callback ${settings.auth0Host}`);
+
 
 class Auth {
   accessToken;
@@ -14,7 +13,8 @@ class Auth {
   expiresAt;
 
   auth0 = new auth0.WebAuth({
-    domain: 'dev-nougy3g5.auth0.com',
+    // domain: 'dev-nougy3g5.auth0.com',
+    domain: 'login.codinginenglish.com',
     clientID: CLIENT_ID,
     redirectUri: settings.auth0Host,
     responseType: 'token id_token',
