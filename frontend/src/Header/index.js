@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Login from '../Login';
 import { Link, Route, Switch } from 'react-router-dom';
-import classNames from 'classnames';
 import styled from 'styled-components';
 
 import { observer } from 'mobx-react';
