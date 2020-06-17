@@ -6,6 +6,7 @@ from simplekv.memory.redisstore import RedisStore
 import hashlib
 import hmac
 import base64
+import json
 
 import redis
 
@@ -74,9 +75,8 @@ def event_stream():
 # MESSAGING TO FRONTEND
 @app.route('/api/send', methods=['POST'])
 def send_sse():
-    j = request.get_json(force=True)
-    message = j['message']
-    res = red.publish('cie', message)
+    command = request.get_json().get("command")
+    res = red.publish('cie', json.dumps(command))
     return jsonify(res)
 
 

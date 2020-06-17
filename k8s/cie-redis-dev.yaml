@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-redis-lb
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.46
+  selector:
+    app: cie-redis-headless
+  ports:
+    - name: cie-redis-headless
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cie-redis-pv-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/redis-data"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cie-redis-pv-volume-slave
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/redis-data-slave"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cie-redis-pv-volume-slave-1
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/redis-data-slave-1"
+
+

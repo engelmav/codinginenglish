@@ -18,8 +18,6 @@ let channelName = "general";
 let prezzieName = 'basic_session_02/live';
 const rocketChatUrl = `${settings.rocketchatUrl}${channelName}?layout=embedded`;
 const slidesUrl = `${settings.slidesUrl}/${prezzieName}`
-console.log(`Using slides url ${slidesUrl}`);
-console.log(`Using rocketchat url ${rocketChatUrl}`);
 const slidesWindowTop = "slidesWindow";
 const videoWindowTop = "videoWindow";
 const guacWindowTop = "guacWindow";
@@ -168,8 +166,8 @@ class ClassroomContainer extends Component {
           <Window title="Dev Environment" onClose={toggleGuac} />
          
           {browserDetect.isSafari ?  <>
-          <p>It looks like you're using Safari. This probably won't work, but you can try. If it doesn't work, please use Firefox or Chrome.</p>
-          <button onClick={() => window.open("https://remote.codinginenglish.com/guacamole")}>Open Dev Environment</button></>
+          <p>It looks like you're using Safari. Try Chrome or Firefox. If you REALLY want to try with Safari, go ahead.</p>
+          <button onClick={() => window.open("https://remote.codinginenglish.com/guacamole")}>I'll try anyway.</button></>
           : <Iframe
             ref={this.setGuacViewerRef}
             id="guac-view"
