@@ -65,7 +65,7 @@ def event_stream():
     for message in pubsub.listen():
         print("Yielding message: ", message)
         message_data = message['data']
-        if message_data != None and type(message_data).__name__ == 'bytes':
+        if message_data is not None and type(message_data).__name__ == 'bytes':
             message_data = message_data.decode('utf8')
         event_str = "event: classUpdate\n"
         event_str = event_str + 'data: %s\n\n' % message_data
@@ -75,8 +75,10 @@ def event_stream():
 # MESSAGING TO FRONTEND
 @app.route('/api/send', methods=['POST'])
 def send_sse():
-    command = request.get_json().get("command")
-    res = red.publish('cie', json.dumps(command))
+    command = request.get_json()
+    # we are doing this twice to clean up control characters
+    command_str = json.dumps(command)
+    res = red.publish('cie', command_str)
     return jsonify(res)
 
 
@@ -92,7 +94,6 @@ def stream_sse():
     sse_message.headers['Cache-Control'] = "no-transform"
     # the below header prevents nginx from swallowing SSEs.
     sse_message.headers['X-Accel-Buffering'] = "no"
-    print("/stream is returning", sse_message)
     return sse_message
 
 

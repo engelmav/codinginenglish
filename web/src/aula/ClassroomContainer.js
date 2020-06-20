@@ -60,15 +60,25 @@ class ClassroomContainer extends Component {
   componentDidMount() {
     this.eventSource.addEventListener("classUpdate", e => {
       console.log("received SSE event data:");
-      let { data } = e;
-      console.log(data);
-      if (data.hasOwnProperty('command') && data.command === 'SHOW_EXERCISE'){
+      const { data } = e;
+      let commmandData;
+      try {
+        commmandData = JSON.parse(data);
+        console.log(commmandData);
+      } catch (ex) {
+        console.log("in catch:")
+        console.error("Exception thrown", ex.stack);
+        console.log(e);
+        console.log(data);
+        return;
+      }
+
+      if (commmandData.hasOwnProperty('command') && commmandData.command.name === 'SHOW_EXERCISE') {
+        console.log("in toggle exercise")
         this.toggleExercise();
       }
     });
   }
-
-
 
   toggleGuac = () => {
     this.setState({ guacWindow: !this.state.guacWindow });
@@ -164,21 +174,21 @@ class ClassroomContainer extends Component {
           onClick={() => this.setState({ onTop: guacWindowTop })}
         >
           <Window title="Dev Environment" onClose={toggleGuac} />
-         
-          {browserDetect.isSafari ?  <>
-          <p>It looks like you're using Safari. Try Chrome or Firefox. If you REALLY want to try with Safari, go ahead.</p>
-          <button onClick={() => window.open("https://remote.codinginenglish.com/guacamole")}>I'll try anyway.</button></>
-          : <Iframe
-            ref={this.setGuacViewerRef}
-            id="guac-view"
-            url={settings.guacUrl}
-            width="100%"
-            height="100%"
-            scrolling="yes"
-            frameborder="10"
-            style={{ zIndex: (onTop === guacWindowTop) ? 200 : 0 }}
-            onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
-          />}
+
+          {browserDetect.isSafari ? <>
+            <p>It looks like you're using Safari. Try Chrome or Firefox. If you REALLY want to try with Safari, go ahead.</p>
+            <button onClick={() => window.open("https://remote.codinginenglish.com/guacamole")}>I'll try anyway.</button></>
+            : <Iframe
+              ref={this.setGuacViewerRef}
+              id="guac-view"
+              url={settings.guacUrl}
+              width="100%"
+              height="100%"
+              scrolling="yes"
+              frameborder="10"
+              style={{ zIndex: (onTop === guacWindowTop) ? 200 : 0 }}
+              onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
+            />}
         </Rnd>}
         {exerciseWindow &&
           <Bounce left>
@@ -192,7 +202,7 @@ class ClassroomContainer extends Component {
 
             >
               <Window className="rnd-header" title="Vocab Exercise" onClose={toggleExercise} />
-              <MultipleChoice onClose={toggleExercise}/>
+              <MultipleChoice onClose={toggleExercise} />
             </Rnd>
           </Bounce>
         }
