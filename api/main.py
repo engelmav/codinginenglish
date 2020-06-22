@@ -85,7 +85,6 @@ def send_sse():
 @app.route('/api/stream')
 def stream_sse():
     stream_message = event_stream()
-    LOG.debug("streaming message: {}".format(stream_message))
     sse_message = flask.Response(
         stream_message,
         mimetype="text/event-stream",

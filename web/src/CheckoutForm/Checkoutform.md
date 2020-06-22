@@ -1,3 +1,3 @@
 ```js
-<CheckoutForm pizza="🍕" />
+<CheckoutForm appStore={{authData: true}} pizza="🍕" />
 ```

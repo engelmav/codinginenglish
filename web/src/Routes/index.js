@@ -3,7 +3,7 @@ import MyDashboard from '../MyDashboard';
 import { auth } from '../auth/Auth';
 import makeRequiresAuth from '../auth/RequiresAuth';
 import Callback from '../auth/Auth0Callback';
-import ClassroomContainer from '../aula/ClassroomContainer';
+import Aula from '../Aula';
 import { Home } from '../Home';
 import { Classes } from '../Classes';
 import { withRouter, Route } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { observer } from 'mobx-react';
 
 
 var requiresAuth = makeRequiresAuth(auth);
-const ClassroomProtected = requiresAuth(ClassroomContainer);
+const ClassroomProtected = requiresAuth(Aula);
 const CallbackWithRouter = withRouter(Callback);
 
 const handleAuthentication = ({ location }) => {
@@ -23,7 +23,7 @@ const handleAuthentication = ({ location }) => {
 
 
 @observer
-class Routes extends Component {
+class Routes extends Component {  
   constructor(props) {
     super(props);
     this.state = {

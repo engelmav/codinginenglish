@@ -1,3 +1,3 @@
 ```js
-<Header pizza="🍕" />
+<Header appStore={{authData: true}} pizza="🍕" />
 ```

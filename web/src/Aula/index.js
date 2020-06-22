@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import './ClassroomContainer.css';
+import './styles.css';
 import Iframe from 'react-iframe';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import styled from 'styled-components';
 import { Window, Button } from '../UtilComponents';
-import { MultipleChoice } from '../MultipleChoice';
+import { PopupActivity } from '../PopupActivity';
 import { Rnd } from 'react-rnd';
 import settings from '../settings';
 
@@ -32,17 +32,19 @@ const Taskbar = styled.div`
 
 
 @observer
-class ClassroomContainer extends Component {
+class Aula extends Component {
   constructor(props) {
     super(props);
     this.slidesWindow = React.createRef();
 
     this.state = {
+      activityData: null,
       guacWindow: true,
       chatWindow: true,
       slidesWindow: true,
       videoWindow: true,
-      exerciseWindow: false,
+      popupActivityWindow: false,
+      exerciseContent: null,
       onTop: null,
     };
 
@@ -73,9 +75,12 @@ class ClassroomContainer extends Component {
         return;
       }
 
-      if (commmandData.hasOwnProperty('command') && commmandData.command.name === 'SHOW_EXERCISE') {
+      if (commmandData.hasOwnProperty('command') && commmandData.command.name === 'SHOW_ACIVITY_POPUP') {
         console.log("in toggle exercise")
-        this.toggleExercise();
+        this.setState(
+          { activityData: commmandData.command.data },
+          this.togglePopupActivity
+        );
       }
     });
   }
@@ -89,13 +94,13 @@ class ClassroomContainer extends Component {
   toggleVideo = () => {
     this.setState({ videoWindow: !this.state.videoWindow });
   }
-  toggleExercise = () => {
-    this.setState({ exerciseWindow: !this.state.exerciseWindow });
+  togglePopupActivity = () => {
+    this.setState({ popupActivityWindow: !this.state.popupActivityWindow });
   }
 
   render() {
-    const { guacWindow, chatWindow, videoWindow, exerciseWindow, onTop } = this.state;
-    const { toggleGuac, toggleChat, toggleVideo, toggleExercise } = this;
+    const { activityData, guacWindow, chatWindow, videoWindow, popupActivityWindow, onTop } = this.state;
+    const { toggleGuac, toggleChat, toggleVideo, togglePopupActivity } = this;
     const { appStore } = this.props;
     let userFirstName = null;
     if (this.props.authData !== null) {
@@ -190,7 +195,7 @@ class ClassroomContainer extends Component {
               onClick={() => { this.focusGuacViewer(); this.setState({ onTop: guacWindowTop }) }}
             />}
         </Rnd>}
-        {exerciseWindow &&
+        {popupActivityWindow &&
           <Bounce left>
             <Rnd
               default={{
@@ -201,8 +206,8 @@ class ClassroomContainer extends Component {
               style={{ zIndex: 300 }}
 
             >
-              <Window className="rnd-header" title="Vocab Exercise" onClose={toggleExercise} />
-              <MultipleChoice onClose={toggleExercise} />
+              <Window className="rnd-header" title="Vocab Exercise" onClose={togglePopupActivity} />
+              <PopupActivity acivities={activityData} onClose={togglePopupActivity} />
             </Rnd>
           </Bounce>
         }
@@ -211,4 +216,4 @@ class ClassroomContainer extends Component {
   }
 }
 
-export default ClassroomContainer;
+export default Aula;
