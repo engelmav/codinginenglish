@@ -75,8 +75,7 @@ class Aula extends Component {
         return;
       }
 
-      if (commmandData.hasOwnProperty('command') && commmandData.command.name === 'SHOW_ACIVITY_POPUP') {
-        console.log("in toggle exercise")
+      if (commmandData.hasOwnProperty('command') && commmandData.command.name === 'SHOW_ACTIVITY_POPUP') {
         this.setState(
           { activityData: commmandData.command.data },
           this.togglePopupActivity
@@ -207,7 +206,7 @@ class Aula extends Component {
 
             >
               <Window className="rnd-header" title="Vocab Exercise" onClose={togglePopupActivity} />
-              <PopupActivity acivities={activityData} onClose={togglePopupActivity} />
+              <PopupActivity activities={activityData} onClose={togglePopupActivity} />
             </Rnd>
           </Bounce>
         }
