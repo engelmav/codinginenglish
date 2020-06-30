@@ -89,7 +89,7 @@ def stream_sse():
         stream_message,
         mimetype="text/event-stream",
     )
-    # the below header tells any proxy not to compress server-sent events (SSEs) - useful for DevServer
+    # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
     sse_message.headers['Cache-Control'] = "no-transform"
     # the below header prevents nginx from swallowing SSEs.
     sse_message.headers['X-Accel-Buffering'] = "no"

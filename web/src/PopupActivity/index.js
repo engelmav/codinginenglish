@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import { Button } from '../UtilComponents/Button';
 
@@ -17,7 +15,6 @@ const GrayBorder = styled.div`
 `;
 
 const RadioButton = styled.input.attrs(() => ({type: "radio"}))`
-
 `
 
 const MultipleChoice = ({ question, answer, choices }) => {
@@ -45,8 +42,9 @@ const Footer = styled.div`
 `;
 
 const PopupActivity = ({ onClose, activities }) => {
-  console.log("Got activities:")
-  console.log(activities)
+  // Resume here:
+  // implement callback (or mobx class) to collect responses from child component
+  // and send them to backend when student clicks "DONE!"
   return (
     <ActivityBorder>
       {
@@ -54,6 +52,8 @@ const PopupActivity = ({ onClose, activities }) => {
           const { activityType, model } = activity;
           if (activityType === "multipleChoice") {
             return <MultipleChoice {...model} />
+          } else {
+            return <div></div>;
           }
         })
       }

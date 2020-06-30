@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Suspense } from 'react'
 import './styles.css';
 import Iframe from 'react-iframe';
 import 'react-grid-layout/css/styles.css';
@@ -6,12 +6,16 @@ import 'react-resizable/css/styles.css';
 import styled from 'styled-components';
 import { Window, Button } from '../UtilComponents';
 import { PopupActivity } from '../PopupActivity';
+// import { VideoCall } from '../VideoConference';
 import { Rnd } from 'react-rnd';
 import settings from '../settings';
 
 import { observer } from 'mobx-react';
 import Bounce from 'react-reveal/Bounce';
 import { browserDetect } from '../util';
+
+
+const VideoCall = React.lazy(() => import('../VideoConference'));
 
 
 let channelName = "general";
@@ -161,11 +165,7 @@ class Aula extends Component {
           onClick={() => this.setState({ onTop: videoWindowTop })}
         >
           <Window title="Video" onClose={toggleVideo} />
-          <Iframe
-            url={`./zoomIndex.html?userName=${userFirstName}`}
-            width="100%"
-            height="100%"
-          />
+          <Suspense fallback={<div>Loading...</div>}><VideoCall /></Suspense>
         </Rnd>}
         {guacWindow && <Rnd
           default={{
