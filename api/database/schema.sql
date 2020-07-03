@@ -78,6 +78,7 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstname` varchar(50) DEFAULT NULL,
   `lastname` varchar(50) DEFAULT NULL,
+  `fullname` varchar(120) DEFAULT NULL, -- used for partial account creations to help identify paying users that haven't signed in / created accounts yet.
   `email` varchar(120) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)

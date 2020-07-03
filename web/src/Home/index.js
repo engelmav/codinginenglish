@@ -8,6 +8,7 @@ import {
 import { lightGray, orangeBgColor } from '../UtilComponents/sharedStyles'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import VideoCall from "../VideoConference"
 
 
 const MainLanding = styled(Main)`
@@ -79,12 +80,11 @@ const RegisterLink = styled(Link)`
   color: white;
   a {
     color: #3d3636;
-    
   }
 `;
 
 
-const RegisterButton = () => <div style={{textAlign:"center"}}><RegisterLink to="/classes">Go to classes >></RegisterLink></div>;
+const RegisterButton = () => <div style={{textAlign:"center"}}><RegisterLink to="/classes">Go to classes</RegisterLink></div>;
 
 
 const Home = (props) => {

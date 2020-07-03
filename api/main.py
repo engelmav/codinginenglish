@@ -1,26 +1,23 @@
 from flask import Flask, jsonify, request
 import flask
+import redis
+from sqlalchemy import and_
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
 
-import hashlib
-import hmac
-import base64
 import json
 
-import redis
-
 import database.models as m
-from payment_endpoints import stripe_bp
+from payment.endpoints import stripe_bp
 from config import config
 from database.models import User
-from sqlalchemy import and_
+from services.cie import get_module_session_by_id, create_partial_user
+
 
 from operator import itemgetter
 import logging
 
 LOG = logging.getLogger(__name__)
-
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
@@ -41,22 +38,6 @@ red = redis.StrictRedis(host=redis_host, password=redis_pw, port=6379)
 redis_store = RedisStore(red)
 
 KVSessionExtension(redis_store, app)
-
-ZOOM_API_KEY = config["cie.zoom.apikey"]
-ZOOM_SECRET = config["cie.zoom.apisecret"]
-
-
-def generate_signature(data, ts):
-    msg = data['apiKey'] + str(data['meetingNumber']) + str(ts) + str(data['role'])
-    message = base64.b64encode(bytes(msg, 'utf-8'))
-    secret = bytes(data['apiSecret'], 'utf-8')
-    hash = hmac.new(secret, message, hashlib.sha256)
-    hash = base64.b64encode(hash.digest())
-    hash = hash.decode("utf-8")
-    tmpString = "%s.%s.%s.%s.%s" % (data['apiKey'], str(data['meetingNumber']), str(ts), str(data['role']), hash)
-    signature = base64.b64encode(bytes(tmpString, "utf-8"))
-    signature = signature.decode("utf-8")
-    return signature.rstrip("=")
 
 
 def event_stream():
@@ -144,7 +125,7 @@ def create_modules():
 def add_session_to_module(cie_module_id):
     """
     {
-	    "session_datetime": "2020-05-20 18:00:00"
+        "session_datetime": "2020-05-20 18:00:00"
     }
     :param cie_module_id: str. integer id of module.
     :return: ModuleSessionSchema object.
@@ -180,6 +161,7 @@ def add_user():
       "scope": "openid profile email"
     }
     Captures users logged on via Auth0 for use in registration and view permissions.
+    This will NOT register a user for a module, only create a user record.
     :return:
     """
 
@@ -195,7 +177,7 @@ def add_user():
     ).one_or_none()
 
     if existing_user:
-        LOG.debug("User with email {} exists already, returning".format(existing_user.email))
+        LOG.warning("User with email {} exists already, returning".format(existing_user.email))
         return serialize(existing_user, m.UserSchema)
 
     _user = User(
@@ -222,34 +204,38 @@ def get_user_sessions(user_id):
 @app.route('/api/users/<int:user_id>/module-sessions', methods=['POST'])
 def register_user_to_session(user_id):
     """
-    Register a user to a session
-    :return:
+    Register a user to a session with a pre-created user ID.
     """
     user = User.query.filter_by(id=user_id).one()
     module_session_json = request.get_json()
-    module_session = m.ModuleSession.query.filter_by(id=module_session_json.get('module_session_id')).one()
+    module_session = get_module_session_by_id(module_session_json.get('module_session_id'))
     user.add_to_module_session(module_session)
     return jsonify(success=True)
 
 
-@app.route('/api/zoom/signature/<meeting_number>/<ts>')
-def get_signature(meeting_number, ts):
-    data = {'apiKey': ZOOM_API_KEY,
-            'apiSecret': ZOOM_SECRET,
-            'meetingNumber': meeting_number,
-            'role': 0}
-
-    signature = generate_signature(data, ts)
-
-    return jsonify({
-        "apiKey": ZOOM_API_KEY,
-        "signature": signature
-    })
+class PartialUser:
+    email: str
+    fullname: str
 
 
-@app.route('/api/zoom/current', )
-def set_current_zoom():
-    pass
+class UncreatedUserRegistration:
+    partial_user: PartialUser
+    module_session_id: int
+
+
+@app.route('/api/users/<str:email>/module-sessions', methods=['POST'])
+def register_uncreated_user_to_session(email):
+    """
+    Register an uncreated user to a session, using his or her email.
+    """
+    fullname = _get("fullname")
+    module_session_id = _get('module_session_id')
+    _user = create_partial_user(fullname, email)
+    module_session_json = request.get_json()
+    module_session = get_module_session_by_id()
+    _user.add_to_module_session(module_session)
+    LOG.info(f"Registered user with email {email} to module session {module_session_id}")
+    return jsonify(success=True)
 
 
 @app.route("/api/site-map")

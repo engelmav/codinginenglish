@@ -17,8 +17,9 @@ class UserModuleRegistration(Base):
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    firstname = Column(String(50))
+    firstname: Column = Column(String(50))
     lastname = Column(String(50))
+    fullname = Column(String(120))
     email = Column(String(120), unique=True)
     registered_modules = relationship(
         'UserModuleRegistration',
