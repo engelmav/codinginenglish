@@ -223,7 +223,7 @@ class UncreatedUserRegistration:
     module_session_id: int
 
 
-@app.route('/api/users/<str:email>/module-sessions', methods=['POST'])
+@app.route('/api/users/<email>/module-sessions', methods=['POST'])
 def register_uncreated_user_to_session(email):
     """
     Register an uncreated user to a session, using his or her email.
@@ -231,7 +231,6 @@ def register_uncreated_user_to_session(email):
     fullname = _get("fullname")
     module_session_id = _get('module_session_id')
     _user = create_partial_user(fullname, email)
-    module_session_json = request.get_json()
     module_session = get_module_session_by_id()
     _user.add_to_module_session(module_session)
     LOG.info(f"Registered user with email {email} to module session {module_session_id}")
