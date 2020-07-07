@@ -13,6 +13,7 @@ RUN venv/bin/pip install gunicorn
 
 COPY database database
 COPY services services
+COPY payment payment
 COPY *.py secrets.json run_cie_api.sh ./
 RUN chmod +x run_cie_api.sh
 
