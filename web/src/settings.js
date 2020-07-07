@@ -8,7 +8,8 @@ const settings = {
     rocketchatUrl: "https://chat.codinginenglish.com/channel/",
     slidesUrl:     "https://slides.com/vincentengelmann",
     auth0LogoutUrl:"https://www.codinginenglish.com",
-    assets:        "https://cie-assets.nyc3.digitaloceanspaces.com"
+    assets:        "https://cie-assets.nyc3.digitaloceanspaces.com",
+    stripePK:      "pk_live_ciL7BF5syCv4uC1KPjHEq2Sa00raFPFo6w"
 
   },
   development: {
@@ -17,7 +18,8 @@ const settings = {
     rocketchatUrl: "https://chat.codinginenglish.com/channel/",
     slidesUrl:     "https://slides.com/vincentengelmann",
     auth0LogoutUrl: (__DEV_SERVER__ === "1") ? 'http://localhost:8080/': 'http://192.168.1.43/',
-    assets:        "https://cie-assets.nyc3.digitaloceanspaces.com"
+    assets:        "https://cie-assets.nyc3.digitaloceanspaces.com",
+    stripePK:      "pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP"
   }
 }
 
