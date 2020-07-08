@@ -29,4 +29,4 @@ def create_partial_user(fullname, email) -> m.User:
 
 def get_module_session_by_id(_id):
     LOG.debug(f"Retrieving module session with id {_id}")
-    return m.ModuleSession.query.filter_by(_id).one()
+    return m.ModuleSession.query.filter_by(id=_id).one()

@@ -8,7 +8,7 @@ from simplekv.memory.redisstore import RedisStore
 import json
 
 import database.models as m
-from payment.endpoints import stripe_bp
+from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
 from services.cie import get_module_session_by_id, create_partial_user

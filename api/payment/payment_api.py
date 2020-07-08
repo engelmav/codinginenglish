@@ -4,6 +4,7 @@ import logging
 
 from config import config
 from services.mailjet import send_mail
+from services.cie import get_module_session_by_id
 
 LOG = logging.getLogger(__name__)
 stripe_bp = Blueprint('stripe_payments', __name__)
@@ -15,6 +16,7 @@ stripe.api_key = stripe_secret
 
 def calc_order_amount(item):
     # TODO: pull from database
+    # get_module_session_by_id
     return 200
 
 
@@ -49,12 +51,37 @@ def payment_failure():
     LOG.error(request.get_json())
 
 
-@stripe_bp.route('/api/payment/confirm', methods=['PUT'])
+@stripe_bp.route('/api/payment/confirmation', methods=['PUT'])
 def confirm_payment():
+    confirmation_details = request.get_json()
+
+    email = confirmation_details.get('email')
+    if email is None or email == '':
+        LOG.error(f"No email received for payment {confirmation_details.get('result')}. Cannot send email confirmation.")
+        return jsonify(success=False, message="No email received. Cannot send confirmation.")
+
+    student_name = confirmation_details.get('name')
+    if student_name is None or '':
+        student_name = 'Student'
+
+    module_session_id = confirmation_details.get('moduleSessionId')
     try:
-        resp = send_mail()
+        module_session = get_module_session_by_id(module_session_id)
+        module_session_start_dt = module_session.session_datetime
+        module_name = module_session.cie_module.name
+    except:
+        LOG.error(f"Could not retrieve module session details for email confirmation. Confirmation details: "
+                  f"{confirmation_details}. Aborting.", exc_info=True)
+        return jsonify(success=False, message="Could not retrieve module session details.")
+
+    # At this point, we should have all the template info we need.
+    try:
+        resp = send_mail(student_name, email, module_name, module_session_start_dt)
+        # get status code in resp object and raise exception/log error if not 200
         LOG.debug(resp)
     except:
         LOG.error("Email confirmation failed. See traceback.", exc_info=True)
         return jsonify(success=False, message="Check server log for details.")
+
+
     return jsonify(success=True, message="Successfully sent email confirmation")

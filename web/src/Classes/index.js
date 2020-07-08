@@ -181,8 +181,8 @@ class ModuleCard extends Component {
               <p>Starts {localDateTime}</p>
               {appStore.authData == null &&
                 <>
-                  <p>Already registered as a student? Login!</p>
-                  <p>Otherwise, register for class this class as a guest. You can create a student profile later.</p>
+                  <p>Already registered as a student? Sign in!</p>
+                  <p>Otherwise, register for this class as a guest. You can create a student profile later.</p>
                 </>
               }
             </ContentSection>

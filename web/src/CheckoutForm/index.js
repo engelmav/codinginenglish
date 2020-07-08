@@ -82,7 +82,7 @@ function CheckoutFormConsumer(props) {
       setLoading(false);
       console.log(error);
       try {
-        const failReason = { ...error, email: email };
+        const failReason = { ...error, email: computedEmail };
         const resp = await axios.post('/api/payment/failure', failReason);
       } catch (err2) {
         console.log("Failed to capture fail reason. Epic!", err2)
@@ -94,15 +94,22 @@ function CheckoutFormConsumer(props) {
 
     if (result.error) {
       console.log(result);
+      const resp = await axios.post('/api/payment/failure', result.error);
       setErrorMsg(result.error.message);
       setLoading(false);
     } else {
       // The payment was processed.
       console.log(result);
       if (result.paymentIntent.status === 'succeeded') {
-        // TODO: turn into modal.
         setComplete(true);
         setLoading(false);
+        await axios.put('/api/payment/confirmation', {
+          email: computedEmail,
+          name: name, // intentionally stick with login user's name if different from card name (don't use a computedName)
+          moduleSessionId: sessionData.id,
+          isAuthenticated: appStore.authData !== null,
+          paymentResult: result
+        });
       }
     }
   }
@@ -110,7 +117,7 @@ function CheckoutFormConsumer(props) {
     <>
       {isComplete ?
         <>
-          <p>Your purchase is complete. See you in there!</p>
+          <p>Your purchase is complete! Check your email for further instructions. If you do not see the confirmation email, please check your spam folder. See you in class!</p>
           <Button onClick={onCloseClick}>CLOSE</Button>
         </>
         :
@@ -125,7 +132,7 @@ function CheckoutFormConsumer(props) {
 
             <PmtFormLabel>Email</PmtFormLabel>
             <div>
-              <NameField placeholder="some.name@domain.com"
+              <NameField placeholder="name@domain.com"
                 value={computedEmail || ''} // need this empty string for React to "control" this input field
                 onChange={e => setEmail(e.target.value)}
               />
