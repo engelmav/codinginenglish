@@ -75,6 +75,12 @@ function CheckoutFormConsumer(props) {
     let clientSecret;
     try {
       setLoading(true);
+      const emailResp = await axios.post('/api/payment/validate-email');
+      // if email is not valid, abort.
+      if (!emailResp.data.success){
+        setLoading(false);
+        alertInvalidEmail(true); // RESUME HERE.
+      }
       const resp = await axios.post('/api/payment/create-payment-intent', intentParams);
       clientSecret = resp.data.clientSecret;
     } catch (error) {
@@ -85,7 +91,7 @@ function CheckoutFormConsumer(props) {
         const failReason = { ...error, email: computedEmail };
         const resp = await axios.post('/api/payment/failure', failReason);
       } catch (err2) {
-        console.log("Failed to capture fail reason. Epic!", err2)
+        console.log("Failed to capture reason for create-payment-intent failure. Epic!", err2)
       }
       return;
     }

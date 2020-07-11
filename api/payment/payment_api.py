@@ -1,10 +1,14 @@
-from flask import Blueprint, jsonify, request
-import stripe
-import logging
-
 from config import config
 from services.mailjet import send_mail
 from services.cie import get_module_session_by_id
+
+from flask import Blueprint, jsonify, request
+import stripe
+from email_validator import validate_email, EmailNotValidError
+
+import logging
+
+
 
 LOG = logging.getLogger(__name__)
 stripe_bp = Blueprint('stripe_payments', __name__)
@@ -20,22 +24,34 @@ def calc_order_amount(item):
     return 200
 
 
+@stripe_bp.route('/api/payment/validate-email', methods=['PUT'])
+def _validate_email():
+    email = request.get_json().get('email')
+    try:
+        validate_email(email)
+        # TODO: normalize and put into db
+    except EmailNotValidError as e:
+        LOG.error(f"Email {email} failed validation. Returning 400 to client. See traceback.", exc_info=True)
+        return jsonify(success=False, message="Invalid email address."), 400
+
+    return jsonify(success=True, message="Email address is valid.")
+
+
 @stripe_bp.route('/api/payment/create-payment-intent', methods=['POST'])
 def create_payment():
-    data = request.get_json()
     LOG.info("Creating payment: %s" % str(data))
     try:
         intent = stripe.PaymentIntent.create(
             amount=calc_order_amount(data.get('item')),
             currency=data.get('currency'),
-            receipt_email=data.get('email'),
+            receipt_email=email,
             payment_method_types=['card'],
             metadata={'integration_check': 'accept_a_payment'}
         )
     except:
-        LOG.error("Failed to create payment intent.", exc_info=True)
+        LOG.error("Failed to create payment intent. Returning 500 to client.", exc_info=True)
         # TODO: RFC-7807
-        return jsonify(error="Error creating payment intent. Check server log."), 500
+        return jsonify(success=False, message="Error creating payment intent. Check server log."), 500
     LOG.info(f"Processing payment id {intent.stripe_id} currency {intent.currency}.")
     return jsonify(
         {
@@ -55,11 +71,7 @@ def payment_failure():
 def confirm_payment():
     confirmation_details = request.get_json()
 
-    email = confirmation_details.get('email')
-    if email is None or email == '':
-        LOG.error(f"No email received for payment {confirmation_details.get('result')}. Cannot send email confirmation.")
-        return jsonify(success=False, message="No email received. Cannot send confirmation.")
-
+    email = confirmation_details.get('email')  # this is already validated in create-payment-intent
     student_name = confirmation_details.get('name')
     if student_name is None or '':
         student_name = 'Student'
@@ -82,6 +94,5 @@ def confirm_payment():
     except:
         LOG.error("Email confirmation failed. See traceback.", exc_info=True)
         return jsonify(success=False, message="Check server log for details.")
-
 
     return jsonify(success=True, message="Successfully sent email confirmation")
