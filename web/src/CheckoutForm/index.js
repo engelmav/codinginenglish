@@ -1,30 +1,26 @@
+import axios from 'axios';
+import 'mobx-react-lite/batchingForReactDom';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import React, { useState } from 'react';
+
+
 import {
   Elements, CardElement, useStripe, useElements
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import React, { useState } from 'react';
-import axios from 'axios';
+
+
 import settings from '../settings';
-
-import {
-  AlertMessage,
-  Button,
-  Spinner,
-} from '../UtilComponents';
-
-import { observable } from 'mobx';
-import { observer } from 'mobx-react';
-import 'mobx-react-lite/batchingForReactDom';
+import { AlertMessage, Button, Spinner } from '../UtilComponents';
 import { CcySelect, EmailNote, Form, PaymentInfo, PmtFormLabel, NameField, BuyButton } from './subcomponents';
 
+
 const { stripePK } = settings;
+const stripePromise = loadStripe(stripePK);
 
 let paymentCurrency = observable.box('EUR');
 const setPaymentCurrency = (e) => paymentCurrency = e.target.value;
-
-
-const stripePromise = loadStripe(stripePK);
-
 const CurrencyMenu = () => {
   return (
     <CcySelect value={paymentCurrency} onChange={setPaymentCurrency}>
@@ -34,22 +30,27 @@ const CurrencyMenu = () => {
 };
 
 
+
 function CheckoutFormConsumer(props) {
   const { appStore, onCloseClick, sessionData } = props;
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState('');
-  // const [postalCode, setPostalCode] = useState('');
   const [email, setEmail] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isInvalidEmail, setIsInvalidEmail] = useState('');
 
   const computedEmail = email || appStore.email; // prioritize a manually entered email over the email we find in the auth user object.
 
   const handleSubmit = async (event) => {
     // disable default form submission
     event.preventDefault();
+
+    if (email === null || email === ''){
+      setIsInvalidEmail("Hey! We need your email address to send you a receipt and class information. Please enter one. :)")
+    }
 
     if (!stripe || !elements) {
       // stripe isn't loaded yet
@@ -73,14 +74,27 @@ function CheckoutFormConsumer(props) {
     };
 
     let clientSecret;
+
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const emailResp = await axios.post('/api/payment/validate-email');
-      // if email is not valid, abort.
-      if (!emailResp.data.success){
+      const res = await axios.put('/api/payment/validate-email', { email });
+      const { errors } = res.data;
+      console.log(errors);
+      if (errors !== undefined && errors.length > 0){
         setLoading(false);
-        alertInvalidEmail(true); // RESUME HERE.
+        setErrorMsg(errors);
+        return;
       }
+    } catch (error) {
+      setLoading(false);
+      console.log("Could not validate email:", error);
+      // if email is not valid, abort.
+      setErrorMsg("An internal error ocurred. We are looking into the issue right now.");
+      return;
+    }
+
+    try {
       const resp = await axios.post('/api/payment/create-payment-intent', intentParams);
       clientSecret = resp.data.clientSecret;
     } catch (error) {

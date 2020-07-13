@@ -47,6 +47,7 @@
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
     "navigator": "^1.0.1",
+    "npm": "^6.14.6",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.2.1",
     "postcss-flexbugs-fixes": "4.1.0",

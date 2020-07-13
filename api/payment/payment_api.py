@@ -28,23 +28,25 @@ def calc_order_amount(item):
 def _validate_email():
     email = request.get_json().get('email')
     try:
-        validate_email(email)
+        res = validate_email(email)
         # TODO: normalize and put into db
     except EmailNotValidError as e:
         LOG.error(f"Email {email} failed validation. Returning 400 to client. See traceback.", exc_info=True)
-        return jsonify(success=False, message="Invalid email address."), 400
+        # we need to return 200 OK for a validation error, otherwise we don't get the JSON returned.
+        return jsonify(success=True, message="Invalid email address.", errors=e.args), 200
 
     return jsonify(success=True, message="Email address is valid.")
 
 
 @stripe_bp.route('/api/payment/create-payment-intent', methods=['POST'])
 def create_payment():
+    data = request.get_json()
     LOG.info("Creating payment: %s" % str(data))
     try:
         intent = stripe.PaymentIntent.create(
             amount=calc_order_amount(data.get('item')),
             currency=data.get('currency'),
-            receipt_email=email,
+            receipt_email=data.get('email'),
             payment_method_types=['card'],
             metadata={'integration_check': 'accept_a_payment'}
         )
@@ -63,8 +65,11 @@ def create_payment():
 
 @stripe_bp.route('/api/payment/failure', methods=['POST'])
 def payment_failure():
-    LOG.error("A payment attempt failed. See details below.")
-    LOG.error(request.get_json())
+    LOG.error("Some part of the CIE payment process failed, either email validation or payment intent creation. "
+              "See the object printed below. This is the `error` object of the try/catch for handleSubmit().")
+    fail_json = request.get_json()
+    LOG.error(fail_json)
+    return jsonify(success=True, message="A payment attempt failed. This is logged in the backend.")
 
 
 @stripe_bp.route('/api/payment/confirmation', methods=['PUT'])
