@@ -48,7 +48,7 @@ function CheckoutFormConsumer(props) {
     // disable default form submission
     event.preventDefault();
 
-    if (email === null || email === ''){
+    if (email === null || email === '') {
       setIsInvalidEmail("Hey! We need your email address to send you a receipt and class information. Please enter one. :)")
     }
 
@@ -81,15 +81,16 @@ function CheckoutFormConsumer(props) {
       const res = await axios.put('/api/payment/validate-email', { email });
       const { errors } = res.data;
       console.log(errors);
-      if (errors !== undefined && errors.length > 0){
+      const hasErrors = errors !== undefined && errors.length > 0;
+      if (hasErrors) {
         setLoading(false);
         setErrorMsg(errors);
         return;
       }
     } catch (error) {
+      // the http call to the backend must have failed.
       setLoading(false);
       console.log("Could not validate email:", error);
-      // if email is not valid, abort.
       setErrorMsg("An internal error ocurred. We are looking into the issue right now.");
       return;
     }

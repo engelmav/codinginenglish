@@ -23,3 +23,5 @@ session_opts = {
     'session.cookie_expires': 300,
     'session.auto': True
 }
+
+AUTH0_DB_CONN = 'con_ejhEHz8B850DcA0T'
