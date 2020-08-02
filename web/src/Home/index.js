@@ -8,7 +8,6 @@ import {
 import { lightGray, orangeBgColor } from '../UtilComponents/sharedStyles'
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import VideoCall from "../VideoConference"
 
 
 const MainLanding = styled(Main)`
