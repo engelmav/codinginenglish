@@ -45,7 +45,7 @@ tickets = Tickets(domain, mgmt_api_token)
 
 TWO_DAYS = 172800
 ticket_res = tickets.create_pswd_change({
-    "result_url": "http://localhost:8080/login",
+    "result_url": "https://www.codinginenglish.com/login",
     # "user_id": user_res.get('user_id'),
     "connection_id": AUTH0_DB_CONN,
     "email": user_email,
