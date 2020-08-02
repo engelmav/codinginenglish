@@ -19,9 +19,9 @@ const VideoCall = React.lazy(() => import('../VideoConference'));
 
 
 let channelName = "general";
-let prezzieName = 'basic_session_02/live';
+// let prezzieName = 'basic_session_02/live';
 const rocketChatUrl = `${settings.rocketchatUrl}${channelName}?layout=embedded`;
-const slidesUrl = `${settings.slidesUrl}/${prezzieName}`
+// const slidesUrl = `${settings.slidesUrl}/${prezzieName}`
 const slidesWindowTop = "slidesWindow";
 const videoWindowTop = "videoWindow";
 const guacWindowTop = "guacWindow";
