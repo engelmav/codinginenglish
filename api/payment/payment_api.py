@@ -72,8 +72,28 @@ def payment_failure():
     return jsonify(success=True, message="A payment attempt failed. This is logged in the backend.")
 
 
+def email_logged_in():
+    pass
+
+
+def email_no_account():
+    pass
+
+
+def email_logged_out():
+    pass
+
+
 @stripe_bp.route('/api/payment/confirmation', methods=['PUT'])
 def confirm_payment():
+    """
+    Three situations:
+    1) you hit this endpoint after paying, with NO account.
+    2) you hit this endpoint after paying, WITH an account but not logged in.
+    3) you hit this endpoint after paying, WITH an account AND logged in.
+    We don't have JWTs set up here yet, which would be idea. But we can pass logged in flag at least.
+    :return:
+    """
     confirmation_details = request.get_json()
 
     email = confirmation_details.get('email')  # this is already validated in create-payment-intent
