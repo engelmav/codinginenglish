@@ -48,6 +48,50 @@ function CheckoutFormConsumer(props) {
     // disable default form submission
     event.preventDefault();
 
+    async function emailValidationFailure(email) {
+      try {
+        const res = await axios.put('/api/payment/validate-email', { email });
+        const { errors } = res.data;
+        console.log(errors);
+        const hasErrors = errors !== undefined && errors.length > 0;
+        if (hasErrors) {
+          setLoading(false);
+          setErrorMsg(errors);
+          return false;
+        }
+      } catch (error) {
+        // the http call to the backend must have failed.
+        setLoading(false);
+        console.log("Could not validate email:", error);
+        setErrorMsg("An internal error ocurred. You might want to try again. The issue has been logged for investigation.");
+        return;
+      }
+      return true;
+    }
+
+    /** Creates payment intent and returns a client secret for use in the next step.
+     *  If function fails, returns null.
+     */
+    async function createPaymentIntent(intentParams) {
+      let clientSecret;
+      try {
+        const resp = await axios.post('/api/payment/create-payment-intent', intentParams);
+        clientSecret = resp.data.clientSecret;
+      } catch (error) {
+        setErrorMsg("We couldn't process your order. You have not been charged. The issue has been logged for investigation.");
+        setLoading(false);
+        console.log(error);
+        try {
+          const failReason = { ...error, email: computedEmail };
+          await axios.post('/api/payment/failure', failReason);
+        } catch (err2) {
+          console.log("Failed to capture reason for create-payment-intent failure. Epic!", err2)
+        }
+        return null;
+      }
+      return clientSecret;
+    }
+
     if (email === null || email === '') {
       setIsInvalidEmail("Hey! We need your email address to send you a receipt and class information. Please enter one. :)")
     }
@@ -56,6 +100,21 @@ function CheckoutFormConsumer(props) {
       // stripe isn't loaded yet
       return;
     }
+
+    setLoading(true);
+
+    if (emailValidationFailure(email)) {
+      // if validation fails, exit early.
+      return;
+    }
+
+    const intentParams = {
+      item: sessionData.id,
+      currency: paymentCurrency,
+      email: email
+    };
+
+    const clientSecret = createPaymentIntent(intentParams);
 
     const paymentMethod = {
       payment_method: {
@@ -67,55 +126,10 @@ function CheckoutFormConsumer(props) {
       }
     };
 
-    const intentParams = {
-      item: sessionData.id,
-      currency: paymentCurrency,
-      email: email
-    };
-
-    let clientSecret;
-
-    setLoading(true);
-
-    try {
-      const res = await axios.put('/api/payment/validate-email', { email });
-      const { errors } = res.data;
-      console.log(errors);
-      const hasErrors = errors !== undefined && errors.length > 0;
-      if (hasErrors) {
-        setLoading(false);
-        setErrorMsg(errors);
-        return;
-      }
-    } catch (error) {
-      // the http call to the backend must have failed.
-      setLoading(false);
-      console.log("Could not validate email:", error);
-      setErrorMsg("An internal error ocurred. We are looking into the issue right now.");
-      return;
-    }
-
-    try {
-      const resp = await axios.post('/api/payment/create-payment-intent', intentParams);
-      clientSecret = resp.data.clientSecret;
-    } catch (error) {
-      setErrorMsg("We couldn't process your order. You have not been charged. We are looking into the issue right now.");
-      setLoading(false);
-      console.log(error);
-      try {
-        const failReason = { ...error, email: computedEmail };
-        const resp = await axios.post('/api/payment/failure', failReason);
-      } catch (err2) {
-        console.log("Failed to capture reason for create-payment-intent failure. Epic!", err2)
-      }
-      return;
-    }
-
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
-
     if (result.error) {
       console.log(result);
-      const resp = await axios.post('/api/payment/failure', result.error);
+      await axios.post('/api/payment/failure', result.error);
       setErrorMsg(result.error.message);
       setLoading(false);
     } else {
