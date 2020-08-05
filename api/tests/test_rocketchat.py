@@ -1,4 +1,4 @@
-from services.rocketchat_service import RocketChatService
+from services.rocketchat import RocketChatService
 from config import config
 
 import responses

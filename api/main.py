@@ -11,8 +11,7 @@ import database.models as m
 from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
-from services.cie import get_module_session_by_id, create_partial_user
-
+from services.cie import get_module_session_by_id, create_partial_user, create_user
 
 from operator import itemgetter
 import logging
@@ -142,7 +141,7 @@ def get_modules():
 
 
 @app.route('/api/users', methods=['POST'])
-def add_user():
+def create_user():
     # TODO: pair down to what we need for unique user identification.
     """
     {
@@ -169,24 +168,7 @@ def add_user():
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
-    existing_user = User.query.filter(
-        and_(
-            User.firstname == given_name,
-            User.lastname == family_name,
-            User.email == email)
-    ).one_or_none()
-
-    if existing_user:
-        LOG.warning("User with email {} exists already, returning".format(existing_user.email))
-        return serialize(existing_user, m.UserSchema)
-
-    _user = User(
-        firstname=given_name,
-        lastname=family_name,
-        email=email
-    )
-    _user.add()
-    LOG.info("New user registered with email address: {}".format(_user.email))
+    _user = create_user(given_name, family_name, email)
 
     return serialize(_user, m.UserSchema)
 

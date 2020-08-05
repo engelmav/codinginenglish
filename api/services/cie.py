@@ -1,9 +1,35 @@
+from sqlalchemy import and_
+
 import database.models as m
 import logging
+
 
 LOG = logging.getLogger(__name__)
 
 
+def create_user(first_name, last_name, email):
+    existing_user = m.User.query.filter(
+        and_(
+            m.User.firstname == first_name,
+            m.User.lastname == last_name,
+            m.User.email == email)
+    ).one_or_none()
+
+    if existing_user:
+        LOG.warning("User with email {} exists already, returning".format(existing_user.email))
+        return existing_user
+
+    _user = m.User(
+        firstname=first_name,
+        lastname=last_name,
+        email=email
+    )
+    _user.add()
+    LOG.info("New user registered with email address: {}".format(_user.email))
+    return _user
+
+
+# We might not need this anymore.
 def create_partial_user(fullname, email) -> m.User:
     """
     Creates a user with the only thing we have during anonymous class purchase: the user's email.

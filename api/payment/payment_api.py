@@ -1,13 +1,13 @@
+from services.auth import create_auth_user, create_auth0_passwd_reset
 from config import config
 from services.mailjet import send_mail
-from services.cie import get_module_session_by_id
+from services.cie import get_module_session_by_id, create_user
 
 from flask import Blueprint, jsonify, request
 import stripe
 from email_validator import validate_email, EmailNotValidError
 
 import logging
-
 
 
 LOG = logging.getLogger(__name__)
@@ -42,6 +42,7 @@ def _validate_email():
 def create_payment():
     data = request.get_json()
     LOG.info("Creating payment: %s" % str(data))
+
     try:
         intent = stripe.PaymentIntent.create(
             amount=calc_order_amount(data.get('item')),
@@ -54,6 +55,7 @@ def create_payment():
         LOG.error("Failed to create payment intent. Returning 500 to client.", exc_info=True)
         # TODO: RFC-7807
         return jsonify(success=False, message="Error creating payment intent. Check server log."), 500
+
     LOG.info(f"Processing payment id {intent.stripe_id} currency {intent.currency}.")
     return jsonify(
         {
@@ -91,15 +93,24 @@ def confirm_payment():
     1) you hit this endpoint after paying, with NO account.
     2) you hit this endpoint after paying, WITH an account but not logged in.
     3) you hit this endpoint after paying, WITH an account AND logged in.
-    We don't have JWTs set up here yet, which would be idea. But we can pass logged in flag at least.
+    We don't have JWTs set up here yet, which would be ideal. But we can pass logged in flag at least.
     :return:
     """
     confirmation_details = request.get_json()
 
     email = confirmation_details.get('email')  # this is already validated in create-payment-intent
     student_name = confirmation_details.get('name')
+
+    is_authenticated = confirmation_details.get('isAuthenticated')
     if student_name is None or '':
         student_name = 'Student'
+
+    email_template = templates.confirm_registration_create_account
+    if not is_authenticated:
+        # User is either not signed in, or has no account.
+        created_user = create_auth_user(student_name, email)
+        create_user()
+        passwd_reset = create_auth0_passwd_reset(email)
 
     module_session_id = confirmation_details.get('moduleSessionId')
     try:
@@ -109,7 +120,7 @@ def confirm_payment():
     except:
         LOG.error(f"Could not retrieve module session details for email confirmation. Confirmation details: "
                   f"{confirmation_details}. Aborting.", exc_info=True)
-        return jsonify(success=False, message="Could not retrieve module session details.")
+        return jsonify(success=False, message='Could not retrieve module session details.')
 
     # At this point, we should have all the template info we need.
     try:
@@ -117,7 +128,7 @@ def confirm_payment():
         # get status code in resp object and raise exception/log error if not 200
         LOG.debug(resp)
     except:
-        LOG.error("Email confirmation failed. See traceback.", exc_info=True)
+        LOG.error('Email confirmation failed. See traceback.', exc_info=True)
         return jsonify(success=False, message="Check server log for details.")
 
     return jsonify(success=True, message="Successfully sent email confirmation")
