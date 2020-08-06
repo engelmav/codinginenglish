@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 import flask
 import redis
-from sqlalchemy import and_
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
 
@@ -11,7 +10,7 @@ import database.models as m
 from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
-from services.cie import get_module_session_by_id, create_partial_user, create_user
+import services.cie as cie
 
 from operator import itemgetter
 import logging
@@ -168,7 +167,7 @@ def create_user():
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
-    _user = create_user(given_name, family_name, email)
+    _user = cie.create_user(email, first_name=given_name, last_name=family_name)
 
     return serialize(_user, m.UserSchema)
 
@@ -190,32 +189,8 @@ def register_user_to_session(user_id):
     """
     user = User.query.filter_by(id=user_id).one()
     module_session_json = request.get_json()
-    module_session = get_module_session_by_id(module_session_json.get('module_session_id'))
+    module_session = cie.get_module_session_by_id(module_session_json.get('module_session_id'))
     user.add_to_module_session(module_session)
-    return jsonify(success=True)
-
-
-class PartialUser:
-    email: str
-    fullname: str
-
-
-class UncreatedUserRegistration:
-    partial_user: PartialUser
-    module_session_id: int
-
-
-@app.route('/api/users/<email>/module-sessions', methods=['POST'])
-def register_uncreated_user_to_session(email):
-    """
-    Register an uncreated user to a session, using his or her email.
-    """
-    fullname = _get("fullname")
-    module_session_id = _get('module_session_id')
-    _user = create_partial_user(fullname, email)
-    module_session = get_module_session_by_id()
-    _user.add_to_module_session(module_session)
-    LOG.info(f"Registered user with email {email} to module session {module_session_id}")
     return jsonify(success=True)
 
 
