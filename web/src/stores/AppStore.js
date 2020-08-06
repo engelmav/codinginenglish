@@ -1,5 +1,5 @@
 import { action, observable } from 'mobx';
-import { storeNewUser, userRegistrations } from '../services/cieApi'
+import { cieApi } from '../services/cieApi'
 
 
 class AppStore {
@@ -13,16 +13,11 @@ class AppStore {
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
   }
-  @action storeUser(authData) {
+  @action async storeUser(authData) {
     this.authData = authData;
-    // weird
-    ({given_name: this.firstName, email: this.email} = authData.idTokenPayload);
-    storeNewUser(authData).then(res => {
-      userRegistrations(res.data.id).then(res => {
-        const userSessions = res.data;
-        this.userSessions = userSessions;
-      })
-    });
+    ({ given_name: this.firstName, email: this.email } = authData.idTokenPayload);
+    const newUser = await cieApi.storeNewUser(authData);
+    this.userSessions = await cieApi.getUserRegistrations(newUser.id);
   }
 }
 
