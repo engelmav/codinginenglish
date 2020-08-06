@@ -4,14 +4,13 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 
-
 import {
   Elements, CardElement, useStripe, useElements
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-
 import settings from '../settings';
+import { cieApi } from '../services/cieApi';
 import { AlertMessage, Button, Spinner } from '../UtilComponents';
 import { CcySelect, EmailNote, Form, PaymentInfo, PmtFormLabel, NameField, BuyButton } from './subcomponents';
 
@@ -138,13 +137,18 @@ function CheckoutFormConsumer(props) {
       if (result.paymentIntent.status === 'succeeded') {
         setComplete(true);
         setLoading(false);
-        await axios.put('/api/payment/confirmation', {
+        const confirmationResp = cieApi.sendPaymentConfirmation({
           email: computedEmail,
           name: name, // intentionally stick with login user's name if different from card name (don't use a computedName)
           moduleSessionId: sessionData.id,
           isAuthenticated: appStore.authData !== null,
           paymentResult: result
         });
+        if (confirmationResp.success === false){
+          setErrorMsg("Something went wrong when we tried to send your confirmation email, but your class was purchased successfully. We will reach out to you shortly.");
+          setLoading(false);
+          setComplete(true);
+        }
       }
     }
   }
@@ -153,13 +157,14 @@ function CheckoutFormConsumer(props) {
       {isComplete ?
         <>
           <p>Your purchase is complete! Check your email for further instructions. If you do not see the confirmation email, please check your spam folder. See you in class!</p>
+          {errorMsg && <AlertMessage style={{ marginTop: '3px' }} text={errorMsg} />}
           <Button onClick={onCloseClick}>CLOSE</Button>
         </>
         :
         <Form onSubmit={handleSubmit}>
           <PaymentInfo className="FormGroup">
             <PmtFormLabel>Name</PmtFormLabel>
-            <NameField placeholder="You Name Here" value={name} onChange={e => setName(e.target.value)} />
+            <NameField placeholder="Your name here" value={name} onChange={e => setName(e.target.value)} />
             <PmtFormLabel>Card Details</PmtFormLabel><CardElement />
             {/* <PmtFormLabel>Postal/Zip Code</PmtFormLabel><NameField placeholder="08000" value={postalCode} onChange={e => setPostalCode(e.target.value)} /> */}
             <PmtFormLabel>Currency</PmtFormLabel>
