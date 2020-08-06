@@ -6,6 +6,7 @@ from services.cie import get_module_session_by_id, create_user
 from flask import Blueprint, jsonify, request
 import stripe
 from email_validator import validate_email, EmailNotValidError
+from email_templates import confirm_registration_create_account
 
 import logging
 
@@ -105,11 +106,10 @@ def confirm_payment():
     if student_name is None or '':
         student_name = 'Student'
 
-    email_template = templates.confirm_registration_create_account
     if not is_authenticated:
         # User is either not signed in, or has no account.
         created_user = create_auth_user(student_name, email)
-        create_user()
+        create_user(email, full_name=student_name)
         passwd_reset = create_auth0_passwd_reset(email)
 
     module_session_id = confirmation_details.get('moduleSessionId')
@@ -124,6 +124,9 @@ def confirm_payment():
 
     # At this point, we should have all the template info we need.
     try:
+        # TODO: 8/5/2020. Trace through from line 109 to here to see how we need to branch
+        # TODO: out to cover the 3 login cases. Also, extract the email template from
+        # TODO: send_mail() and pass it in (confirm_registration_create_account).
         resp = send_mail(student_name, email, module_name, module_session_start_dt)
         # get status code in resp object and raise exception/log error if not 200
         LOG.debug(resp)
