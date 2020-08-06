@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 import database.models as m
 import logging
@@ -7,16 +7,22 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def create_user(first_name, last_name, email):
+def create_user(email, full_name=None, first_name=None, last_name=None):
     existing_user = m.User.query.filter(
-        and_(
-            m.User.firstname == first_name,
-            m.User.lastname == last_name,
-            m.User.email == email)
+        or_(
+            and_(
+                m.User.firstname == first_name,
+                m.User.lastname == last_name,
+                m.User.email == email),
+
+            and_(
+                m.User.fullname == full_name,
+                m.User.email == email)
+        )
     ).one_or_none()
 
     if existing_user:
-        LOG.warning("User with email {} exists already, returning".format(existing_user.email))
+        LOG.warning(f"User with email {existing_user.email} exists already, returning")
         return existing_user
 
     _user = m.User(
@@ -25,7 +31,7 @@ def create_user(first_name, last_name, email):
         email=email
     )
     _user.add()
-    LOG.info("New user registered with email address: {}".format(_user.email))
+    LOG.info(f"New user registered with email address: {_user.email}")
     return _user
 
 
