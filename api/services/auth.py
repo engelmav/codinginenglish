@@ -20,7 +20,7 @@ token = get_token.client_credentials(client_id, client_secret, API_ENDPOINT)
 mgmt_api_token = token['access_token']
 
 
-def create_auth_user(full_name, user_email):
+def create_auth0_user(full_name, user_email):
     user_id = uuid.uuid4()
     users = Users(domain, mgmt_api_token)
     user_res = users.create({
@@ -55,8 +55,9 @@ def create_auth0_passwd_reset(user_email):
         "mark_email_as_verified": True,
         "includeEmailInRedirect": True
     })
-
+    LOG.info(f"Password reset ticket generated for user {user_email}: {ticket_res}")
     print(ticket_res)
+    return ticket_res
 
     #
 # resp = requests.post('https://{}/oauth/token'.format("login.codinginenglish.com"),
