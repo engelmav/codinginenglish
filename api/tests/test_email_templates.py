@@ -9,9 +9,10 @@ def test_confirm_reg_create_account():
 
 
 def test_make_template():
-    body_parts = confirm_reg_create_account(
-        "Benicio del Toro", "1/1/2020"
-    )
-    templ = make_template("benicio@toro.io", "Benicio del Toro", "Intermediate", body_parts)
-    print(templ)
-    assert "Benicio del Toro" in templ['Messages'][0]['email_body']
+    params = ["Benicio del Toro", "1/1/2020", "https://change-pass"]
+    body_parts = confirm_reg_create_account(*params)
+    templ = make_template("benicio@toro.io", "Benicio del Toro", "Intermediate Class", body_parts)
+    email_body = templ['Messages'][0]['email_body']
+    for p in params:
+        assert p in email_body
+

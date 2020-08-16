@@ -99,4 +99,14 @@ def test_get_modules_endpoint():
     res = test_client.get('/modules').json
 
 
+def test_payment_confirmation():
+    payload = {
+        "email": "lorenzo@lambourghini.com",
+        "name": "Lorenzo Saenz",
+        "isAuthenticated": False
+    }
+    res = test_client.put('/api/payment/confirmation', json=payload)
+
+
+
 

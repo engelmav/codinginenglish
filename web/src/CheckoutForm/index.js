@@ -51,21 +51,20 @@ function CheckoutFormConsumer(props) {
       try {
         const res = await axios.put('/api/payment/validate-email', { email });
         const { errors } = res.data;
-        console.log(errors);
         const hasErrors = errors !== undefined && errors.length > 0;
         if (hasErrors) {
           setLoading(false);
           setErrorMsg(errors);
-          return false;
+          return true;
         }
       } catch (error) {
         // the http call to the backend must have failed.
         setLoading(false);
-        console.log("Could not validate email:", error);
+        console.log("Error calling email validation on the backend:", error);
         setErrorMsg("An internal error ocurred. You might want to try again. The issue has been logged for investigation.");
-        return;
+        return true;
       }
-      return true;
+      return false;
     }
 
     /** Creates payment intent and returns a client secret for use in the next step.
@@ -91,19 +90,21 @@ function CheckoutFormConsumer(props) {
       return clientSecret;
     }
 
-    if (email === null || email === '') {
+    const noEmail = email === null || email === '';
+    if (noEmail) {
       setIsInvalidEmail("Hey! We need your email address to send you a receipt and class information. Please enter one. :)")
     }
 
-    if (!stripe || !elements) {
-      // stripe isn't loaded yet
+    const stripeNotLoaded = !stripe || !elements;
+    if (stripeNotLoaded) {
       return;
     }
 
     setLoading(true);
 
-    if (emailValidationFailure(email)) {
+    if (await emailValidationFailure(email)) {
       // if validation fails, exit early.
+      setLoading(false);
       return;
     }
 
@@ -113,7 +114,7 @@ function CheckoutFormConsumer(props) {
       email: email
     };
 
-    const clientSecret = createPaymentIntent(intentParams);
+    const clientSecret = await createPaymentIntent(intentParams);
 
     const paymentMethod = {
       payment_method: {
@@ -125,6 +126,12 @@ function CheckoutFormConsumer(props) {
       }
     };
 
+    function errorAndSetComplete(errorText) {
+      setErrorMsg(errorText);
+      setLoading(false);
+      setComplete(true);
+    }
+
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
     if (result.error) {
       console.log(result);
@@ -134,24 +141,27 @@ function CheckoutFormConsumer(props) {
     } else {
       // The payment was processed.
       console.log(result);
+      const errorText = "Something went wrong when we tried to send your confirmation email, but your class was purchased successfully. We will reach out to you shortly.";
+      let confirmationResp;
       if (result.paymentIntent.status === 'succeeded') {
         setComplete(true);
         setLoading(false);
-        const confirmationResp = cieApi.sendPaymentConfirmation({
+        confirmationResp = cieApi.sendPaymentConfirmation({
           email: computedEmail,
           name: name, // intentionally stick with login user's name if different from card name (don't use a computedName)
           moduleSessionId: sessionData.id,
           isAuthenticated: appStore.authData !== null,
           paymentResult: result
-        });
-        if (confirmationResp.success === false){
-          setErrorMsg("Something went wrong when we tried to send your confirmation email, but your class was purchased successfully. We will reach out to you shortly.");
-          setLoading(false);
-          setComplete(true);
-        }
+        }).catch(err => { console.log("caught an error outside"); errorAndSetComplete(errorText); })
       }
+
+    }
+    if (confirmationResp === 'undefined' || confirmationResp.success === false) {
+      errorAndSetComplete(errorText);
     }
   }
+
+
   return (
     <>
       {isComplete ?

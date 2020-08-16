@@ -13,10 +13,12 @@ class CieApi {
   }
 
   async sendPaymentConfirmation(params){
-    return (await axios.put('/api/payment/confirmation', params)).data;
+    let resp;
+
+    resp = await axios.put('/api/payment/confirmation', params);
+
   }
 }
-
 const cieApi = new CieApi();
 
 

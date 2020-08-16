@@ -20,8 +20,13 @@ token = get_token.client_credentials(client_id, client_secret, API_ENDPOINT)
 mgmt_api_token = token['access_token']
 
 
+def get_auth0_user(email):
+    user = Users(domain, mgmt_api_token).list(q=f"email={email}")
+    return user
+
+
 def create_auth0_user(full_name, user_email):
-    user_id = uuid.uuid4()
+    user_id = str(uuid.uuid4())
     users = Users(domain, mgmt_api_token)
     user_res = users.create({
       "email": user_email,

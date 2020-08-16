@@ -1,4 +1,4 @@
-from services.auth import create_auth0_user, create_auth0_passwd_reset
+from services.auth import create_auth0_user, create_auth0_passwd_reset, get_auth0_user
 from config import config
 from services.mailjet import send_mail
 from services.cie import get_module_session_by_id, create_user
@@ -75,18 +75,6 @@ def payment_failure():
     return jsonify(success=True, message="A payment attempt failed. This is logged in the backend.")
 
 
-def email_logged_in():
-    pass
-
-
-def email_no_account():
-    pass
-
-
-def email_logged_out():
-    pass
-
-
 @stripe_bp.route('/api/payment/confirmation', methods=['PUT'])
 def confirm_payment():
     """
@@ -103,42 +91,54 @@ def confirm_payment():
     student_name = confirmation_details.get('name')
 
     is_authenticated = confirmation_details.get('isAuthenticated')
+    no_auth_user = get_auth0_user(student_email).get('total') == 0
+
     if student_name is None or '':
         student_name = 'Student'
 
-    if not is_authenticated:
-        # User is either not signed in, or has no account.
-        _ = create_auth0_user(student_name, student_email)
-        create_user(student_email, full_name=student_name)
-        passwd_reset_ticket = create_auth0_passwd_reset(student_email)
-        body_parts = templates.confirm_reg_create_account(
-            student_email, student_name, passwd_reset_ticket["link"])
-    else:
-        body_parts = templates.confirm_registration()
-
-    email = templates.make_template(student_email, student_name, body_parts)
+    template_params = [student_name, student_email]
 
     module_session_id = confirmation_details.get('moduleSessionId')
     try:
-        module_session = get_module_session_by_id(module_session_id)
-        module_session_start_dt = module_session.session_datetime
-        module_name = module_session.cie_module.name
+        module_name, module_session_start_dt = get_module_details(module_session_id)
     except:
         LOG.error(f"Could not retrieve module session details for email confirmation. Confirmation details: "
                   f"{confirmation_details}. Aborting.", exc_info=True)
         return jsonify(success=False, message='Could not retrieve module session details.')
 
+    template_params += [module_name, module_session_start_dt]
+
+    if not is_authenticated and no_auth_user:
+        confirmation_email = handle_new_user(student_email, student_name, template_params)
+    else:
+        confirmation_email = templates.confirm_registration(*template_params)
+
     # At this point, we should have all the template info we need.
     try:
-        # TODO: 8/5/2020. Trace through from line 109 to here to see how we need to branch
-        # TODO: out to cover the 3 login cases. Also, extract the email template from
-        # TODO: send_mail() and pass it in (confirm_registration_create_account).
-
-        resp = send_mail(student_name, email, module_name, module_session_start_dt)
+        resp = send_mail(confirmation_email)
         # get status code in resp object and raise exception/log error if not 200
         LOG.debug(resp)
+        if resp.status_code != 200:
+            raise Exception(f"Error sending confirmation email. Error text: {resp.text}")
     except:
         LOG.error('Email confirmation failed. See traceback.', exc_info=True)
         return jsonify(success=False, message="Check server log for details.")
 
     return jsonify(success=True, message="Successfully sent email confirmation")
+
+
+def get_module_details(module_session_id):
+    module_session = get_module_session_by_id(module_session_id)
+    module_session_start_dt = module_session.session_datetime
+    module_name = module_session.cie_module.name
+    return module_name, module_session_start_dt
+
+
+def handle_new_user(student_email, student_name, template_params):
+    # TODO: UUID not serializable
+    _ = create_auth0_user(student_name, student_email)
+    create_user(student_email, full_name=student_name)
+    passwd_reset_ticket = create_auth0_passwd_reset(student_email)
+    template_params.append(passwd_reset_ticket["link"])
+    body_parts = templates.confirm_reg_create_account(*template_params)
+    return body_parts
