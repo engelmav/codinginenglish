@@ -137,8 +137,8 @@ class ModuleCard extends Component {
 
   render() {
     let { cie_module, session_datetime } = this.props.sessionData;
-    var local = DateTime.fromISO(session_datetime);
-    const localDateTime = local.toLocaleString(DateTime.DATETIME_FULL);
+    var sessionDateTime = DateTime.fromISO(session_datetime);
+    const localSessionDateTime = sessionDateTime.toLocaleString(DateTime.DATETIME_FULL);
     const { modalIsOpen } = this.state;
     const { afterOpenModal, closeModal } = this;
     const { appStore, sessionData } = this.props;
@@ -154,7 +154,7 @@ class ModuleCard extends Component {
         />
         <div className="title-desc">
           <Title p={0}>{cie_module.name}</Title>
-          <p className="datetime">Course begins {localDateTime}</p>
+          <p className="datetime">Course begins {localSessionDateTime}</p>
           <p>{cie_module.description}</p>
           <Button
             onClick={this.handleSignupClick}

@@ -1,5 +1,5 @@
 from auth0.v3.authentication import GetToken
-from auth0.v3.management import Auth0, Users, Tickets
+from auth0.v3.management import Users, Tickets
 from passlib import pwd
 
 from config import config, AUTH0_DB_CONN
@@ -34,9 +34,6 @@ def create_auth0_user(full_name, user_email):
       "blocked": False,
       "email_verified": False,
       "app_metadata": {},
-      # "given_name": "Vinnie from API",
-      # "family_name": "Engelmann",
-      # "name": "Vinnie",
       "nickname": full_name,
       "picture": "https://secure.gravatar.com/avatar/15626c5e0c749cb912f9d1ad48dba440?s=480&r=pg&d=https%3A%2F%2Fssl"
                  ".gstatic.com%2Fs2%2Fprofiles%2Fimages%2Fsilhouette80.png",

@@ -9,6 +9,7 @@ class AppStore {
   @observable firstName = null;
   @observable email = null;
   @observable userSessions = null;
+  @observable hasActiveSessions = false;
 
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
@@ -18,6 +19,17 @@ class AppStore {
     ({ given_name: this.firstName, email: this.email } = authData.idTokenPayload);
     const newUser = await cieApi.storeNewUser(authData);
     this.userSessions = await cieApi.getUserRegistrations(newUser.id);
+  }
+
+  hasActiveSessions() {
+    const now = new Date();
+    if (this.userSessions) {
+      return this.userSessions.filter(userSession => {
+        if (userSession.start_time === now) {
+          this.hasActiveSessions = true;
+        }
+      });
+    }
   }
 }
 

@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import Login from '../Login';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { observer } from 'mobx-react';
+import { cieApi } from '../services/cieApi';
 
 const HeaderElem = styled.header`
   margin-top: 40px;
@@ -60,38 +61,33 @@ const RoutesUL = styled.ul`
 `;
 
 
-@observer
-class Header extends Component {
-  render() {
-    const {
-      auth,
-      appStore
-    } = this.props;
+const Header = observer((props) => {
+  const {
+    auth,
+    appStore
+  } = props;
 
-    return (
-      <Switch>
-        <Route path="/class"><div></div></Route>
-        <Route path="*">
-          <HeaderElem>
-            <Img alt="cie logo" src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></Img>
-            <RoutesUL>
-              <li><Link to="/">home</Link></li>
-              <li><Link to="/classes">upcoming_classes</Link></li>
-              {appStore.authData &&
-                <React.Fragment>
-                  <li><Link to="/my-dashboard">my_dashboard</Link></li>
-                  <li onClick={() => alert()}>
-                    <Link to="/class">in_session!</Link>
-                  </li>
-                </React.Fragment>
-              }
-              <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>
-            </RoutesUL>
-          </HeaderElem>
-        </Route>
-      </Switch>
-    );
-  }
+  return (
+    <Switch>
+      <Route path="/class"><div></div></Route>
+      <Route path="*">
+        <HeaderElem>
+          <Img alt="cie logo" src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></Img>
+          <RoutesUL>
+            <li><Link to="/">home</Link></li>
+            <li><Link to="/classes">upcoming_classes</Link></li>
+            {appStore.authData &&
+              <>
+                <li><Link to="/my-dashboard">my_dashboard</Link></li>
+                {appStore.hasActiveSessions && <li><Link to="/class">in_session!</Link></li>}
+              </>
+            }
+            <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>
+          </RoutesUL>
+        </HeaderElem>
+      </Route>
+    </Switch>
+  );
 }
 
 export default Header; 

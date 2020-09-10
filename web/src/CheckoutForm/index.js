@@ -47,6 +47,10 @@ function CheckoutFormConsumer(props) {
     // disable default form submission
     event.preventDefault();
 
+    /**
+     * Calls API backend to validate email. If email is invalid, returns true.
+     * @param {string} email 
+     */
     async function emailValidationFailure(email) {
       try {
         const res = await axios.put('/api/payment/validate-email', { email });
@@ -90,6 +94,12 @@ function CheckoutFormConsumer(props) {
       return clientSecret;
     }
 
+    function errorAndSetComplete(errorText) {
+      setErrorMsg(errorText);
+      setLoading(false);
+      setComplete(true);
+    }
+
     const noEmail = email === null || email === '';
     if (noEmail) {
       setIsInvalidEmail("Hey! We need your email address to send you a receipt and class information. Please enter one. :)")
@@ -126,12 +136,6 @@ function CheckoutFormConsumer(props) {
       }
     };
 
-    function errorAndSetComplete(errorText) {
-      setErrorMsg(errorText);
-      setLoading(false);
-      setComplete(true);
-    }
-
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
     if (result.error) {
       console.log(result);
@@ -148,11 +152,15 @@ function CheckoutFormConsumer(props) {
         setLoading(false);
         confirmationResp = cieApi.sendPaymentConfirmation({
           email: computedEmail,
-          name: name, // intentionally stick with login user's name if different from card name (don't use a computedName)
+          /**
+           * intentionally stick with login user's name if different from card name (don't use a computedName),
+           * this is in case the user uses a card that isn't their own.
+           *  */ 
+          name: name,
           moduleSessionId: sessionData.id,
           isAuthenticated: appStore.authData !== null,
           paymentResult: result
-        }).catch(err => { console.log("caught an error outside"); errorAndSetComplete(errorText); })
+        }).catch(err => { console.log("Failed to send payment confirmation:", err); errorAndSetComplete(errorText); })
       }
 
     }

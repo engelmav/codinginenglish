@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@babel/core": "7.2.2",
     "@babel/runtime": "^7.6.3",
     "@novnc/novnc": "^1.1.0",
     "@stripe/react-stripe-js": "^1.1.2",
@@ -14,7 +13,6 @@
     "axios": "^0.18.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "9.0.0",
-    "babel-jest": "23.6.0",
     "babel-loader": "8.0.5",
     "babel-plugin-named-asset-import": "^0.3.1",
     "babel-preset-react-app": "^7.0.2",
@@ -37,10 +35,8 @@
     "identity-obj-proxy": "3.0.0",
     "immutability-helper": "^3.0.0",
     "jQuery": "^1.7.4",
-    "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.2",
     "jest-resolve": "23.6.0",
-    "jest-watch-typeahead": "^0.2.1",
     "location": "0.0.1",
     "luxon": "^1.17.2",
     "mini-css-extract-plugin": "0.5.0",
@@ -88,7 +84,7 @@
   "scripts": {
     "start": "PORT=8080 DEV_SERVER=1 node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "jest"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -160,10 +156,15 @@
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.11.5",
+    "babel-jest": "^23.6.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",
+    "jest": "^23.6.0",
     "jest-localstorage-mock": "^2.4.0",
     "jest-mock-axios": "^2.4.0",
+    "jest-watch-typeahead": "^0.2.1",
     "react-styleguidist": "^10.6.2",
     "react-test-renderer": "^16.8.6"
   }
