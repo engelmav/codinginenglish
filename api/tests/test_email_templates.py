@@ -1,4 +1,4 @@
-from api.email_templates import make_template, confirm_reg_create_account
+from api.email_templates import confirm_reg_create_account
 
 
 def test_confirm_reg_create_account():
@@ -9,10 +9,15 @@ def test_confirm_reg_create_account():
 
 
 def test_make_template():
-    params = ["Benicio del Toro", "1/1/2020", "https://change-pass"]
-    body_parts = confirm_reg_create_account(*params)
-    templ = make_template("benicio@toro.io", "Benicio del Toro", "Intermediate Class", body_parts)
-    email_body = templ['Messages'][0]['email_body']
-    for p in params:
-        assert p in email_body
+    params = {
+        "student_name": "Benicio del Toro",
+        "student_email": "benicio@toro.io",
+        "module_name": "Intermediate Class",
+        "module_session_start_dt": "1/1/2020",
+        "change_pass_ticket_link": "https://change-pass"}
+    populated_template = confirm_reg_create_account(**params)
+    message = populated_template['Messages'][0]
+
+    assert params["student_name"] in message["TextPart"]
+    assert params["student_email"] in message["To"][0]["Email"]
 

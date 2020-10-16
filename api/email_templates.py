@@ -1,3 +1,8 @@
+"""
+All templates must confirm to the MailJet API spec described here:
+https://app.mailjet.com/transactional/sendapi
+"""
+
 from jinja2 import Template
 
 
@@ -47,24 +52,38 @@ def confirm_registration(student_name, student_email, module_name, module_sessio
     return _make_template(student_email, student_name, module_name, body_parts)
 
 
-def confirm_reg_create_account(student_name, student_email, module_name, module_session_start_dt, ticket_link):
+def confirm_reg_create_account(
+        student_name,
+        student_email,
+        module_name,
+        module_session_start_dt,
+        change_pass_ticket_link):
+    """
+    Confirms class registration and includes a link to setup student's account.
+    :param student_name:
+    :param student_email:
+    :param module_name:
+    :param module_session_start_dt:
+    :param change_pass_ticket_link: the link used to reset student's the password.
+    :return:
+    """
     body = Template("Dear {{ student_name}},%0A"
-                    "Thank you for registering for {{ module_name}} at Coding in English."
+                    "Thank you for registering for {{ module_name }} at Coding in English."
                     "Your class will begin on {{ module_session_start_dt }}."
                     "To prepare for access to your upcoming class, please create your account as soon as possible by"
                     "clicking the below link:%0A"
                     "{{ reset_password_ticket }}"
                     "Sincerely,%0AVincent Caudo Engelmann, Coding in English").render(
         student_name=student_name, module_name=module_name, module_session_start_dt=module_session_start_dt,
-        reset_password_ticket=ticket_link)
+        reset_password_ticket=change_pass_ticket_link)
     html_body = Template("<p>Dear {{ student_name }},</p>"
-                         "<p>Thank you for registering for {{ module_name}} at Coding in English.</p>"
+                         "<p>Thank you for registering for {{ module_name }} at Coding in English.</p>"
                          "Your class will begin on {{ module_session_start_dt }}.</p>"
                          "<p>Please create your account as soon as possible by clicking the below link:</p>"
                          "<p>{{ reset_password_ticket }}</p>"
                          "<p>Sincerely,<br/>Vincent Caudo Engelmann, Coding in English</p>").render(
         student_name=student_name, module_name=module_name, module_session_start_dt=module_session_start_dt,
-        reset_password_ticket=ticket_link)
+        reset_password_ticket=change_pass_ticket_link)
 
     body_parts = _main_part(body, html_body, "ClassRegNoAccount")
     return _make_template(student_email, student_name, module_name, body_parts)
