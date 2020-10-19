@@ -6,19 +6,18 @@ class CieApi {
     return await (await axios.post('/api/users', data)).data;
   }
   async getUserRegistrations(userId) {
-    return await axios.get(`/api/users/${userId}/module-sessions`);
+    const res = await axios.get(`/api/users/${userId}/module-sessions`).data;
+    return res;
   }
   async registerUserToSession(userId){
-    return await axios.post(`/api/users/${userId}/module-sessions`);
+    return await axios.post(`/api/users/${userId}/module-sessions`).data;
   }
-
   async sendPaymentConfirmation(params){
-    let resp;
-
-    resp = await axios.put('/api/payment/confirmation', params);
-
+    return (await axios.put('/api/payment/confirmation', params)).data;
   }
 }
+
+
 const cieApi = new CieApi();
 
 
