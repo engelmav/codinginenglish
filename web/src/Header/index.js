@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Login from '../Login';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { observer } from 'mobx-react';
-import { cieApi } from '../services/cieApi';
+
 
 const HeaderElem = styled.header`
   margin-top: 40px;
@@ -88,6 +88,6 @@ const Header = observer((props) => {
       </Route>
     </Switch>
   );
-}
+});
 
 export default Header; 
