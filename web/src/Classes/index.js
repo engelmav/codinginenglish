@@ -178,7 +178,7 @@ class ModuleCard extends Component {
           <ModalContent>
             <Title>{cie_module.name}</Title>
             <ContentSection>
-              <p>Starts {localDateTime}</p>
+              <p>Starts {localSessionDateTime}</p>
               {appStore.authData == null &&
                 <>
                   <p>Already registered as a student? Sign in!</p>
