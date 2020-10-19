@@ -105,18 +105,22 @@ class Aula extends Component {
     const { activityData, guacWindow, chatWindow, videoWindow, popupActivityWindow, onTop } = this.state;
     const { toggleGuac, toggleChat, toggleVideo, togglePopupActivity } = this;
     const { appStore } = this.props;
-    let userFirstName = null;
-    if (this.props.authData !== null) {
-      userFirstName = appStore.authData.idTokenPayload.given_name;
+    let userFirstName;
+    const userIsAuthenticated = this.props.authData !== null;
+    const useAuthenticatedFirstName = () => appStore.authData.idTokenPayload.given_name;
+    if (userIsAuthenticated) {
+      userFirstName = useAuthenticatedFirstName();
+    } else {
+      throw new Error("You are not logged in! Unable to load page.");
     }
 
     return (
       <div>
         <h1>{this.state.event}</h1>
         <Taskbar>
-          {!guacWindow && <Button mr={2} onClick={() => this.toggleGuac()}>Dev Environment</Button>}
-          {!chatWindow && <Button mr={2} onClick={() => this.toggleChat()}>Chat</Button>}
-          {!videoWindow && <Button mr={2} onClick={() => this.toggleVideo()}>Video</Button>}
+          {!guacWindow && <Button mr={2} onClick={this.toggleGuac}>Dev Environment</Button>}
+          {!chatWindow && <Button mr={2} onClick={this.toggleChat}>Chat</Button>}
+          {!videoWindow && <Button mr={2} onClick={this.toggleVideo}>Video</Button>}
           {guacWindow && chatWindow && videoWindow && <p>Coding in English</p>}
         </Taskbar>
 
