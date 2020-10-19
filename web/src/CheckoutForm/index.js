@@ -136,6 +136,8 @@ function CheckoutFormConsumer(props) {
       }
     };
 
+    let confirmationResp;
+    const confirmationFailure = "Something went wrong when we tried to send your confirmation email, but your class was purchased successfully. We will reach out to you shortly.";
     const result = await stripe.confirmCardPayment(clientSecret, paymentMethod);
     if (result.error) {
       console.log(result);
@@ -145,8 +147,6 @@ function CheckoutFormConsumer(props) {
     } else {
       // The payment was processed.
       console.log(result);
-      const errorText = "Something went wrong when we tried to send your confirmation email, but your class was purchased successfully. We will reach out to you shortly.";
-      let confirmationResp;
       if (result.paymentIntent.status === 'succeeded') {
         setComplete(true);
         setLoading(false);
@@ -155,17 +155,19 @@ function CheckoutFormConsumer(props) {
           /**
            * intentionally stick with login user's name if different from card name (don't use a computedName),
            * this is in case the user uses a card that isn't their own.
-           *  */ 
+           *  */
           name: name,
           moduleSessionId: sessionData.id,
           isAuthenticated: appStore.authData !== null,
           paymentResult: result
-        }).catch(err => { console.log("Failed to send payment confirmation:", err); errorAndSetComplete(errorText); })
+        }).catch(err => {
+          console.log("Failed to send payment confirmation:", err); errorAndSetComplete(confirmationFailure);
+        })
       }
 
     }
     if (confirmationResp === 'undefined' || confirmationResp.success === false) {
-      errorAndSetComplete(errorText);
+      errorAndSetComplete(confirmationFailure);
     }
   }
 
