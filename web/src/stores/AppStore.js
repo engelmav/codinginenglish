@@ -24,7 +24,7 @@ class AppStore {
   hasActiveSessions() {
     const now = new Date();
     if (this.userSessions) {
-      return this.userSessions.filter(userSession => {
+      this.userSessions.forEach(userSession => {
         if (userSession.start_time === now) {
           this.hasActiveSessions = true;
         }
