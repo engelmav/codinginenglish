@@ -133,6 +133,16 @@ def add_session_to_module(cie_module_id):
     return serialize(new_sess, m.ModuleSessionSchema)
 
 
+@app.route('/api/module_sessions/<session_id>', methods=['DELETE'])
+def delete_session_from_module(session_id):
+    session = m.ModuleSession.query(id=session_id).one()
+    session.delete()
+    return jsonify(
+        status="success",
+        messages=["Deleted session"]
+    )
+
+
 @app.route('/api/module-sessions')
 def get_modules():
     res = m.ModuleSession.query.all()

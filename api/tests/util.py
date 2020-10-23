@@ -18,3 +18,9 @@ def create_2_hour_session():
     print(resp)
     print(resp.json())
 
+
+def delete_session(session_id):
+    _url = f"http://{cie_api}/api/module_sessions/{session_id}"
+    resp = requests.delete(_url)
+    print(resp.json())
+
