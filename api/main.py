@@ -89,7 +89,8 @@ def serialize(data, clazz, many=False):
     :return: json string
     """
     schema = clazz(many=many)
-    return jsonify(schema.dump(data))
+    return jsonify(status="success", data=schema.dump(data),
+                   messages="Object(s) created successfully.")
 
 
 def deserialize(data, clazz):
@@ -128,9 +129,9 @@ def add_session_to_module(cie_module_id):
     :param cie_module_id: str. integer id of module.
     :return: ModuleSessionSchema object.
     """
-    sess = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
-    new_sess = sess.add()
-    return serialize(new_sess, m.ModuleSessionSchema)
+    session = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
+    session.add()
+    return serialize(session, m.ModuleSessionSchema)
 
 
 @app.route('/api/module_sessions/<session_id>', methods=['DELETE'])

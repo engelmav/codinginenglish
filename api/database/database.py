@@ -5,7 +5,6 @@ from sqlalchemy.pool import QueuePool, Pool
 from sqlalchemy import exc, event
 import pymysql
 import logging
-import os
 
 from config import config
 
