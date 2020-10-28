@@ -201,8 +201,8 @@ def register_user_to_session(user_id):
     user = User.query.filter_by(id=user_id).one()
     module_session_json = request.get_json()
     module_session = cie.get_module_session_by_id(module_session_json.get('module_session_id'))
-    user.add_to_module_session(module_session)
-    return jsonify(success=True)
+    user_reg = user.add_to_module_session(module_session)
+    return serialize(user_reg, m.UserModuleRegistrationSchema)
 
 
 @app.route("/api/site-map")

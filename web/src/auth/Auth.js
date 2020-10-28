@@ -53,7 +53,6 @@ class Auth {
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
-    
   }
 
   signOut() {

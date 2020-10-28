@@ -27,9 +27,10 @@ class User(Base):
         cascade='all, delete, delete-orphan'
     )
 
-    def add_to_module_session(self, module_session: 'ModuleSession'):
+    def add_to_module_session(self, module_session: 'ModuleSession') -> UserModuleRegistration:
         user_mod_reg = UserModuleRegistration(user_id=self.id, module_session_id=module_session.id)
         user_mod_reg.add()
+        return user_mod_reg
 
 
 class UserSchema(ModelSchema):
