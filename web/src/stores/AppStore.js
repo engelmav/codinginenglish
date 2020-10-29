@@ -1,4 +1,4 @@
-import { action,computed, makeObservable, observable } from 'mobx';
+import { action,computed, observable } from 'mobx';
 import { cieApi } from '../services/cieApi'
 
 
@@ -9,16 +9,6 @@ class AppStore {
   @observable firstName = null;
   @observable email = null;
   @observable userSessions = null;
-  /**
-   * Notes for tomorrow:
-   *  - upgrade mobx to get makeObservable.
-   *  - fix hasActiveSessions to work with Login component
-   */
-  constructor() {
-    makeObservable(this, {
-      isAuthenticated: computed
-    })
-  }
 
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
@@ -29,11 +19,13 @@ class AppStore {
     console.log("auth data:", authData);
     const newUser = (await cieApi.storeNewUser(authData)).data;
     console.log("result of storeNewUser:", newUser);
-    this.userSessions = await cieApi.getUserRegistrations(newUser.id);
+    this.userSessions = newUser.registered_modules;
+    console.log("appStore.storeUser() userSessions:", this.userSessions);
   }
 
-  mGet hasActiveSessions() {
+  @computed get hasActiveSessions() {
     const now = new Date();
+    console.log("appStore.hasActiveSessions() userSessions:", this.userSessions);
     if (this.userSessions) {
       this.userSessions.forEach(userSession => {
         if (userSession.start_time === now) {
