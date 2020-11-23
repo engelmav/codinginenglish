@@ -9,6 +9,7 @@ import Routes from '../Routes';
 import { observer } from 'mobx-react';
 import { auth } from '../auth/Auth';
 import { appStore } from '../stores/AppStore';
+import { cieApi } from '../services/cieApi';
 import axios from 'axios';
 
 
@@ -33,7 +34,7 @@ class App extends Component {
   render() {
     return (
       <Router history={history}>
-          <Header auth={auth} appStore={appStore} />
+          <Header auth={auth} appStore={appStore} cieApi={cieApi} />
           <Routes auth={auth} appStore={appStore}/>
           <Footer><i>Made with love in Encinitas, California.</i></Footer>
       </Router>

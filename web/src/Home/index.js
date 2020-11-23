@@ -122,8 +122,8 @@ const Home = (props) => {
           Python, and MySQL, with professional code in a GitHub repository, and a real, deployed WebApp.
         </p>
         <ImgContainer>
-          {['react-logo-150.png', 'python-logo-150.png', 'mysql-logo-150.png'].map(src => 
-            <img alt={src} style={{height: '150px'}} src={`${settings.assets}/${src}`} />)}
+          {['react-logo-150.png', 'python-logo-150.png', 'mysql-logo-150.png'].map((src, idx) => 
+            <img alt={src} key={idx} style={{height: '150px'}} src={`${settings.assets}/${src}`} />)}
         </ImgContainer>
         <RegisterButton />
       </ContentSectionLanding>

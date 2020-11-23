@@ -6,10 +6,16 @@ class CieApi {
     return await (await axios.post('/api/users', data)).data;
   }
 
+  async _get(uri){
+    // TODO: handle exceptions
+
+  }
+
   async getUserRegistrations(userId) {
-    const res = await axios.get(`/api/users/${userId}/module-sessions`).data;
-    console.log("cieApi.getUserRegistrations():", res)
-    return res.data;
+    console.log("getUserRegistrations() checking registrations for userId", userId);
+    const res = await axios.get(`/api/users/${userId}/module-sessions`);
+    console.log("cieApi.getUserRegistrations():", res);
+    return res.data.data;
   }
 
   async registerUserToSession(userId){
@@ -22,7 +28,7 @@ class CieApi {
 }
 
 
-const cieApi = new CieApi();
+const cieApi = new CieApi("/api");
 
 
 export {

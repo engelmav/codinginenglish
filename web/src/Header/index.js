@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Login from '../Login';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -64,8 +64,26 @@ const RoutesUL = styled.ul`
 const Header = observer((props) => {
   const {
     auth,
-    appStore
+    appStore,
   } = props;
+  let hasActiveSession;
+  let eventSource;
+  const [sessionStarted, setSessionStarted] = useState(false);
+  useEffect(() => {
+    eventSource = new EventSource('/api/stream');
+    eventSource.addEventListener('classUpdate', event => {
+      console.log('received sessionStart event');
+      const { data } = event;
+      try {
+        const eventData = JSON.parse(data);
+        console.log("event data:", eventData);
+        setSessionStarted(true);
+      } catch (ex) {
+        console.log("Unable to parse event data:", data);
+      }
+    })
+  })
+
 
   return (
     <Switch>
@@ -79,7 +97,7 @@ const Header = observer((props) => {
             {appStore.authData &&
               <>
                 <li><Link to="/my-dashboard">my_dashboard</Link></li>
-                {appStore.hasActiveSessions && <li><Link to="/class">in_session!</Link></li>}
+                {sessionStarted && <li><Link to="/class">in_session!</Link></li>}
               </>
             }
             <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>

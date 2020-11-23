@@ -1,5 +1,4 @@
 import axios from 'axios';
-import 'mobx-react-lite/batchingForReactDom';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';

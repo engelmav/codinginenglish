@@ -33,8 +33,8 @@ const MyDashboard = observer(props => {
         <p>Currently registered classes:</p>
         {appStore.userSessions &&
           <ul>
-            {appStore.userSessions.map(sess =>
-              <li>{sess.module_session_id}</li>
+            {appStore.userSessions.map((sess, idx) =>
+              <li key={idx}>{sess.module_session_id}</li>
             )}
           </ul>
         }

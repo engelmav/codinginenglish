@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, request
 import flask
-import redis
-from flask_kvsession import KVSessionExtension
-from simplekv.memory.redisstore import RedisStore
 
 import json
 
 import database.models as m
+from events import red, pub_to_redis, session_start_poll
 from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
@@ -23,19 +21,11 @@ app = Flask(__name__,
 
 app.register_blueprint(stripe_bp)
 app.secret_key = config["cie.api.session.key"]
-redis_pw = config["cie.redis.password"]
-redis_host = config["cie.redis.host"]
 
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     m.db_session.remove()
-
-
-red = redis.StrictRedis(host=redis_host, password=redis_pw, port=6379)
-redis_store = RedisStore(red)
-
-KVSessionExtension(redis_store, app)
 
 
 def event_stream():
@@ -57,7 +47,8 @@ def send_sse():
     command = request.get_json()
     # we are doing this twice to clean up control characters
     command_str = json.dumps(command)
-    res = red.publish('cie', command_str)
+    res = pub_to_redis(command_str)
+
     return jsonify(res)
 
 
@@ -179,7 +170,7 @@ def create_user():
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
     _user = cie.create_user(email, first_name=given_name, last_name=family_name)
-
+    session_start_poll(pub_to_redis)
     return serialize(_user, m.UserSchema)
 
 

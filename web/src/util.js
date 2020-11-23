@@ -44,7 +44,20 @@ const isInSession = (startDateTime, durationMinutes) => {
   return interval.contains(nowUtc);
 }
 
+
+function hasActiveSession(userSessions) {
+  let _hasActiveSession = false;
+  userSessions.forEach(userSession => {
+    if (isInSession(userSession.start_time)) {
+      console.log("User has an active session!")
+      _hasActiveSession = true;
+    }
+  });
+  return _hasActiveSession;
+}
+
 export {
+  hasActiveSession,
   browserDetect,
   isInSession
 };

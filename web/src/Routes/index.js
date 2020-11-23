@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import MyDashboard from '../MyDashboard';
 import { auth } from '../auth/Auth';
 import makeRequiresAuth from '../auth/RequiresAuth';
+import { cieApi } from '../services/cieApi';
 import Callback from '../auth/Auth0Callback';
 import Aula from '../Aula';
 import { Home } from '../Home';
@@ -19,6 +20,11 @@ const handleAuthentication = ({ location }) => {
   if (/access_token|id_token|error/.test(location.hash)) {
     auth.handleAuthentication();
   }
+}
+
+const rootProps = {
+  appStore,
+  cieApi
 }
 
 
@@ -44,11 +50,11 @@ class Routes extends Component {
   render() {
     return (
       <>
-        <Route exact path="/" component={(props) => <Home appStore={appStore} {...props} />} />
-        <Route exact path="/classes" component={(props) => <Classes appStore={appStore} />} />
-        <Route exact path="/my-dashboard" component={(props) => <MyDashboard auth={auth} appStore={appStore} {...props} />} />
+        <Route exact path="/" component={(props) => <Home {...rootProps} {...props} />} />
+        <Route exact path="/classes" component={(props) => <Classes {...rootProps} />} />
+        <Route exact path="/my-dashboard" component={(props) => <MyDashboard {...rootProps} {...props} />} />
         <Route exact path="/class" component={(props) =>
-          <ClassroomProtected authData={this.props.authData} appStore={appStore} {...props} />} />
+          <ClassroomProtected authData={this.props.authData} {...rootProps} {...props} />} />
         <Route path="/callback" render={(props) => {
           handleAuthentication(props);
           return <CallbackWithRouter {...props} />
