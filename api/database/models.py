@@ -1,5 +1,5 @@
 from database.database import Base, db_session
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 
 from marshmallow_sqlalchemy import ModelSchema
@@ -7,11 +7,36 @@ from marshmallow.fields import Nested
 from marshmallow import post_load
 
 
+class CieModule(Base):
+    __tablename__ = 'cie_modules'
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    description = Column(String(255))
+    image_path = Column(String(255))
+
+    def add_user(self, user: 'User', session: 'ModuleSession'):
+        reg = UserModuleRegistration(user_id=user.id, module_session_id=session.id)
+        reg.add()
+
+
+class ModuleSession(Base):
+    __tablename__ = 'module_sessions'
+    id = Column(Integer, primary_key=True)
+    cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
+    cie_module = relationship(
+        'CieModule',
+        backref='ModuleSession'
+    )
+    session_datetime = Column(DateTime)
+
+
 class UserModuleRegistration(Base):
     __tablename__ = 'user_module_registration'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     module_session_id = Column(Integer, ForeignKey('module_sessions.id'))
+    module_session = relationship("ModuleSession")
 
 
 class User(Base):
@@ -39,19 +64,6 @@ class UserSchema(ModelSchema):
         sqla_session = db_session
 
 
-class CieModule(Base):
-    __tablename__ = 'cie_modules'
-    __table_args__ = {'extend_existing': True}
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    description = Column(String(255))
-    image_path = Column(String(255))
-
-    def add_user(self, user: User, session: 'ModuleSession'):
-        reg = UserModuleRegistration(user_id=user.id, module_session_id=session.id)
-        reg.add()
-
-
 class CieModuleSchema(ModelSchema):
     class Meta:
         model = CieModule
@@ -60,17 +72,6 @@ class CieModuleSchema(ModelSchema):
     @post_load
     def make_cie_module(self, data, **kwargs):
         return CieModule(**data)
-
-
-class ModuleSession(Base):
-    __tablename__ = 'module_sessions'
-    id = Column(Integer, primary_key=True)
-    cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
-    cie_module = relationship(
-        'CieModule',
-        backref='ModuleSession'
-    )
-    session_datetime = Column(DateTime)
 
 
 class SmartNested(Nested):

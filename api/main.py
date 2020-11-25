@@ -4,7 +4,7 @@ import flask
 import json
 
 import database.models as m
-from events import red, pub_to_redis, session_start_poll
+from events import red, pub_to_redis, notify_on_session_start
 from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
@@ -170,7 +170,15 @@ def create_user():
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
     _user = cie.create_user(email, first_name=given_name, last_name=family_name)
-    session_start_poll(pub_to_redis)
+
+    registrations = cie.user_module_registrations_by_user_id(_user.id)
+
+    for reg in registrations:
+        session_start_time = reg.module_session.session_datetime
+        session_id = reg.module_session.id
+        notify_on_session_start(_user.id, session_id, session_start_time, pub_to_redis)
+
+    notify_on_session_start(_user.id, pub_to_redis)
     return serialize(_user, m.UserSchema)
 
 
@@ -193,6 +201,11 @@ def register_user_to_session(user_id):
     module_session_json = request.get_json()
     module_session = cie.get_module_session_by_id(module_session_json.get('module_session_id'))
     user_reg = user.add_to_module_session(module_session)
+
+    session_id = user_reg.module_session_id
+    session_start_dt = user_reg.module_session.session_datetime
+    notify_on_session_start(user.id, session_id, session_start_dt, pub_to_redis)
+
     return serialize(user_reg, m.UserModuleRegistrationSchema)
 
 
