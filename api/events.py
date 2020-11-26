@@ -1,8 +1,8 @@
 import json
+import logging
 import threading
-from datetime import time
-from time import sleep
-
+from datetime import datetime, timedelta
+import time
 import redis
 from simplekv.memory.redisstore import RedisStore
 
@@ -16,24 +16,35 @@ red = redis.StrictRedis(host=redis_host, password=redis_pw, port=6379)
 redis_store = RedisStore(red)
 
 
+LOG = logging.getLogger(__name__)
+
+
 def pub_to_redis(command_str):
     res = red.publish('cie', command_str)
     return res
 
 
-def wait_for_session_start(session_id, session_datetime, on_start):
+def wait_for_session_start(user_id, session_id, session_start_dt, on_start):
     while True:
-        current_time = time.now()
-        if current_time == session_datetime:
+        now = datetime.now()
+        session_end_dt = session_start_dt + timedelta(hours=1, minutes=30)
+        already_started = session_start_dt >= now
+        still_going = now < session_end_dt
+
+        if already_started and still_going:
+            # todo: add check "not previous alerted"; requires persistence
             event_message = {
                 "event_type": "session_start",
-                "data": {"session_id": session_id}
+                "data": {"session_id": session_id, "user_id": user_id}
             }
             on_start(event_message)
+        time.sleep(1)
 
 
 def notify_on_session_start(user_id, session_id, session_start_dt, on_start):
-    t = threading.Thread(name=f"notifier-session-user_id:{user_id}-session_id:{session_id}",
+    notifier_task_name = f"notifier-session-user_id:{user_id}-session_id:{session_id}"
+    LOG.debug(f"Spawning task {notifier_task_name}")
+    t = threading.Thread(name=notifier_task_name,
                          target=wait_for_session_start, args=[user_id, session_id, session_start_dt, on_start],
                          daemon=True)
     t.start()

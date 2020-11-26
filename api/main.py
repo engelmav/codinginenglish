@@ -1,7 +1,10 @@
+import threading
+
 from flask import Flask, jsonify, request
 import flask
 
 import json
+from datetime import datetime
 
 import database.models as m
 from events import red, pub_to_redis, notify_on_session_start
@@ -178,8 +181,15 @@ def create_user():
         session_id = reg.module_session.id
         notify_on_session_start(_user.id, session_id, session_start_time, pub_to_redis)
 
-    notify_on_session_start(_user.id, pub_to_redis)
     return serialize(_user, m.UserSchema)
+
+
+@app.route('/api/threads', methods=['GET'])
+def get_threads():
+    threads = []
+    for thread in threading.enumerate():
+        threads.append(thread.name)
+    return jsonify(threads)
 
 
 @app.route('/api/users/<int:user_id>/module-sessions', methods=['GET'])
