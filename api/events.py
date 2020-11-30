@@ -28,17 +28,22 @@ def wait_for_session_start(user_id, session_id, session_start_dt, on_start):
     while True:
         now = datetime.now()
         session_end_dt = session_start_dt + timedelta(hours=1, minutes=30)
-        already_started = session_start_dt >= now
+        already_started = session_start_dt < now
         still_going = now < session_end_dt
+        session_in_progress = already_started and still_going
 
-        if already_started and still_going:
+        if session_in_progress:
             # todo: add check "not previous alerted"; requires persistence
             event_message = {
                 "event_type": "session_start",
                 "data": {"session_id": session_id, "user_id": user_id}
             }
-            on_start(event_message)
-        time.sleep(1)
+            LOG.debug(f"Calling on_start callback for event {str(event_message)}")
+            on_start(json.dumps(event_message))
+        else:
+            LOG.debug(f"Not waiting for session {session_id} for user {user_id} with start date {session_start_dt} already_started: {already_started}, still_going: {still_going}")
+            break
+        time.sleep(5)
 
 
 def notify_on_session_start(user_id, session_id, session_start_dt, on_start):
