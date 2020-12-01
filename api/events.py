@@ -3,18 +3,8 @@ import logging
 import threading
 from datetime import datetime, timedelta
 import time
-import redis
-from simplekv.memory.redisstore import RedisStore
 
-from config import config
-from database.models import UserModuleRegistration
-from services.cie import user_module_registrations_by_user_id
-
-redis_pw = config["cie.redis.password"]
-redis_host = config["cie.redis.host"]
-red = redis.StrictRedis(host=redis_host, password=redis_pw, port=6379)
-redis_store = RedisStore(red)
-
+from app_context import red
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +31,8 @@ def wait_for_session_start(user_id, session_id, session_start_dt, on_start):
             LOG.debug(f"Calling on_start callback for event {str(event_message)}")
             on_start(json.dumps(event_message))
         else:
-            LOG.debug(f"Not waiting for session {session_id} for user {user_id} with start date {session_start_dt} already_started: {already_started}, still_going: {still_going}")
+            LOG.debug(f"Not waiting for session {session_id} for user {user_id} with start date {session_start_dt} "
+                      f"already_started: {already_started}, still_going: {still_going}")
             break
         time.sleep(5)
 

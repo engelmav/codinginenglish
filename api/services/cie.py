@@ -3,6 +3,7 @@ from sqlalchemy import and_, or_
 import database.models as m
 import logging
 
+from app_context import red
 
 LOG = logging.getLogger(__name__)
 
@@ -67,3 +68,19 @@ def get_module_session_by_id(_id):
 def user_module_registrations_by_user_id(user_id):
     LOG.debug(f"Retrieving module sessions for user id {user_id}")
     return m.UserModuleRegistration.query.filter_by(user_id=user_id).all()
+
+
+def _make_key(user_id):
+    return f"user_id_{user_id}_session_in_progress"
+
+
+def store_session_in_progress(user_id):
+    red.set(_make_key(user_id), "true")
+
+
+def get_session_in_progress(user_id):
+    return red.get(_make_key(user_id)).decode('utf-8') == "true"
+
+
+def remove_session_in_progress(user_id):
+    red.delete(_make_key(user_id))

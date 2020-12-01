@@ -7,7 +7,8 @@ import json
 from datetime import datetime
 
 import database.models as m
-from events import red, pub_to_redis, notify_on_session_start
+from events import pub_to_redis, notify_on_session_start
+from app_context import red
 from payment.payment_api import stripe_bp
 from config import config
 from database.models import User
