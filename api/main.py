@@ -1,10 +1,9 @@
 import threading
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 import flask
 
 import json
-from datetime import datetime
 
 import database.models as m
 from events import pub_to_redis, notify_on_session_start
@@ -30,6 +29,18 @@ app.secret_key = config["cie.api.session.key"]
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     m.db_session.remove()
+
+
+# @app.after_request
+def after_request_func(response):
+    data = json.loads(response.get_data())
+    user_id = session.get('user_id')
+    if user_id is None:
+        LOG.warning('No user_id stored in Flask session. Unable to lookup class session in progress.')
+        return response
+    data['show_class_link'] = cie.is_session_in_progress(user_id)
+    response.set_data(json.dumps(data))
+    return response
 
 
 def event_stream():
@@ -124,9 +135,11 @@ def add_session_to_module(cie_module_id):
     :param cie_module_id: str. integer id of module.
     :return: ModuleSessionSchema object.
     """
-    session = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
-    session.add()
-    return serialize(session, m.ModuleSessionSchema)
+    LOG.debug(f"Adding session of date {_get('session_datetime')} to cie_module_id {cie_module_id}")
+    _session = m.ModuleSession(cie_module_id=cie_module_id, session_datetime=_get('session_datetime'))
+    _session.add()
+    LOG.debug(f"Session added: {_session}")
+    return serialize(_session, m.ModuleSessionSchema)
 
 
 @app.route('/api/module_sessions/<session_id>', methods=['DELETE'])
@@ -146,7 +159,14 @@ def get_modules():
 
 
 @app.route('/api/users', methods=['POST'])
-def create_user():
+def initialize_user():
+    """
+    Initializes a user. This involves user creation if necessary, or returning
+    a known existing user based on "given name" and "family name", both Auth0
+    User object fields. Will also return whether the user currently has a class that
+    is in session.
+    :return: UserSchema
+    """
     # TODO: pair down to what we need for unique user identification.
     """
     {
@@ -168,21 +188,23 @@ def create_user():
     This will NOT register a user for a module, only create a user record.
     :return:
     """
-
     req = request.get_json()
     given_name, family_name, email = itemgetter(
         "given_name", "family_name", "email"
     )(req['idTokenPayload'])
     _user = cie.create_user(email, first_name=given_name, last_name=family_name)
-
-    registrations = cie.user_module_registrations_by_user_id(_user.id)
+    user_id = _user.id
+    registrations = cie.user_module_registrations_by_user_id(user_id)
 
     for reg in registrations:
         session_start_time = reg.module_session.session_datetime
         session_id = reg.module_session.id
         notify_on_session_start(_user.id, session_id, session_start_time, pub_to_redis)
 
-    return serialize(_user, m.UserSchema)
+    in_session = cie.is_session_in_progress(user_id)
+    schema = m.UserSchema()
+    return jsonify(status="success", data=dict(user=schema.dump(_user), is_in_session=in_session),
+                   messages=f"User initialized {user_id} successfully.")
 
 
 @app.route('/api/threads', methods=['GET'])
@@ -208,14 +230,32 @@ def register_user_to_session(user_id):
     """
     Register a user to a session with a pre-created user ID.
     """
+    LOG.debug(f"register_user_to_session(): Looking up user_id {user_id}")
     user = User.query.filter_by(id=user_id).one()
     module_session_json = request.get_json()
+    LOG.debug(f"register_user_to_session(): Looking up module_session_id {module_session_json.get('module_session_id')}")
     module_session = cie.get_module_session_by_id(module_session_json.get('module_session_id'))
+
     user_reg = user.add_to_module_session(module_session)
+
+    LOG.debug(f"Registering student id {user.id} to module_session id {module_session}")
 
     session_id = user_reg.module_session_id
     session_start_dt = user_reg.module_session.session_datetime
-    notify_on_session_start(user.id, session_id, session_start_dt, pub_to_redis)
+
+    def handle_session_start(session_start_message):
+        """
+        If session already marked as in progress, do not emit message.
+        The web client will rely on Redis state.
+        :param session_start_message:
+        :return:
+        """
+        if cie.is_session_in_progress(user.id):
+            return
+        cie.set_session_in_progress(user.id)
+        pub_to_redis(session_start_message)
+
+    notify_on_session_start(user.id, session_id, session_start_dt, on_start=handle_session_start)
 
     return serialize(user_reg, m.UserModuleRegistrationSchema)
 

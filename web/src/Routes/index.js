@@ -1,32 +1,17 @@
 import React, { Component } from 'react';
 import MyDashboard from '../MyDashboard';
-import { auth } from '../auth/Auth';
-import makeRequiresAuth from '../auth/RequiresAuth';
 import { cieApi } from '../services/cieApi';
 import Callback from '../auth/Auth0Callback';
 import Aula from '../Aula';
 import { Home } from '../Home';
 import { Classes } from '../Classes';
 import { withRouter, Route } from 'react-router-dom';
-import { appStore } from '../stores/AppStore';
 import { observer } from 'mobx-react';
+import { requiresAuth } from '../rootProd';
 
 
-var requiresAuth = makeRequiresAuth(auth);
 const ClassroomProtected = requiresAuth(Aula);
 const CallbackWithRouter = withRouter(Callback);
-
-const handleAuthentication = ({ location }) => {
-  if (/access_token|id_token|error/.test(location.hash)) {
-    auth.handleAuthentication();
-  }
-}
-
-const rootProps = {
-  appStore,
-  cieApi
-}
-
 
 @observer
 class Routes extends Component {  
@@ -40,7 +25,7 @@ class Routes extends Component {
   async componentDidMount() {
     if (window.location.pathname.includes('/callback')) return;
     try {
-      await auth.silentAuth();
+      await this.props.auth.silentAuth();
       this.forceUpdate();
     } catch (err) {
       if (err.error !== 'login_required') console.log(err.error);
@@ -48,6 +33,18 @@ class Routes extends Component {
   }
 
   render() {
+
+    const {
+      appStore,
+      auth
+    } = this.props;
+
+    const rootProps = {
+      appStore,
+      auth,
+      cieApi
+    }
+
     return (
       <>
         <Route exact path="/" component={(props) => <Home {...rootProps} {...props} />} />
@@ -56,7 +53,7 @@ class Routes extends Component {
         <Route exact path="/class" component={(props) =>
           <ClassroomProtected authData={this.props.authData} {...rootProps} {...props} />} />
         <Route path="/callback" render={(props) => {
-          handleAuthentication(props);
+          auth.handleAuthenticationFromCallbackRoute(props);
           return <CallbackWithRouter {...props} />
         }} />
         <Route path="/login" render={(props) => {

@@ -19,19 +19,19 @@ def create_test_user():
 
 def create_2_hour_session():
     _url = f"{cie_api}/cie-modules/19/sessions"
-    resp = requests.post(_url, params={"cie_module_id": 19}, json=session_start_date(),)
-    print(resp)
-    print(resp.json())
-    return resp.json().get('data').get('id')
+    resp = requests.post(_url, params={"cie_module_id": 19}, json=session_start_date())
+    session_id = resp.json().get('data').get('id')
+    print(f"created_2_hour_session(): session_id {session_id}")
+    return session_id
 
 
 def register_user_to_session(user_id, session_id):
     payload = {"module_session_id": session_id}
     _url = f"{cie_api}/users/{user_id}/module-sessions"
     resp = requests.post(_url, json=payload)
-    print(resp)
-    print(resp.json())
-    return resp.json().get('data').get('id')
+    registered_session = resp.json().get('data').get('id')
+    print(f"register_user_to_session(): Registered session {registered_session}")
+    return registered_session
 
 
 def setup_live_test_session():

@@ -1,7 +1,7 @@
 import auth0 from 'auth0-js';
 import history from '../history'
 import settings from '../settings';
-import { appStore } from '../stores/AppStore';
+
 
 
 var CLIENT_ID = 'pyJiq82f4s6ik5dr9oNnyryW5127T965';
@@ -21,12 +21,20 @@ class Auth {
     scope: 'openid email profile'
   });
 
-  constructor() {
+  constructor(appStore) {
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.handleAuthentication = this.handleAuthentication.bind(this);
+    this.handleAuthenticationFromCallbackRoute = this.handleAuthenticationFromCallbackRoute.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
     this.renewSession = this.renewSession.bind(this);
+    this.appStore = appStore;
+    this.onAuthSuccess = [];
+  }
+
+
+  addOnAuthSuccess(callback){
+    this.onAuthSuccess.push(callback);
   }
 
 
@@ -44,12 +52,20 @@ class Auth {
         this.navigateToHomeRoute();
         resolve();
         this.setSession(authResult);
+        this.onAuthSuccess.forEach(callback => callback(authResult))
       });
     })
   }
 
+  handleAuthenticationFromCallbackRoute = ({ location }) => {
+    if (/access_token|id_token|error/.test(location.hash)) {
+      this.handleAuthentication();
+    }
+  }
+  
+
   setSession(authResult) {
-    appStore.storeUser(authResult);
+    this.appStore.storeUser(authResult);
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
@@ -111,6 +127,4 @@ class Auth {
 
 }
 
-var auth = new Auth();
-
-export { auth };
+export { Auth };

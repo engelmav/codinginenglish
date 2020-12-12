@@ -61,7 +61,7 @@ def create_partial_user(fullname, email) -> m.User:
 
 
 def get_module_session_by_id(_id):
-    LOG.debug(f"Retrieving module session with id {_id}")
+    LOG.debug(f"get_module_session_by_id(): Retrieving module session with id {_id}")
     return m.ModuleSession.query.filter_by(id=_id).one()
 
 
@@ -74,11 +74,12 @@ def _make_key(user_id):
     return f"user_id_{user_id}_session_in_progress"
 
 
-def store_session_in_progress(user_id):
+def set_session_in_progress(user_id):
+    LOG.debug(f"Setting session_in_progress for user id {user_id}")
     red.set(_make_key(user_id), "true")
 
 
-def get_session_in_progress(user_id):
+def is_session_in_progress(user_id):
     return red.get(_make_key(user_id)).decode('utf-8') == "true"
 
 

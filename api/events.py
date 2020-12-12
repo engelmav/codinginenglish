@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import time
 
 from app_context import red
+from services.cie import is_session_in_progress
 
 LOG = logging.getLogger(__name__)
 
@@ -21,10 +22,12 @@ def wait_for_session_start(user_id, session_id, session_start_dt, on_start):
         already_started = session_start_dt < now
         still_going = now < session_end_dt
         session_in_progress = already_started and still_going
+        # the is_session_in_progress doesn't work because it's not "login-session-specific"
+        already_notified = is_session_in_progress(user_id)
 
-        if session_in_progress:
-            # todo: add check "not previous alerted"; requires persistence
+        if session_in_progress and not already_notified:
             event_message = {
+                "event": "student-session-manager",
                 "event_type": "session_start",
                 "data": {"session_id": session_id, "user_id": user_id}
             }

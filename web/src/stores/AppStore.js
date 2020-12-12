@@ -9,6 +9,11 @@ class AppStore {
   @observable firstName = null;
   @observable email = null;
   @observable userSessions = null;
+  @observable sessionInProgress = false;
+
+  constructor(){
+    this.setSessionInProgress = this.setSessionInProgress.bind(this);
+  }
 
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
@@ -21,8 +26,10 @@ class AppStore {
     this.userId = storedUser.id;
     this.userSessions = storedUser.registered_modules;
   }
+  setSessionInProgress(){
+    this.sessionInProgress = true;
+  }
 }
 
 
-const appStore = new AppStore();
-export { appStore };
+export { AppStore };

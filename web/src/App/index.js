@@ -3,14 +3,11 @@ import './styles.css';
 import { Router } from 'react-router-dom';
 import styled from 'styled-components';
 import history from '../history';
-import Header from '../Header';
 import Routes from '../Routes';
 
 import { observer } from 'mobx-react';
-import { auth } from '../auth/Auth';
-import { appStore } from '../stores/AppStore';
-import { cieApi } from '../services/cieApi';
 import axios from 'axios';
+import { auth, appStore, Header } from "../rootProd";
 
 
 const Footer = styled.footer`
@@ -24,9 +21,9 @@ const Footer = styled.footer`
 }
 `;
 
-axios.get("https://api.ipdata.co?api-key=test").then(
-  res => console.log(res.data)
-);
+// axios.get("https://api.ipdata.co?api-key=test").then(
+//   res => console.log(res.data)
+// );
 
 
 @observer
@@ -34,9 +31,9 @@ class App extends Component {
   render() {
     return (
       <Router history={history}>
-          <Header auth={auth} appStore={appStore} cieApi={cieApi} />
-          <Routes auth={auth} appStore={appStore}/>
-          <Footer><i>Made with love in Encinitas, California.</i></Footer>
+        <Header />
+        <Routes auth={auth} appStore={appStore} />
+        <Footer><i>Made with love in Encinitas, California.</i></Footer>
       </Router>
     );
   }

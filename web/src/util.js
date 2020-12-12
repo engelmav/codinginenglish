@@ -56,8 +56,46 @@ function hasActiveSession(userSessions) {
   return _hasActiveSession;
 }
 
+
+class StudentSessionManager {
+  constructor(apiService, EventSource) {
+    this.apiService = apiService;
+    this.EventSource = EventSource;
+    this.start = this.start.bind(this);
+  }
+  onSessionStart(callback) {
+    this.onSessionStartCallback = callback;
+  }
+  onSessionEnd(callback) {
+    this.onSessionEndCallback = callback;
+  }
+  start() {
+    const eventSource = new this.EventSource('/api/stream');
+    eventSource.addEventListener('student-session-manager', event => {
+      console.log('Received event from stream:', event);
+      const { data } = event;
+      try {
+        const eventData = JSON.parse(data);
+        console.log("Event data:", eventData);
+        const isStartEvent = eventData.hasOwnProperty("event_type")
+          && eventData.event_type === "session_start";
+        if (isStartEvent) {
+          this.onSessionStart(true)
+        }
+      } catch (ex) {
+        console.log("Unable to parse event data:", data);
+        throw (ex);
+      }
+    })
+    eventSource.onerror = function (err) {
+      console.log("Error ocurred on event stream /api/stream:", err);
+    }
+  }
+}
+
 export {
   hasActiveSession,
   browserDetect,
-  isInSession
+  isInSession,
+  StudentSessionManager
 };

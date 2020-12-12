@@ -66,24 +66,6 @@ const Header = observer((props) => {
     auth,
     appStore,
   } = props;
-  let hasActiveSession;
-  let eventSource;
-  const [sessionStarted, setSessionStarted] = useState(false);
-  useEffect(() => {
-    eventSource = new EventSource('/api/stream');
-    eventSource.addEventListener('classUpdate', event => {
-      console.log('received sessionStart event');
-      const { data } = event;
-      try {
-        const eventData = JSON.parse(data);
-        console.log("event data:", eventData);
-        setSessionStarted(true);
-      } catch (ex) {
-        console.log("Unable to parse event data:", data);
-      }
-    })
-  })
-
 
   return (
     <Switch>
@@ -97,7 +79,7 @@ const Header = observer((props) => {
             {appStore.authData &&
               <>
                 <li><Link to="/my-dashboard">my_dashboard</Link></li>
-                {sessionStarted && <li><Link to="/class">in_session!</Link></li>}
+                {appStore.sessionInProgress && <li><Link to="/class">in_session!</Link></li>}
               </>
             }
             <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>
@@ -108,4 +90,4 @@ const Header = observer((props) => {
   );
 });
 
-export default Header; 
+export { Header }; 
