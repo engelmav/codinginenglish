@@ -1,4 +1,5 @@
 from sqlalchemy import and_, or_
+from datetime import datetime, timedelta
 
 import database.models as m
 import logging
@@ -65,9 +66,50 @@ def get_module_session_by_id(_id):
     return m.ModuleSession.query.filter_by(id=_id).one()
 
 
-def user_module_registrations_by_user_id(user_id):
+def is_already_started(self, session_start_dt):
+    now = datetime.now()
+    already_started = session_start_dt < now
+    return already_started
+
+def is_ended(self, session_start_dt):
+    end_dt = session_start_dt + timedelta(hours=1, minutes=30)
+    now = datetime.now()
+    ended = now < end_dt
+    return ended
+
+
+def get_upcoming_sessions_by_user_id(user_id):
     LOG.debug(f"Retrieving module sessions for user id {user_id}")
-    return m.UserModuleRegistration.query.filter_by(user_id=user_id).all()
+    """
+    Ok, so we only care about classes that
+    * haven't started yet
+      what does havent started yet look like?
+      it means that start_dt is in the future.
+      
+    * but what if they already started, and they haven't ended yet?
+      how do we figure that out?
+      well, the end_dt is start_dt + duration.
+      
+      so,
+          end_dt = start_dt + duration
+          
+      so if right now is less than end_dt AND right now is greater than start_dt,
+      then you're in the middle of a class.
+    """
+    results = m.UserModuleRegistration \
+        .query \
+        .join(m.ModuleSession) \
+        .filter(m.UserModuleRegistration.user_id == user_id) \
+        .all()
+
+    upcoming_sessions = []
+    for user_registration in results:
+        session_start_dt = user_registration.module_session.session_datetime
+        in_progress = is_already_started(session_start_dt) and not is_ended(session_start_dt)
+        not_started_yet = session_start_dt > datetime.now()
+        if not_started_yet or in_progress:
+            upcoming_sessions.append(user_registration)
+    return upcoming_sessions
 
 
 def _make_key(user_id):

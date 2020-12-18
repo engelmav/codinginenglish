@@ -6,7 +6,7 @@ import flask
 import json
 
 import database.models as m
-from events import pub_to_redis, notify_on_session_start
+from events import pub_to_redis, StudentSessionManager
 from app_context import red
 from payment.payment_api import stripe_bp
 from config import config
@@ -144,8 +144,8 @@ def add_session_to_module(cie_module_id):
 
 @app.route('/api/module_sessions/<session_id>', methods=['DELETE'])
 def delete_session_from_module(session_id):
-    session = m.ModuleSession.query(id=session_id).one()
-    session.delete()
+    _session = m.ModuleSession.query(id=session_id).one()
+    _session.delete()
     return jsonify(
         status="success",
         messages=["Deleted session"]
@@ -194,12 +194,13 @@ def initialize_user():
     )(req['idTokenPayload'])
     _user = cie.create_user(email, first_name=given_name, last_name=family_name)
     user_id = _user.id
-    registrations = cie.user_module_registrations_by_user_id(user_id)
-
+    registrations = cie.get_upcoming_sessions_by_user_id(user_id)
     for reg in registrations:
         session_start_time = reg.module_session.session_datetime
         session_id = reg.module_session.id
-        notify_on_session_start(_user.id, session_id, session_start_time, pub_to_redis)
+        student_session_mgr = StudentSessionManager(_user.id)
+        student_session_mgr.add_on_session_start(pub_to_redis)
+        StudentSessionManager.notify_on_session_start(session_id, session_start_time)
 
     in_session = cie.is_session_in_progress(user_id)
     schema = m.UserSchema()
