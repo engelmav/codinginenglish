@@ -13,10 +13,6 @@ def session_start_date(start_date=None):
     return {"session_datetime": start_date}
 
 
-def create_test_user():
-    pass
-
-
 def create_2_hour_session():
     _url = f"{cie_api}/cie-modules/19/sessions"
     resp = requests.post(_url, params={"cie_module_id": 19}, json=session_start_date())

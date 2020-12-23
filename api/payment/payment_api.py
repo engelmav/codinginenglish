@@ -1,7 +1,6 @@
 from services.auth import create_auth0_user, create_auth0_passwd_reset, get_auth0_user
 from config import config
 from services.mailjet import send_mail
-from services.cie import get_module_session_by_id, create_user
 
 from flask import Blueprint, jsonify, request
 import stripe
@@ -127,11 +126,7 @@ def confirm_payment():
     return jsonify(success=True, message="Successfully sent email confirmation")
 
 
-def get_module_details(module_session_id):
-    module_session = get_module_session_by_id(module_session_id)
-    module_session_start_dt = module_session.session_datetime
-    module_name = module_session.cie_module.name
-    return module_name, module_session_start_dt
+
 
 
 def handle_new_user(student_email, student_name, template_params):
