@@ -171,7 +171,7 @@ def create_main_api(event_stream,
         )(req['idTokenPayload'])
         _user = user_service.create_user(email, first_name=given_name, last_name=family_name)
 
-        user_id = _user.get('user_id')
+        user_id = _user.id
         student_session_service.set_user_id(user_id)
 
         upcoming_sessions: List[dict] = student_session_service.get_upcoming_sessions()
@@ -180,6 +180,7 @@ def create_main_api(event_stream,
         for sess in upcoming_sessions:
             if sess.get('in_progress'):
                 has_session_in_progress = True
+                next  # Do not launch poller thread for session already started
             session_start_dt = sess.get('session_datetime')
             session_id = sess.get('session_id')
             student_session_service.add_on_session_start(publish_message)

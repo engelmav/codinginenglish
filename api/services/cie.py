@@ -10,7 +10,7 @@ class UserService:
     def __init__(self, models):
         self.models = models
 
-    def create_user(self, email, full_name=None, first_name=None, last_name=None) -> dict:
+    def create_user(self, email, full_name=None, first_name=None, last_name=None):
         m = self.models
         existing_user = m.User.query.filter(
             or_(
@@ -35,14 +35,9 @@ class UserService:
             email=email
         )
         _user.add()
-        user_dict = {
-            "user_id": _user.id,
-            "firstname": _user.firstname,
-            "lastname": _user.lastname,
-            "email": _user.email
-        }
+
         LOG.info(f"New user registered with email address: {_user.email}")
-        return user_dict
+        return _user
 
     # We might not need this anymore.
     def create_partial_user(self, fullname, email):

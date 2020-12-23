@@ -73,8 +73,9 @@ class StudentSessionService:
         upcoming_sessions = []
         for session in sessions:
             session_start_dt = session.module_session.session_datetime
-            in_progress = self.is_already_started(session_start_dt) \
-                and not self.is_ended(session_start_dt)
+            already_started = self.is_already_started(session_start_dt)
+            ended = self.is_ended(session_start_dt)
+            in_progress = already_started and not ended
             is_upcoming = session_start_dt > datetime.now()
             if is_upcoming or in_progress:
                 upcoming_sessions.append(
@@ -117,7 +118,7 @@ class StudentSessionService:
     def is_ended(self, session_start_dt):
         end_dt = session_start_dt + timedelta(hours=1, minutes=30)
         now = datetime.now()
-        ended = now < end_dt
+        ended = now > end_dt
         return ended
 
     def notify_on_session_start(self, session_id, session_start_dt):
