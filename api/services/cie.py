@@ -68,6 +68,11 @@ class ModuleService:
     def __init__(self, models):
         self.models = models
 
+    def create_module(self, name, description, image_path=None):
+        mod = self.models.CieModule(name=name, description=description, image_path=image_path)
+        mod.add()
+        return mod
+
     def get_module_session_by_id(self, _id):
         LOG.debug(f"get_module_session_by_id(): Retrieving module session with id {_id}")
         m = self.models

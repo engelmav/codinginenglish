@@ -16,7 +16,35 @@ from operator import itemgetter
 import logging
 
 from rest_schema import Schema
+import queue
 
+
+class MessageAnnouncer:
+
+    def __init__(self):
+        self.listeners = []
+
+    def listen(self):
+        q = queue.Queue(maxsize=5)
+        self.listeners.append(q)
+        return q
+
+    def announce(self, msg):
+        for i in reversed(range(len(self.listeners))):
+            try:
+                self.listeners[i].put_nowait(msg)
+            except queue.Full:
+                del self.listeners[i]
+
+
+def format_sse(data: str, event=None) -> str:
+    msg = f'data: {data}\n\n'
+    if event is not None:
+        msg = f'event: {event}\n{msg}'
+    return msg
+
+
+announcer = MessageAnnouncer()
 LOG = logging.getLogger(__name__)
 app = Flask(__name__,
             static_url_path='',
@@ -34,7 +62,8 @@ def create_main_api(event_stream,
                     user_service: cie.UserService,
                     db_session,
                     models: Models,
-                    schema: Schema):
+                    schema: Schema,
+                    redis):
 
     @app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -50,11 +79,23 @@ def create_main_api(event_stream,
 
         return jsonify(res)
 
+    def event_stream():
+        pubsub = redis.pubsub()
+        pubsub.subscribe('cie')
+        for message in pubsub.listen():
+            print("Yielding message: ", message)
+            message_data = message['data']
+            if message_data is not None and type(message_data).__name__ == 'bytes':
+                message_data = message_data.decode('utf8')
+            event_str = "event: classUpdate\n"
+            event_str = event_str + 'data: %s\n\n' % message_data
+            yield event_str
+
     @app.route('/api/stream')
     def stream_sse():
-        stream_message = event_stream()
+
         sse_message = flask.Response(
-            stream_message,
+            event_stream(),
             mimetype="text/event-stream",
         )
         # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
@@ -62,6 +103,30 @@ def create_main_api(event_stream,
         # the below header prevents nginx from swallowing SSEs.
         sse_message.headers['X-Accel-Buffering'] = "no"
         return sse_message
+
+    @app.route('/ping1')
+    def ping():
+        msg = format_sse(data='pong')
+        announcer.announce(msg=msg)
+        return {}, 200
+
+    @app.route('/listen', methods=['GET'])
+    def listen():
+        LOG.debug("got listen request")
+        def stream():
+            messages = announcer.listen()  # returns a queue.Queue
+            while True:
+                LOG.debug("Getting messages from queue")
+                msg = messages.get()  # blocks until a new message arrives
+                LOG.debug(f"Yielding message: {msg}")
+                yield msg
+        # l = ["this", "is", "a", "test"]
+        #
+        # def stream():
+        #     for word in l:
+        #         yield "data: {}\n\n".format(word)
+
+        return flask.Response(stream(), mimetype='text/event-stream')
 
     def _get(key, default=None):
         j = request.get_json()
@@ -232,6 +297,7 @@ def create_main_api(event_stream,
             :param session_start_message:
             :return:
             """
+            student_session_service.set_user_id(user_id)
             # student_session_manager is already configured at initialize_user()
             if student_session_service.is_session_in_progress():
                 return

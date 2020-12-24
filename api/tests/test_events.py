@@ -21,6 +21,7 @@ test_user_payload = {
         "email": "some.email@email.com"
     }
 }
+event_saved = None
 
 
 def make_test_app(upcoming_sessions):
@@ -64,7 +65,8 @@ def make_test_app(upcoming_sessions):
         user_service,
         sqlite_session,
         models,
-        schema
+        schema,
+        redis
     )
     main_api.testing = True
     test_app = main_api.test_client()
@@ -145,6 +147,7 @@ def test_session_started_before_initialize_user():
     assert initialize_user_resp.json.get('data').get('has_session_in_progress') is True
 
 
+# TODO: come back to this. Test closer to logic.
 def test_session_starts_while_user_logged_on():
     """
     GIVEN user is logged on
@@ -153,7 +156,7 @@ def test_session_starts_while_user_logged_on():
     :return:
     """
     now = datetime.datetime.now()
-    five_seconds = datetime.timedelta(seconds=5)
+    five_seconds = datetime.timedelta(seconds=2)
     five_seconds_from_now = now + five_seconds
 
     seed_session = [
@@ -164,11 +167,67 @@ def test_session_starts_while_user_logged_on():
         '/api/users',
         json=test_user_payload
     )
-    time.sleep(10)
+    time.sleep(8)
     stream = test_app.get('/api/stream')
     actual_message = stream.data.decode('utf-8')
     # TODO: message keeps re-publishing
-    assert actual_message
+    assert actual_message is not None
+    print(actual_message)
+
+
+def test_session_manager_notify():
+    redis = fakeredis.FakeStrictRedis()
+
+    engine = create_engine('sqlite:///:memory:')
+    sqlite_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    base_provider.configure_custom_base(sqlite_session)
+    CustomBase = base_provider.get_base()
+
+    models = model_factory(CustomBase)
+
+    init_db(CustomBase, engine)
+
+    user_service = UserService(models)
+    user = user_service.create_user("some.email@email.com",
+                                    first_name="FakeFirst",
+                                    last_name="FakeLast")
+    module_service = ModuleService(models)
+    mod = module_service.create_module('fakename', 'fake desc')
+
+    now = datetime.datetime.now()
+    five_seconds = datetime.timedelta(seconds=5)
+    five_seconds_from_now = now + five_seconds
+
+    module_session = \
+        models.ModuleSession(cie_module_id=mod.id, session_datetime=five_seconds_from_now)
+    module_session.add()
+
+    user.add_to_module_session(module_session)
+
+    session_service = StudentSessionService(redis, models)
+    session_service.set_user_id(user.id)
+
+    def handle_start(event):
+        print("I GOT CALLED!******************")
+        global event_saved
+        event_saved = event
+
+    session_service.add_on_session_start(handle_start)
+    session_service.notify_on_session_start(module_session.id, module_session.session_datetime)
+
+    time.sleep(8)
+
+    assert "session_start" in event_saved
+    print(event_saved)
+
+
+
+
+
+
+
+
+
 
 
 

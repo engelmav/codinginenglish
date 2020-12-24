@@ -4,6 +4,7 @@ import threading
 from datetime import datetime, timedelta
 import time
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -15,9 +16,34 @@ def create_publish_message(redis_client):
     return publish_message
 
 
-def create_event_stream(iterable_stream):
+class ThreadSafeIter:
+    """Takes an iterator/generator and makes it thread-safe by
+    serializing call to the `next` method of given iterator/generator.
+    https://anandology.com/blog/using-iterators-and-generators/
+    """
+
+    def __next__(self):
+        with self.lock:
+            return self.generator.__next__()
+
+    def __init__(self, generator):
+        self.generator = generator
+        self.lock = threading.Lock()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        with self.lock:
+            return self.generator.next()
+
+
+def create_event_stream(red):
     def event_stream():
-        for message in iterable_stream:
+        pubsub = red.pubsub()
+        pubsub.subscribe('cie')
+        pub_sub_listener = pubsub.listen()
+        for message in pub_sub_listener:
             print("Yielding message: ", message)
             message_data = message['data']
             if message_data is not None and type(message_data).__name__ == 'bytes':
@@ -26,6 +52,8 @@ def create_event_stream(iterable_stream):
             event_str = event_str + 'data: %s\n\n' % message_data
             yield event_str
 
+    # thread_safe_event_stream = ThreadSafeIter(event_stream())
+    # return thread_safe_event_stream
     return event_stream
 
 
@@ -137,7 +165,6 @@ class StudentSessionService:
             already_started = self.is_already_started(session_start_dt)
             ended = self.is_ended(session_start_dt)
             session_in_progress = already_started and not ended
-
             if session_in_progress:
                 event_message = {
                     "event": "student-session-manager",
@@ -147,8 +174,10 @@ class StudentSessionService:
                 LOG.debug(f"Calling on_start callback for event {str(event_message)}")
                 for notifier in notifiers:
                     notifier(json.dumps(event_message))
-            else:
+                break
+            if ended:
+                print("Ending poll because session ended.")
                 LOG.debug(f"Not waiting for session {session_id} for user {user_id} with start date {session_start_dt} "
                           f"already_started: {already_started}, ended: {ended}")
                 break
-            time.sleep(5)
+            time.sleep(2)
