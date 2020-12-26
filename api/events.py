@@ -157,6 +157,7 @@ class StudentSessionService:
                                                                        self.on_start_notifiers],
                              daemon=True
                              )
+        t.name = notifier_task_name
         t.start()
         return t
 

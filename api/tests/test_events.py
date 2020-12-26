@@ -221,10 +221,19 @@ def test_session_manager_notify():
     print(event_saved)
 
 
+def create_live_test_session_for_user_10():
+    from api.main import models
 
+    now = datetime.datetime.now()
+    five_seconds = datetime.timedelta(seconds=5)
+    five_seconds_from_now = now + five_seconds
 
+    module_session = \
+        models.ModuleSession(cie_module_id=19, session_datetime=five_seconds_from_now)
+    module_session.add()
 
-
+    user = models.User.query.filter_by(id=10).one()
+    user.add_to_module_session(module_session)
 
 
 

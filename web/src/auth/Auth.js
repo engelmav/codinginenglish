@@ -52,6 +52,7 @@ class Auth {
         this.navigateToHomeRoute();
         resolve();
         this.setSession(authResult);
+        console.log("Auth module successfully authenticated. Calling callbacks...")
         this.onAuthSuccess.forEach(callback => callback(authResult))
       });
     })

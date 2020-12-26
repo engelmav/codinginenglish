@@ -27,6 +27,7 @@ class AppStore {
     this.userSessions = storedUser.registered_modules;
   }
   setSessionInProgress(){
+    console.log("AppStore setting sessionInProgress to `true`");
     this.sessionInProgress = true;
   }
 }

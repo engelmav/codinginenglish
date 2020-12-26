@@ -58,21 +58,26 @@ function hasActiveSession(userSessions) {
 
 
 class StudentSessionManager {
-  constructor(apiService, EventSource) {
-    this.apiService = apiService;
-    this.EventSource = EventSource;
+  constructor(_EventSource) {
+    this.EventSource = _EventSource;
     this.start = this.start.bind(this);
+    this.onSessionStartCallbacks = [];
   }
-  onSessionStart(callback) {
-    this.onSessionStartCallback = callback;
+
+  addOnSessionStart(callback) {
+    this.onSessionStartCallbacks.push(callback);
+  }
+  onSessionStart(event) {
+    this.onSessionStartCallbacks.forEach(cb => cb(event));
   }
   onSessionEnd(callback) {
     this.onSessionEndCallback = callback;
   }
   start() {
     const eventSource = new this.EventSource('/api/stream');
+    console.log("Adding event listener to student-session-manager on /api/stream");
     eventSource.addEventListener('student-session-manager', event => {
-      console.log('Received event from stream:', event);
+      console.log('Received event from stream student-session-manager:', event);
       const { data } = event;
       try {
         const eventData = JSON.parse(data);
@@ -80,7 +85,7 @@ class StudentSessionManager {
         const isStartEvent = eventData.hasOwnProperty("event_type")
           && eventData.event_type === "session_start";
         if (isStartEvent) {
-          this.onSessionStart(true)
+          this.onSessionStart(eventData);
         }
       } catch (ex) {
         console.log("Unable to parse event data:", data);

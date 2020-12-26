@@ -40,3 +40,6 @@ def delete_session(session_id):
     resp = requests.delete(_url)
     print(resp.json())
 
+
+
+

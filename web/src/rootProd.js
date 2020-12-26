@@ -18,10 +18,13 @@ const CreateComponent = (Component, dependsToInject) => {
 
 const appStore = new AppStore();
 
-const studentSessionMgr = new StudentSessionManager();
-studentSessionMgr.onSessionStart(appStore.setSessionInProgress);
+const studentSessionMgr = new StudentSessionManager(EventSource);
+studentSessionMgr.start();
+studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
 
-const auth = new Auth();
+const auth = new Auth(appStore);
+
+// Start studentSessionManager on successful login.
 auth.addOnAuthSuccess(studentSessionMgr.start);
 
 const Header = CreateComponent(_Header, { appStore, auth });

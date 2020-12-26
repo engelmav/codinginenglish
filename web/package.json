@@ -84,7 +84,9 @@
   "scripts": {
     "start": "PORT=8080 DEV_SERVER=1 node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "jest"
+    "test": "jest",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -158,6 +160,10 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.11.5",
+    "@storybook/addon-actions": "^6.1.11",
+    "@storybook/addon-essentials": "^6.1.11",
+    "@storybook/addon-links": "^6.1.11",
+    "@storybook/react": "^6.1.11",
     "babel-jest": "^23.6.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",

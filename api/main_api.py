@@ -79,17 +79,27 @@ def create_main_api(event_stream,
 
         return jsonify(res)
 
+    class Event:
+        def __init__(self, event_type, message):
+            self.event_type = event_type
+            self.message = message
+
+        def __str__(self):
+            return (
+                f"event: {self.event_type}\ndata: {self.message}\n\n"
+            )
+
     def event_stream():
+        # todo: pull the next two lines back out to make this testable.
         pubsub = redis.pubsub()
         pubsub.subscribe('cie')
         for message in pubsub.listen():
-            print("Yielding message: ", message)
             message_data = message['data']
             if message_data is not None and type(message_data).__name__ == 'bytes':
                 message_data = message_data.decode('utf8')
-            event_str = "event: classUpdate\n"
-            event_str = event_str + 'data: %s\n\n' % message_data
-            yield event_str
+            event = Event("student-session-manager", message_data)
+            LOG.debug(f"Emitting event {str(event)}")
+            yield str(event)
 
     @app.route('/api/stream')
     def stream_sse():
