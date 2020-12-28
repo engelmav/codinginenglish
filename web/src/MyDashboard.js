@@ -3,6 +3,8 @@ import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import { font } from './UtilComponents/sharedStyles';
 import { Title, Main } from './UtilComponents';
+import Loader from 'react-spinners/PulseLoader';
+import { BeatLoader } from 'react-spinners';
 
 
 const ContentWrapper = styled.div`
@@ -13,9 +15,33 @@ const ContentWrapper = styled.div`
 `;
 
 
+function loadOrContent(condition, Loader, Content,) {
+  if (condition) {
+    return Content;
+  }
+  return Loader;
+}
+
+
+
 const MyDashboard = observer(props => {
 
   const { appStore } = props;
+
+  const isLoaded = appStore.registeredSessions !== null;
+
+  const RegisteredSessions = loadOrContent(isLoaded,
+    <div>loading...</div>,
+    <>
+      <p>Currently registered classes:</p>
+
+      <ul>
+        {appStore.registeredSessions.map((sess, idx) =>
+          <li key={idx}>{sess.module_session_id}</li>
+        )}
+      </ul>
+    </>
+  );
 
   return (
     <Main>
@@ -30,19 +56,12 @@ const MyDashboard = observer(props => {
           )
         }
         <p>Your class is in session. Go there now!</p>
-        <p>Currently registered classes:</p>
-        {appStore.userSessions &&
-          <ul>
-            {appStore.userSessions.map((sess, idx) =>
-              <li key={idx}>{sess.module_session_id}</li>
-            )}
-          </ul>
-        }
-        <p>Your next classes</p>
-        <p>Find More Classes</p>
-        <p>Words for me to learn</p>
+        {RegisteredSessions}
+      <p>Your next classes</p>
+      <p>Find More Classes</p>
+      <p>Words for me to learn</p>
       </ContentWrapper>
-    </Main>
+    </Main >
   );
 
 });

@@ -39,6 +39,7 @@ class Auth {
 
 
   login() {
+    console.log("Auth.js: calling auth0.authorize():");
     this.auth0.authorize();
   }
 
@@ -49,7 +50,6 @@ class Auth {
         if (!authResult || !authResult.idToken) {
           return reject(err);
         }
-        this.navigateToHomeRoute();
         resolve();
         this.setSession(authResult);
         console.log("Auth module successfully authenticated. Calling callbacks...")
@@ -66,7 +66,6 @@ class Auth {
   
 
   setSession(authResult) {
-    this.appStore.storeUser(authResult);
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
     this.expiresAt = authResult.idTokenPayload.exp * 1000;
@@ -89,10 +88,6 @@ class Auth {
     });
   }
 
-  navigateToHomeRoute() {
-    history.push('/my-dashboard');
-  }
-
   logout() {
     // Remove tokens and expiry time.
     this.accessToken = null;
@@ -104,9 +99,6 @@ class Auth {
     this.auth0.logout({
       returnTo: window.location.origin
     });
-
-    // could this be redundant?
-    this.navigateToHomeRoute();
   }
 
   isAuthenticated() {

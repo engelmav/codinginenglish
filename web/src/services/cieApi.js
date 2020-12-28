@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 class CieApi {
-  async storeNewUser(data) {
+  async initializeUser(data) {
     return await (await axios.post('/api/users', data)).data;
   }
 

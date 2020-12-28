@@ -23,11 +23,6 @@ def schema_factory(db_session, models):
     :param models:
     :return:
     """
-    class UserSchema(ModelSchema):
-        class Meta:
-            model = models.User
-            sqla_session = db_session
-
     class CieModuleSchema(ModelSchema):
         class Meta:
             model = models.CieModule
@@ -39,7 +34,7 @@ def schema_factory(db_session, models):
 
     class ModuleSessionSchema(ModelSchema):
         # cie_module = SmartNested(CieModuleSchema)
-        cie_module = Nested(CieModuleSchema())
+        registered_modules = Nested(CieModuleSchema())
 
         class Meta:
             model = models.ModuleSession
@@ -50,6 +45,13 @@ def schema_factory(db_session, models):
         class Meta:
             include_fk = True
             model = models.UserModuleRegistration
+            sqla_session = db_session
+
+    class UserSchema(ModelSchema):
+        cie_module = Nested(CieModuleSchema())
+
+        class Meta:
+            model = models.User
             sqla_session = db_session
 
     schema = Schema(
