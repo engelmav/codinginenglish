@@ -21,7 +21,7 @@ const MyDashboard = observer(props => {
     <Main>
       <Title>{`${appStore.firstName}'s Dashboard`}</Title>
       <ContentWrapper style={{ margin: "0 auto", maxWidth: "980px", minWidth: "769px" }}>
-        
+
         {
           appStore.authData && (
             <h4>
@@ -47,4 +47,4 @@ const MyDashboard = observer(props => {
 
 });
 
-export default MyDashboard;
+export { MyDashboard };

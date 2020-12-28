@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-
 class CieApi {
   async storeNewUser(data) {
     return await (await axios.post('/api/users', data)).data;
   }
 
-  async _get(uri){
+  async _get(uri) {
     // TODO: handle exceptions
 
   }
@@ -18,11 +17,24 @@ class CieApi {
     return res.data.data;
   }
 
-  async registerUserToSession(userId){
+  async getUpcomingSessions() {
+    let scheduledSessions = [];
+    try {
+      const res = await axios.get('/api/module-sessions');
+      scheduledSessions = res.data;
+      console.log("Got scheduled sessions:", scheduledSessions);
+    } catch {
+      console.log("Failed to get upcoming classes.");
+      return [];
+    }
+    return scheduledSessions;
+  }
+
+  async registerUserToSession(userId) {
     return await axios.post(`/api/users/${userId}/module-sessions`).data;
   }
 
-  async sendPaymentConfirmation(params){
+  async sendPaymentConfirmation(params) {
     return (await axios.put('/api/payment/confirmation', params)).data;
   }
 }
@@ -32,5 +44,6 @@ const cieApi = new CieApi("/api");
 
 
 export {
-  cieApi
+  cieApi,
+  CieApi
 };

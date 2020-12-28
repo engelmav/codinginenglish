@@ -219,4 +219,4 @@ class Aula extends Component {
   }
 }
 
-export default Aula;
+export { Aula };

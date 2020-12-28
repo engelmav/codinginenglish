@@ -88,19 +88,19 @@ class StudentSessionManager {
           this.onSessionStart(eventData);
         }
       } catch (ex) {
-        console.log("Unable to parse event data:", data);
+        console.log("student-session-manager unable to parse event data:", data);
         throw (ex);
       }
     })
     eventSource.onerror = function (err) {
-      console.log("Error ocurred on event stream /api/stream:", err);
+      console.log("Error ocurred on event student-session-manager /api/stream:", err);
     }
   }
 }
 
 export {
-  hasActiveSession,
   browserDetect,
+  hasActiveSession,
   isInSession,
   StudentSessionManager
 };

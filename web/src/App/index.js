@@ -3,12 +3,7 @@ import './styles.css';
 import { Router } from 'react-router-dom';
 import styled from 'styled-components';
 import history from '../history';
-import Routes from '../Routes';
-
 import { observer } from 'mobx-react';
-import axios from 'axios';
-import { auth, appStore, Header } from "../rootProd";
-
 
 const Footer = styled.footer`
   display: flex;
@@ -21,6 +16,8 @@ const Footer = styled.footer`
 }
 `;
 
+// Dear Vin, there appears to be a circular reference between this module and rootProd.
+
 // axios.get("https://api.ipdata.co?api-key=test").then(
 //   res => console.log(res.data)
 // );
@@ -29,14 +26,20 @@ const Footer = styled.footer`
 @observer
 class App extends Component {
   render() {
+    const {
+      appStore,
+      auth,
+      Header,
+      Routes
+    } = this.props;
     return (
       <Router history={history}>
         <Header />
-        <Routes auth={auth} appStore={appStore} />
+        <Routes />
         <Footer><i>Made with love in Encinitas, California.</i></Footer>
       </Router>
     );
   }
 }
 
-export default App;
+export { App };

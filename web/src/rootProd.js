@@ -1,12 +1,23 @@
-import { Auth } from './auth/Auth'
-import { StudentSessionManager } from './util'
-import { AppStore } from './stores/AppStore'
+import { App as _App } from './App';
+import { Auth } from './auth/Auth';
+import { CieApi } from './services/cieApi';
+import { StudentSessionManager } from './util';
+import { AppStore } from './stores/AppStore';
+import Callback from './auth/Auth0Callback';
+import { withRouter } from 'react-router-dom';
 import React from 'react';
 import { Header as _Header } from './Header';
-import makeRequiresAuth from './auth/RequiresAuth';
+import { Home as _Home } from './Home';
+import { MyDashboard as _MyDashboard } from './MyDashboard';
+import { UpcomingSessions as _UpcomingSessions } from './UpcomingSessions';
+import { Routes as _Routes } from './Routes';
+import { ModuleCard as _ModuleCard } from './ModuleCard';
+import { createWithAuth } from './auth/RequiresAuth';
+import { Aula as _Classroom } from './Aula';
 
 
-const CreateComponent = (Component, dependsToInject) => {
+
+const compose = (Component, dependsToInject) => {
   return class InjectedHOC extends React.Component {
     render() {
       return (
@@ -16,6 +27,7 @@ const CreateComponent = (Component, dependsToInject) => {
   }
 }
 
+const cieApi = new CieApi();
 const appStore = new AppStore();
 
 const studentSessionMgr = new StudentSessionManager(EventSource);
@@ -27,14 +39,47 @@ const auth = new Auth(appStore);
 // Start studentSessionManager on successful login.
 auth.addOnAuthSuccess(studentSessionMgr.start);
 
-const Header = CreateComponent(_Header, { appStore, auth });
+const Header = compose(_Header, { appStore, auth });
+const ModuleCard = compose(_ModuleCard, { cieApi, appStore });
+const UpcomingSessions = compose(_UpcomingSessions,
+  { cieApi, auth, appStore, ModuleCard })
 
-const requiresAuth = makeRequiresAuth(auth);
+const withAuth = createWithAuth(auth);
+console.log("rootProd withAuth:", withAuth)
+
+// authData={this.props.authData} {...rootProps} {...props}
+const { authData } = appStore;
+const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi });
+
+const Classroom = withAuth(_ClassroomInjected);
+const CallbackWithRouter = withRouter(Callback);
+const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
+const Home = compose(_Home, { auth, cieApi });
+const MyDashboard = compose(_MyDashboard, { auth, cieApi });
+const routesProps = {
+  appStore,
+  auth,
+  cieApi,
+
+  CallbackRoute,
+  Classroom,
+  Home,
+  MyDashboard,
+  UpcomingSessions,
+};
+
+const Routes = compose(_Routes, routesProps);
+
+const App = compose(_App, { appStore, auth, Header, Routes })
+
+
 
 
 export {
-  auth,
+  App,
+  Routes,
+  UpcomingSessions,
   appStore,
-  Header,
-  requiresAuth
+  auth,
+  withAuth
 };

@@ -1,82 +1,15 @@
-import React, { Component } from 'react'
-import axios from 'axios';
 import { DateTime } from 'luxon';
 import Modal from 'react-modal';
 
 import { CheckoutForm } from '../CheckoutForm';
-import { Button, ContentSection, Main, Title } from '../UtilComponents';
+import { Button, ContentSection, Title } from '../UtilComponents';
 import { FaRegWindowClose } from 'react-icons/fa';
 import styled from 'styled-components';
 import { observer } from 'mobx-react';
 
+import React, { Component } from 'react';
 
-import './styles.css';
 import settings from '../settings';
-
-
-/* global __VERSION__ */
-
-
-class CieApi {
-  startSignup(name) {
-    // TODO: add logged out flow
-    console.log("Signing up to class", name);
-    // Assume logged in.
-  }
-  async scheduledSessions() {
-    let scheduledSessions = [];
-    try {
-      const res = await axios.get('/api/module-sessions');
-      scheduledSessions = res.data;
-    } catch {
-      console.log("Failed to get classes.");
-    }
-    return scheduledSessions;
-  }
-}
-
-
-var cieApi = new CieApi();
-
-
-
-@observer
-class Classes extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classList: []
-    };
-    console.log(`Version ${__VERSION__}`);
-  }
-
-  async componentDidMount() {
-    let classList;
-    try {
-      classList = await cieApi.scheduledSessions();
-    } catch {
-      console.log("Failed to assign class list.");
-      classList = [];
-    }
-    this.setState({ classList });
-  }
-
-  render() {
-    let { classList } = this.state;
-    const { appStore } = this.props;
-    return (
-      <Main>
-        <Title textAlign="center">upcoming classes</Title>
-        <div>
-          {
-            classList.map((sessionData, i) =>
-              <ModuleCard key={i} sessionData={sessionData} appStore={appStore} />)
-          }
-        </div>
-      </Main>
-    );
-  }
-}
 
 const ModuleCardContainer = styled.div`
   display: flex;
@@ -124,7 +57,7 @@ class ModuleCard extends Component {
 
   handleSignupClick = () => {
     this.setState({ modalIsOpen: true });
-    cieApi.startSignup(this.props.sessionData.id, 1);
+    this.props.cieApi.startSignup(this.props.sessionData.id, 1);
   }
 
   afterOpenModal = () => {
@@ -171,7 +104,7 @@ class ModuleCard extends Component {
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           shouldCloseOnOverlayClick={false}
-          >
+        >
           <FaRegWindowClose size="20" style={{ cursor: "pointer", float: 'right' }}
             onClick={closeModal}
           />
@@ -194,5 +127,4 @@ class ModuleCard extends Component {
   }
 }
 
-
-export { Classes, ModuleCard };
+export { ModuleCard };
