@@ -22,9 +22,9 @@ class CieApi {
     try {
       const res = await axios.get('/api/module-sessions');
       scheduledSessions = res.data;
-      console.log("Got scheduled sessions:", scheduledSessions);
-    } catch {
+    } catch (ex) {
       console.log("Failed to get upcoming classes.");
+      console.log(ex.stack);
       return [];
     }
     return scheduledSessions;

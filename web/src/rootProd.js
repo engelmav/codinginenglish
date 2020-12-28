@@ -5,27 +5,18 @@ import { StudentSessionManager } from './util';
 import { AppStore } from './stores/AppStore';
 import Callback from './auth/Auth0Callback';
 import { withRouter } from 'react-router-dom';
-import React from 'react';
 import { Header as _Header } from './Header';
 import { Home as _Home } from './Home';
 import { MyDashboard as _MyDashboard } from './MyDashboard';
 import { UpcomingSessions as _UpcomingSessions } from './UpcomingSessions';
 import { Routes as _Routes } from './Routes';
+import settings from './settings';
 import { ModuleCard as _ModuleCard } from './ModuleCard';
 import { createWithAuth } from './auth/RequiresAuth';
 import { Aula as _Classroom } from './Aula';
+import { compose } from './compose';
 
 
-
-const compose = (Component, dependsToInject) => {
-  return class InjectedHOC extends React.Component {
-    render() {
-      return (
-        <Component {...dependsToInject} />
-      );
-    }
-  }
-}
 
 const cieApi = new CieApi();
 const appStore = new AppStore();
@@ -40,7 +31,7 @@ const auth = new Auth(appStore);
 auth.addOnAuthSuccess(studentSessionMgr.start);
 
 const Header = compose(_Header, { appStore, auth });
-const ModuleCard = compose(_ModuleCard, { cieApi, appStore });
+const ModuleCard = compose(_ModuleCard, { cieApi, appStore, settings });
 const UpcomingSessions = compose(_UpcomingSessions,
   { cieApi, auth, appStore, ModuleCard })
 

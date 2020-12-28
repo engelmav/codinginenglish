@@ -165,6 +165,7 @@
     "@storybook/addon-links": "^6.1.11",
     "@storybook/react": "^6.1.11",
     "babel-jest": "^23.6.0",
+    "core-js": "^3.8.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",
     "jest": "^23.6.0",

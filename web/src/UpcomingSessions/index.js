@@ -3,8 +3,6 @@ import { Main, Title } from '../UtilComponents';
 import { observer } from 'mobx-react';
 import './styles.css';
 
-/* global __VERSION__ */
-
 @observer
 class UpcomingSessions extends Component {
   constructor(props) {
@@ -12,20 +10,21 @@ class UpcomingSessions extends Component {
     this.state = {
       scheduledSessions: []
     };
-    console.log(`Version ${__VERSION__}`);
   }
 
   async componentDidMount() {
     let scheduledSessions;
     try {
-      scheduledSessions = await this.props.cieApi.scheduledSessions();
+      const result = await this.props.cieApi.getUpcomingSessions();
+      scheduledSessions = result.data;
       console.log("scheduledSessions returned", scheduledSessions);
       if (scheduledSessions === null | scheduledSessions === undefined) {
         console.log("No scheduledSessions returned.");
         scheduledSessions = [];
       }
-    } catch {
+    } catch (ex) {
       console.log("Failed to assign scheduledSessions.");
+      console.log(ex.stack);
       scheduledSessions = [];
     }
     this.setState({ scheduledSessions });
@@ -33,14 +32,19 @@ class UpcomingSessions extends Component {
 
   render() {
     let { scheduledSessions } = this.state;
+    console.log("scheduledSessions in render", scheduledSessions)
+    const sessionsLoaded = scheduledSessions.length > 0;
     const { appStore, ModuleCard } = this.props;
     return (
       <Main>
         <Title textAlign="center">upcoming classes</Title>
+        {
+
+        }
         <div>
           {
             scheduledSessions.map((sessionData, i) =>
-              <ModuleCard key={i} sessionData={sessionData} appStore={appStore} />)
+              <ModuleCard key={i} sessionData={sessionData} />)
           }
         </div>
       </Main>
