@@ -16,35 +16,8 @@ from operator import itemgetter
 import logging
 
 from rest_schema import Schema
-import queue
 
 
-class MessageAnnouncer:
-
-    def __init__(self):
-        self.listeners = []
-
-    def listen(self):
-        q = queue.Queue(maxsize=5)
-        self.listeners.append(q)
-        return q
-
-    def announce(self, msg):
-        for i in reversed(range(len(self.listeners))):
-            try:
-                self.listeners[i].put_nowait(msg)
-            except queue.Full:
-                del self.listeners[i]
-
-
-def format_sse(data: str, event=None) -> str:
-    msg = f'data: {data}\n\n'
-    if event is not None:
-        msg = f'event: {event}\n{msg}'
-    return msg
-
-
-announcer = MessageAnnouncer()
 LOG = logging.getLogger(__name__)
 app = Flask(__name__,
             static_url_path='',
@@ -113,30 +86,6 @@ def create_main_api(event_stream,
         # the below header prevents nginx from swallowing SSEs.
         sse_message.headers['X-Accel-Buffering'] = "no"
         return sse_message
-
-    @app.route('/ping1')
-    def ping():
-        msg = format_sse(data='pong')
-        announcer.announce(msg=msg)
-        return {}, 200
-
-    @app.route('/listen', methods=['GET'])
-    def listen():
-        LOG.debug("got listen request")
-        def stream():
-            messages = announcer.listen()  # returns a queue.Queue
-            while True:
-                LOG.debug("Getting messages from queue")
-                msg = messages.get()  # blocks until a new message arrives
-                LOG.debug(f"Yielding message: {msg}")
-                yield msg
-        # l = ["this", "is", "a", "test"]
-        #
-        # def stream():
-        #     for word in l:
-        #         yield "data: {}\n\n".format(word)
-
-        return flask.Response(stream(), mimetype='text/event-stream')
 
     def _get(key, default=None):
         j = request.get_json()
@@ -279,7 +228,7 @@ def create_main_api(event_stream,
         Get the sessions for which a user is registered.
         :return:
         """
-        registered_modules = models.User.query.filter_by(id=user_id).one().registered_modules
+
         return serialize(registered_modules, schema.UserModuleRegistrationSchema, many=True)
 
     @app.route('/api/users/<int:user_id>/module-sessions', methods=['POST'])

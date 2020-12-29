@@ -63,6 +63,28 @@ class UserService:
 
         return _user
 
+    def registered_modules(self, user_id):
+        models = self.models
+        registered_modules = (
+            models.UserModuleRegistration.query
+            .filter_by(user_id=user_id)
+            .join(models.ModuleSession)
+            .join(models.CieModule)
+            .all()
+        )
+        modules = []
+        class Module:
+            def __init__(self, module_name, start_date):
+                self.module_name = module_name
+                self.start_date = start_date
+        for module in registered_modules:
+            modules.append(Module(
+                module_name=module.module_session.cie_module.name,
+                start_date=module.module_session.session_datetime
+            ))
+
+        return modules
+
 
 class ModuleService:
     def __init__(self, models):

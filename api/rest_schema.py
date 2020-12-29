@@ -41,6 +41,7 @@ def schema_factory(db_session, models):
             sqla_session = db_session
 
     class UserModuleRegistrationSchema(ModelSchema):
+
         # This strangely produces an extra `User: <id>` field in the serialized JSON.
         class Meta:
             include_fk = True

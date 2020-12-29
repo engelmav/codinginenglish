@@ -34,7 +34,8 @@ async function initializeUser(authResult) {
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
   appStore.configureUser(authResult, userData);
-  const userRegistrations = cieApi.getUserRegistrations(userData.id)
+  const userRegistrations = await cieApi.getUserRegistrations(userData.id)
+  console.log("Got userRegistrations:", userRegistrations);
   appStore.registeredSessions = userRegistrations;
   // Start studentSessionManager on successful login.
   studentSessionMgr.start();
