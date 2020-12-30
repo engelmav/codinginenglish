@@ -15,15 +15,14 @@ class UpcomingSessions extends Component {
   async componentDidMount() {
     let scheduledSessions;
     try {
+      // TODO: lift into composite root.
       const result = await this.props.cieApi.getUpcomingSessions();
       scheduledSessions = result.data;
-      console.log("scheduledSessions returned", scheduledSessions);
       if (scheduledSessions === null | scheduledSessions === undefined) {
-        console.log("No scheduledSessions returned.");
         scheduledSessions = [];
       }
     } catch (ex) {
-      console.log("Failed to assign scheduledSessions.");
+      console.log("Failed to retrieve scheduledSessions.");
       console.log(ex.stack);
       scheduledSessions = [];
     }
@@ -32,9 +31,7 @@ class UpcomingSessions extends Component {
 
   render() {
     let { scheduledSessions } = this.state;
-    console.log("scheduledSessions in render", scheduledSessions)
-    const sessionsLoaded = scheduledSessions.length > 0;
-    const { appStore, ModuleCard } = this.props;
+    const { ModuleCard } = this.props;
     return (
       <Main>
         <Title textAlign="center">upcoming classes</Title>

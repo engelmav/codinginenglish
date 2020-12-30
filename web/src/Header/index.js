@@ -76,13 +76,13 @@ const Header = observer((props) => {
           <RoutesUL>
             <li><Link to="/">home</Link></li>
             <li><Link to="/upcoming-sessions">upcoming_classes</Link></li>
-            {appStore.user &&
+            {appStore.authData &&
               <>
                 <li><Link to="/my-dashboard">my_dashboard</Link></li>
                 {appStore.sessionInProgress && <li><Link to="/class">in_session!</Link></li>}
               </>
             }
-            <li><Login auth={auth} isAuthenticated={appStore.authData} /></li>
+            <li><Login auth={auth} appStore={appStore} /></li>
           </RoutesUL>
         </HeaderElem>
       </Route>

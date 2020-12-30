@@ -13,14 +13,15 @@ class Login extends Component {
   }
 
   render() {
+    const { appStore } = this.props;
     return (
       <>
         {
-          !this.props.isAuthenticated &&
+          appStore.authData === null &&
             <Button onClick={this.login}>sign in / sign up</Button>
         }
         {
-          this.props.isAuthenticated &&
+          appStore.authData !== null &&
             <Button onClick={this.logout}>
               sign out
           </Button>

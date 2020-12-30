@@ -30,11 +30,16 @@ class Auth {
     this.renewSession = this.renewSession.bind(this);
     this.appStore = appStore;
     this.onAuthSuccess = [];
+    this.onLogout = [];
   }
 
 
   addOnAuthSuccess(callback){
     this.onAuthSuccess.push(callback);
+  }
+
+  addOnLogout(callback) {
+    this.onLogout.push(callback)
   }
 
 
@@ -76,6 +81,7 @@ class Auth {
       returnTo: settings.auth0LogoutUrl,
       clientID: CLIENT_ID,
     });
+    this.onLogout.forEach(cb => cb());
   }
 
   silentAuth() {
@@ -94,11 +100,10 @@ class Auth {
     this.idToken = null;
     this.expiresAt = 0;
 
-    localStorage.removeItem('isLoggedIn');
-
     this.auth0.logout({
       returnTo: window.location.origin
     });
+    this.onLogout.forEach(cb => cb());
   }
 
   isAuthenticated() {

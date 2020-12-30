@@ -1,6 +1,29 @@
-import { action,computed, observable, toJS, flow } from 'mobx';
-import { cieApi } from '../services/cieApi'
+import { action, computed, observable } from 'mobx';
+import {
+  persistence,
+  useClear,
+  useDisposers,
+  isSynchronized,
+  StorageAdapter
+} from 'mobx-persist-store';
 
+
+function readStore(name) {
+  return new Promise((resolve) => {
+    const data = sessionStorage.getItem(name);
+    const objects = JSON.parse(data)
+    console.log("readStore objects:")
+    console.log(objects)
+    resolve(objects);
+  });
+}
+
+function writeStore(name, content) {
+  return new Promise((resolve) => {
+    sessionStorage.setItem(name, JSON.stringify(content));
+    resolve()
+  });
+}
 
 class AppStore {
   @observable isAuthenticated = false;
@@ -8,17 +31,18 @@ class AppStore {
   @observable userId = null;
   @observable firstName = null;
   @observable email = null;
-  @observable registeredSessions = null;
+  @observable registeredSessions = [];
   @observable sessionInProgress = false;
 
-  constructor(){
+  constructor() {
     this.setSessionInProgress = this.setSessionInProgress.bind(this);
+    this.resetStore = this.resetStore.bind(this);
   }
 
   @action toggleIsAuthenticated() {
     this.isAuthenticated = !this.isAuthenticated;
   }
-  
+
   @action async configureUser(authData, storedUser) {
     console.log("configureUser()", authData, storedUser);
     this.authData = authData;
@@ -26,11 +50,33 @@ class AppStore {
     this.userId = storedUser.id;
   }
 
-  setSessionInProgress(){
-    console.log("AppStore setting sessionInProgress to `true`");
+  setSessionInProgress() {
     this.sessionInProgress = true;
+  }
+
+  @action resetStore = () => {
+    useClear(this)
+  }
+
+  @action persistDispose = () => {
+    useDisposers(this)
+  }
+
+  @computed get isSynchronized() {
+    return isSynchronized(this)
   }
 }
 
+persistence({
+  name: 'AppStore',
+  properties: ['isAuthenticated', 'authData', 'userId', 'firstName', 'email', 'registeredSessions', 'sessionInProgress'],
+  adapter: new StorageAdapter({
+    read: readStore,
+    write: writeStore
+  }),
+  reactionOptions: {
+    delay: 2000
+  }
+})(AppStore);
 
 export { AppStore };

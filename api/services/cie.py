@@ -73,12 +73,14 @@ class UserService:
             .all()
         )
         modules = []
-        class Module:
+
+        class ModuleSessionDTO:
             def __init__(self, module_name, start_date):
                 self.module_name = module_name
                 self.start_date = start_date
+
         for module in registered_modules:
-            modules.append(Module(
+            modules.append(ModuleSessionDTO(
                 module_name=module.module_session.cie_module.name,
                 start_date=module.module_session.session_datetime
             ))

@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react';
 import styled from 'styled-components';
 import { font } from './UtilComponents/sharedStyles';
+import { Link } from 'react-router-dom';
 import { Title, Main } from './UtilComponents';
 import Loader from 'react-spinners/PulseLoader';
 import { BeatLoader } from 'react-spinners';
@@ -28,7 +29,7 @@ const MyDashboard = observer(props => {
 
   const { appStore } = props;
 
-  const isLoaded = appStore.registeredSessions !== null;
+  const isLoaded = appStore.registeredSessions.length > 0;
 
   const RegisteredSessions = loadOrContent(isLoaded,
     <div>loading...</div>,
@@ -37,7 +38,7 @@ const MyDashboard = observer(props => {
 
       <ul>
         {appStore.registeredSessions.map((sess, idx) =>
-          <li key={idx}>{sess.module_session_id}</li>
+          <li key={idx}>{`${sess.module_name} ${sess.start_date}`}</li>
         )}
       </ul>
     </>
@@ -45,9 +46,8 @@ const MyDashboard = observer(props => {
 
   return (
     <Main>
-      <Title>{`${appStore.firstName}'s Dashboard`}</Title>
+      <Title textAlign="center">{`${appStore.firstName}'s Dashboard`}</Title>
       <ContentWrapper style={{ margin: "0 auto", maxWidth: "980px", minWidth: "769px" }}>
-
         {
           appStore.authData && (
             <h4>
@@ -55,13 +55,13 @@ const MyDashboard = observer(props => {
             </h4>
           )
         }
-        <p>Your class is in session. Go there now!</p>
+        {appStore.sessionInProgress && <p>Your class is in session. Go there now!</p>}
         {RegisteredSessions}
       <p>Your next classes</p>
-      <p>Find More Classes</p>
-      <p>Words for me to learn</p>
+      <p><Link to="/upcoming-sessions">Find more classes</Link></p>
+      <p>My Linux Box</p>
       </ContentWrapper>
-    </Main >
+    </Main>
   );
 
 });

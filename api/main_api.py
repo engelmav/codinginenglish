@@ -1,5 +1,6 @@
 import datetime
 import json
+import jsonpickle
 import threading
 from typing import List
 
@@ -228,8 +229,17 @@ def create_main_api(event_stream,
         Get the sessions for which a user is registered.
         :return:
         """
+        registered_modules = user_service.registered_modules(user_id)
+        # todo: if we do this again, use marshmallow
+        serializable = [obj.__dict__ for obj in registered_modules]
 
-        return serialize(registered_modules, schema.UserModuleRegistrationSchema, many=True)
+        return jsonify(
+            dict(
+                data=serializable,
+                status="success",
+                messages=["Successfully retrieved registered modules."]
+            )
+        )
 
     @app.route('/api/users/<int:user_id>/module-sessions', methods=['POST'])
     def register_user_to_session(user_id):

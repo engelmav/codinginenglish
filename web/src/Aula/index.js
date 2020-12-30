@@ -13,6 +13,7 @@ import settings from '../settings';
 import { observer } from 'mobx-react';
 import Bounce from 'react-reveal/Bounce';
 import { browserDetect } from '../util';
+import { toJS } from 'mobx';
 
 
 const VideoCall = React.lazy(() => import('../VideoConference'));
@@ -104,18 +105,11 @@ class Aula extends Component {
   render() {
     const { activityData, guacWindow, chatWindow, videoWindow, popupActivityWindow, onTop } = this.state;
     const { toggleGuac, toggleChat, toggleVideo, togglePopupActivity } = this;
-    const { appStore } = this.props;
-    let userFirstName;
-    const userIsAuthenticated = this.props.authData !== null;
-    const useAuthenticatedFirstName = () => appStore.authData.idTokenPayload.given_name;
-    if (userIsAuthenticated) {
-      userFirstName = useAuthenticatedFirstName();
-    } else {
-      throw new Error("You are not logged in! Unable to load page.");
-    }
+    console.log("appStore.authData:", this.props.authData);
 
     return (
       <div>
+        <h1>{`${JSON.stringify(toJS(this.props.appStore.authData))}`}</h1>
         <h1>{this.state.event}</h1>
         <Taskbar>
           {!guacWindow && <Button mr={2} onClick={this.toggleGuac}>Dev Environment</Button>}

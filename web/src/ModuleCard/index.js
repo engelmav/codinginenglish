@@ -1,7 +1,5 @@
 import { DateTime } from 'luxon';
 import Modal from 'react-modal';
-
-// import { CheckoutForm } from '../CheckoutForm';
 import { Button, ContentSection, Title } from '../UtilComponents';
 import { FaRegWindowClose } from 'react-icons/fa';
 import styled from 'styled-components';
@@ -154,7 +152,7 @@ class ModuleCard extends Component {
                 </>
               }
             </ContentSection>
-            <CheckoutForm sessionData={sessionData} onCloseClick={closeModal} appStore={appStore} />
+            <CheckoutForm sessionData={sessionData} onCloseClick={closeModal} />
           </ModalContent>
         </Modal>
       </ModuleCardContainer>

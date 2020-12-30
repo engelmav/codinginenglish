@@ -1,21 +1,22 @@
 import { App as _App } from './App';
-import { Auth } from './auth/Auth';
-import { CieApi } from './services/cieApi';
-import { StudentSessionManager } from './util';
 import { AppStore } from './stores/AppStore';
+import { Aula as _Classroom } from './Aula';
+import { Auth } from './auth/Auth';
 import Callback from './auth/Auth0Callback';
-import { withRouter } from 'react-router-dom';
+import { CieApi } from './services/cieApi';
+import { CheckoutForm as _CheckoutForm } from './CheckoutForm';
+import { compose } from './compose';
+import { createWithAuth } from './auth/RequiresAuth';
 import { Header as _Header } from './Header';
 import history from './history';
 import { Home as _Home } from './Home';
-import { MyDashboard as _MyDashboard } from './MyDashboard';
-import { UpcomingSessions as _UpcomingSessions } from './UpcomingSessions';
+import { ModuleCard as _ModuleCard } from './ModuleCard';
+import { MyDashboard as _MyDashboard } from './MyDashboard'
 import { Routes as _Routes } from './Routes';
 import settings from './settings';
-import { ModuleCard as _ModuleCard } from './ModuleCard';
-import { createWithAuth } from './auth/RequiresAuth';
-import { Aula as _Classroom } from './Aula';
-import { compose } from './compose';
+import { StudentSessionManager } from './util';
+import { UpcomingSessions as _UpcomingSessions } from './UpcomingSessions';
+import { withRouter } from 'react-router-dom';
 
 
 const cieApi = new CieApi();
@@ -27,25 +28,27 @@ studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
 
 const auth = new Auth(appStore);
 
-
-
 async function initializeUser(authResult) {
+  console.log("Initializing user...");
   const initializedUser = await cieApi.initializeUser(authResult);
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
   appStore.configureUser(authResult, userData);
   const userRegistrations = await cieApi.getUserRegistrations(userData.id)
-  console.log("Got userRegistrations:", userRegistrations);
+  console.log("userRegistrations:", userRegistrations);
   appStore.registeredSessions = userRegistrations;
-  // Start studentSessionManager on successful login.
   studentSessionMgr.start();
   history.push('/my-dashboard');
 }
 
 auth.addOnAuthSuccess(initializeUser);
+auth.addOnLogout(appStore.resetStore)
+
 
 const Header = compose(_Header, { appStore, auth });
-const ModuleCard = compose(_ModuleCard, { cieApi, appStore, settings });
+
+const CheckoutForm = compose(_CheckoutForm, { appStore });
+const ModuleCard = compose(_ModuleCard, { cieApi, appStore, settings, CheckoutForm });
 const UpcomingSessions = compose(_UpcomingSessions,
   { cieApi, auth, appStore, ModuleCard })
 
