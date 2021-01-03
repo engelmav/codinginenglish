@@ -11,8 +11,8 @@ let apiSvc = createService(
     80,
     "http"
 );
-apiSvc.validate();
 
+apiSvc.validate();
 
 let apiDeploy = createDeployment({
     componentName: COMPONENT_NAME,

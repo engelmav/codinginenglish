@@ -1,5 +1,4 @@
 from sqlalchemy import and_, or_
-from datetime import datetime, timedelta
 import logging
 
 

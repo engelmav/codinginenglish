@@ -6,7 +6,7 @@ const YAML = require('json-to-pretty-yaml');
 
 
 const deployEnv = argv.e;
-const COMPONENT_NAME = 'cie-frontend';
+const COMPONENT_NAME = 'cie-web';
 
 let service;
 if (deployEnv == 'local' || deployEnv == 'dev') {
@@ -30,7 +30,7 @@ service.validate();
 
 let deployment = createDeployment({
     componentName: COMPONENT_NAME,
-    imageName: 'vengelmann/cie-frontend',
+    imageName: 'vengelmann/cie-web',
     envVars: [{ name: 'CIE_ENV', value: deployEnv }],
     ports: [{ 'containerPort': 80 }]
 });

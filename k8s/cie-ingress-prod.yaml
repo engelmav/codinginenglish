@@ -24,13 +24,13 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: cie-frontend
+          serviceName: cie-web
           servicePort: 80
   - host: codinginenglish.com
     http:
       paths:
       - backend:
-          serviceName: cie-frontend
+          serviceName: cie-web
           servicePort: 80
   - host: remote.codinginenglish.com
     http:
