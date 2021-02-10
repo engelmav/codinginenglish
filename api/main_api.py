@@ -108,6 +108,11 @@ def create_main_api(event_stream,
         loaded = _schema.load(data)
         return loaded.data
 
+    @app.route('/api/modules', methods=['GET'])
+    def get_cie_modules():
+        modules = models.CieModule.query.all()
+        return serialize(modules, schema.CieModuleSchema, many=True)
+
     @app.route('/api/modules', methods=['POST'])
     def create_modules():
         """
