@@ -209,10 +209,12 @@ def create_main_api(event_stream,
         for sess in upcoming_sessions:
             if sess.get('in_progress'):
                 has_session_in_progress = True
+                LOG.debug(f"User has session in progress")
                 next  # Do not launch poller thread for session already started
             session_start_dt = sess.get('session_datetime')
             session_id = sess.get('session_id')
             student_session_service.add_on_session_start(publish_message)
+            LOG.debug(f"Registering student_session_service for session_id {session_id}")
             student_session_service.notify_on_session_start(session_id, session_start_dt)
 
         user_schema = schema.UserSchema()

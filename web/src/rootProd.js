@@ -56,7 +56,7 @@ const withAuth = createWithAuth(auth);
 
 // authData={this.props.authData} {...rootProps} {...props}
 const { authData } = appStore;
-const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi });
+const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi, settings });
 
 const Classroom = withAuth(_ClassroomInjected);
 const CallbackWithRouter = withRouter(Callback);

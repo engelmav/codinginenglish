@@ -51,7 +51,7 @@ def set_local():
 def create_module(module_data):
     _url = f"{config.current_url}/modules"
     resp = requests.post(_url, json=module_data)
-    print("Created CIE module")
+    print(">>>> Created CIE module")
     print(resp)
     pp.pprint(resp.json())
     return resp.json()
@@ -76,7 +76,7 @@ def create_2_hour_session(module_id):
     _url = f"{config.current_url}/cie-modules/19/sessions"
     resp = requests.post(_url, params={"cie_module_id": module_id}, json=session_start_date())
     session_id = resp.json().get('data').get('id')
-    print(f"created_2_hour_session(): session_id {session_id}")
+    print(f">>>> created_2_hour_session(): session_id {session_id}")
     pp.pprint(resp.json())
     return session_id
 
@@ -85,10 +85,10 @@ def register_user_to_session(user_id, session_id):
     payload = {"module_session_id": session_id}
     _url = f"{config.current_url}/users/{user_id}/module-sessions"
     resp = requests.post(_url, json=payload)
-    registered_session = resp.json().get('data').get('id')
-    print(f"register_user_to_session(): Registered session {registered_session}")
+    registered_session_id = resp.json().get('data').get('id')
+    print(f" **** Registered user {user_id} to session {registered_session_id}")
     pp.pprint(resp.json())
-    return registered_session
+    return resp.json()
 
 
 def setup_live_test_session():
@@ -99,6 +99,7 @@ def setup_live_test_session():
 def delete_session(session_id):
     _url = f"{config.current_url}/module_sessions/{session_id}"
     resp = requests.delete(_url)
+    print(f" **** Deleted session ID {session_id}")
     pp.pprint(resp.json())
     print(resp.json())
 
@@ -114,17 +115,17 @@ def create_beginners_module():
 
 def create_2_hour_session(module_id):
     _url = f"{config.current_url}/cie-modules/{module_id}/sessions"
-    resp = requests.post(_url, params={"cie_module_id": 19}, json=session_start_date())
-    session_id = resp.json().get('data').get('id')
-    print(f"created_2_hour_session(): session_id {session_id}")
+    resp = requests.post(_url, json=session_start_date())
+    print(f" **** Created 2 hour session")
     pp.pprint(resp.json())
-    return session_id
+    return resp.json()
 
 
 def users():
     # TODO: make users GET endpoint
     _url = f"{config.current_url}/users"
     resp = requests.get(_url)
+    print(f" **** Users")
     pp.pprint(resp.json())
     return resp.json()
 
@@ -141,3 +142,13 @@ def create_test_data():
 def delete_test_data():
     # TODO: create delete methods
     pass
+
+
+def user_sessions(user_id):
+    _url = f"{config.current_url}/users/{user_id}/module-sessions"
+    resp = requests.get(_url)
+    print(f" **** User sessions for user_id {user_id}")
+    pp.pprint(resp.json())
+    return resp.json()
+
+

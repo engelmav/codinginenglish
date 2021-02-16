@@ -121,15 +121,15 @@ class StudentSessionService:
     def add_on_session_start(self, notifier):
         self.on_start_notifiers.append(notifier)
 
-    def _make_key(self, ):
+    def _make_key(self):
         return f"user_id_{self.user_id}_session_in_progress"
 
     def set_session_in_progress(self):
         LOG.debug(f"Setting session_in_progress for user id {self.user_id}")
-        self.redis.set(self._make_key(self.user_id), "true")
+        self.redis.set(self._make_key(), "true")
 
     def remove_session_in_progress(self):
-        self.redis.delete(self._make_key(self.user_id))
+        self.redis.delete(self._make_key())
 
     def is_session_in_progress(self):
         key = self.redis.get(self._make_key())

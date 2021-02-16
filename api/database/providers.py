@@ -41,6 +41,4 @@ class BaseProvider:
 
 
 base_provider = BaseProvider()
-
-
 db_session_provider = SessionProvider()
