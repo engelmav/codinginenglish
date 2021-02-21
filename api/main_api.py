@@ -3,6 +3,7 @@ import json
 import threading
 from typing import List
 
+import pytz
 from flask import Flask, jsonify, request
 import flask
 
@@ -52,27 +53,19 @@ def create_main_api(event_stream,
 
         return jsonify(res)
 
-    class Event:
-        def __init__(self, event_type, message):
-            self.event_type = event_type
-            self.message = message
 
-        def __str__(self):
-            return (
-                f"event: {self.event_type}\ndata: {self.message}\n\n"
-            )
 
-    def event_stream():
-        # todo: pull the next two lines back out to make this testable.
-        pubsub = redis.pubsub()
-        pubsub.subscribe('cie')
-        for message in pubsub.listen():
-            message_data = message['data']
-            if message_data is not None and type(message_data).__name__ == 'bytes':
-                message_data = message_data.decode('utf8')
-            event = Event("student-session-manager", message_data)
-            LOG.debug(f"Emitting event {str(event)}")
-            yield str(event)
+    # def event_stream():
+    #     # todo: pull the next two lines back out to make this testable.
+    #     pubsub = redis.pubsub()
+    #     pubsub.subscribe('cie')
+    #     for message in pubsub.listen():
+    #         message_data = message['data']
+    #         if message_data is not None and type(message_data).__name__ == 'bytes':
+    #             message_data = message_data.decode('utf8')
+    #         event = Event("student-session-manager", message_data)
+    #         LOG.debug(f"Emitting event {str(event)}")
+    #         yield str(event)
 
     @app.route('/api/stream')
     def stream_sse():
@@ -264,6 +257,7 @@ def create_main_api(event_stream,
 
         session_id = user_reg.module_session_id
         session_start_dt = user_reg.module_session.session_datetime
+        session_start_dt_tz = pytz.utc.localize(session_start_dt)
 
         def handle_session_start(session_start_message):
             """
@@ -281,7 +275,7 @@ def create_main_api(event_stream,
 
         # TODO: make this a singleton
         student_session_service.add_on_session_start(handle_session_start)
-        student_session_service.notify_on_session_start(session_id, session_start_dt)
+        student_session_service.notify_on_session_start(session_id, session_start_dt_tz)
 
         return serialize(user_reg, schema.UserModuleRegistrationSchema)
 

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 import time
 
 from sqlalchemy import create_engine
@@ -78,9 +78,6 @@ def make_test_app(upcoming_sessions):
     created_module_id = resp.json.get('data').get('id')
 
     for sess in upcoming_sessions:
-        # created_mod_session = test_app.post(
-        #     f"/api/cie-modules/{created_module_id}/sessions",
-        #     json=sess)
         start_dt = sess.get("session_datetime")
         created_session = models.ModuleSession(cie_module_id=created_module_id, session_datetime=start_dt)
         created_session.add()
@@ -100,8 +97,8 @@ def test_session_start_no_message_on_initialize_user():
     THEN the user will not receive a message
     :return:
     """
-    now = datetime.datetime.now()
-    five_hours = datetime.timedelta(hours=5)
+    now = datetime.now(timezone.utc)
+    five_hours = timedelta(hours=5)
     five_hours_from_now = now + five_hours
 
     upcoming_sessions = [
@@ -129,8 +126,8 @@ def test_session_started_before_initialize_user():
     THEN the user will receive is_in_session == True
     :return:
     """
-    now = datetime.datetime.now()
-    five_minutes = datetime.timedelta(minutes=5)
+    now = datetime.now(timezone.utc)
+    five_minutes = timedelta(minutes=5)
     five_minutes_ago = now - five_minutes
     upcoming_sessions = [
         {"session_id": 1, "session_datetime": five_minutes_ago}
@@ -155,8 +152,8 @@ def test_session_starts_while_user_logged_on():
     THEN they receive a message
     :return:
     """
-    now = datetime.datetime.now()
-    five_seconds = datetime.timedelta(seconds=2)
+    now = datetime.now(timezone.utc)
+    five_seconds = timedelta(seconds=2)
     five_seconds_from_now = now + five_seconds
 
     seed_session = [
@@ -194,7 +191,7 @@ def test_session_manager_notify():
     module_service = ModuleService(models)
     mod = module_service.create_module('fakename', 'fake desc')
 
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(timezone.utc)
     five_seconds = datetime.timedelta(seconds=5)
     five_seconds_from_now = now + five_seconds
 
@@ -224,7 +221,7 @@ def test_session_manager_notify():
 def create_live_test_session_for_user_10():
     from api.main import models
 
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(timezone.utc)
     five_seconds = datetime.timedelta(seconds=5)
     five_seconds_from_now = now + five_seconds
 

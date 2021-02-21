@@ -1,11 +1,23 @@
 import json
 import logging
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import pytz
 import time
 
 
 LOG = logging.getLogger(__name__)
+
+
+class Event:
+    def __init__(self, event_type, message):
+        self.event_type = event_type
+        self.message = message
+
+    def __str__(self):
+        return (
+            f"event: {self.event_type}\ndata: {self.message}\n\n"
+        )
 
 
 def create_publish_message(redis_client):
@@ -40,17 +52,16 @@ class ThreadSafeIter:
 
 def create_event_stream(red):
     def event_stream():
+        # todo: pull the next two lines back out to make this testable.
         pubsub = red.pubsub()
         pubsub.subscribe('cie')
-        pub_sub_listener = pubsub.listen()
-        for message in pub_sub_listener:
-            print("Yielding message: ", message)
+        for message in pubsub.listen():
             message_data = message['data']
             if message_data is not None and type(message_data).__name__ == 'bytes':
                 message_data = message_data.decode('utf8')
-            event_str = "event: classUpdate\n"
-            event_str = event_str + 'data: %s\n\n' % message_data
-            yield event_str
+            event = Event("student-session-manager", message_data)
+            LOG.debug(f"Emitting event {str(event)}")
+            yield str(event)
 
     # thread_safe_event_stream = ThreadSafeIter(event_stream())
     # return thread_safe_event_stream
@@ -101,16 +112,17 @@ class StudentSessionService:
         upcoming_sessions = []
         for session in sessions:
             session_start_dt = session.module_session.session_datetime
-            already_started = self.is_already_started(session_start_dt)
-            ended = self.is_ended(session_start_dt)
+            session_start_dt_utc = pytz.utc.localize(session_start_dt)
+            already_started = self.is_already_started(session_start_dt_utc)
+            ended = self.is_ended(session_start_dt_utc)
             in_progress = already_started and not ended
-            is_upcoming = session_start_dt > datetime.now()
+            is_upcoming = session_start_dt_utc > datetime.now(timezone.utc)
             if is_upcoming or in_progress:
                 upcoming_sessions.append(
                     {
                         "in_progress": in_progress,
                         "session_id": session.module_session.id,
-                        "session_datetime": session_start_dt
+                        "session_datetime": session_start_dt_utc
                     }
                 )
         return upcoming_sessions
@@ -139,19 +151,19 @@ class StudentSessionService:
         return False
 
     def is_already_started(self, session_start_dt):
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         already_started = session_start_dt < now
         return already_started
 
     def is_ended(self, session_start_dt):
         end_dt = session_start_dt + timedelta(hours=1, minutes=30)
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         ended = now > end_dt
         return ended
 
     def notify_on_session_start(self, session_id, session_start_dt):
         notifier_task_name = f"notifier-session-user_id:{self.user_id}-session_id:{session_id}"
-        LOG.debug(f"Spawning task {notifier_task_name}")
+        LOG.debug(f"Spawning task {notifier_task_name} for user {self.user_id}")
         t = threading.Thread(name=notifier_task_name,
                              target=self.wait_for_session_start, args=[self.user_id, session_id, session_start_dt,
                                                                        self.on_start_notifiers],

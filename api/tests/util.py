@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import pprint
 
 import requests
@@ -68,8 +68,10 @@ def modules():
 
 def session_start_date(start_date=None):
     if start_date is None:
-        start_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return {"session_datetime": start_date}
+        start_date = datetime.now(timezone.utc)
+        start_date_utc = start_date.astimezone(timezone.utc)
+        start_date_str = start_date_utc.strftime("%Y-%m-%d %H:%M:%S")
+    return {"session_datetime": start_date_str}
 
 
 def create_2_hour_session(module_id):
