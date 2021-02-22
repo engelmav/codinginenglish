@@ -111,11 +111,13 @@ def test_get_future_sessions():
     ]
     test_app = make_test_app(upcoming_sessions)
     test_user_id = "1"
-    resp = test_app.get(f"/api/users/{test_user_id}/module-sessions")
+    resp = test_app.get(f"/api/users/{test_user_id}/module-sessions",
+                        query_string={"futureOnly": "true"})
     expected_date_str = five_hours_from_now.strftime('%a, %-d %b %Y %H:%M:%S %Z')
     recvd_start_dt = resp.json.get('data')[0].get('start_date')
-    recvd_start_dt_utc = recvd_start_dt.replace('GMT', 'UTC') # oh yes, that happened.
+    recvd_start_dt_utc = recvd_start_dt.replace('GMT', 'UTC')  # oh yes, that happened.
     assert recvd_start_dt_utc == expected_date_str
+    assert len(resp.json.get('data')) == 1
 
 
 

@@ -1,5 +1,6 @@
 from sqlalchemy import and_, or_
 import logging
+from datetime import datetime
 
 
 LOG = logging.getLogger(__name__)
@@ -62,15 +63,22 @@ class UserService:
 
         return _user
 
-    def registered_modules(self, user_id):
+    def registered_modules(self, user_id, future_only=False):
         models = self.models
-        registered_modules = (
+
+        filters = [models.UserModuleRegistration.user_id == user_id]
+        if future_only:
+            utc_now = datetime.utcnow()
+            filters.append(
+                models.ModuleSession.session_datetime > utc_now)
+
+        query = (
             models.UserModuleRegistration.query
-            .filter_by(user_id=user_id)
             .join(models.ModuleSession)
             .join(models.CieModule)
-            .all()
         )
+
+        registered_modules = query.filter(*filters).all()
         modules = []
 
         class ModuleSessionDTO:

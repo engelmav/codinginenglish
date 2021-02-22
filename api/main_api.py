@@ -228,7 +228,10 @@ def create_main_api(event_stream,
         Get the sessions for which a user is registered.
         :return:
         """
-        registered_modules = user_service.registered_modules(user_id)
+
+        future_only = request.args.get('futureOnly')
+        registered_modules = \
+            user_service.registered_modules(user_id, future_only=future_only)
         # todo: if we do this again, use marshmallow
         serializable = [obj.__dict__ for obj in registered_modules]
 
