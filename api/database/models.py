@@ -1,3 +1,4 @@
+import pytz
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
@@ -35,7 +36,15 @@ def model_factory(Base):
             'CieModule',
             backref='ModuleSession'
         )
-        session_datetime = Column(DateTime)
+        _session_datetime = Column("session_datetime", DateTime)
+
+        @property
+        def session_datetime(self):
+            return pytz.utc.localize(self._session_datetime)
+
+        @session_datetime.setter
+        def session_datetime(self, session_dt):
+            self._session_datetime = session_dt
 
     class UserModuleRegistration(Base):
         __tablename__ = 'user_module_registration'

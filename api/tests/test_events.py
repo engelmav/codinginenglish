@@ -14,6 +14,7 @@ from database.handlers import init_db
 from database.models import model_factory
 from rest_schema import schema_factory
 
+
 test_user_payload = {
     "idTokenPayload": {
         "given_name": "FakeFirst",
@@ -119,6 +120,7 @@ def test_session_start_no_message_on_initialize_user():
     #  (already_started and not_ended or not_started_yet)
 
 
+
 def test_session_started_before_initialize_user():
     """
     GIVEN user's session started 5 minutes ago
@@ -191,8 +193,8 @@ def test_session_manager_notify():
     module_service = ModuleService(models)
     mod = module_service.create_module('fakename', 'fake desc')
 
-    now = datetime.datetime.now(timezone.utc)
-    five_seconds = datetime.timedelta(seconds=5)
+    now = datetime.now(timezone.utc)
+    five_seconds = timedelta(seconds=5)
     five_seconds_from_now = now + five_seconds
 
     module_session = \
@@ -209,8 +211,12 @@ def test_session_manager_notify():
         global event_saved
         event_saved = event
 
+
+    # pytz.utc.localize(module_session.session_datetime)
+
     session_service.add_on_session_start(handle_start)
-    session_service.notify_on_session_start(module_session.id, module_session.session_datetime)
+    session_service.notify_on_session_start(
+        module_session.id, module_session.session_datetime)
 
     time.sleep(8)
 

@@ -1,18 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
 class CieApi {
   async initializeUser(data) {
-    return await (await axios.post('/api/users', data)).data;
+    return await (await axios.post("/api/users", data)).data;
   }
 
   async _get(uri) {
     // TODO: handle exceptions
-
   }
 
-  async getUserRegistrations(userId) {
-    console.log("getUserRegistrations() checking registrations for userId", userId);
-    const res = await axios.get(`/api/users/${userId}/module-sessions`);
+  async getFutureUserRegistrations(userId) {
+    console.log(
+      "getUserRegistrations() checking registrations for userId",
+      userId
+    );
+    const res = await axios.get(`/api/users/${userId}/module-sessions`, {
+      params: { futureOnly: true },
+    });
     console.log("cieApi.getUserRegistrations():", res);
     return res.data.data;
   }
@@ -20,7 +24,7 @@ class CieApi {
   async getUpcomingSessions() {
     let scheduledSessions = [];
     try {
-      const res = await axios.get('/api/module-sessions');
+      const res = await axios.get("/api/module-sessions");
       scheduledSessions = res.data;
     } catch (ex) {
       console.log("Failed to get upcoming classes.");
@@ -35,15 +39,10 @@ class CieApi {
   }
 
   async sendPaymentConfirmation(params) {
-    return (await axios.put('/api/payment/confirmation', params)).data;
+    return (await axios.put("/api/payment/confirmation", params)).data;
   }
 }
 
-
 const cieApi = new CieApi("/api");
 
-
-export {
-  cieApi,
-  CieApi
-};
+export { cieApi, CieApi };

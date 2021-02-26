@@ -1,6 +1,7 @@
 import React from "react";
 import { Aula as _Aula } from ".";
 import { compose } from '../compose';
+import { AppStore } from "stores/AppStore";
 
 export default {
   title: "Views/Aula",
@@ -18,8 +19,12 @@ const settings = {
   assets: "https://cie-assets.nyc3.digitaloceanspaces.com",
 };
 
+const appStore = new AppStore();
+appStore.firstName = "Marc";
+
 const cieApi = new MockCieApi();
 const Aula = compose(_Aula, {
+  appStore,
   cieApi,
   settings,
 });

@@ -34,7 +34,7 @@ async function initializeUser(authResult) {
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
   appStore.configureUser(authResult, userData);
-  const userRegistrations = await cieApi.getUserRegistrations(userData.id)
+  const userRegistrations = await cieApi.getFutureUserRegistrations(userData.id)
   console.log("userRegistrations:", userRegistrations);
   appStore.registeredSessions = userRegistrations;
   studentSessionMgr.start();
@@ -67,7 +67,6 @@ const routesProps = {
   appStore,
   auth,
   cieApi,
-
   CallbackRoute,
   Classroom,
   Home,

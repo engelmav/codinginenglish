@@ -13,7 +13,6 @@ class Auth {
   expiresAt;
 
   auth0 = new auth0.WebAuth({
-    // domain: 'dev-nougy3g5.auth0.com',
     domain: 'login.codinginenglish.com',
     clientID: CLIENT_ID,
     redirectUri: settings.auth0Host,

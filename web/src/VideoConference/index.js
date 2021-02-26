@@ -1,24 +1,20 @@
-import React from 'react';
-import Jitsi from 'react-jitsi';
+import React from "react";
+import { Jutsu } from "./jitsiReact";
 
-
-
-
-const handleAPI = (JitsiMeetAPI) => {
-  // JitsiMeetAPI.executeCommand('toggleVideo')
-  window.JitsiAPI = JitsiMeetAPI;
-}
-
-const VideoCall = () =>
-  <Jitsi
-    containerStyle={{ width: '600', height: '400px' }}
-    roomName={"cievideo"}
-  // displayName={"Jisti display name"}
-  // // password={password}
-  onAPILoad={handleAPI}
-  />;
-
-
-
+const room = "cie";
+const password = "what";
+const VideoCall = (props) => {
+  const { participantName } = props;
+  return (
+    <Jutsu
+      roomName={room}
+      displayName={participantName}
+      password={password}
+      onMeetingEnd={() => console.log("Meeting has ended")}
+      loadingComponent={<p>loading ...</p>}
+      errorComponent={<p>Oops, something went wrong</p>}
+    />
+  );
+};
 
 export default VideoCall;

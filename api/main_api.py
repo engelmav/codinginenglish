@@ -78,6 +78,8 @@ def create_main_api(event_stream,
         sse_message.headers['Cache-Control'] = "no-transform"
         # the below header prevents nginx from swallowing SSEs.
         sse_message.headers['X-Accel-Buffering'] = "no"
+        # browsers will close after 2 min of inactivity unless Connection=keep-alive
+        sse_message.headers['Connection'] = "keep-alive"
         return sse_message
 
     def _get(key, default=None):
@@ -260,7 +262,6 @@ def create_main_api(event_stream,
 
         session_id = user_reg.module_session_id
         session_start_dt = user_reg.module_session.session_datetime
-        session_start_dt_tz = pytz.utc.localize(session_start_dt)
 
         def handle_session_start(session_start_message):
             """
@@ -278,7 +279,7 @@ def create_main_api(event_stream,
 
         # TODO: make this a singleton
         student_session_service.add_on_session_start(handle_session_start)
-        student_session_service.notify_on_session_start(session_id, session_start_dt_tz)
+        student_session_service.notify_on_session_start(session_id, session_start_dt)
 
         return serialize(user_reg, schema.UserModuleRegistrationSchema)
 

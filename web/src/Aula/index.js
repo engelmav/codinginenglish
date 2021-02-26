@@ -90,7 +90,7 @@ class Aula extends Component {
   };
 
   render() {
-    const { settings } = this.props;
+    const { appStore, settings } = this.props;
     const {
       activityData,
       guacWindow,
@@ -176,12 +176,13 @@ class Aula extends Component {
             />
           </Rnd>
         )}
+
         {videoWindow && (
           <Rnd
             default={{
               x: 600,
               y: 450,
-              width: 600,
+              width: 800,
               height: 400,
             }}
             style={{ zIndex: onTop === videoWindowTop ? 200 : 0 }}
@@ -189,10 +190,11 @@ class Aula extends Component {
           >
             <Window title="Video" onClose={toggleVideo} />
             <Suspense fallback={<div>Loading...</div>}>
-              <VideoCall />
+              <VideoCall participantName={appStore.firstName} />
             </Suspense>
           </Rnd>
         )}
+
         {guacWindow && (
           <Rnd
             default={{
@@ -210,7 +212,8 @@ class Aula extends Component {
               <>
                 <p>
                   It looks like you're using Safari. Try Chrome or Firefox. If
-                  you REALLY want to try with Safari, go ahead.
+                  you REALLY want to try with Safari, this remote session window
+                  won't work due to iframe constraints.
                 </p>
                 <button
                   onClick={() =>

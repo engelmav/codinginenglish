@@ -22,6 +22,7 @@ class Event:
 
 def create_publish_message(redis_client):
     def publish_message(message_str):
+        LOG.debug(f"Publishing message on cie channel: {message_str}")
         res = redis_client.publish('cie', message_str)
         return res
 
@@ -112,17 +113,16 @@ class StudentSessionService:
         upcoming_sessions = []
         for session in sessions:
             session_start_dt = session.module_session.session_datetime
-            session_start_dt_utc = pytz.utc.localize(session_start_dt)
-            already_started = self.is_already_started(session_start_dt_utc)
-            ended = self.is_ended(session_start_dt_utc)
+            already_started = self.is_already_started(session_start_dt)
+            ended = self.is_ended(session_start_dt)
             in_progress = already_started and not ended
-            is_upcoming = session_start_dt_utc > datetime.now(timezone.utc)
+            is_upcoming = session_start_dt > datetime.now(timezone.utc)
             if is_upcoming or in_progress:
                 upcoming_sessions.append(
                     {
                         "in_progress": in_progress,
                         "session_id": session.module_session.id,
-                        "session_datetime": session_start_dt_utc
+                        "session_datetime": session_start_dt
                     }
                 )
         return upcoming_sessions

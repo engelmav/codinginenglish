@@ -1,6 +1,6 @@
 from marshmallow import post_load
 from marshmallow.fields import Nested
-from marshmallow_sqlalchemy import ModelSchema
+from marshmallow_sqlalchemy import ModelSchema, auto_field
 
 
 class Schema:
@@ -39,6 +39,8 @@ def schema_factory(db_session, models):
         class Meta:
             model = models.ModuleSession
             sqla_session = db_session
+
+        # session_datetime = auto_field("_session_datetime")
 
     class UserModuleRegistrationSchema(ModelSchema):
 
