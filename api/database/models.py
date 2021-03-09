@@ -8,11 +8,13 @@ class Models:
                  _CieModule,
                  _ModuleSession,
                  _UserModuleRegistration,
-                 _User):
+                 _User,
+                 _ActiveSession):
         self.CieModule = _CieModule
         self.ModuleSession = _ModuleSession
         self.UserModuleRegistration = _UserModuleRegistration
         self.User = _User
+        self.ActiveSession = _ActiveSession
 
 
 def model_factory(Base):
@@ -71,11 +73,18 @@ def model_factory(Base):
             user_mod_reg.add()
             return user_mod_reg
 
+    class ActiveSession(Base):
+        __tablename__ = 'current_sessions'
+        id = Column(Integer, primary_key=True)
+        module_session_id = Column(Integer, ForeignKey('module_sessions.id'))
+        user_id = Column(Integer, ForeignKey('users.id'))
+
     models = Models(
         CieModule,
         ModuleSession,
         UserModuleRegistration,
-        User)
+        User,
+        ActiveSession)
     return models
 
 

@@ -24,6 +24,24 @@ test_user_payload = {
 event_saved = None
 
 
+def make_models():
+    engine = create_engine('sqlite:///:memory:', echo=True)
+    sqlite_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    base_provider.configure_custom_base(sqlite_session)
+    CustomBase = base_provider.get_base()
+
+    models = model_factory(CustomBase)
+    init_db(CustomBase, engine)
+    return models
+
+
+def make_datetime_5_min_ago():
+    now = datetime.now(timezone.utc)
+    five_minutes = timedelta(minutes=5)
+    five_minutes_ago = now - five_minutes
+    return five_minutes_ago
+
+
 def make_test_app(upcoming_sessions):
     redis = fakeredis.FakeStrictRedis()
 
