@@ -74,7 +74,7 @@ def model_factory(Base):
             return user_mod_reg
 
     class ActiveSession(Base):
-        __tablename__ = 'current_sessions'
+        __tablename__ = 'active_sessions'
         id = Column(Integer, primary_key=True)
         module_session_id = Column(Integer, ForeignKey('module_sessions.id'))
         user_id = Column(Integer, ForeignKey('users.id'))

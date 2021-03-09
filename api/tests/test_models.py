@@ -17,7 +17,6 @@ def test_active_session():
     module_session_sqla = module_service.get_module_session_by_id(mod_session_id)
 
     user_service = UserService(models)
-    module_service = ModuleService(models)
     user = user_service.create_user("some.email@email.com",
                                     first_name="FakeFirst",
                                     last_name="FakeLast")
