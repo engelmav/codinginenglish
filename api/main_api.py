@@ -53,20 +53,6 @@ def create_main_api(event_stream,
 
         return jsonify(res)
 
-
-
-    # def event_stream():
-    #     # todo: pull the next two lines back out to make this testable.
-    #     pubsub = redis.pubsub()
-    #     pubsub.subscribe('cie')
-    #     for message in pubsub.listen():
-    #         message_data = message['data']
-    #         if message_data is not None and type(message_data).__name__ == 'bytes':
-    #             message_data = message_data.decode('utf8')
-    #         event = Event("student-session-manager", message_data)
-    #         LOG.debug(f"Emitting event {str(event)}")
-    #         yield str(event)
-
     @app.route('/api/stream')
     def stream_sse():
 
@@ -153,6 +139,22 @@ def create_main_api(event_stream,
             status="success",
             messages=["Deleted session"]
         )
+
+    @app.route('/api/module_sessions/<session_id>/active_sessions', methods=['POST'])
+    def activate_module_session(session_id):
+        req = request.get_json()
+        teacher_ids, student_ids = itemgetter("teachers", "students")(req)
+        for user_id in teacher_ids + student_ids:
+            _as = models.ActiveSession(
+                module_session_id=session_id,
+                user_id=user_id
+            )
+            _as.add()
+        return jsonify(
+            status="success",
+            messages=["Objects added."]
+        )
+
 
     @app.route('/api/module-sessions')
     def get_modules():
