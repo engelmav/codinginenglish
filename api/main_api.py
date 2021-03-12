@@ -155,7 +155,6 @@ def create_main_api(event_stream,
             messages=["Objects added."]
         )
 
-
     @app.route('/api/module-sessions')
     def get_modules():
         res = models.ModuleSession.query.all()

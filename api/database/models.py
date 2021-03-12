@@ -1,5 +1,6 @@
 import pytz
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 
@@ -40,9 +41,13 @@ def model_factory(Base):
         )
         _session_datetime = Column("session_datetime", DateTime)
 
-        @property
+        @hybrid_property
         def session_datetime(self):
             return pytz.utc.localize(self._session_datetime)
+        
+        @session_datetime.expression
+        def session_datetime(cls):
+            return cls._session_datetime
 
         @session_datetime.setter
         def session_datetime(self, session_dt):
