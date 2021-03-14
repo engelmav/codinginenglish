@@ -140,19 +140,57 @@ def create_main_api(event_stream,
             messages=["Deleted session"]
         )
 
-    @app.route('/api/module_sessions/<session_id>/active_sessions', methods=['POST'])
+    @app.route("/api/module_sessions/<session_id>/active_sessions", methods=["POST"])
     def activate_module_session(session_id):
+        """
+        Teacher or admin POSTs here to perform the following tasks:
+        1. assign teachers to a given session
+        2. assign students to a given session
+        3. provide a unique instance of a running module session
+        4. derive unique video and chat identifiers
+        This sets up a classroom for students and teachers to come into.
+        """
         req = request.get_json()
         teacher_ids, student_ids = itemgetter("teachers", "students")(req)
+        """
+        I'm going to need to add both ActiveSession and UserActiveSession
+        How do I do that?
+        What if the ActiveSession is not unique enough? Wait, it has its
+        own ID. We want to be able to create multiple ActiveSessions
+        for a given ModuleSession...so that we can have identical
+        simultaneous active sessions.
+        The uniqueness is based on the *users*. We want to check for the uniqueness
+        of (module_session_id, user_id): if you add a user and his or her module_session
+        to another active_session or user_active_session, you'll be putting them into
+        two classes at the same time.
+        """
+        _as = models.ActiveSession(
+            module_session_id=session_id
+        )
+        _as.add()
+
         for user_id in teacher_ids + student_ids:
-            _as = models.ActiveSession(
-                module_session_id=session_id,
-                user_id=user_id
+            uas = models.UserActiveSession(
+                user_id=user_id,
+                active_session_id=_as.id
             )
-            _as.add()
+            uas.add()
+
         return jsonify(
             status="success",
             messages=["Objects added."]
+        )
+
+    # give me the current session for the user
+    @app.route("/api/users/<user_id>/active_sessions", methods=["GET"])
+    def get_active_session_by_user_id(user_id):
+        uas = models.UserActiveSession.query.filter_by(user_id=user_id).one()
+        _schema = schema.UserActiveSessionSchema()
+        serialized = _schema.dump(uas)
+        return jsonify(
+            status="success",
+            data=serialized,
+            messages=["Retrieved active sessions."]
         )
 
     @app.route('/api/module-sessions')

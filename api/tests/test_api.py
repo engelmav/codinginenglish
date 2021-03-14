@@ -24,22 +24,47 @@ def test_get_future_sessions():
     assert len(resp.json.get('data')) == 1
 
 
-def test_create_active_session():
+def make_active_session_test_app():
     five_mins_ago = make_datetime_5_min_ago()
     upcoming_sessions = [
         {"session_id": 1, "session_datetime": five_mins_ago},
     ]
     test_app = make_test_app(upcoming_sessions)
-    module_session_id_from_fixture = 1
-    student_id_from_fixture = 1
     teacher_user = test_app.models.User(firstname="teacher1", lastname="teacherlastname", email="teacher1@cie.com")
     teacher_user.add()
+    return test_app, teacher_user
+
+
+def test_create_active_session():
+    test_app, teacher_user = make_active_session_test_app()
+    module_session_id_from_fixture = 1
+    student_id_from_fixture = 1
+
     students_ids = [student_id_from_fixture]
     teacher_ids = [teacher_user.id]
     url = f"/api/module_sessions/{module_session_id_from_fixture}/active_sessions"
     resp = test_app.flask.post(
         url,
         json={"students": students_ids, "teachers": teacher_ids}
-        # "/api/site-map"
     )
+
     assert resp.json["status"] == "success"
+
+
+def test_get_active_session_by_user_id():
+    test_app, teacher_user = make_active_session_test_app()
+    module_session_id_from_fixture = 1
+    student_id_from_fixture = 1
+
+    students_ids = [student_id_from_fixture]
+    teacher_ids = [teacher_user.id]
+
+    url = f"/api/module_sessions/{module_session_id_from_fixture}/active_sessions"
+    _ = test_app.flask.post(
+        url,
+        json={"students": students_ids, "teachers": teacher_ids}
+    )
+
+    url = f"/api/users/{student_id_from_fixture}/active_sessions"
+    resp = test_app.flask.get(url)
+    assert resp.json.get("data").get("active_session_id") == 1

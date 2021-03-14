@@ -44,19 +44,13 @@ class TestApp:
 
 
 def make_models():
-    engine = create_engine('sqlite:///:memory:', echo=True)
-    sqlite_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-    base_provider.configure_custom_base(sqlite_session)
+    engine = create_engine("sqlite:///:memory:")
+    alchemy_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    base_provider.configure_custom_base(alchemy_session)
     CustomBase = base_provider.get_base()
     models = model_factory(CustomBase)
     init_db(CustomBase, engine)
-    test_app = TestApp(
-        alchemy_engine=engine,
-        alchemy_session=sqlite_session,
-        CustomBase=CustomBase,
-        models=models
-    )
-    return test_app
+    return models, engine, alchemy_session, CustomBase
 
 
 def make_datetime_5_min_ago():
@@ -69,7 +63,13 @@ def make_datetime_5_min_ago():
 def make_test_app(upcoming_sessions):
     redis = fakeredis.FakeStrictRedis()
 
-    test_app = make_models()
+    models, engine, alchemy_session, CustomBase = make_models()
+    test_app = TestApp(
+        alchemy_engine=engine,
+        alchemy_session=alchemy_session,
+        CustomBase=CustomBase,
+        models=models
+    )
     schema = schema_factory(test_app.alchemy_session, test_app.models)
     test_app.schema = schema
     models = test_app.models
