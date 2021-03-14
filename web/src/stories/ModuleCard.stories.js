@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { compose } from '../compose';
 import { AppStore } from '../stores/AppStore';
@@ -41,7 +40,6 @@ const ModuleCard = compose(
 export default {
   title: 'ModuleCard',
   component: ModuleCard,
-
 };
 
 export const DefaultView = () =>
