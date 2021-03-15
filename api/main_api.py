@@ -181,7 +181,6 @@ def create_main_api(event_stream,
             messages=["Objects added."]
         )
 
-    # give me the current session for the user
     @app.route("/api/users/<user_id>/active_sessions", methods=["GET"])
     def get_active_session_by_user_id(user_id):
         uas = models.UserActiveSession.query.filter_by(user_id=user_id).one()
