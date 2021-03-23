@@ -27,7 +27,7 @@ const ChatSignIn = (props) => {
           },
           "*"
         );
-      }, 5000);
+      }, 8000);
     });
   };
   useEffect(() => authenticateChat(), []);
@@ -85,15 +85,6 @@ class Aula extends Component {
       prezzie_link,
       video_channel,
     } = activeSessionData.data;
-
-    console.log(
-      "activeSessionData destructured:",
-      chat_channel,
-      prezzie_link,
-      video_channel
-    );
-
-    // channel was already created by admin app
 
     this.setState(
       {
@@ -184,7 +175,6 @@ class Aula extends Component {
 
     return (
       <div>
-        <button onClick={this.authenticateChat}>Login Rocketchat</button>
         <h1>{this.state.event}</h1>
         <Taskbar>
           {!slidesWindow && (
