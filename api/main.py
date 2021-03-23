@@ -9,6 +9,7 @@ from simplekv.memory.redisstore import RedisStore
 from config import config
 from rest_schema import schema_factory
 from services.cie import UserService, ModuleService
+from services.rocketchat import RocketChatService
 
 """
 Because of the way sqlalchemy configures itself,
@@ -33,6 +34,7 @@ pubsub.subscribe('cie')
 pub_sub_listener = pubsub.listen()
 event_stream = create_event_stream(red)
 publish_message = create_publish_message(red)
+rc_service = RocketChatService()
 
 app = create_main_api(
     event_stream,
@@ -43,6 +45,7 @@ app = create_main_api(
     mysql_session,
     models,
     schema,
-    red
+    red,
+    rc_service
 )
 

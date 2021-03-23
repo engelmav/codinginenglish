@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from "react";
+import React, { Component, Suspense, useEffect, useRef } from "react";
 import "./styles.css";
 import Iframe from "react-iframe";
 import "react-grid-layout/css/styles.css";
@@ -6,13 +6,37 @@ import "react-resizable/css/styles.css";
 import styled from "styled-components";
 import { Window, Button } from "../UtilComponents";
 import { PopupActivity } from "../PopupActivity";
-// import { VideoCall } from '../VideoConference';
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
 import Bounce from "react-reveal/Bounce";
 import { browserDetect } from "../util";
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
+
+const ChatSignIn = (props) => {
+  const divRef = useRef(null);
+  const authenticateChat = () => {
+    const chatIframe = divRef.current.firstElementChild;
+    chatIframe.addEventListener("load", function() {
+     this.contentWindow.postMessage(
+        {
+          externalCommand: "login-with-token",
+          token: props.appStore.rocketchatAuthToken,
+        },
+        "*"
+      );
+    });
+    // divRef.current.firstElementChild.contentWindow.postMessage(
+    //   {
+    //     externalCommand: "login-with-token",
+    //     token: props.appStore.rocketchatAuthToken,
+    //   },
+    //   "*"
+    // );
+  };
+  useEffect(() => authenticateChat(), []);
+  return <div ref={divRef}>{props.children}</div>;
+};
 
 const Taskbar = styled.div`
   border-radius: 3px;
@@ -34,6 +58,10 @@ class Aula extends Component {
       slidesWindow: true,
       videoWindow: true,
       popupActivityWindow: false,
+
+      rocketchatAuthToken: null,
+      chatChannel: null,
+      prezzieLink: null,
       exerciseContent: null,
       onTop: null,
     };
@@ -47,9 +75,65 @@ class Aula extends Component {
     this.focusGuacViewer = () => {
       if (this.guacViewer) this.guacViewer.focus();
     };
+    this.configureActiveSession = this.configureActiveSession.bind(this);
+    this.chatIframeRef = React.createRef();
+  }
+
+  async configureActiveSession() {
+    /**
+     * We want to check if a user already has a Rocketchat
+     * login. For this, we'll need to get the user's
+     * username from Auth0 and check Rocketchat.
+     * --> do this on student  login, because we won't know
+     * their login name ahead of time necessarily. the common key
+     * is the user_id in the CIE database. If the username is present, just add the user
+     * to the ActiveSession's chat channel, and just let the
+     * SSO process take place with the Rocketchat iframe. If
+     * it isn't present, create it, and only after it's created,
+     * join the user to the chat channel and let the SSO take place.
+     */
+    const { appStore, cieApi } = this.props;
+    const activeSessionData = await cieApi.getActiveSessionByUserId(
+      appStore.userId
+    );
+    const {
+      chat_channel,
+      prezzie_link,
+      video_channel,
+    } = activeSessionData.data;
+
+    console.log(
+      "activeSessionData destructured:",
+      chat_channel,
+      prezzie_link,
+      video_channel
+    );
+
+    // channel was already created by admin app
+    // const resp = await cieApi.configureRocketchat();
+    /**
+     * We need to go create the channel in the util.py code.
+     * util.py acts like the admin console. When that's created,
+     * we only need to ADD the user to the chat channel.
+     * When we;re done changing util.py, come back here and
+     * add the call to addUserToChannel(). I think that, because
+     * addUserToChannel requires a roomId, we should save it in
+     * the database so we can use it here.
+     */
+
+    this.setState(
+      {
+        chatChannel: chat_channel,
+        prezzieLink: prezzie_link,
+        videoChannel: video_channel,
+      },
+      () => console.log("state updated:", this.state)
+    );
+    console.log("After set state");
   }
 
   componentDidMount() {
+    this.configureActiveSession();
     this.eventSource.addEventListener("classUpdate", (e) => {
       console.log("received SSE event data:");
       const { data } = e;
@@ -82,6 +166,10 @@ class Aula extends Component {
   toggleChat = () => {
     this.setState({ chatWindow: !this.state.chatWindow });
   };
+  toggleSlides = () => {
+    console.log("toggle slides");
+    this.setState({ slidesWindow: !this.state.slidesWindow });
+  };
   toggleVideo = () => {
     this.setState({ videoWindow: !this.state.videoWindow });
   };
@@ -92,19 +180,29 @@ class Aula extends Component {
   render() {
     const { appStore, settings } = this.props;
     const {
-      activityData,
       guacWindow,
       chatWindow,
+      slidesWindow,
       videoWindow,
       popupActivityWindow,
+
+      activityData,
+      chatChannel,
+      prezzieLink,
+      videoChannel,
+
       onTop,
     } = this.state;
-    const { toggleGuac, toggleChat, toggleVideo, togglePopupActivity } = this;
 
-    let channelName = "general";
-    // let prezzieName = 'basic_session_02/live';
-    const rocketChatUrl = `${settings.rocketchatUrl}${channelName}?layout=embedded`;
-    // const slidesUrl = `${settings.slidesUrl}/${prezzieName}`
+    const {
+      toggleGuac,
+      toggleChat,
+      toggleSlides,
+      toggleVideo,
+      togglePopupActivity,
+    } = this;
+
+    const rocketChatUrl = `${settings.rocketchatUrl}${chatChannel}?layout=embedded`;
     const slidesWindowTop = "slidesWindow";
     const videoWindowTop = "videoWindow";
     const guacWindowTop = "guacWindow";
@@ -112,8 +210,14 @@ class Aula extends Component {
 
     return (
       <div>
+        <button onClick={this.authenticateChat}>Login Rocketchat</button>
         <h1>{this.state.event}</h1>
         <Taskbar>
+          {!slidesWindow && (
+            <Button mr={2} onClick={this.toggleSlides}>
+              Slides
+            </Button>
+          )}
           {!guacWindow && (
             <Button mr={2} onClick={this.toggleGuac}>
               Dev Environment
@@ -129,34 +233,35 @@ class Aula extends Component {
               Video
             </Button>
           )}
-          {guacWindow && chatWindow && videoWindow && <p>Coding in English</p>}
+          {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
         </Taskbar>
 
-        <Rnd
-          default={{
-            x: 0,
-            y: 50,
-            width: 600,
-            height: 400,
-          }}
-          style={{ zIndex: onTop === slidesWindowTop ? 200 : 0 }}
-          onClick={() => this.setState({ onTop: slidesWindowTop })}
-        >
-          <Window title="Slides" hideClose={true} />
-          <Iframe
-            id="slidesView"
-            // url={slidesUrl}
-            url="https://slides.com/vincentengelmann/basic_session_02/live"
-            width="100%"
-            height="100%"
-            scrolling="no"
-            frameborder="0"
-            webkitallowfullscreen
-            mozallowfullscreen
-            allowfullscreen
-          />
-        </Rnd>
-        {chatWindow && (
+        {slidesWindow && prezzieLink && (
+          <Rnd
+            default={{
+              x: 0,
+              y: 50,
+              width: 600,
+              height: 400,
+            }}
+            style={{ zIndex: onTop === slidesWindowTop ? 200 : 0 }}
+            onClick={() => this.setState({ onTop: slidesWindowTop })}
+          >
+            <Window title="Slides" hideClose={false} onClose={toggleSlides} />
+            <Iframe
+              id="slidesView"
+              url={prezzieLink}
+              width="100%"
+              height="100%"
+              scrolling="no"
+              frameborder="0"
+              webkitallowfullscreen
+              mozallowfullscreen
+              allowfullscreen
+            />
+          </Rnd>
+        )}
+        {chatWindow && chatChannel && (
           <Rnd
             default={{
               x: 0,
@@ -168,16 +273,18 @@ class Aula extends Component {
             onClick={() => this.setState({ onTop: chatWindowTop })}
           >
             <Window title="CIE Chat" onClose={toggleChat} />
-            <Iframe
-              url={rocketChatUrl}
-              id="classroomcontainer__chat-iframe"
-              width="100%"
-              height="500px"
-            />
+            <ChatSignIn appStore={this.props.appStore}>
+              <Iframe
+                url={rocketChatUrl}
+                id="classroomcontainer__chat-iframe"
+                width="100%"
+                height="500px"
+              />
+            </ChatSignIn>
           </Rnd>
         )}
 
-        {videoWindow && (
+        {videoWindow && videoChannel && (
           <Rnd
             default={{
               x: 600,
@@ -190,7 +297,10 @@ class Aula extends Component {
           >
             <Window title="Video" onClose={toggleVideo} />
             <Suspense fallback={<div>Loading...</div>}>
-              <VideoCall participantName={appStore.firstName} />
+              <VideoCall
+                participantName={appStore.firstName}
+                videoChannel={videoChannel}
+              />
             </Suspense>
           </Rnd>
         )}

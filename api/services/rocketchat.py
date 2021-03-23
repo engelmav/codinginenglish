@@ -22,10 +22,10 @@ class SessionB(requests.Session):
         return super(SessionB, self).request(method, modified_url, **kwargs)
 
 
-class RocketChatService(requests.Session):
+class RocketChatService:
     LOGIN_URI = '/api/v1/login'
 
-    def __init__(self, username, password, api_url):
+    def __init__(self):
         self.session = None
         self._authenticate(username, password, api_url)
 
@@ -95,3 +95,43 @@ class RocketChatService(requests.Session):
             # user doesn't exist - create it!
             user = self.create_user(username, name, email, password)
         return self.login_user(email, password)
+
+    def login_with_auth0(self, auth0_access_token, auth0_secret):
+        """
+        '{ "serviceName": "facebook", "accessToken": "hash",
+      "secret": "hash", "expiresIn": 200 }'
+        :return:
+        """
+        resp = self._post('/api/v1/login',
+                          {"serviceName": "auth0", "accessToken": auth0_access_token,
+                           "secret": "hash", "expiresIn": 200})
+        return resp
+
+    def create_channel(self, channel_name, users=None):
+        if users is None:
+            members = []
+        else:
+            members = users
+        resp = self._post('/api/v1/channels.create',
+                          {"name": channel_name, "members": members})
+        return resp
+
+    def add_user_to_channel(self, user_id, channel_id):
+        """
+        curl -H "X-Auth-Token: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq" \
+        -H "X-User-Id: aobEdbYhXfu5hkeqG" \
+        -H "Content-type: application/json" \
+     http://localhost:3000/api/v1/channels.invite \
+     -d '{ "roomId": "ByehQjC44FwMeiLbX", "userId": "nSYqWzZ4GsKTX4dyK" }'
+        :param users:
+        :return:
+        """
+        resp = self._post('/api/v1/channels.invite',
+                          {"roomId": channel_id, "userId": user_id})
+        return resp
+
+    def delete_channel(self, channel_name):
+        resp = self._post('/api/v1/channels.delete',
+                          {"roomName": channel_name})
+        return resp
+

@@ -42,10 +42,12 @@ def test_create_active_session():
 
     students_ids = [student_id_from_fixture]
     teacher_ids = [teacher_user.id]
-    url = f"/api/module_sessions/{module_session_id_from_fixture}/active_sessions"
+    url = f"/api/module-sessions/{module_session_id_from_fixture}/active-sessions"
     resp = test_app.flask.post(
         url,
-        json={"students": students_ids, "teachers": teacher_ids}
+        json={"students": students_ids,
+              "teachers": teacher_ids,
+              "prezzie_link": "https://slideurl"}
     )
 
     assert resp.json["status"] == "success"
@@ -59,12 +61,18 @@ def test_get_active_session_by_user_id():
     students_ids = [student_id_from_fixture]
     teacher_ids = [teacher_user.id]
 
-    url = f"/api/module_sessions/{module_session_id_from_fixture}/active_sessions"
+    url = f"/api/module-sessions/{module_session_id_from_fixture}/active-sessions"
     _ = test_app.flask.post(
         url,
-        json={"students": students_ids, "teachers": teacher_ids}
+        json={"students": students_ids, "teachers": teacher_ids, "prezzie_link": "https://prezzie-link"}
     )
 
-    url = f"/api/users/{student_id_from_fixture}/active_sessions"
+    url = f"/api/users/{student_id_from_fixture}/active-sessions"
     resp = test_app.flask.get(url)
-    assert resp.json.get("data").get("active_session_id") == 1
+    expected_payload = {'chat_channel': 'cie-chat-1-1',
+                        'id': 1, 'is_active': True,
+                        'prezzie_link': 'https://prezzie-link',
+                        'video_channel': 'codinginenglish-video-1-1'}
+    assert resp.json.get("data") == expected_payload
+
+

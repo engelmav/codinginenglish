@@ -1,5 +1,5 @@
 import pytz
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -83,14 +83,18 @@ def model_factory(Base):
     class ActiveSession(Base):
         __tablename__ = 'active_sessions'
         id = Column(Integer, primary_key=True)
-        is_active = Column(Boolean)
         module_session_id = Column(Integer, ForeignKey('module_sessions.id'))
+        chat_channel = Column(Text)
+        prezzie_link = Column(Text)
+        video_channel = Column(Text)
+        is_active = Column(Boolean)
 
     class UserActiveSession(Base):
         __tablename__ = 'user_active_sessions'
         id = Column(Integer, primary_key=True)
         user_id = Column(Integer, ForeignKey('users.id'))
         active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
+        active_session = relationship('ActiveSession')
 
     models = Models(
         CieModule,

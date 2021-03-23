@@ -1,8 +1,8 @@
 import axios from "axios";
 
 class CieApi {
-  async initializeUser(data) {
-    return await (await axios.post("/api/users", data)).data;
+  async initializeUser(userData) {
+    return await (await axios.post("/api/users", userData)).data;
   }
 
   async _get(uri) {
@@ -40,6 +40,14 @@ class CieApi {
 
   async sendPaymentConfirmation(params) {
     return (await axios.put("/api/payment/confirmation", params)).data;
+  }
+
+  async getActiveSessionByUserId(userId) {
+    return (await axios.get(`/api/users/${userId}/active-sessions`)).data;
+  }
+
+  async rocketchatLogin(username) {
+    return (await axios.post(`/api/rocketchat/do-login`, { username })).data;
   }
 }
 

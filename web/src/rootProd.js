@@ -33,10 +33,9 @@ async function initializeUser(authResult) {
   const initializedUser = await cieApi.initializeUser(authResult);
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
-  appStore.configureUser(authResult, userData);
+  appStore.configureUser(authResult, userData, initializedUser.data.rocketchat_auth_token);
   const userRegistrations = await cieApi.getFutureUserRegistrations(userData.id)
   console.log("userRegistrations:", userRegistrations);
-  appStore.registeredSessions = userRegistrations;
   studentSessionMgr.start();
   history.push('/my-dashboard');
 }
@@ -54,7 +53,6 @@ const UpcomingSessions = compose(_UpcomingSessions,
 
 const withAuth = createWithAuth(auth);
 
-// authData={this.props.authData} {...rootProps} {...props}
 const { authData } = appStore;
 const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi, settings });
 

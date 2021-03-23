@@ -28,7 +28,7 @@ config = Config()
 test_data = TestData()
 
 config.current_url = None
-test_user_id = 10
+test_user_id = 17
 
 
 def site_map():
@@ -132,6 +132,27 @@ def users():
     return resp.json()
 
 
+def create_user_active_session(user_id, module_session_id):
+    url = f"{config.current_url}/module-sessions/{module_session_id}/active-sessions"
+    resp = requests.post(
+        url,
+        json={"students": [user_id],
+              "teachers": [],
+              "prezzie_link": "https://slides.com/vincentengelmann/basic_session_02/live"}
+    )
+    print(f" **** User active session:")
+    pp.pprint(resp.json())
+    return resp.json()
+
+
+def create_chat_channel(channel_name):
+    url = f"{config.current_url}/rocketchat/channel.create"
+    resp = requests.post(url, json={"channelName": channel_name})
+    print(f" **** Chat channel created:")
+    pp.pprint(resp.json())
+    return resp.json()
+
+
 def create_test_data():
     module_data = create_beginners_module()
     test_data.module_id = module_data.get('data').get('id')
@@ -139,6 +160,11 @@ def create_test_data():
     session_data = create_2_hour_session(test_data.module_id)
     test_data.session_id = session_data.get('data').get('id')
     register_user_to_session(test_user_id, test_data.session_id)
+    test_data.active_session = create_user_active_session(
+        test_user_id, test_data.session_id)
+    test_data.chat_channel_name = test_data.active_session["data"]["active_session"]["chat_channel"]
+    channel_json = create_chat_channel(test_data.chat_channel_name)
+    print(channel_json)
 
 
 def delete_test_data():

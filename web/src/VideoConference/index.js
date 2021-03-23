@@ -2,12 +2,12 @@ import React from "react";
 import { Jutsu } from "./jitsiReact";
 
 const room = "cie";
-const password = "what";
+const password = "hardcodednonsense";
 const VideoCall = (props) => {
-  const { participantName } = props;
+  const { participantName, videoChannel } = props;
   return (
     <Jutsu
-      roomName={room}
+      roomName={videoChannel}
       displayName={participantName}
       password={password}
       onMeetingEnd={() => console.log("Meeting has ended")}

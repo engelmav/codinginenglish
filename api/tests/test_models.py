@@ -26,7 +26,11 @@ def test_active_session():
     user_reg = user.add_to_module_session(module_session_sqla)
 
     _as = models.ActiveSession(
-        module_session_id=user_reg.module_session_id
+        is_active=True,
+        module_session_id=user_reg.module_session_id,
+        video_channel="video-channel-name",
+        prezzie_link="https://wwww.someslidelink.com",
+        chat_channel="chat-channel-name"
     )
     _as.add()
 

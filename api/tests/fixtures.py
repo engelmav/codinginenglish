@@ -13,6 +13,7 @@ from database.handlers import init_db
 
 from database.models import model_factory
 from rest_schema import schema_factory
+from services.rocketchat import RocketChatService
 
 test_user_payload = {
     "idTokenPayload": {
@@ -93,6 +94,7 @@ def make_test_app(upcoming_sessions):
 
     student_session_service = StudentSessionService(redis, models)
     student_session_service.set_user_id(100)
+    rc_service = RocketChatService()
 
     main_api = create_main_api(
         event_stream,
@@ -103,7 +105,8 @@ def make_test_app(upcoming_sessions):
         test_app.alchemy_session,
         models,
         schema,
-        redis
+        redis,
+        rc_service
     )
     main_api.testing = True
     test_app.flask = main_api.test_client()
