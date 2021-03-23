@@ -68,6 +68,7 @@ class UserService:
 
         filters = [models.UserModuleRegistration.user_id == user_id]
         if future_only:
+            # models.ModuleSession.query(models.ModuleSession)
             utc_now = datetime.utcnow()
             filters.append(
                 models.ModuleSession.session_datetime > utc_now)

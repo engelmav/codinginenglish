@@ -13,6 +13,7 @@ from database.handlers import init_db
 
 from database.models import model_factory
 from rest_schema import schema_factory
+from services.rocketchat import RocketChatService
 
 test_user_payload = {
     "idTokenPayload": {
@@ -24,18 +25,55 @@ test_user_payload = {
 event_saved = None
 
 
+class TestApp:
+    def __init__(self, flask=None, alchemy_engine=None, alchemy_session=None, models=None, schema=None, CustomBase=None):
+        """
+        A global namespace for CIE test dependencies.
+        :param flask:
+        :param alchemy_engine:
+        :param alchemy_session:
+        :param models:
+        :param schema:
+        :param CustomBase:
+        """
+        self.flask = flask
+        self.alchemy_engine = alchemy_engine
+        self.alchemy_session = alchemy_session
+        self.models = models
+        self.schema = schema
+        self.CustomBase = CustomBase
+
+
+def make_models():
+    engine = create_engine("sqlite:///:memory:")
+    alchemy_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    base_provider.configure_custom_base(alchemy_session)
+    CustomBase = base_provider.get_base()
+    models = model_factory(CustomBase)
+    init_db(CustomBase, engine)
+    return models, engine, alchemy_session, CustomBase
+
+
+def make_datetime_5_min_ago():
+    now = datetime.now(timezone.utc)
+    five_minutes = timedelta(minutes=5)
+    five_minutes_ago = now - five_minutes
+    return five_minutes_ago
+
+
 def make_test_app(upcoming_sessions):
     redis = fakeredis.FakeStrictRedis()
 
-    engine = create_engine('sqlite:///:memory:', echo=True)
-    sqlite_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-    base_provider.configure_custom_base(sqlite_session)
-    CustomBase = base_provider.get_base()
-
-    models = model_factory(CustomBase)
-    schema = schema_factory(sqlite_session, models)
-
-    init_db(CustomBase, engine)
+    models, engine, alchemy_session, CustomBase = make_models()
+    test_app = TestApp(
+        alchemy_engine=engine,
+        alchemy_session=alchemy_session,
+        CustomBase=CustomBase,
+        models=models
+    )
+    schema = schema_factory(test_app.alchemy_session, test_app.models)
+    test_app.schema = schema
+    models = test_app.models
     user_service = UserService(models)
     module_service = ModuleService(models)
     user = user_service.create_user("some.email@email.com",
@@ -56,6 +94,7 @@ def make_test_app(upcoming_sessions):
 
     student_session_service = StudentSessionService(redis, models)
     student_session_service.set_user_id(100)
+    rc_service = RocketChatService()
 
     main_api = create_main_api(
         event_stream,
@@ -63,18 +102,19 @@ def make_test_app(upcoming_sessions):
         module_service,
         student_session_service,
         user_service,
-        sqlite_session,
+        test_app.alchemy_session,
         models,
         schema,
-        redis
+        redis,
+        rc_service
     )
     main_api.testing = True
-    test_app = main_api.test_client()
+    test_app.flask = main_api.test_client()
 
     module_json = {
         "name": "Web App Development - Intermediate",
         "description": "some description."}
-    resp = test_app.post('/api/modules', json=module_json)
+    resp = test_app.flask.post('/api/modules', json=module_json)
     created_module_id = resp.json.get('data').get('id')
 
     for sess in upcoming_sessions:

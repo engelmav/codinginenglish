@@ -3,9 +3,9 @@ import json
 import threading
 from typing import List
 
-import pytz
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 import flask
+from sqlalchemy import func
 
 from database.models import Models
 from events import StudentSessionService
@@ -17,7 +17,9 @@ from operator import itemgetter
 import logging
 
 from rest_schema import Schema
-
+from services.rocketchat import RocketChatService
+from flask_session import Session
+from flask_cors import CORS, cross_origin
 
 LOG = logging.getLogger(__name__)
 app = Flask(__name__,
@@ -25,8 +27,14 @@ app = Flask(__name__,
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
 
+SECRET_KEY = config.get("cie.api.session_secret_key")
+SESSION_TYPE = 'filesystem'
+app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=False)
+app.config.from_object(__name__)
+Session(app)
+CORS(app, supports_credentials=True, origins=["https://chat.codinginenglish.com"])
+
 app.register_blueprint(stripe_bp)
-app.secret_key = config["cie.api.session.key"]
 
 
 def create_main_api(event_stream,
@@ -37,7 +45,8 @@ def create_main_api(event_stream,
                     db_session,
                     models: Models,
                     schema: Schema,
-                    redis):
+                    redis,
+                    rc_service: RocketChatService):
 
     @app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -52,20 +61,6 @@ def create_main_api(event_stream,
         res = publish_message(command_str)
 
         return jsonify(res)
-
-
-
-    # def event_stream():
-    #     # todo: pull the next two lines back out to make this testable.
-    #     pubsub = redis.pubsub()
-    #     pubsub.subscribe('cie')
-    #     for message in pubsub.listen():
-    #         message_data = message['data']
-    #         if message_data is not None and type(message_data).__name__ == 'bytes':
-    #             message_data = message_data.decode('utf8')
-    #         event = Event("student-session-manager", message_data)
-    #         LOG.debug(f"Emitting event {str(event)}")
-    #         yield str(event)
 
     @app.route('/api/stream')
     def stream_sse():
@@ -102,6 +97,11 @@ def create_main_api(event_stream,
         _schema = clazz()
         loaded = _schema.load(data)
         return loaded.data
+
+    def make_response(payload_dict, status_code):
+        resp = jsonify(payload_dict)
+        resp.status_code = status_code
+        return resp
 
     @app.route('/api/modules', methods=['GET'])
     def get_cie_modules():
@@ -154,10 +154,118 @@ def create_main_api(event_stream,
             messages=["Deleted session"]
         )
 
+    @app.route("/api/module-sessions/<session_id>/active-sessions", methods=["POST"])
+    def activate_module_session(session_id):
+        # TODO: We need "add single user to existing active session"
+        """
+        Teacher or admin POSTs here to perform the following tasks:
+        1. assign teachers to a given session
+        2. assign students to a given session
+        3. provide a unique instance of a running module session
+        4. derive unique video and chat identifiers
+        5. Create the Rocketchat channel for the session. (will happen in subsequent call)
+        This sets up a classroom for students and teachers to come into.
+        """
+        data = {}
+        messages = []
+        req = request.get_json()
+        try:
+            teacher_ids, student_ids, prezzie_link = itemgetter("teachers", "students", "prezzie_link")(req)
+        except Exception as e:
+            LOG.exception(f"Missing parameter: {e}", exc_info=True)
+            messages.append("Missing or invalid parameter. Endpoint "
+                            "requires `teachers`, `students`, `prezzie_link`")
+            return make_response(dict(status="error", messages=messages), 500)
+        """
+        We want to be able to create multiple ActiveSessions
+        for a given ModuleSession...so that we can have identical
+        simultaneous active sessions.
+        The uniqueness is based on the *users*. We want to check for the uniqueness
+        of (module_session_id, user_id): if you add a user and his or her module_session
+        to another active_session or user_active_session, you'll be putting them into
+        two classes at the same time.
+        """
+        query = models.ActiveSession.query
+        max_query = query.with_entities(func.max(models.ActiveSession.id))
+        latest_pk = max_query.scalar()
+        first_active_session = latest_pk is None
+        if first_active_session:
+            latest_pk = 0
+        active_sesssion_slug = f"{session_id}-{int(latest_pk) + 1}"
+        chat_channel = f"cie-chat-{active_sesssion_slug}"
+        try:
+            _as = models.ActiveSession(
+                is_active=True,
+                module_session_id=session_id,
+                video_channel=f"codinginenglish-video-{active_sesssion_slug}",
+                prezzie_link=prezzie_link,
+                chat_channel=chat_channel
+            )
+            _as.add()
+            as_schema = schema.ActiveSessionSchema()
+            created_as = as_schema.dump(_as)
+            data["active_session"] = created_as
+            messages.append(f"Created ActiveSession with id {_as.id}")
+        except Exception:
+            LOG.error("Failed to create ActiveSession in database.", exc_info=True)
+            messages.append("An error occurred adding the ActiveSession: please check logs.")
+            make_response(dict(status="error", messages=messages))
+
+        created_uas = []
+        uas_schema = schema.UserActiveSessionSchema()
+        for user_id in teacher_ids + student_ids:
+            uas = models.UserActiveSession(
+                user_id=user_id,
+                active_session_id=_as.id,
+            )
+            uas.add()
+            created_uas.append(uas_schema.dump(uas))
+        data["user_active_sessions"] = created_uas
+        response = make_response(
+            dict(status="success", messages=messages, data=data), 200)
+        return response
+
+    @app.route("/api/users/<user_id>/active-sessions", methods=["GET"])
+    def get_active_session_by_user_id(user_id):
+        uas = (models.UserActiveSession.query
+               .join(models.ActiveSession, models.ActiveSession.is_active == True)
+               .filter(models.UserActiveSession.user_id == user_id)
+               .one())
+
+        _schema = schema.ActiveSessionSchema()
+        serialized = _schema.dump(uas.active_session)
+        LOG.debug(f"Returning active session: {serialized}")
+        return jsonify(
+            status="success",
+            data=serialized,
+            messages=["Retrieved active session."]
+        )
+
+    @app.route("/api/rocketchat/channel.create", methods=["POST"])
+    def create_rocketchat_channel():
+        messages = []
+        try:
+            channel_name = request.get_json().get("channelName")
+        except Exception as e:
+            messages.append(f"Endpoint expecting param `channelName`")
+            return make_response(dict(status="error", messages=messages), 500)
+        try:
+            channel_resp = rc_service.create_channel(channel_name)
+            messages.append(f"Successfully created Rocketchat channel {channel_name}")
+            LOG.debug(f"Created Rocketchat channel {channel_resp}")
+        except Exception:
+            messages.append(f"Failed to create Rocketchat channel {channel_name}")
+            LOG.error(f"Failed to create rocketchat channel {channel_name}", exc_info=True)
+            return make_response(dict(status="error", messages=messages), 500)
+        return make_response(dict(status="success", messages=messages), 200)
+
     @app.route('/api/module-sessions')
     def get_modules():
         res = models.ModuleSession.query.all()
         return serialize(res, schema.ModuleSessionSchema, many=True)
+
+    def make_rocketchat_username(firstname, lastname):
+        return firstname[0] + lastname
 
     @app.route('/api/users', methods=['POST'])
     def initialize_user():
@@ -193,7 +301,26 @@ def create_main_api(event_stream,
         given_name, family_name, email = itemgetter(
             "given_name", "family_name", "email"
         )(req['idTokenPayload'])
+        # change me if you need to try another token - idToken?
+        auth0_access_token = req["accessToken"]
         _user = user_service.create_user(email, first_name=given_name, last_name=family_name)
+
+        messages = []
+        try:
+            # rc_username = make_rocketchat_username(given_name, family_name)
+            # rc_name = f"{given_name}  {family_name}"
+            # rc_login_resp = rc_service.create_or_login_user(rc_username, rc_name, email)
+            # session["rocketchat_auth_token"] = rc_login_resp.get("authToken")
+            auth0_login_resp = rc_service.login_with_auth0(auth0_access_token, config.get("cie.auth0.secretkey"))
+            print(auth0_login_resp)
+            rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
+            messages.append("Retrieved RocketChat auth token.")
+        except Exception as e:
+            messages.append(f"Error creating or logging in user {email} to Rocketchat")
+            LOG.error(f"Error creating or logging in user {e}", exc_info=True)
+            return make_response(dict(messages=messages, status="error"), 500)
+
+        messages.append("Stored Rocketchat auth token in session successfully.")
 
         user_id = _user.id
         student_session_service.set_user_id(user_id)
@@ -211,11 +338,12 @@ def create_main_api(event_stream,
             student_session_service.add_on_session_start(publish_message)
             LOG.debug(f"Registering student_session_service for session_id {session_id}")
             student_session_service.notify_on_session_start(session_id, session_start_dt)
-
+        messages.append("Initialized user successfully.")
         user_schema = schema.UserSchema()
-        payload = dict(user=user_schema.dump(_user), has_session_in_progress=has_session_in_progress)
-        return jsonify(status="success", data=payload,
-                       messages=f"User initialized {user_id} successfully.")
+        payload = dict(user=user_schema.dump(_user), has_session_in_progress=has_session_in_progress,
+                       rocketchat_auth_token=rocketchat_auth_token)
+        resp = make_response(dict(status="success", data=payload, messages=messages), 200)
+        return resp
 
     @app.route('/api/threads', methods=['GET'])
     def get_threads():

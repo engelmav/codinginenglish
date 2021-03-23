@@ -1,8 +1,6 @@
 from services.rocketchat import RocketChatService
 from config import config
 
-import responses
-
 from operator import itemgetter
 from urllib.parse import urljoin
 import uuid
@@ -26,21 +24,17 @@ def rocketchat_service():
     r = RocketChatService(username, password, api_url)
     return r
 
-@responses.activate
 def test_auth_headers():
-    responses.add(
-        responses.POST,
-        urljoin(api_url, RocketChatService.LOGIN_URI),
-        json={
-            "status": "success",
-            "data": {
-                "userId": "romanosofia",
-                "authToken": "vienenpronto"
-            }
-        }
-    )
 
-    r = RocketChatService('user', 'pass', base_url)
+    _json = {
+        "status": "success",
+        "data": {
+            "userId": "romanosofia",
+            "authToken": "vienenpronto"
+        }
+    }
+
+    r = RocketChatService('user', 'pass', )
     assert r.session.headers['X-TokenAuth'] == "vienenpronto"
     assert r.session.headers['X-User-Id'] == "romanosofia"
 
@@ -69,3 +63,12 @@ def test_create_user(rocketchat_service):
     passwd = f'fakepassword{current_uuid}'
     res = rocketchat_service.create_user(username, name, email, passwd)
 
+
+def test_create_channel(rocketchat_service):
+    test_channel_name = "testchannel"
+    resp_create = rocketchat_service.create_channel(test_channel_name)
+    # assert resp
+    assert resp_create["channel"]["name"] == test_channel_name
+    resp_delete = rocketchat_service.delete_channel(test_channel_name)
+    assert resp_delete["success"] is True
+    print(resp_create, resp_delete)

@@ -1,5 +1,6 @@
 import pytz
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 
@@ -8,11 +9,15 @@ class Models:
                  _CieModule,
                  _ModuleSession,
                  _UserModuleRegistration,
-                 _User):
+                 _User,
+                 _ActiveSession,
+                 _UserActiveSession):
         self.CieModule = _CieModule
         self.ModuleSession = _ModuleSession
         self.UserModuleRegistration = _UserModuleRegistration
         self.User = _User
+        self.ActiveSession = _ActiveSession
+        self.UserActiveSession = _UserActiveSession
 
 
 def model_factory(Base):
@@ -38,9 +43,13 @@ def model_factory(Base):
         )
         _session_datetime = Column("session_datetime", DateTime)
 
-        @property
+        @hybrid_property
         def session_datetime(self):
             return pytz.utc.localize(self._session_datetime)
+        
+        @session_datetime.expression
+        def session_datetime(cls):
+            return cls._session_datetime
 
         @session_datetime.setter
         def session_datetime(self, session_dt):
@@ -71,11 +80,29 @@ def model_factory(Base):
             user_mod_reg.add()
             return user_mod_reg
 
+    class ActiveSession(Base):
+        __tablename__ = 'active_sessions'
+        id = Column(Integer, primary_key=True)
+        module_session_id = Column(Integer, ForeignKey('module_sessions.id'))
+        chat_channel = Column(Text)
+        prezzie_link = Column(Text)
+        video_channel = Column(Text)
+        is_active = Column(Boolean)
+
+    class UserActiveSession(Base):
+        __tablename__ = 'user_active_sessions'
+        id = Column(Integer, primary_key=True)
+        user_id = Column(Integer, ForeignKey('users.id'))
+        active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
+        active_session = relationship('ActiveSession')
+
     models = Models(
         CieModule,
         ModuleSession,
         UserModuleRegistration,
-        User)
+        User,
+        ActiveSession,
+        UserActiveSession)
     return models
 
 

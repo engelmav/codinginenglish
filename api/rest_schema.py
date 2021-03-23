@@ -8,11 +8,15 @@ class Schema:
                  _UserSchema,
                  _CieModuleSchema,
                  _ModuleSessionSchema,
-                 _UserModuleRegistrationSchema):
+                 _UserModuleRegistrationSchema,
+                 _ActiveSessionSchema,
+                 _UserActiveSessionSchema):
         self.UserSchema = _UserSchema
         self.CieModuleSchema = _CieModuleSchema
         self.ModuleSessionSchema = _ModuleSessionSchema
         self.UserModuleRegistrationSchema = _UserModuleRegistrationSchema
+        self.ActiveSessionSchema = _ActiveSessionSchema
+        self.UserActiveSessionSchema = _UserActiveSessionSchema
 
 
 def schema_factory(db_session, models):
@@ -57,11 +61,24 @@ def schema_factory(db_session, models):
             model = models.User
             sqla_session = db_session
 
+    class ActiveSessionSchema(ModelSchema):
+        class Meta:
+            model = models.ActiveSession
+            sqla_session = db_session
+
+    class UserActiveSessionSchema(ModelSchema):
+        class Meta:
+            include_fk = True
+            model = models.UserActiveSession
+            sqla_session = db_session
+
     schema = Schema(
         UserSchema,
         CieModuleSchema,
         ModuleSessionSchema,
-        UserModuleRegistrationSchema
+        UserModuleRegistrationSchema,
+        ActiveSessionSchema,
+        UserActiveSessionSchema
     )
     return schema
 
