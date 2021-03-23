@@ -241,39 +241,6 @@ def create_main_api(event_stream,
             messages=["Retrieved active session."]
         )
 
-    # @app.route("/api/rocketchat_iframe", methods=["GET"])
-    # def get_rocketchat_iframe():
-    #     """
-    #     `<script>
-    #     window.parent.postMessage({
-    #     event: 'login-with-token',
-    #     loginToken: '${ req.session.user.rocketchatAuthToken }'
-    #     }, '${ rocketChatServer }');
-    #     </script>
-    #     `)
-    #
-    #     :return:
-    #     """
-    #     return jsonify()
-    #     pass
-
-    @app.route("/api/rocketchat/token", methods=["GET"])
-    @cross_origin(supports_credentials=True, origins="https://chat.codinginenglish.com")
-    def get_rocketchat_session():
-        _session = session
-        print(_session)
-
-        requested = request
-        token = {"loginToken": session["rocketchat_auth_token"]
-
-                 }
-        resp = jsonify(token)
-        # resp.headers.add("Access-Control-Allow-Origin", "https://chat.codinginenglish.com")
-        resp.headers.add("Access-Control-Allow-Credentials", "true")
-        resp.headers.add('Access-Control-Allow-Headers', "*")
-        resp.headers.add('Access-Control-Allow-Methods', "*")
-        return resp
-
     @app.route("/api/rocketchat/channel.create", methods=["POST"])
     def create_rocketchat_channel():
         messages = []
@@ -290,47 +257,6 @@ def create_main_api(event_stream,
             messages.append(f"Failed to create Rocketchat channel {channel_name}")
             LOG.error(f"Failed to create rocketchat channel {channel_name}", exc_info=True)
             return make_response(dict(status="error", messages=messages), 500)
-        return make_response(dict(status="success", messages=messages), 200)
-
-    @app.route("/api/rocketchat/user.configure", methods=["POST"])
-    def configure_user_for_rocketchat():
-        """
-        We want to check if a user already has a Rocketchat
-        login. For this, we'll need to get the user's
-        username from Auth0 and check Rocketchat.
-        If the username is present, just add the user
-        to the ActiveSession's chat channel, and just let the
-        SSO process take place with the Rocketchat iframe. If
-        it isn't present, create it, and only after it's created,
-        join the user to the chat channel and let the SSO take place.
-        """
-        username = request.get("userName")
-        channel_id = request.get("channelId")
-        messages = []
-        try:
-            user_create_resp = rc_service.create_user(username)
-            messages.append(f"Successfully created Rocketchat user")
-            LOG.debug(f"Created Rocketchat user {user_create_resp}")
-        except Exception:
-            """
-            Be careful, this could fail because of a duplicate. If it's a duplicate,
-            we don't want to exit the function, we want to proceed to adding the user
-            to the channel_id provided.
-            """
-            messages.append(f"Failed to create Rocketchat user {username}")
-            LOG.error(f"Failed to create Rocketchat username: {username}", exc_info=True)
-            return make_response(dict(status="error", messages=messages), 500)
-
-        try:
-            user_add_resp = rc_service.add_user_to_channel(username, channel_id)
-            messages.append(f"Successfully added user {username} to channel"
-                            f"{channel_id}")
-            LOG.debug(f"User added to Rocketchat channel: {user_add_resp}")
-        except Exception:
-            LOG.error("Failed to add user to Rocketchat channel.", exc_info=True)
-            messages.append("Failed to add user to Rocketchat channel. See log for details.")
-            return make_response(dict(status="error", messages=messages), 500)
-
         return make_response(dict(status="success", messages=messages), 200)
 
     @app.route('/api/module-sessions')

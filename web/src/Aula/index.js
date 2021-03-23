@@ -17,22 +17,18 @@ const ChatSignIn = (props) => {
   const divRef = useRef(null);
   const authenticateChat = () => {
     const chatIframe = divRef.current.firstElementChild;
-    chatIframe.addEventListener("load", function() {
-     this.contentWindow.postMessage(
-        {
-          externalCommand: "login-with-token",
-          token: props.appStore.rocketchatAuthToken,
-        },
-        "*"
-      );
+    chatIframe.addEventListener("load", function () {
+      setTimeout(() =>{
+        console.log("posting message with", props.appStore.rocketchatAuthToken)
+        this.contentWindow.postMessage(
+          {
+            externalCommand: "login-with-token",
+            token: props.appStore.rocketchatAuthToken,
+          },
+          "*"
+        );
+      }, 5000);
     });
-    // divRef.current.firstElementChild.contentWindow.postMessage(
-    //   {
-    //     externalCommand: "login-with-token",
-    //     token: props.appStore.rocketchatAuthToken,
-    //   },
-    //   "*"
-    // );
   };
   useEffect(() => authenticateChat(), []);
   return <div ref={divRef}>{props.children}</div>;
@@ -80,18 +76,6 @@ class Aula extends Component {
   }
 
   async configureActiveSession() {
-    /**
-     * We want to check if a user already has a Rocketchat
-     * login. For this, we'll need to get the user's
-     * username from Auth0 and check Rocketchat.
-     * --> do this on student  login, because we won't know
-     * their login name ahead of time necessarily. the common key
-     * is the user_id in the CIE database. If the username is present, just add the user
-     * to the ActiveSession's chat channel, and just let the
-     * SSO process take place with the Rocketchat iframe. If
-     * it isn't present, create it, and only after it's created,
-     * join the user to the chat channel and let the SSO take place.
-     */
     const { appStore, cieApi } = this.props;
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
@@ -110,16 +94,6 @@ class Aula extends Component {
     );
 
     // channel was already created by admin app
-    // const resp = await cieApi.configureRocketchat();
-    /**
-     * We need to go create the channel in the util.py code.
-     * util.py acts like the admin console. When that's created,
-     * we only need to ADD the user to the chat channel.
-     * When we;re done changing util.py, come back here and
-     * add the call to addUserToChannel(). I think that, because
-     * addUserToChannel requires a roomId, we should save it in
-     * the database so we can use it here.
-     */
 
     this.setState(
       {
