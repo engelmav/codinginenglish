@@ -97,11 +97,6 @@ class RocketChatService:
         return self.login_user(email, password)
 
     def login_with_auth0(self, auth0_access_token, auth0_secret):
-        """
-        '{ "serviceName": "facebook", "accessToken": "hash",
-      "secret": "hash", "expiresIn": 200 }'
-        :return:
-        """
         resp = self._post('/api/v1/login',
                           {"serviceName": "auth0", "accessToken": auth0_access_token,
                            "secret": "hash", "expiresIn": 200})

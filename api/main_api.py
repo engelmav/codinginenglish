@@ -18,21 +18,12 @@ import logging
 
 from rest_schema import Schema
 from services.rocketchat import RocketChatService
-from flask_session import Session
-from flask_cors import CORS, cross_origin
 
 LOG = logging.getLogger(__name__)
 app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
-
-SECRET_KEY = config.get("cie.api.session_secret_key")
-SESSION_TYPE = 'filesystem'
-app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=False)
-app.config.from_object(__name__)
-Session(app)
-CORS(app, supports_credentials=True, origins=["https://chat.codinginenglish.com"])
 
 app.register_blueprint(stripe_bp)
 
