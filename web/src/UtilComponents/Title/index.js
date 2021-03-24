@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { typography, space } from 'styled-system';
-import {  fontColor } from '../sharedStyles';
+import { fontColor } from '../sharedStyles';
 
 
 const Title = styled.h1`

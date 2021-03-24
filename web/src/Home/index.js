@@ -1,12 +1,36 @@
 import React from "react";
 import { Main, Title, ContentSection } from "../UtilComponents";
-import { lightGray, orangeBgColor } from "../UtilComponents/sharedStyles";
-import styled from "styled-components";
+import { lightGray, orangeBgColor, darkGray, debugBorder } from "../UtilComponents/sharedStyles";
+import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 
+
 const MainLanding = styled(Main)`
-  width: 40%;
-  padding-bottom: 60px;
+  width: min(90%, 700px);
+  & h1 {
+    // font-size: 3vw;              // ok on desktop, too small on mobile
+    // font-size: 2.5rem;           // too big on mobile.
+    // font-size: min(2.5rem, 3vw); // ok on desktop, too small on mobile
+    // font-size: max(2.5rem, 3vw); // ok on desktop, too big on mobile
+    // font-size: 1.75rem; // ok on mobile, too small on desktop
+    font-size: max(1.75rem, min(2.5rem, 3vw));
+    font-family: sans-serif;
+    text-align: center;
+    color: ${darkGray}
+    ${debugBorder}
+  }
+  & .cie-title {
+    font-family: monospace;
+    font-size: max(1rem, min(2.5rem, 3vw));
+    padding: 0;
+    margin: 0;
+  }
+  display: flex;
+  flex-direction: column;
+  ${debugBorder}
+  & .section {
+    flex-basis: 100%;
+  }
 `;
 
 const ContentSectionLanding = styled(ContentSection)`
@@ -25,6 +49,7 @@ const BlockQuote = styled.blockquote`
     margin: 1.5em 10px;
     padding: 0.5em 10px;
     margin-bottom: 0;
+    font-size: clamp(1rem, 1.25vw, 1.25rem);
   }
 
   p:before {
@@ -55,6 +80,7 @@ const I = styled.p`
 const ImgContainer = styled.div`
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
   margin-bottom: 30px;
 `;
 
@@ -80,14 +106,8 @@ const RegisterButton = () => (
 const Home = (props) => {
   return (
     <MainLanding>
-      <Title
-        fontFamily="Courier, Monaco, monospace"
-        textAlign="center"
-        fontSize="4em"
-      >
-        coding_in_english
-      </Title>
-      <ContentSection>
+      {/* <h1 className="cie-title">coding_in_english</h1> */}
+      <ContentSection className="section">
         <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
           <p>
             "As a foreign student, learning any subject ... was extremely tough.
@@ -109,7 +129,6 @@ const Home = (props) => {
           code.
         </Title>
         <RegisterButton />
-        <hr style={{ marginTop: "50px", marginBottom: "50px", width: "50%" }} />
       </ContentSection>
       <Title textAlign="center">
         Build Technical and Conversational Fluency

@@ -570,6 +570,7 @@ module.exports = function (webpackEnv) {
     // our own hints via the FileSizeReporter
     performance: false,
     devServer: {
+      host: '0.0.0.0',
       proxy: {
         '**': {
           target: 'http://localhost:5000',
