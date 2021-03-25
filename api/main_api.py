@@ -9,7 +9,6 @@ from sqlalchemy import func
 
 from database.models import Models
 from events import StudentSessionService
-from payment.payment_api import stripe_bp
 from config import config
 import services.cie as cie
 
@@ -25,8 +24,6 @@ app = Flask(__name__,
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
 
-app.register_blueprint(stripe_bp)
-
 
 def create_main_api(event_stream,
                     publish_message,
@@ -37,8 +34,10 @@ def create_main_api(event_stream,
                     models: Models,
                     schema: Schema,
                     redis,
-                    rc_service: RocketChatService):
+                    rc_service: RocketChatService,
+                    payment_api):
 
+    app.register_blueprint(payment_api)
     @app.teardown_appcontext
     def shutdown_session(exception=None):
         db_session.remove()
@@ -292,7 +291,6 @@ def create_main_api(event_stream,
         given_name, family_name, email = itemgetter(
             "given_name", "family_name", "email"
         )(req['idTokenPayload'])
-        # change me if you need to try another token - idToken?
         auth0_access_token = req["accessToken"]
         _user = user_service.create_user(email, first_name=given_name, last_name=family_name)
 
