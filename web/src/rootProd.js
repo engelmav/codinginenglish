@@ -59,7 +59,7 @@ const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi, set
 const Classroom = withAuth(_ClassroomInjected);
 const CallbackWithRouter = withRouter(Callback);
 const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
-const Home = compose(_Home, { auth, cieApi });
+const Home = compose(_Home, { auth, cieApi, settings });
 const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
 const routesProps = {
   appStore,

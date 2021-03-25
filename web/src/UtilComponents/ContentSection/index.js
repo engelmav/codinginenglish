@@ -4,7 +4,7 @@ import { font } from '../sharedStyles';
 
 const ContentSection = styled.section`
   ${font}
-`
+`;
 
 
 export { ContentSection };

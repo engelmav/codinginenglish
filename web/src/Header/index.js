@@ -1,51 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Login from '../Login';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
+import { darkGray, debugBorder } from "../UtilComponents/sharedStyles";
 
 import { observer } from 'mobx-react';
 
 
-const HeaderElem = styled.header`
-  margin-top: 40px;
-  padding: 15px;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-  position: relative;
-  z-index: 1;
+const Header = styled.header`
+  ${debugBorder}
+  margin-bottom: 2rem;
   max-width:100%; 
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  background-color: ${darkGray};
 `;
 
 const Img = styled.img`
-  border: 1px black solid;
-  top: -30px;
-  left: 75px;
-  float: left;
-  position: absolute;
-  z-index: 2;
   background-color: white;
 `;
 
 
 const RoutesUL = styled.ul`
-  float: right;
-  color: #3d3636;
+  ${debugBorder}
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
   font-weight: 900;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   font-family: 'Roboto Mono', monospace;
-
+  font-size: clamp(1rem, 1.25vw, 1.25rem);
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin: 10px;
   align-self: center;
   li {
     display: inline-block;
     padding-right: 10px;
   }
   li a {
-    color: #3d3636;
+    color: white;
     font-weight: 900;
     text-align: center;
     text-decoration: none;
@@ -61,7 +59,8 @@ const RoutesUL = styled.ul`
 `;
 
 
-const Header = observer((props) => {
+
+const HeaderContainer = observer((props) => {
   const {
     auth,
     appStore,
@@ -71,10 +70,11 @@ const Header = observer((props) => {
     <Switch>
       <Route path="/class"><div></div></Route>
       <Route path="*">
-        <HeaderElem>
+        <Header>
           <Img alt="cie logo" src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></Img>
           <RoutesUL>
             <li><Link to="/">home</Link></li>
+            <li><Link to="/about">about_us</Link></li>
             <li><Link to="/upcoming-sessions">upcoming_classes</Link></li>
             {appStore.authData &&
               <>
@@ -84,10 +84,10 @@ const Header = observer((props) => {
             }
             <li><Login auth={auth} appStore={appStore} /></li>
           </RoutesUL>
-        </HeaderElem>
+        </Header>
       </Route>
     </Switch>
   );
 });
 
-export { Header }; 
+export { HeaderContainer as Header }; 
