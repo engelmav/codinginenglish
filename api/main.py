@@ -7,6 +7,7 @@ import redis
 from simplekv.memory.redisstore import RedisStore
 
 from config import config
+from payment.payment_api import create_payment_api
 from rest_schema import schema_factory
 from services.cie import UserService, ModuleService
 from services.rocketchat import RocketChatService
@@ -36,6 +37,8 @@ event_stream = create_event_stream(red)
 publish_message = create_publish_message(red)
 rc_service = RocketChatService()
 
+payment_api = create_payment_api(module_service)
+
 app = create_main_api(
     event_stream,
     publish_message,
@@ -46,6 +49,7 @@ app = create_main_api(
     models,
     schema,
     red,
-    rc_service
+    rc_service,
+    payment_api
 )
 

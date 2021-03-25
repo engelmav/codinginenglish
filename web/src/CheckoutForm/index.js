@@ -27,8 +27,6 @@ const CurrencyMenu = () => {
   )
 };
 
-
-
 function CheckoutFormConsumer(props) {
   const { appStore, onCloseClick, sessionData } = props;
   const stripe = useStripe();
