@@ -69,44 +69,6 @@ class ModuleCard extends Component {
     );
     const { modalIsOpen } = this.state;
     const { afterOpenModal, closeModal } = this;
-
-    // <div className="title-desc">
-    //   <Title p={0}>{cie_module.name}</Title>
-    //   <p className="datetime">Course begins {localSessionDateTime}</p>
-    //   <p>{cie_module.description}</p>
-    //   <Button
-    //     onClick={this.handleSignupClick}
-    //     m={2}>
-    //     REGISTER
-    // </Button>
-    // </div>
-    // <Modal
-    //   style={{
-    //     content: { top: '45%', left: '50%', transform: 'translate(-50%,-50%)', width: '45%' }
-    //   }}
-    //   ariaHideApp={false}
-    //   isOpen={modalIsOpen}
-    //   onAfterOpen={afterOpenModal}
-    //   onRequestClose={closeModal}
-    //   shouldCloseOnOverlayClick={false}
-    // >
-    //   <FaRegWindowClose size="20" style={{ cursor: "pointer", float: 'right' }}
-    //     onClick={closeModal}
-    //   />
-    //   <ModalContent>
-    //     <Title>{cie_module.name}</Title>
-    //     <ContentSection>
-    //       <p>Starts {localSessionDateTime}</p>
-    //       {appStore.authData == null &&
-    //         <>
-    //           <p>Already registered as a student? Sign in!</p>
-    //           <p>Otherwise, register for this class as a guest. You can create a student profile later.</p>
-    //         </>
-    //       }
-    //     </ContentSection>
-    //     <CheckoutForm sessionData={sessionData} onCloseClick={closeModal} appStore={appStore} />
-    //   </ModalContent>
-    // </Modal>
     return (
       <ModuleCardContainer>
         <img

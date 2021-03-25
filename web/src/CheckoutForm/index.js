@@ -51,11 +51,9 @@ function CheckoutFormConsumer(props) {
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isInvalidEmail, setIsInvalidEmail] = useState("");
-  console.log("Email in appStore:", appStore.email);
   const computedEmail = email || appStore.email; // prioritize a manually entered email over the email we find in the auth user object.
 
   const handlePurchaseProcess = async (computedEmail) => {
-    console.log("handlePurchaseProcess() computedEmail:", computedEmail);
     // disable default form submission
     // event.preventDefault();
 
