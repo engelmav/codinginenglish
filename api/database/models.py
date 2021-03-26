@@ -28,6 +28,7 @@ def model_factory(Base):
         name = Column(String(50))
         description = Column(String(255))
         image_path = Column(String(255))
+        module_sessions = relationship("ModuleSession", back_populates="cie_module")
 
         def add_user(self, user: 'User', session: 'ModuleSession'):
             reg = UserModuleRegistration(user_id=user.id, module_session_id=session.id)
@@ -37,9 +38,10 @@ def model_factory(Base):
         __tablename__ = 'module_sessions'
         id = Column(Integer, primary_key=True)
         cie_module_id = Column(Integer, ForeignKey('cie_modules.id'))
+        # https://stackoverflow.com/a/55570422/1258020
         cie_module = relationship(
             'CieModule',
-            backref='ModuleSession'
+            back_populates='module_sessions'
         )
         _session_datetime = Column("session_datetime", DateTime)
 
