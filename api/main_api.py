@@ -252,7 +252,11 @@ def create_main_api(event_stream,
     @app.route('/api/module-sessions')
     def get_modules():
         res = models.ModuleSession.query.all()
-        return serialize(res, schema.ModuleSessionSchema, many=True)
+        _schema = schema.ModuleSessionSchema()
+        serialized = _schema.dump(res, many=True)
+        return make_response(
+            dict(messages=["Successfully retried module sessions."],
+                 data=serialized), 200)
 
     def make_rocketchat_username(firstname, lastname):
         return firstname[0] + lastname

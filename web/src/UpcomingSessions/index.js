@@ -1,14 +1,14 @@
-import React, { Component } from 'react'
-import { Main, Title } from '../UtilComponents';
-import { observer } from 'mobx-react';
-import './styles.css';
+import React, { Component } from "react";
+import { Main, Title } from "../UtilComponents";
+import { observer } from "mobx-react";
+import "./styles.css";
 
 @observer
 class UpcomingSessions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scheduledSessions: []
+      scheduledSessions: [],
     };
   }
 
@@ -17,8 +17,9 @@ class UpcomingSessions extends Component {
     try {
       // TODO: lift into composite root.
       const result = await this.props.cieApi.getUpcomingSessions();
+      console.log("getUpcomingSessions result:", result);
       scheduledSessions = result.data;
-      if (scheduledSessions === null | scheduledSessions === undefined) {
+      if (scheduledSessions === null || scheduledSessions === undefined) {
         scheduledSessions = [];
       }
     } catch (ex) {
@@ -35,19 +36,14 @@ class UpcomingSessions extends Component {
     return (
       <Main>
         <Title textAlign="center">upcoming classes</Title>
-        {
-
-        }
         <div>
-          {
-            scheduledSessions.map((sessionData, i) =>
-              <ModuleCard key={i} sessionData={sessionData} />)
-          }
+          {scheduledSessions.map((sessionData, i) => (
+            <ModuleCard key={i} sessionData={sessionData} />
+          ))}
         </div>
       </Main>
     );
   }
 }
-
 
 export { UpcomingSessions };
