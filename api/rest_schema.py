@@ -37,14 +37,13 @@ def schema_factory(db_session, models):
             return models.CieModule(**data)
 
     class ModuleSessionSchema(ModelSchema):
-        # cie_module = SmartNested(CieModuleSchema)
+        cie_module = Nested(CieModuleSchema)
+        # I don't remember why "registered_modules" is here but it doesn't look right.
         registered_modules = Nested(CieModuleSchema())
 
         class Meta:
             model = models.ModuleSession
             sqla_session = db_session
-
-        # session_datetime = auto_field("_session_datetime")
 
     class UserModuleRegistrationSchema(ModelSchema):
 
