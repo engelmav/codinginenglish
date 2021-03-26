@@ -62,8 +62,10 @@ class ModuleCard extends Component {
 
   render() {
     const { appStore, sessionData, settings, CheckoutForm } = this.props;
-    let { cie_module, session_datetime } = sessionData;
-    var sessionDateTime = DateTime.fromISO(session_datetime);
+    let { cie_module, _session_datetime } = sessionData;
+
+    var sessionDateTime = DateTime.fromISO(_session_datetime);
+
     const localSessionDateTime = sessionDateTime.toLocaleString(
       DateTime.DATETIME_FULL
     );
