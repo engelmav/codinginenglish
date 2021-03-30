@@ -37,7 +37,7 @@ event_stream = create_event_stream(red)
 publish_message = create_publish_message(red)
 rc_service = RocketChatService()
 
-payment_api = create_payment_api(module_service)
+payment_api = create_payment_api(module_service, user_service)
 
 app = create_main_api(
     event_stream,
