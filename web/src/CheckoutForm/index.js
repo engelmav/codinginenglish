@@ -1,7 +1,7 @@
 import axios from "axios";
 import { computed, observable } from "mobx";
 import { observer } from "mobx-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Elements,
@@ -51,18 +51,24 @@ function CheckoutFormConsumer(props) {
   const [isComplete, setComplete] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isInvalidEmail, setIsInvalidEmail] = useState("");
-  const computedEmail = email || appStore.email; // prioritize a manually entered email over the email we find in the auth user object.
+  const [computedEmail, setComputedEmail] = useState(null);
+  
+  useEffect(() => {
+    const _computedEmail = email || appStore.email;
+    setComputedEmail(_computedEmail);
+  }, [email]);
 
-  const handlePurchaseProcess = async (computedEmail) => {
+  async function handlePurchaseProcess(event) {
+    // prioritize a manually entered email over the email we find in the auth user object.
+    
     // disable default form submission
-    // event.preventDefault();
+    event.preventDefault();
 
     /**
      * Calls API backend to validate email. If email is invalid, returns true.
      * @param {string} email
      */
     async function emailValidationFailure(email) {
-      console.log("Validating email", email);
       try {
         const res = await axios.put("/api/payment/validate-email", { email });
         const { errors } = res.data;
@@ -121,15 +127,16 @@ function CheckoutFormConsumer(props) {
       setComplete(true);
     }
 
-    const noEmail = email === null || email === "";
+    
+    const noEmail = computedEmail === null || computedEmail === "";
     if (noEmail) {
       setIsInvalidEmail(
         "Hey! We need your email address to send you a receipt and class information. Please enter one. :)"
       );
     }
-
     const stripeNotLoaded = !stripe || !elements;
     if (stripeNotLoaded) {
+      setLoading(false);
       return;
     }
 
@@ -170,7 +177,6 @@ function CheckoutFormConsumer(props) {
       setLoading(false);
     } else {
       // The payment was processed.
-      console.log(result);
       if (result.paymentIntent.status === "succeeded") {
         setComplete(true);
         setLoading(false);
@@ -180,7 +186,7 @@ function CheckoutFormConsumer(props) {
             /**
              * intentionally stick with login user's name if different from card name (don't use a computedName),
              * this is in case the user uses a card that isn't their own.
-             *  */
+             **/
             name: name,
             moduleSessionId: sessionData.id,
             isAuthenticated: appStore.authData !== null,
@@ -198,7 +204,7 @@ function CheckoutFormConsumer(props) {
     ) {
       errorAndSetComplete(confirmationFailure);
     }
-  };
+  }
 
   return (
     <>
@@ -215,7 +221,7 @@ function CheckoutFormConsumer(props) {
           <Button onClick={onCloseClick}>CLOSE</Button>
         </>
       ) : (
-        <Form onSubmit={() => handlePurchaseProcess(computedEmail)}>
+        <Form onSubmit={handlePurchaseProcess}>
           <PaymentInfo className="FormGroup">
             <PmtFormLabel>Name</PmtFormLabel>
             <NameField
@@ -243,7 +249,8 @@ function CheckoutFormConsumer(props) {
             </div>
 
             <BuyButton
-              onClick={() => handlePurchaseProcess(computedEmail)}
+              type="simpleQuery"
+              onClick={e => handlePurchaseProcess(e)}
               disabled={!stripe || isLoading}
             >
               PURCHASE
