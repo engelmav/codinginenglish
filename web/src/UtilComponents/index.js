@@ -1,5 +1,5 @@
 import { Button } from './Button';
-import { Title } from './Title';
+import { Title } from './Typography/Typography';
 import { Window } from './Window';
 import { Spinner } from './Spinner';
 import { TextInput } from './TextInput';

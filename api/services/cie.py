@@ -10,7 +10,7 @@ class UserService:
     def __init__(self, models):
         self.models = models
 
-    def create_user(self, email, full_name=None, first_name=None, last_name=None):
+    def create_user(self, email, first_name=None, last_name=None):
         m = self.models
         existing_user = m.User.query.filter(
             or_(
@@ -20,8 +20,9 @@ class UserService:
                     m.User.email == email),
 
                 and_(
-                    m.User.fullname == full_name,
-                    m.User.email == email)
+                    # m.User.fullname == full_name,
+                    m.User.email == email
+                )
             )
         ).one_or_none()
 
@@ -94,6 +95,10 @@ class UserService:
             ))
 
         return modules
+
+    def get_user_by_email(self, email):
+        user = self.models.User.query.filter_by(email=email).one_or_none()
+        return user
 
 
 class ModuleService:

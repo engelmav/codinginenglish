@@ -292,9 +292,11 @@ def create_main_api(event_stream,
         :return:
         """
         req = request.get_json()
-        given_name, family_name, email = itemgetter(
-            "given_name", "family_name", "email"
-        )(req['idTokenPayload'])
+        id_token_payload = req['idTokenPayload']
+        given_name = id_token_payload.get("given_name")
+        family_name = id_token_payload.get("family_name")
+        email = id_token_payload.get("email")
+
         auth0_access_token = req["accessToken"]
         _user = user_service.create_user(email, first_name=given_name, last_name=family_name)
 

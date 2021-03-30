@@ -1,13 +1,14 @@
 import React from "react";
-import { Main, Title, ContentSection } from "../UtilComponents";
+import { Main, ContentSection } from "../UtilComponents";
+import { Title } from "../UtilComponents/Typography/Typography";
+import BlockQuote from "../UtilComponents/BlockQuote";
 import {
-  lightGray,
   orangeBgColor,
   darkGray,
   debugBorder,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { space, color, layout } from "styled-system";
 
@@ -31,40 +32,6 @@ const ContentSectionLanding = styled(ContentSection)`
   margin-bottom: 1.5rem;
 `;
 
-const BlockQuote = styled.blockquote`
-  ${lightGray}
-  font-family: serif;
-  font-size: 1.5rem;
-
-  p {
-    background: #f9f9f9;
-    border-left: 10px solid #ccc;
-    margin: 1.5em 10px;
-    padding: 0.5em 10px;
-    margin-bottom: 0;
-    font-size: clamp(1rem, 1.25vw, 1.25rem);
-  }
-
-  p:before {
-    color: #ccc;
-    content: open-quote;
-    font-size: 2em;
-    line-height: 0.1em;
-    margin-right: 0.25em;
-    vertical-align: -0.4em;
-  }
-
-  footer {
-    font-size: 0.7em;
-    margin: 1.5em 10px;
-    padding: 0.5em 10px;
-    margin-top: 0;
-  }
-
-  a {
-    text-decoration: none;
-  }
-`;
 
 const I = styled.p`
   font-style: italic;
@@ -84,7 +51,7 @@ const RegisterLink = styled(Link)`
   padding: 10px;
   color: white;
   a {
-    color: #3d3636;
+    color: ${cieOrange};
   }
 `;
 
@@ -117,13 +84,6 @@ const TaglineSubtitle = styled.h2`
 `;
 
 const SectionTitle = styled(Title)`
-  // font-size: 3vw;              // ok on desktop, too small on mobile
-  // font-size: 2.5rem;           // too big on mobile.
-  // font-size: min(2.5rem, 3vw); // ok on desktop, too small on mobile
-  // font-size: max(2.5rem, 3vw); // ok on desktop, too big on mobile
-  // font-size: 1.75rem; // ok on mobile, too small on desktop
-  font-size: max(1.75rem, min(2.5rem, 3vw));
-  font-family: sans-serif;
   text-align: center;
   color: ${darkGray};
   ${debugBorder}

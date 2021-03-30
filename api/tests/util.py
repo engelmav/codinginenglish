@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import pprint
 
 import requests
@@ -28,7 +28,7 @@ config = Config()
 test_data = TestData()
 
 config.current_url = None
-test_user_id = 17
+test_user_id = 10  #17
 
 
 def site_map():
@@ -66,21 +66,29 @@ def modules():
     return resp
 
 
-def session_start_date(start_date=None):
-    if start_date is None:
-        start_date = datetime.now(timezone.utc)
-        start_date_utc = start_date.astimezone(timezone.utc)
-        start_date_str = start_date_utc.strftime("%Y-%m-%d %H:%M:%S")
+def session_start_date_now():
+    start_date = datetime.now(timezone.utc)
+    start_date_utc = start_date.astimezone(timezone.utc)
+    start_date_str = start_date_utc.strftime("%Y-%m-%d %H:%M:%S")
     return {"session_datetime": start_date_str}
 
 
-def create_2_hour_session(module_id):
-    _url = f"{config.current_url}/cie-modules/19/sessions"
-    resp = requests.post(_url, params={"cie_module_id": module_id}, json=session_start_date())
+def session_start_date_now():
+    start_date = datetime.now(timezone.utc)
+
+    start_date_utc = start_date.astimezone(timezone.utc)
+    start_date_str = start_date_utc.strftime("%Y-%m-%d %H:%M:%S")
+    return {"session_datetime": start_date_str}
+
+
+def create_2_hour_session(module_id, session_start_dt):
+    session_start_dt_str = session_start_dt.strftime("%Y-%m-%d %H:%M:%S")
+    _url = f"{config.current_url}/cie-modules/{module_id}/sessions"
+    resp = requests.post(_url, params={"cie_module_id": module_id}, json={"session_datetime": session_start_dt_str})
     session_id = resp.json().get('data').get('id')
     print(f">>>> created_2_hour_session(): session_id {session_id}")
     pp.pprint(resp.json())
-    return session_id
+    return resp.json()
 
 
 def register_user_to_session(user_id, session_id):
@@ -115,14 +123,6 @@ def create_beginners_module():
     return module_data
 
 
-def create_2_hour_session(module_id):
-    _url = f"{config.current_url}/cie-modules/{module_id}/sessions"
-    resp = requests.post(_url, json=session_start_date())
-    print(f" **** Created 2 hour session")
-    pp.pprint(resp.json())
-    return resp.json()
-
-
 def users():
     # TODO: make users GET endpoint
     _url = f"{config.current_url}/users"
@@ -153,20 +153,6 @@ def create_chat_channel(channel_name):
     return resp.json()
 
 
-def create_test_data():
-    module_data = create_beginners_module()
-    test_data.module_id = module_data.get('data').get('id')
-
-    session_data = create_2_hour_session(test_data.module_id)
-    test_data.session_id = session_data.get('data').get('id')
-    register_user_to_session(test_user_id, test_data.session_id)
-    test_data.active_session = create_user_active_session(
-        test_user_id, test_data.session_id)
-    test_data.chat_channel_name = test_data.active_session["data"]["active_session"]["chat_channel"]
-    channel_json = create_chat_channel(test_data.chat_channel_name)
-    print(channel_json)
-
-
 def delete_test_data():
     # TODO: create delete methods
     pass
@@ -178,5 +164,46 @@ def user_sessions(user_id):
     print(f" **** User sessions for user_id {user_id}")
     pp.pprint(resp.json())
     return resp.json()
+
+
+def create_test_data(test_data_spec, add_user_to_session=True, activate_session=True):
+    session_start_date = test_data_spec.get("session_start_date")
+    module_data = create_beginners_module()
+    test_data.module_id = module_data.get('data').get('id')
+
+    session_data = create_2_hour_session(test_data.module_id, session_start_date)
+    if add_user_to_session:
+        test_data.session_id = session_data.get('data').get('id')
+        register_user_to_session(test_user_id, test_data.session_id)
+        if activate_session:
+            test_data.active_session = create_user_active_session(
+                test_user_id, test_data.session_id)
+            test_data.chat_channel_name = test_data.active_session["data"]["active_session"]["chat_channel"]
+            channel_json = create_chat_channel(test_data.chat_channel_name)
+            print(channel_json)
+
+
+def session_start_date_5_days_from_now():
+    now = datetime.now(timezone.utc)
+    five_days = timedelta(days=5)
+    five_hours_from_now = now + five_days
+    return five_hours_from_now
+
+
+def create_test_data_session_in_progress():
+    test_data_spec = {
+        "session_start_date": session_start_date_now()
+    }
+    create_test_data(test_data_spec)
+
+
+def create_test_data_session_in_5_days():
+    test_data_spec = {
+        "session_start_date": session_start_date_5_days_from_now()
+    }
+    create_test_data(test_data_spec, add_user_to_session=False, activate_session=False)
+
+
+
 
 

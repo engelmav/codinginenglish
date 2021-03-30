@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import styled from "styled-components";
-import { font } from "./UtilComponents/sharedStyles";
+import { font } from "../UtilComponents/sharedStyles";
 import { Link } from "react-router-dom";
-import { Title, Main } from "./UtilComponents";
+import { Title, Main } from "../UtilComponents";
 import Loader from "react-spinners/PulseLoader";
 import { BeatLoader } from "react-spinners";
 
@@ -22,22 +22,36 @@ function loadOrContent(condition, Loader, Content) {
 }
 
 const MyDashboard = observer((props) => {
-  const { appStore } = props;
+  const { appStore, cieApi } = props;
+  const [registrations, setRegistrations] = useState(null);
 
-  const isLoaded = appStore.registeredSessions.length > 0;
+  useEffect(() => {
+    async function loadRegisteredSessions() {
+      const reg = await cieApi.getUpcomingRegistrationsByUserId(appStore.userId);
+      console.log("reg", reg)
+      setRegistrations(reg);
+    }
+    loadRegisteredSessions();
+  }, []);
 
-  const RegisteredSessions = loadOrContent(
-    isLoaded,
-    <div>loading...</div>,
-    <>
+  const getClasses = (registrations) => {
+    if (registrations === null){
+      return <p>Loading...</p>;
+    }
+    if (registrations.length === 0){
+      return <p>You're not registered for any classes. Sign up!</p>
+    } else {
+      return <>
       <p>Currently registered classes:</p>
       <ul>
-        {appStore.registeredSessions.map((sess, idx) => (
-          <li key={idx}>{`${sess.module_name} ${sess.start_date}`}</li>
-        ))}
-      </ul>
-    </>
-  );
+      {registrations.map((sess, idx) => (
+        <li key={idx}>{`${sess.module_name} ${sess.start_date}`}</li>
+      ))}
+    </ul>
+    <p>My Linux Box</p>
+    </>;
+    }
+  }
 
   return (
     <Main>
@@ -49,12 +63,10 @@ const MyDashboard = observer((props) => {
         {appStore.sessionInProgress && (
           <p>Your class is in session. Go there now!</p>
         )}
-        {RegisteredSessions}
-        <p>Your next classes</p>
+        {getClasses(registrations)}
         <p>
           <Link to="/upcoming-sessions">Find more classes</Link>
         </p>
-        <p>My Linux Box</p>
       </ContentWrapper>
     </Main>
   );

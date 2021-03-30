@@ -74,7 +74,7 @@ const HeaderContainer = observer((props) => {
           <Img alt="cie logo" src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-logo-hands.png"></Img>
           <RoutesUL>
             <li><Link to="/">home</Link></li>
-            <li><Link to="/about">about_us</Link></li>
+            <li><Link to="/about-us">about_us</Link></li>
             <li><Link to="/upcoming-sessions">upcoming_classes</Link></li>
             {appStore.authData &&
               <>

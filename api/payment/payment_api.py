@@ -1,6 +1,6 @@
-from services.auth import create_auth0_user, create_auth0_passwd_reset, get_auth0_user
+from services.auth import create_auth0_user, create_auth0_passwd_reset_ticket, get_auth0_user
 from config import config
-from services.cie import ModuleService
+from services.cie import ModuleService, UserService
 from services.mailjet import send_mail
 
 from flask import Blueprint, jsonify, request
@@ -19,7 +19,7 @@ stripe_publishable_key = config.get('cie.api.stripe.publishablekey')
 stripe.api_key = stripe_secret
 
 
-def create_payment_api(module_service: ModuleService):
+def create_payment_api(module_service: ModuleService, user_service: UserService):
     def calc_order_amount(item):
         # TODO: pull from database
         # get_module_session_by_id
@@ -97,7 +97,10 @@ def create_payment_api(module_service: ModuleService):
 
         module_session_id = confirmation_details.get('moduleSessionId')
         try:
-            module_name, module_session_start_dt = module_service.get_module_details(module_session_id)
+            # module_name, module_session_start_dt = module_service.get_module_details(module_session_id)
+            module_session = module_service.get_module_session_by_id(module_session_id)
+            module_session_start_dt = module_session.session_datetime
+            module_name = module_session.cie_module.name
         except:
             LOG.error(f"Could not retrieve module session details for email confirmation. Confirmation details: "
                       f"{confirmation_details}. Aborting.", exc_info=True)
@@ -105,31 +108,52 @@ def create_payment_api(module_service: ModuleService):
 
         template_params += [module_name, module_session_start_dt]
 
+        """
+        if you're authenticated, you have a user already
+        if you're not authenticated but you have a user, you have a user
+        if you're not authenticated and toy don't have an auth0 user, then create one
+        """
         if not is_authenticated and no_auth0_user:
-            confirmation_email = handle_new_user(student_email, student_name, template_params)
+            confirmation_email, student_user = handle_new_user(student_email, student_name, template_params)
         else:
+            try:
+                student_user = user_service.get_user_by_email(student_email)
+            except:
+                LOG.error(f"Error looking up user by email {student_email}. This means user will need to be manually"
+                          f" added to module_session {module_session.id}.")
             confirmation_email = templates.confirm_registration(*template_params)
+
+        try:
+            student_user.add_to_module_session(module_session)
+            LOG.info(f"Student user {student_user.id} added to module_session {module_session.id}")
+        except:
+            LOG.error(f"Failed to add user {student_user.id} to module_session {module_session.id}. The result "
+                      f"is that this user will not see his or her registered classes automatically populated in "
+                      f"MyDashboard.", exc_info=True)
 
         # At this point, we should have all the template info we need.
         try:
             resp = send_mail(confirmation_email)
+            LOG.info(f"Response from send_mail: {resp}")
             # get status code in resp object and raise exception/log error if not 200
-            LOG.debug(f"Response from send_mail: {resp}")
             if resp.status_code != 200:
-                raise Exception(f"Error sending confirmation email. Error text: {resp.text}")
+                raise Exception(f"Error sending confirmation email. Error text: {resp.text}. ")
         except:
-            LOG.error('Email confirmation failed. See traceback.', exc_info=True)
+            LOG.error(f"Email confirmation failed for student user {student_user.id}. Please reach out to student"
+                      f" directly. See traceback.", exc_info=True)
             return jsonify(success=False, message="Check server log for details.")
 
         return jsonify(success=True, message="Successfully sent email confirmation")
 
     def handle_new_user(student_email, student_name, template_params):
         # TODO: UUID not serializable
-        _ = create_auth0_user(student_name, student_email)
-        create_user(student_email, full_name=student_name)
-        passwd_reset_ticket = create_auth0_passwd_reset(student_email)
-        template_params.append(passwd_reset_ticket["link"])
+        auth0_user = create_auth0_user(student_name, student_email)
+        # TODO: link auth0 user to "local" user by user_id
+        auth0_user_id = auth0_user.get("user_id")
+        new_user = user_service.create_user(student_email, full_name=student_name)
+        ticket = create_auth0_passwd_reset_ticket(student_email)
+        template_params.append(ticket)
         body_parts = templates.confirm_reg_create_account(*template_params)
-        return body_parts
+        return body_parts, new_user
 
     return stripe_bp

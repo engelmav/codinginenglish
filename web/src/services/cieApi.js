@@ -9,7 +9,7 @@ class CieApi {
     // TODO: handle exceptions
   }
 
-  async getFutureUserRegistrations(userId) {
+  async getUpcomingRegistrationsByUserId(userId) {
     console.log(
       "getUserRegistrations() checking registrations for userId",
       userId

@@ -11,7 +11,8 @@ import { Header as _Header } from './Header';
 import history from './history';
 import { Home as _Home } from './Home';
 import { ModuleCard as _ModuleCard } from './ModuleCard';
-import { MyDashboard as _MyDashboard } from './MyDashboard'
+import { MyDashboard as _MyDashboard } from './MyDashboard/MyDashboard'
+import { AboutUs } from "./AboutUs";
 import { Routes as _Routes } from './Routes';
 import settings from './settings';
 import { StudentSessionManager } from './util';
@@ -34,8 +35,6 @@ async function initializeUser(authResult) {
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
   appStore.configureUser(authResult, userData, initializedUser.data.rocketchat_auth_token);
-  const userRegistrations = await cieApi.getFutureUserRegistrations(userData.id)
-  console.log("userRegistrations:", userRegistrations);
   studentSessionMgr.start();
   history.push('/my-dashboard');
 }
@@ -65,6 +64,7 @@ const routesProps = {
   appStore,
   auth,
   cieApi,
+  AboutUs,
   CallbackRoute,
   Classroom,
   Home,

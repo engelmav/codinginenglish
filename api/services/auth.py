@@ -16,6 +16,8 @@ client_secret = config.get("cie.auth0.secretkey")
 API_ENDPOINT = 'https://{}/api/v2/'.format(domain)
 
 get_token = GetToken(domain)
+
+
 token = get_token.client_credentials(client_id, client_secret, API_ENDPOINT)
 mgmt_api_token = token['access_token']
 
@@ -28,6 +30,7 @@ def get_auth0_user(email):
 def create_auth0_user(full_name, user_email):
     user_id = str(uuid.uuid4())
     users = Users(domain, mgmt_api_token)
+    generated_password = pwd.genword(entropy=56, charset="ascii_62")
     user_res = users.create({
       "email": user_email,
       "user_metadata": {"was_invite": True},
@@ -39,14 +42,14 @@ def create_auth0_user(full_name, user_email):
                  ".gstatic.com%2Fs2%2Fprofiles%2Fimages%2Fsilhouette80.png",
       "user_id": user_id,
       "connection": "Username-Password-Authentication",
-      "password": pwd.genword(),
+      "password": generated_password,
       "verify_email": True,
     })
     LOG.info(f"Created user in auth0 for email {user_email} with user_id {user_id}")
     return user_res
 
 
-def create_auth0_passwd_reset(user_email):
+def create_auth0_passwd_reset_ticket(user_email):
     tickets = Tickets(domain, mgmt_api_token)
     two_days = 172800
     ticket_res = tickets.create_pswd_change({
@@ -58,15 +61,6 @@ def create_auth0_passwd_reset(user_email):
         "includeEmailInRedirect": True
     })
     LOG.info(f"Password reset ticket generated for user {user_email}: {ticket_res}")
-    print(ticket_res)
-    return ticket_res
-
-    #
-# resp = requests.post('https://{}/oauth/token'.format("login.codinginenglish.com"),
-#              data={"grant_type": "client_credentials", "client_id": client_id, "client_secret": client_secret,
-#                    "audience": "https://dev-nougy3g5.auth0.com/api/v2/"})
-# headers = {'authorization': resp.json().get("access_token")}
-#
-# requests.delete(
-#     'https://login.codinginenglish.com/api/v2/users/auth0/identities/google-oauth2/111239133715150760465',
-#     headers=headers)
+    ticket_link = ticket_res.get("ticket")
+    better_link = ticket_link.replace("dev-nougy3g5.auth0", "login.codinginenglish")
+    return better_link
