@@ -25,6 +25,7 @@ class Routes extends Component {
     const {
       auth,
 
+      AboutUs,
       CallbackRoute,
       Classroom,
       Home,
@@ -35,6 +36,7 @@ class Routes extends Component {
     return (
       <>
         <Route exact path="/" component={(props) => <Home />} />
+        <Route exact path="/about-us" component={(props) => <AboutUs />} /> 
         <Route exact path="/upcoming-sessions" component={(props) => <UpcomingSessions />} />
         <Route exact path="/my-dashboard" component={(props) => <MyDashboard />} />
         <Route exact path="/class" component={(props) => <Classroom />} />
