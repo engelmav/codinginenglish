@@ -2,6 +2,7 @@ import React from "react";
 import { Main, ContentSection } from "../UtilComponents";
 import { Title } from "../UtilComponents/Typography/Typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
+import { Box } from "../UtilComponents/Box";
 import {
   orangeBgColor,
   darkGray,
@@ -10,7 +11,6 @@ import {
 } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { space, color, layout } from "styled-system";
 
 const MainLanding = styled(Main)`
   width: min(90%, 700px);
@@ -89,15 +89,7 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
-const Box = styled.div(
-  {
-    boxSizing: "border-box",
-    minWidth: 0,
-  },
-  space,
-  color,
-  layout
-);
+
 
 const Home = (props) => {
   return (

@@ -76,3 +76,16 @@ def test_get_active_session_by_user_id():
     assert resp.json.get("data") == expected_payload
 
 
+def test_user_patch():
+    upcoming_sessions = []
+    test_app = make_test_app(upcoming_sessions)
+    user_to_patch = test_app.models.User(firstname="user1first", lastname="user1last", email="user@cie.com")
+    user_to_patch.add()
+    url = f"/api/users/{user_to_patch.id}"
+    _ = test_app.flask.patch(
+        url,
+        json={u"firstname": u"Neo"},
+        content_type='application/json',
+    )
+    modified_user = test_app.models.User.query.filter_by(id=user_to_patch.id).one()
+    assert modified_user.firstname == "Neo"

@@ -49,6 +49,11 @@ class CieApi {
   async rocketchatLogin(username) {
     return (await axios.post(`/api/rocketchat/do-login`, { username })).data;
   }
+
+  async updateUser(userId, userData) {
+    console.log("Attempting to update user with userId", userId, "and data", userData)
+    return (await axios.patch(`/api/users/${userId}`, userData)).data;
+  }
 }
 
 const cieApi = new CieApi("/api");

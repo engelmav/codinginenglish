@@ -1,42 +1,30 @@
-import { action, computed, observable } from "mobx";
+import { action, configure, makeAutoObservable } from "mobx";
 import {
-  persistence,
-  useClear,
-  useDisposers,
+  clearPersist,
   isSynchronized,
+  persistence,
+  stopPersist,
   StorageAdapter,
 } from "mobx-persist-store";
 
-function readStore(name) {
-  return new Promise((resolve) => {
-    const data = sessionStorage.getItem(name);
-    const objects = JSON.parse(data);
-    console.log("readStore objects:");
-    console.log(objects);
-    resolve(objects);
-  });
-}
-
-function writeStore(name, content) {
-  return new Promise((resolve) => {
-    sessionStorage.setItem(name, JSON.stringify(content));
-    resolve();
-  });
-}
+configure({
+  enforceActions: "never",
+});
 
 class AppStore {
-  @observable isAuthenticated = false;
-  @observable authData = null;
-  @observable userId = null;
-  @observable firstName = null;
-  @observable email = null;
-  @observable registeredSessions = [];
-  @observable sessionInProgress = false;
-  @observable rocketchatAuthToken = null;
+  isAuthenticated = false;
+  authData = null;
+  userId = null;
+  firstName = null;
+  email = null;
+  registeredSessions = [];
+  sessionInProgress = false;
+  rocketchatAuthToken = null;
 
   constructor() {
+    makeAutoObservable(this);
     this.setSessionInProgress = this.setSessionInProgress.bind(this);
-    this.resetStore = this.resetStore.bind(this);
+    this.clearStore = this.clearStore.bind(this);
   }
 
   @action toggleIsAuthenticated() {
@@ -44,52 +32,64 @@ class AppStore {
   }
 
   @action async configureUser(authData, storedUser, rcAuthToken) {
-    console.log("configureUser()", authData, storedUser);
     this.authData = authData;
-    ({
-      given_name: this.firstName,
-      email: this.email,
-    } = authData.idTokenPayload);
+    const { email, given_name } = authData.idTokenPayload;
+    this.email = email;
+
+    // TODO: perform official reconciliation of two user sources
+    const { firstname } = storedUser;
+    this.firstName = given_name || firstname;
     this.userId = storedUser.id;
     this.rocketchatAuthToken = rcAuthToken;
+  }
+
+  @action setFirstname(firstname) {
+    this.firstName = firstname;
   }
 
   setSessionInProgress() {
     this.sessionInProgress = true;
   }
+  clearStore() {
+    clearPersist(this);
+  }
 
-  @action resetStore = () => {
-    useClear(this);
-  };
+  stopPersist() {
+    stopPersist(this);
+  }
 
-  @action persistDispose = () => {
-    useDisposers(this);
-  };
-
-  @computed get isSynchronized() {
+  get isSynchronized() {
     return isSynchronized(this);
   }
 }
 
-persistence({
-  name: "AppStore",
-  properties: [
-    "isAuthenticated",
-    "authData",
-    "userId",
-    "firstName",
-    "email",
-    "registeredSessions",
-    "sessionInProgress",
-    "rocketchatAuthToken",
-  ],
-  adapter: new StorageAdapter({
-    read: readStore,
-    write: writeStore,
-  }),
-  reactionOptions: {
-    delay: 2000,
-  },
-})(AppStore);
+export const makeAppStore = (appStoreName = "default") => {
+  return persistence({
+    name: `AppStore.${appStoreName}`,
+    properties: [
+      "isAuthenticated",
+      "authData",
+      "userId",
+      "firstName",
+      "email",
+      "registeredSessions",
+      "sessionInProgress",
+      "rocketchatAuthToken",
+    ],
+    adapter: new StorageAdapter({
+      read: async (name) => {
+        const data = window.localStorage.getItem(name);
+        return data ? JSON.parse(data) : undefined;
+      },
+      write: async (name, content) => {
+        console.log(name, content);
 
-export { AppStore };
+        window.localStorage.setItem(name, JSON.stringify(content));
+      },
+    }),
+    reactionOptions: {
+      // optional
+      delay: 200,
+    },
+  })(new AppStore());
+};

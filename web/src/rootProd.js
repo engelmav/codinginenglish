@@ -1,5 +1,5 @@
 import { App as _App } from './App';
-import { AppStore } from './stores/AppStore';
+import { makeAppStore } from './stores/AppStore';
 import { Aula as _Classroom } from './Aula';
 import { Auth } from './auth/Auth';
 import Callback from './auth/Auth0Callback';
@@ -21,7 +21,8 @@ import { withRouter } from 'react-router-dom';
 
 
 const cieApi = new CieApi();
-const appStore = new AppStore();
+// const appStore = new AppStore();
+const appStore = makeAppStore();
 
 const studentSessionMgr = new StudentSessionManager(EventSource);
 studentSessionMgr.start();
@@ -38,9 +39,9 @@ async function initializeUser(authResult) {
   studentSessionMgr.start();
   history.push('/my-dashboard');
 }
-
+console.log("here is the clearStore method:", appStore.clearStore)
 auth.addOnAuthSuccess(initializeUser);
-auth.addOnLogout(appStore.resetStore)
+auth.addOnLogout(appStore.clearStore)
 
 
 const Header = compose(_Header, { appStore, auth });
