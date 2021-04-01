@@ -9,7 +9,7 @@ import { observer } from 'mobx-react';
 
 const Header = styled.header`
   ${debugBorder}
-  margin-bottom: 2rem;
+
   max-width:100%; 
   display: flex;
   flex-wrap: wrap;

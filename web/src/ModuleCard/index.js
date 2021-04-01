@@ -1,132 +1,113 @@
-import { DateTime } from "luxon";
 import Modal from "react-modal";
 import { Button, ContentSection, Title } from "../UtilComponents";
+import { toLocalTime } from "../util";
 import { FaRegWindowClose } from "react-icons/fa";
+import Dialog from "@material-ui/core/Dialog";
 import styled from "styled-components";
 import { observer } from "mobx-react";
+import { Flex, Text, Image } from "rebass";
 
-import React, { Component } from "react";
+import React, { useState } from "react";
 
-const ModuleCardContainer = styled.div`
-  display: flex;
-  border-bottom: 1px solid #ff3e00;
-  &:last-of-type {
-    border-bottom: none;
-  }
-  border-radius: 3px;
-  background-color: white;
-  font-family: "Roboto", serif;
-  padding-bottom: 30px;
-  margin-bottom: 30px;
-
-  h1 {
-    font-size: 120%;
-    // justify-self: center;
-    font-weight: 850;
-  }
-
-  .datetime {
-    font-size: 80%;
-    justify-self: center;
-  }
-  .title-desc {
-    padding-left: 30px;
+const ShadowBox = styled(Flex)`
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.2s;
+  :hover {
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
   }
 `;
 
-const ModalContent = styled.div`
-  margin: 0 auto;
-  width: 80%;
+const DialogContent = styled(Flex)`
+  flex-direction: column;
 `;
 
-@observer
-class ModuleCard extends Component {
-  constructor() {
-    super();
-    this.state = {
-      modalIsOpen: false,
-    };
+const CloseBox = styled(FaRegWindowClose)`
+  align-self: flex-end;
+  cursor: pointer;
+  transition: 0.2s;
+  :hover {
+    background-color: black;
+    color: white;
   }
+`;
 
-  handleSignupClick = () => {
-    this.setState({ modalIsOpen: true });
-  };
-
-  afterOpenModal = () => {
-    // ?
-  };
-
-  closeModal = () => {
-    this.setState({ modalIsOpen: false });
-  };
-
-  render() {
-    const { appStore, sessionData, settings, CheckoutForm } = this.props;
-    let { cie_module, _session_datetime } = sessionData;
-
-    var sessionDateTime = DateTime.fromISO(_session_datetime);
-
-    const localSessionDateTime = sessionDateTime.toLocaleString(
-      DateTime.DATETIME_FULL
-    );
-    const { modalIsOpen } = this.state;
-    const { afterOpenModal, closeModal } = this;
-    return (
-      <ModuleCardContainer>
-        <img
+export const ModuleCard = (props) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const { appStore, CheckoutForm, settings } = props;
+  const {
+    name: moduleName,
+    description: moduleDescription,
+    module_sessions: moduleSessions,
+  } = props.moduleData;
+  return (
+    <>
+      <ShadowBox sx={{ borderRadius: 15 }} p={20} mb={20}>
+        <Image
+          sx={{ "@media screen and (max-width: 500px)": { display: "none" } }}
           src={`${settings.assets}/lego-man-key-250.jpeg`}
-          alt={cie_module.name}
-          width="150"
-          height="150"
+          alt={moduleName}
+          mr={2}
+          width="50%"
         />
-        <div className="title-desc">
-          <Title p={0}>{cie_module.name}</Title>
-          <p className="datetime">Course begins {localSessionDateTime}</p>
-          <p>{cie_module.description}</p>
-          <Button onClick={this.handleSignupClick} m={2}>
-            REGISTER
-          </Button>
-        </div>
-        <Modal
-          style={{
-            content: {
-              top: "45%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-              width: "45%",
-            },
-          }}
-          ariaHideApp={false}
-          isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
-          onRequestClose={closeModal}
-          shouldCloseOnOverlayClick={false}
-        >
-          <FaRegWindowClose
-            size="20"
-            style={{ cursor: "pointer", float: "right" }}
-            onClick={closeModal}
-          />
-          <ModalContent>
-            <Title>{cie_module.name}</Title>
-            <ContentSection>
-              <p>Starts {localSessionDateTime}</p>
-              {appStore.authData == null && (
-                <>
-                  <p>Already registered as a student? Sign in!</p>
-                  <p>
-                    Otherwise, register for this class as a guest. You can
-                    create a student profile later.
-                  </p>
-                </>
-              )}
-            </ContentSection>
-            <CheckoutForm sessionData={sessionData} onCloseClick={closeModal} />
-          </ModalContent>
-        </Modal>
-      </ModuleCardContainer>
-    );
-  }
-}
 
-export { ModuleCard };
+        <Text
+          as="h1"
+          m={3}
+          fontSize={[3, 4, 5]}
+          fontWeight="bold"
+          color="primary"
+          textAlign="center"
+        >
+          {moduleName}
+        </Text>
+
+        <Text as="p" m={1}>
+          {moduleDescription}
+        </Text>
+        <p>Choose a start time:</p>
+        {moduleSessions.map((ms, index) => {
+          const sessionDtLocalTime = toLocalTime(ms._session_datetime);
+          return (
+            <Button
+              key={index}
+              m={1}
+              alignSelf="center"
+              maxWidth="500px"
+              onClick={() => {setDialogOpen(true); setSelectedSession(sessionDtLocalTime)}}
+            >
+              {sessionDtLocalTime}
+            </Button>
+          );
+        })}
+      </ShadowBox>
+
+      <Dialog open={dialogOpen} onBackdropClick={() => setDialogOpen(false)}>
+        <DialogContent flexDirection="column" p={20}>
+          <CloseBox onClick={() => setDialogOpen(false)} />
+          <Title>{moduleName}</Title>
+
+          <ContentSection>
+            <p>This class begins on <b>{selectedSession}</b>.</p>
+            {appStore.authData == null && (
+              <>
+                <p>Already registered as a student? Sign in!</p>
+                <p>
+                  Otherwise, register for this class as a guest. You can create
+                  a student profile later.
+                </p>
+              </>
+            )}
+          </ContentSection>
+          <CheckoutForm
+            // sessionData={sessionData}
+            onCloseClick={() => setDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};

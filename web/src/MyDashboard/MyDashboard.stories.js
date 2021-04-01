@@ -1,6 +1,6 @@
 import React from "react";
 import { MyDashboard } from "./MyDashboard";
-import { AppStore } from "../stores/AppStore";
+import { makeAppStore } from "../stores/AppStore";
 import { createBrowserHistory } from "history";
 import { Router } from "react-router";
 
@@ -9,9 +9,9 @@ export default {
   component: MyDashboard,
 };
 
-const appStoreWithName = new AppStore("withname");
+const appStoreWithName = new makeAppStore("withname");
 appStoreWithName.setFirstname("Test user first name");
-const appStoreNoName = new AppStore("noname");
+const appStoreNoName = makeAppStore("noname");
 appStoreNoName.setFirstname(null);
 
 const oneRegistration = [

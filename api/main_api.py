@@ -250,11 +250,13 @@ def create_main_api(event_stream,
             return make_response(dict(status="error", messages=messages), 500)
         return make_response(dict(status="success", messages=messages), 200)
 
-    @app.route('/api/module-sessions')
+    @app.route('/api/cie-modules')
     def get_modules():
-        res = models.ModuleSession.query.all()
-        _schema = schema.ModuleSessionSchema()
-        serialized = _schema.dump(res, many=True)
+        # res = models.ModuleSession.query.all()
+        # _schema = schema.ModuleSessionSchema()
+        _schema = schema.CieModuleSchema()
+        modules = models.CieModule.query.all()
+        serialized = _schema.dump(modules, many=True)
         return make_response(
             dict(messages=["Successfully retried module sessions."],
                  data=serialized), 200)

@@ -1,7 +1,6 @@
 /* global window, navigator */
 
 import { DateTime, Duration, Interval } from "luxon";
-
 let userAgentString = navigator.userAgent;
 let isChrome = userAgentString.indexOf("Chrome") > -1;
 let isSafari = userAgentString.indexOf("Safari") > -1;
@@ -97,6 +96,14 @@ class StudentSessionManager {
     }
   }
 }
+
+export function toLocalTime(dt) {
+  var dtFromISO = DateTime.fromISO(dt);
+  const localDt = dtFromISO.toLocaleString(
+    DateTime.DATETIME_FULL
+  );
+  return localDt;
+  }
 
 export {
   browserDetect,
