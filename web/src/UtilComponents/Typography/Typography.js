@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { typography, space } from "styled-system";
-import { font, fontColor } from "../sharedStyles";
+import { font, fontColor, debugBorder } from "../sharedStyles";
 
 export const Title = styled.h1`
   font-family: Andale Mono,AndaleMono,monospace;
@@ -30,6 +30,10 @@ export const TitleH2 = styled.h2`
 `;
 
 export const P = styled.p`
+  // word-break: break-all;
+  // white-space: normal;
+  hyphens: auto;
   ${font}
   ${fontColor}
+  ${debugBorder}
 `

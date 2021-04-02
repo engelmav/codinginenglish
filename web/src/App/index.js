@@ -14,6 +14,7 @@ const Footer = styled.footer`
   background: #ff3e00;
   text-align: center;
   color: white;
+  padding: 10px;
 }
 `;
 

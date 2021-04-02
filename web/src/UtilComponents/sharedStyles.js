@@ -1,7 +1,7 @@
 import { css } from 'styled-components';
 
 export const debugBorder = css`
-  // border: 1px dotted blue;
+  border: 1px dotted blue;
 `;
 
 const fontColor = css`

@@ -3,8 +3,9 @@ import { observer } from "mobx-react";
 import styled from "styled-components";
 import { font, cieOrange } from "../UtilComponents/sharedStyles";
 import { Link } from "react-router-dom";
-import { Title, Main } from "../UtilComponents";
+import { Main } from "../UtilComponents";
 import { Button } from "../UtilComponents/Button";
+import { P, Title, TitleH2 } from "../UtilComponents/Typography/Typography"
 import { Box } from "../UtilComponents/Box";
 import Loader from "react-spinners/PulseLoader";
 import { BeatLoader } from "react-spinners";
@@ -49,7 +50,7 @@ const Input = styled.input`
   ${space}
 `;
 
-const QuestionText = styled.p`
+const QuestionText = styled(P)`
   font-family: "New Tegomin", serif;
 `;
 
@@ -100,7 +101,7 @@ const MyDashboard = observer((props) => {
       return <p>Loading...</p>;
     }
     if (registrations.length === 0) {
-      return <p>You're not registered for any classes. Sign up!</p>;
+      return <P>You're not registered for any classes. Sign up!</P>;
     } else {
       return (
         <>
@@ -124,18 +125,16 @@ const MyDashboard = observer((props) => {
         <Title textAlign="center">{`${
           appStore.firstName ? appStore.firstName : "Student"
         }'s Dashboard`}</Title>
-        <ContentWrapper
-          style={{ margin: "0 auto", maxWidth: "980px", minWidth: "769px" }}
-        >
-          {appStore.authData && <h4>Welcome, {appStore.firstName}!</h4>}
+
+          {appStore.authData && <TitleH2>Welcome, {appStore.firstName}!</TitleH2>}
           {appStore.sessionInProgress && (
             <p>Your class is in session. Go there now!</p>
           )}
           {getClasses(registrations)}
-          <p>
+          <P>
             <Link to="/upcoming-sessions">Find more classes</Link>
-          </p>
-        </ContentWrapper>
+          </P>
+
       </Main>
       <Dialog
         onClose={handleClose}
