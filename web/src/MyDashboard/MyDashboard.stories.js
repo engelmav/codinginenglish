@@ -1,6 +1,6 @@
 import React from "react";
 import { MyDashboard } from "./MyDashboard";
-import { AppStore } from "../stores/AppStore";
+import { makeAppStore } from "../stores/AppStore";
 import { createBrowserHistory } from "history";
 import { Router } from "react-router";
 
@@ -9,8 +9,10 @@ export default {
   component: MyDashboard,
 };
 
-const appStore = new AppStore();
-appStore.firstName = "Test User First Name";
+const appStoreWithName = new makeAppStore("withname");
+appStoreWithName.setFirstname("Test user first name");
+const appStoreNoName = makeAppStore("noname");
+appStoreNoName.setFirstname(null);
 
 const oneRegistration = [
   {
@@ -22,39 +24,53 @@ const oneRegistration = [
 
 class DummyApi {
   registrations;
-  getFutureUserRegistrations(){
+  getUpcomingRegistrationsByUserId(){
     return this.registrations;
+  }
+  saveUser(userData){
+    alert("User data:", userData)
   }
 }
 const cieApi = new DummyApi();
 cieApi.registrations = oneRegistration;
 
-let props = {
+let propsWithRegistrations = {
   settings: {
     assets: "https://cie-assets.nyc3.digitaloceanspaces.com",
   },
   cieApi,
-  appStore,
+  appStore: appStoreWithName,
 };
 
 const history = createBrowserHistory();
 
 export const WithRegistrations = () => (
   <Router history={history}>
-    <MyDashboard {...props} />;
+    <MyDashboard {...propsWithRegistrations} />
   </Router>
 );
 
 const cieApi2 = new DummyApi()
 cieApi2.registrations = []
 
-const props2 = {
+const propsWithoutRegistrations = {
   cieApi: cieApi2,
-  appStore
+  appStore: appStoreWithName
 }
 
 export const WithoutRegistrations = () => (
   <Router history={history}>
-    <MyDashboard {...props2} />;
+    <MyDashboard {...propsWithoutRegistrations} />
+  </Router>
+);
+
+const propsNoName = {
+  cieApi: cieApi2,
+  appStore: appStoreNoName
+}
+
+export const WithoutUnknownName = () => (
+  <Router history={history}>
+    <MyDashboard {...propsNoName} />
   </Router>
 );

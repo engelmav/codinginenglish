@@ -12,6 +12,7 @@ from api.events import StudentSessionService
 from database.handlers import init_db
 
 from database.models import model_factory
+from payment.payment_api import create_payment_api
 from rest_schema import schema_factory
 from services.rocketchat import RocketChatService
 
@@ -95,7 +96,7 @@ def make_test_app(upcoming_sessions):
     student_session_service = StudentSessionService(redis, models)
     student_session_service.set_user_id(100)
     rc_service = RocketChatService()
-
+    payment_api = create_payment_api(module_service, user_service)
     main_api = create_main_api(
         event_stream,
         publish_message,
@@ -106,7 +107,8 @@ def make_test_app(upcoming_sessions):
         models,
         schema,
         redis,
-        rc_service
+        rc_service,
+        payment_api
     )
     main_api.testing = True
     test_app.flask = main_api.test_client()

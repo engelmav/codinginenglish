@@ -28,6 +28,7 @@ def schema_factory(db_session, models):
     :return:
     """
     class CieModuleSchema(ModelSchema):
+        module_sessions = Nested("ModuleSessionSchema", many=True, exclude=("cie_module",))
         class Meta:
             model = models.CieModule
             sqla_session = db_session

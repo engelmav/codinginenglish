@@ -1,46 +1,38 @@
-import React from 'react';
-import { compose } from '../compose';
-import { AppStore } from '../stores/AppStore';
-import { ModuleCard as _ModuleCard } from '../ModuleCard';
+import React from "react";
+import { compose } from "../compose";
+import { makeAppStore } from "../stores/AppStore";
+import { ModuleCard as _ModuleCard } from "../ModuleCard";
 
 const mockSettings = {
-  assets: "some-url"
-}
-
-class MockCieApi {
-  scheduledSessions() {
-    return [
-      'thing'
-    ];
-  }
-}
-
-const appStore = new AppStore();
-const cieApi = new MockCieApi();
-const settings = mockSettings;
-const sessionData = {
-  cie_module: "1",
-  session_datetime: "2/28/2021"
+  assets: "https://cie-assets.nyc3.digitaloceanspaces.com",
 };
 
-const CheckoutForm = () =>
-  <div>I am a nonsense checkout form</div>;
+const appStore = makeAppStore();
+const settings = mockSettings;
+const moduleData = {
+  description:
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa porro quae animi quos accusantium esse amet! Cupiditate, corrupti. Quo velit debitis optio, vel deleniti tempore modi facilis labore. Nam.",
+  id: 1,
+  image_path: null,
+  module_sessions: [
+    { _session_datetime: "2021-04-01T19:45:39.723160", id: 1 },
+    { _session_datetime: "2021-04-01T09:45:39.723160", id: 2 },
+  ],
+  name: "Web App Development - Intermediate",
+};
 
-const ModuleCard = compose(
-  _ModuleCard,
-  {
-    appStore,
-    sessionData,
-    settings,
-    CheckoutForm
-  }
-);
+const CheckoutForm = () => <div>I am a nonsense checkout form</div>;
 
+const ModuleCard = compose(_ModuleCard, {
+  appStore,
+  moduleData,
+  settings,
+  CheckoutForm,
+});
 
 export default {
-  title: 'ModuleCard',
+  title: "ModuleCard",
   component: ModuleCard,
 };
 
-export const DefaultView = () =>
-  <ModuleCard />
+export const DefaultView = () => <ModuleCard />;

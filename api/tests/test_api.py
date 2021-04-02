@@ -76,3 +76,33 @@ def test_get_active_session_by_user_id():
     assert resp.json.get("data") == expected_payload
 
 
+def test_user_patch():
+    upcoming_sessions = []
+    test_app = make_test_app(upcoming_sessions)
+    user_to_patch = test_app.models.User(firstname="user1first", lastname="user1last", email="user@cie.com")
+    user_to_patch.add()
+    url = f"/api/users/{user_to_patch.id}"
+    _ = test_app.flask.patch(
+        url,
+        json={u"firstname": u"Neo"},
+        content_type='application/json',
+    )
+    modified_user = test_app.models.User.query.filter_by(id=user_to_patch.id).one()
+    assert modified_user.firstname == "Neo"
+
+
+def test_get_cie_modules():
+    url = "/api/cie-modules"
+    now = datetime.now(timezone.utc)
+    five_hours = timedelta(hours=5)
+    five_hours_from_now = now + five_hours
+    five_hours_ago = now - five_hours
+
+    upcoming_sessions = [
+        {"session_id": 1, "session_datetime": five_hours_from_now},
+        {"session_id": 1, "session_datetime": five_hours_ago}
+    ]
+    test_app = make_test_app(upcoming_sessions)
+    test_app.models.CieModule(name="Test Module", description="a test")
+    resp = test_app.flask.get(url)
+    assert resp.json.get("data")[0].get("name") == "Web App Development - Intermediate"

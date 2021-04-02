@@ -21,17 +21,17 @@ class CieApi {
     return res.data.data;
   }
 
-  async getUpcomingSessions() {
-    let scheduledSessions = [];
+  async getUpcomingModulesAndSessions() {
+    let modulesAndSessions = [];
     try {
-      const res = await axios.get("/api/module-sessions");
-      scheduledSessions = res.data;
+      const res = await axios.get("/api/cie-modules");
+      modulesAndSessions = res.data;
     } catch (ex) {
       console.log("Failed to get upcoming classes.");
       console.log(ex.stack);
       return [];
     }
-    return scheduledSessions;
+    return modulesAndSessions;
   }
 
   async registerUserToSession(userId) {
@@ -48,6 +48,11 @@ class CieApi {
 
   async rocketchatLogin(username) {
     return (await axios.post(`/api/rocketchat/do-login`, { username })).data;
+  }
+
+  async updateUser(userId, userData) {
+    console.log("Attempting to update user with userId", userId, "and data", userData)
+    return (await axios.patch(`/api/users/${userId}`, userData)).data;
   }
 }
 

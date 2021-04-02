@@ -38,6 +38,7 @@ def create_main_api(event_stream,
                     payment_api):
 
     app.register_blueprint(payment_api)
+
     @app.teardown_appcontext
     def shutdown_session(exception=None):
         db_session.remove()
@@ -249,17 +250,32 @@ def create_main_api(event_stream,
             return make_response(dict(status="error", messages=messages), 500)
         return make_response(dict(status="success", messages=messages), 200)
 
-    @app.route('/api/module-sessions')
+    @app.route('/api/cie-modules')
     def get_modules():
-        res = models.ModuleSession.query.all()
-        _schema = schema.ModuleSessionSchema()
-        serialized = _schema.dump(res, many=True)
+        # res = models.ModuleSession.query.all()
+        # _schema = schema.ModuleSessionSchema()
+        _schema = schema.CieModuleSchema()
+        modules = models.CieModule.query.all()
+        serialized = _schema.dump(modules, many=True)
         return make_response(
             dict(messages=["Successfully retried module sessions."],
                  data=serialized), 200)
 
     def make_rocketchat_username(firstname, lastname):
         return firstname[0] + lastname
+
+    @app.route("/api/users/<user_id>", methods=["PATCH"])
+    def patch_user(user_id):
+        patch_dict = request.get_json()
+        user = models.User.query.filter_by(id=user_id).one()
+        for key, value in patch_dict.items():
+            setattr(user, key, value)
+        user.session.flush()
+        user.session.commit()
+        updated_user = models.User.query.filter_by(id=user_id).one()
+        _schema = schema.UserSchema()
+        data = _schema.dump(updated_user)
+        return make_response(dict(data=data, messages=["Successfully updated user"]), 200)
 
     @app.route('/api/users', methods=['POST'])
     def initialize_user():

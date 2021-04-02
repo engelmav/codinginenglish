@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { typography, space } from "styled-system";
-import { font, fontColor } from "../sharedStyles";
+import { font, fontColor, debugBorder } from "../sharedStyles";
 
 export const Title = styled.h1`
-  font-family: Andale Mono,AndaleMono,monospace;;
+  font-family: Andale Mono,AndaleMono,monospace;
   ${space}
   ${fontColor}
   ${typography}
@@ -13,6 +13,7 @@ export const Title = styled.h1`
   // font-size: max(2.5rem, 3vw); // ok on desktop, too big on mobile
   // font-size: 1.75rem; // ok on mobile, too small on desktop
   font-size: max(1.75rem, min(2.5rem, 3vw));
+  width: 100%;
 `;
 
 export const TitleH2 = styled.h2`
@@ -29,6 +30,10 @@ export const TitleH2 = styled.h2`
 `;
 
 export const P = styled.p`
+  // word-break: break-all;
+  // white-space: normal;
+  hyphens: auto;
   ${font}
   ${fontColor}
+  ${debugBorder}
 `

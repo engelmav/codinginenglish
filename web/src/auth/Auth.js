@@ -1,11 +1,8 @@
-import auth0 from 'auth0-js';
-import history from '../history'
-import settings from '../settings';
+import auth0 from "auth0-js";
+import history from "../history";
+import settings from "../settings";
 
-
-
-var CLIENT_ID = 'pyJiq82f4s6ik5dr9oNnyryW5127T965';
-
+var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 
 class Auth {
   accessToken;
@@ -13,18 +10,20 @@ class Auth {
   expiresAt;
 
   auth0 = new auth0.WebAuth({
-    domain: 'login.codinginenglish.com',
+    domain: "login.codinginenglish.com",
     clientID: CLIENT_ID,
     redirectUri: settings.auth0Host,
-    responseType: 'token id_token',
-    scope: 'openid email profile'
+    responseType: "token id_token",
+    scope: "openid email profile",
   });
 
   constructor(appStore) {
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.handleAuthentication = this.handleAuthentication.bind(this);
-    this.handleAuthenticationFromCallbackRoute = this.handleAuthenticationFromCallbackRoute.bind(this);
+    this.handleAuthenticationFromCallbackRoute = this.handleAuthenticationFromCallbackRoute.bind(
+      this
+    );
     this.isAuthenticated = this.isAuthenticated.bind(this);
     this.renewSession = this.renewSession.bind(this);
     this.appStore = appStore;
@@ -32,15 +31,13 @@ class Auth {
     this.onLogout = [];
   }
 
-
-  addOnAuthSuccess(callback){
+  addOnAuthSuccess(callback) {
     this.onAuthSuccess.push(callback);
   }
 
   addOnLogout(callback) {
-    this.onLogout.push(callback)
+    this.onLogout.push(callback);
   }
-
 
   login() {
     console.log("Auth.js: calling auth0.authorize():");
@@ -56,18 +53,19 @@ class Auth {
         }
         resolve();
         this.setSession(authResult);
-        console.log("Auth module successfully authenticated. Calling callbacks...")
-        this.onAuthSuccess.forEach(callback => callback(authResult))
+        console.log(
+          "Auth module successfully authenticated. Calling callbacks..."
+        );
+        this.onAuthSuccess.forEach((callback) => callback(authResult));
       });
-    })
+    });
   }
 
   handleAuthenticationFromCallbackRoute = ({ location }) => {
     if (/access_token|id_token|error/.test(location.hash)) {
       this.handleAuthentication();
     }
-  }
-  
+  };
 
   setSession(authResult) {
     this.idToken = authResult.idToken;
@@ -76,11 +74,11 @@ class Auth {
   }
 
   signOut() {
+    this.onLogout.forEach((cb) => cb());
     this.auth0.logout({
       returnTo: settings.auth0LogoutUrl,
       clientID: CLIENT_ID,
     });
-    this.onLogout.forEach(cb => cb());
   }
 
   silentAuth() {
@@ -94,15 +92,15 @@ class Auth {
   }
 
   logout() {
+    this.onLogout.forEach((cb) => cb());
     // Remove tokens and expiry time.
     this.accessToken = null;
     this.idToken = null;
     this.expiresAt = 0;
 
     this.auth0.logout({
-      returnTo: window.location.origin
+      returnTo: window.location.origin,
     });
-    this.onLogout.forEach(cb => cb());
   }
 
   isAuthenticated() {
@@ -117,11 +115,12 @@ class Auth {
       } else if (err) {
         this.logout();
         console.log(err);
-        alert(`Could not get new token (${err.error}: ${err.errorDescription})`)
+        alert(
+          `Could not get new token (${err.error}: ${err.errorDescription})`
+        );
       }
     });
   }
-
 }
 
 export { Auth };

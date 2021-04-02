@@ -1,27 +1,27 @@
-import { App as _App } from './App';
-import { AppStore } from './stores/AppStore';
-import { Aula as _Classroom } from './Aula';
-import { Auth } from './auth/Auth';
-import Callback from './auth/Auth0Callback';
-import { CieApi } from './services/cieApi';
-import { CheckoutForm as _CheckoutForm } from './CheckoutForm';
-import { compose } from './compose';
-import { createWithAuth } from './auth/RequiresAuth';
-import { Header as _Header } from './Header';
-import history from './history';
-import { Home as _Home } from './Home';
-import { ModuleCard as _ModuleCard } from './ModuleCard';
-import { MyDashboard as _MyDashboard } from './MyDashboard/MyDashboard'
+import { App as _App } from "./App";
+import { makeAppStore } from "./stores/AppStore";
+import { Aula as _Classroom } from "./Aula";
+import { Auth } from "./auth/Auth";
+import Callback from "./auth/Auth0Callback";
+import { CieApi } from "./services/cieApi";
+import { CheckoutForm as _CheckoutForm } from "./CheckoutForm";
+import { compose } from "./compose";
+import { createWithAuth } from "./auth/RequiresAuth";
+import { Header as _Header } from "./Header";
+import history from "./history";
+import { Home as _Home } from "./Home";
+import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
+import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { AboutUs } from "./AboutUs";
-import { Routes as _Routes } from './Routes';
-import settings from './settings';
-import { StudentSessionManager } from './util';
-import { UpcomingSessions as _UpcomingSessions } from './UpcomingSessions';
-import { withRouter } from 'react-router-dom';
-
+import { Routes as _Routes } from "./Routes";
+import settings from "./settings";
+import { StudentSessionManager } from "./util";
+import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
+import { withRouter } from "react-router-dom";
 
 const cieApi = new CieApi();
-const appStore = new AppStore();
+// const appStore = new AppStore();
+const appStore = makeAppStore();
 
 const studentSessionMgr = new StudentSessionManager(EventSource);
 studentSessionMgr.start();
@@ -34,26 +34,43 @@ async function initializeUser(authResult) {
   const initializedUser = await cieApi.initializeUser(authResult);
   appStore.user = initializedUser;
   const userData = initializedUser.data.user;
-  appStore.configureUser(authResult, userData, initializedUser.data.rocketchat_auth_token);
+  appStore.configureUser(
+    authResult,
+    userData,
+    initializedUser.data.rocketchat_auth_token
+  );
   studentSessionMgr.start();
-  history.push('/my-dashboard');
+  history.push("/my-dashboard");
 }
-
+console.log("here is the clearStore method:", appStore.clearStore);
 auth.addOnAuthSuccess(initializeUser);
-auth.addOnLogout(appStore.resetStore)
-
+auth.addOnLogout(appStore.clearStore);
 
 const Header = compose(_Header, { appStore, auth });
 
 const CheckoutForm = compose(_CheckoutForm, { appStore });
-const ModuleCard = compose(_ModuleCard, { cieApi, appStore, settings, CheckoutForm });
-const UpcomingSessions = compose(_UpcomingSessions,
-  { cieApi, auth, appStore, ModuleCard })
+const ModuleCard = compose(_ModuleCard, {
+  cieApi,
+  appStore,
+  settings,
+  CheckoutForm,
+});
+const UpcomingSessions = compose(_UpcomingSessions, {
+  cieApi,
+  auth,
+  appStore,
+  ModuleCard,
+});
 
 const withAuth = createWithAuth(auth);
 
 const { authData } = appStore;
-const _ClassroomInjected = compose(_Classroom, { appStore, authData, cieApi, settings });
+const _ClassroomInjected = compose(_Classroom, {
+  appStore,
+  authData,
+  cieApi,
+  settings,
+});
 
 const Classroom = withAuth(_ClassroomInjected);
 const CallbackWithRouter = withRouter(Callback);
@@ -74,14 +91,6 @@ const routesProps = {
 
 const Routes = compose(_Routes, routesProps);
 
-const App = compose(_App, { appStore, auth, Header, Routes })
+const App = compose(_App, { appStore, auth, Header, Routes });
 
-
-export {
-  App,
-  Routes,
-  UpcomingSessions,
-  appStore,
-  auth,
-  withAuth
-};
+export { App, Routes, UpcomingSessions, appStore, auth, withAuth };

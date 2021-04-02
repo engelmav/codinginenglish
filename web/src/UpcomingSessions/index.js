@@ -1,46 +1,46 @@
 import React, { Component } from "react";
-import { Main, Title } from "../UtilComponents";
+import { Button, Main, Title } from "../UtilComponents";
 import { observer } from "mobx-react";
-import "./styles.css";
+import styled from "styled-components";
+
+const Title2 = styled(Title)`
+  text-align: center;
+`;
 
 @observer
 class UpcomingSessions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scheduledSessions: [],
+      cieModules: [],
     };
   }
 
   async componentDidMount() {
-    let scheduledSessions;
+    let cieModules;
     try {
-      // TODO: lift into composite root.
-      const result = await this.props.cieApi.getUpcomingSessions();
-      console.log("getUpcomingSessions result:", result);
-      scheduledSessions = result.data;
-      if (scheduledSessions === null || scheduledSessions === undefined) {
-        scheduledSessions = [];
+      const result = await this.props.cieApi.getUpcomingModulesAndSessions();
+      cieModules = result.data;
+      if ((cieModules === null) | (cieModules === undefined)) {
+        cieModules = [];
       }
     } catch (ex) {
       console.log("Failed to retrieve scheduledSessions.");
       console.log(ex.stack);
-      scheduledSessions = [];
+      cieModules = [];
     }
-    this.setState({ scheduledSessions });
+    this.setState({ cieModules });
   }
 
   render() {
-    let { scheduledSessions } = this.state;
+    const { cieModules } = this.state;
     const { ModuleCard } = this.props;
     return (
       <Main>
-        <Title textAlign="center">upcoming classes</Title>
-        <div>
-          {scheduledSessions.map((sessionData, i) => (
-            <ModuleCard key={i} sessionData={sessionData} />
-          ))}
-        </div>
+        <Title2 mb={20}>upcoming classes</Title2>
+        {cieModules.map((moduleData, i) => (
+          <ModuleCard key={i} moduleData={moduleData} />
+        ))}
       </Main>
     );
   }

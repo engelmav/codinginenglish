@@ -26,9 +26,9 @@ class BaseProvider:
 
             def add(self):
                 db_session.add(self)
-                self._commit()
+                self.commit()
 
-            def _commit(self):
+            def commit(self):
                 db_session.commit()
 
         self.Base = declarative_base(cls=CustomBase)
