@@ -1,7 +1,7 @@
 import React from "react";
 import { compose } from "../compose";
 import { makeAppStore } from "../stores/AppStore";
-import { ModuleCard as _ModuleCard } from "../ModuleCard";
+import { ModuleCard as _ModuleCard } from "../ModuleCard/ModuleCard";
 
 const mockSettings = {
   assets: "https://cie-assets.nyc3.digitaloceanspaces.com",

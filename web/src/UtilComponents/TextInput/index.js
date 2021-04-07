@@ -1,8 +1,18 @@
-import styled from 'styled-components';
+import styled from "styled-components";
+import { space } from "styled-system";
+import { fontFamily, inputPadding, lgInputFontSize, smInputFontSize, whenSmallScreen } from "../sharedStyles";
 
-
-const TextInput = styled.input.attrs(props => ({ type: 'text' }))`
-  border-radius: 3px;
+export const inputFormBorder = "1px dotted black";
+export const inputFormBorderRadius = "3px";
+export const TextInput = styled.input.attrs((props) => ({ type: "text" }))`
+  ${space}
+  border: ${inputFormBorder};
+  border-radius: ${inputFormBorderRadius};
+  font-family: ${fontFamily};
+  font-size: ${lgInputFontSize};
+  padding: ${inputPadding};
+  margin: 0;
+  ${whenSmallScreen`
+    font-size: ${smInputFontSize}
+  `}
 `;
-
-export { TextInput };

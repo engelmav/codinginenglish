@@ -14,6 +14,8 @@ export const Title = styled.h1`
   // font-size: 1.75rem; // ok on mobile, too small on desktop
   font-size: max(1.75rem, min(2.5rem, 3vw));
   width: 100%;
+  margin: 0;
+  padding: 0;
 `;
 
 export const TitleH2 = styled.h2`

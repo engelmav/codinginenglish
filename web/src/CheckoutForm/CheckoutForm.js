@@ -1,7 +1,17 @@
 import axios from "axios";
-import { computed, observable } from "mobx";
+import { observable } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {
+  smMediaQuery,
+  smInputFontSize,
+  lgInputFontSize,
+  fontFamily,
+  inputPadding,
+  debugBorder
+} from "../UtilComponents/sharedStyles";
 
 import {
   Elements,
@@ -11,21 +21,22 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
-import settings from "../settings";
 import { cieApi } from "../services/cieApi";
 import { AlertMessage, Button, Spinner } from "../UtilComponents";
 import {
   CcySelect,
   EmailNote,
+  font,
   Form,
   PaymentInfo,
   PmtFormLabel,
-  NameField,
+  PaymentInfoField,
   BuyButton,
 } from "./subcomponents";
-
-const { stripePK } = settings;
-const stripePromise = loadStripe(stripePK);
+import {
+  inputFormBorder,
+  inputFormBorderRadius,
+} from "../UtilComponents/TextInput";
 
 let paymentCurrency = observable.box("EUR");
 const setPaymentCurrency = (e) => (paymentCurrency = e.target.value);
@@ -41,6 +52,22 @@ const CurrencyMenu = () => {
   );
 };
 
+const CardElementContainer = styled.div`
+  border: ${inputFormBorder};
+  padding: ${inputPadding};
+  padding-bottom: calc(${inputPadding} - 2px);
+  border-radius: ${inputFormBorderRadius};
+  width: 100%;
+`;
+
+const PaymentFormContainer = styled.div`
+  max-width: 600px;
+  ${font}
+  display: flex;
+  flex-wrap: wrap;
+  ${debugBorder}
+`;
+
 function CheckoutFormConsumer(props) {
   const { appStore, onCloseClick, sessionData } = props;
   const stripe = useStripe();
@@ -52,7 +79,7 @@ function CheckoutFormConsumer(props) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isInvalidEmail, setIsInvalidEmail] = useState("");
   const [computedEmail, setComputedEmail] = useState(null);
-  
+
   useEffect(() => {
     const _computedEmail = email || appStore.email;
     setComputedEmail(_computedEmail);
@@ -60,7 +87,7 @@ function CheckoutFormConsumer(props) {
 
   async function handlePurchaseProcess(event) {
     // prioritize a manually entered email over the email we find in the auth user object.
-    
+
     // disable default form submission
     event.preventDefault();
 
@@ -127,7 +154,6 @@ function CheckoutFormConsumer(props) {
       setComplete(true);
     }
 
-    
     const noEmail = computedEmail === null || computedEmail === "";
     if (noEmail) {
       setIsInvalidEmail(
@@ -206,8 +232,9 @@ function CheckoutFormConsumer(props) {
     }
   }
 
+  const isSmallScreen = useMediaQuery(smMediaQuery);
   return (
-    <>
+    <PaymentFormContainer>
       {isComplete ? (
         <>
           <p>
@@ -221,52 +248,53 @@ function CheckoutFormConsumer(props) {
           <Button onClick={onCloseClick}>CLOSE</Button>
         </>
       ) : (
-        <Form onSubmit={handlePurchaseProcess}>
-          <PaymentInfo className="FormGroup">
-            <PmtFormLabel>Name</PmtFormLabel>
-            <NameField
-              placeholder="Your name here"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <PmtFormLabel>Card Details</PmtFormLabel>
-            <CardElement />
-            {/* <PmtFormLabel>Postal/Zip Code</PmtFormLabel><NameField placeholder="08000" value={postalCode} onChange={e => setPostalCode(e.target.value)} /> */}
-            <PmtFormLabel>Currency</PmtFormLabel>
-            <CurrencyMenu />
-
-            <PmtFormLabel>Email</PmtFormLabel>
-            <div>
-              <NameField
-                placeholder="name@domain.com"
-                value={computedEmail || ""} // need this empty string for React to "control" this input field
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <EmailNote>
+        <>
+          <PaymentInfoField
+            pb={10}
+            placeholder="Your name here"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <PaymentInfoField
+            placeholder="name@domain.com"
+            value={computedEmail || ""} // need this empty string for React to "control" this input field
+            onChange={(e) => setEmail(e.target.value)}
+          />
+                    <EmailNote>
                 For receipt and account creation on your terms. We will NOT spam
                 you.
               </EmailNote>
-            </div>
-
-            <BuyButton
-              type="simpleQuery"
-              onClick={e => handlePurchaseProcess(e)}
-              disabled={!stripe || isLoading}
-            >
-              PURCHASE
-            </BuyButton>
-          </PaymentInfo>
-          {isLoading && <Spinner />}
+          <CardElementContainer>
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontFamily: fontFamily,
+                    fontSize: isSmallScreen ? smInputFontSize : lgInputFontSize,
+                  },
+                },
+              }}
+            />
+          </CardElementContainer>
+          <BuyButton
+            type="simpleQuery"
+            onClick={(e) => handlePurchaseProcess(e)}
+            disabled={!stripe || isLoading}
+          >
+            PURCHASE
+          </BuyButton>
           {!isLoading && errorMsg && (
             <AlertMessage style={{ marginTop: "3px" }} text={errorMsg} />
           )}
-        </Form>
+        </>
       )}
-    </>
+    </PaymentFormContainer>
   );
 }
 
 function CheckoutForm(props) {
+  const { stripePK } = props.settings;
+  const stripePromise = loadStripe(stripePK);
   return (
     <Elements stripe={stripePromise}>
       <CheckoutFormConsumer

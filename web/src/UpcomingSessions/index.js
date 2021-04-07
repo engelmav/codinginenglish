@@ -36,7 +36,7 @@ class UpcomingSessions extends Component {
     const { cieModules } = this.state;
     const { ModuleCard } = this.props;
     return (
-      <Main>
+      <Main p={20}>
         <Title2 mb={20}>upcoming classes</Title2>
         {cieModules.map((moduleData, i) => (
           <ModuleCard key={i} moduleData={moduleData} />

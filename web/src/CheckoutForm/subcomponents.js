@@ -1,39 +1,27 @@
-import styled from 'styled-components';
-import {
-  Button,
+import styled from "styled-components";
+import { debugBorder } from "../UtilComponents/sharedStyles";
+import { Button, TextInput } from "../UtilComponents";
+import { font } from "../UtilComponents/sharedStyles";
 
-  TextInput
-} from '../UtilComponents';
-import { font } from '../UtilComponents/sharedStyles';
 export const PaymentInfo = styled.div`
   ${font}
-  display: grid;
-  grid-template-columns: min-content auto;
-  grid-gap: 0.6em;
-  align-items: center;
-  grid-auto-flow: dense;
+  display: flex;
+  flex-wrap: wrap;
+  ${debugBorder}
+  max-width: 800px;
 `;
-export const NameField = styled(TextInput)`
-  grid-column: 2 / 3;
+export const PaymentInfoField = styled(TextInput)`
   width: 100%;
-  margin: 0;
-  border: none;
-  outline: none;
+  margin-bottom: 10px;
 `;
 export const PmtFormLabel = styled.label`
-  align-self: start;
-  text-align: right;
-  width: auto;
   padding: 0;
   padding-top: 1px;
   margin: 0;
   font-size: 85%;
   font-weight: 600;
-  white-space: nowrap;
-
 `;
 export const BuyButton = styled(Button)`
-  grid-column: 2 / 3;
   border-color: black;
   background-color: black;
   color: white;
@@ -42,20 +30,21 @@ export const BuyButton = styled(Button)`
     background-color: white;
   }
   margin-top: 6px;
-  justify-self: start;
+  width: 100%;
+  justify-self: flex-end;
+  padding: 15px;
+  font-weight: 900;
 `;
 export const CcySelect = styled.select`
-  justify-self: start;
-`;
-
-export const Form = styled.form`
 
 `;
+
+export const Form = styled.form``;
 
 export const EmailNote = styled.p`
   font-style: italic;
-  font-size: .8em;
+  font-size: 0.8rem;
   margin: 0;
   padding-top: 1px;
-  padding-bottom: 1px;
+  padding-bottom: 10px;
 `;

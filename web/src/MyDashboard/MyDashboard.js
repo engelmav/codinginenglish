@@ -105,7 +105,7 @@ const MyDashboard = observer((props) => {
     } else {
       return (
         <>
-          <p>Currently registered classes:</p>
+          <P>Currently registered classes:</P>
           <ul>
             {registrations.map((sess, idx) => (
               <li key={idx}>{`${sess.module_name} ${sess.start_date}`}</li>
@@ -128,7 +128,7 @@ const MyDashboard = observer((props) => {
 
           {appStore.authData && <TitleH2>Welcome, {appStore.firstName}!</TitleH2>}
           {appStore.sessionInProgress && (
-            <p>Your class is in session. Go there now!</p>
+            <P>Your class is in session. Go there now!</P>
           )}
           {getClasses(registrations)}
           <P>
