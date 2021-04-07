@@ -1,15 +1,16 @@
-import Modal from "react-modal";
 import { Button, ContentSection, Title } from "../UtilComponents";
+import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
+import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 import { toLocalTime } from "../util";
-import { FaRegWindowClose } from "react-icons/fa";
 import Dialog from "@material-ui/core/Dialog";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Flex, Text, Image } from "rebass";
 
 import React, { useState } from "react";
 
-const ShadowBox = styled(Flex)`
+const CardBox = styled(Flex)`
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -24,19 +25,11 @@ const DialogContent = styled(Flex)`
   flex-direction: column;
 `;
 
-const CloseBox = styled(FaRegWindowClose)`
-  align-self: flex-end;
-  cursor: pointer;
-  transition: 0.2s;
-  :hover {
-    background-color: black;
-    color: white;
-  }
-`;
-
 export const ModuleCard = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  // 
+  const fullScreen = useMediaQuery("(max-width: 40em)");
   const { appStore, CheckoutForm, settings } = props;
   const {
     name: moduleName,
@@ -45,30 +38,21 @@ export const ModuleCard = (props) => {
   } = props.moduleData;
   return (
     <>
-      <ShadowBox sx={{ borderRadius: 15 }} p={20} mb={20}>
+      <CardBox sx={{ borderRadius: 15 }} p={20} mb={20}>
         <Image
           sx={{ "@media screen and (max-width: 500px)": { display: "none" } }}
-          src={`${settings.assets}/lego-man-key-250.jpeg`}
+          src={`${settings.assets}/upcoming-sessions/computer-city-nighttime.png`}
           alt={moduleName}
           mr={2}
           width="50%"
         />
 
-        <Text
-          as="h1"
-          m={3}
-          fontSize={[3, 4, 5]}
-          fontWeight="bold"
-          color="primary"
-          textAlign="center"
-        >
+        <TitleH2 fontWeight="bold" color="primary" textAlign="center">
           {moduleName}
-        </Text>
+        </TitleH2>
 
-        <Text as="p" m={1}>
-          {moduleDescription}
-        </Text>
-        <p>Choose a start time:</p>
+        <P>{moduleDescription}</P>
+        <P>Choose a start time:</P>
         {moduleSessions.map((ms, index) => {
           const sessionDtLocalTime = toLocalTime(ms._session_datetime);
           return (
@@ -77,28 +61,41 @@ export const ModuleCard = (props) => {
               m={1}
               alignSelf="center"
               maxWidth="500px"
-              onClick={() => {setDialogOpen(true); setSelectedSession(sessionDtLocalTime)}}
+              onClick={() => {
+                setDialogOpen(true);
+                setSelectedSession(sessionDtLocalTime);
+              }}
             >
               {sessionDtLocalTime}
             </Button>
           );
         })}
-      </ShadowBox>
+      </CardBox>
 
-      <Dialog open={dialogOpen} onBackdropClick={() => setDialogOpen(false)}>
+      <Dialog
+        open={dialogOpen}
+        onBackdropClick={() => setDialogOpen(false)}
+        fullScreen={fullScreen}
+      >
         <DialogContent flexDirection="column" p={20}>
-          <CloseBox onClick={() => setDialogOpen(false)} />
+          <CloseBox
+            size="30"
+            alignSelf="flex-end"
+            onClick={() => setDialogOpen(false)}
+          />
           <Title>{moduleName}</Title>
 
           <ContentSection>
-            <p>This class begins on <b>{selectedSession}</b>.</p>
+            <P>
+              This class begins on <b>{selectedSession}</b>.
+            </P>
             {appStore.authData == null && (
               <>
-                <p>Already registered as a student? Sign in!</p>
-                <p>
+                <P>Already registered as a student? Sign in!</P>
+                <P>
                   Otherwise, register for this class as a guest. You can create
                   a student profile later.
-                </p>
+                </P>
               </>
             )}
           </ContentSection>

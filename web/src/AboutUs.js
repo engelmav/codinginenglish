@@ -5,7 +5,7 @@ import BlockQuote from "./UtilComponents/BlockQuote";
 
 const AboutUs = () => {
   return (
-    <Main>
+    <Main p={20}>
       <Title>About Us</Title>
       <P>
         Coding in English is born of one passionate and principal belief: that
@@ -35,7 +35,7 @@ const AboutUs = () => {
         pretty ugly. Eric is a senior and seasoned product and project manager
         with excellent design sense.
       </P>
-      <TitleH2>Editing and Translation</TitleH2>
+      <TitleH2>Editing & Translation</TitleH2>
       <P>
         We continue to work with{" "}
         <a href="https://www.linkedin.com/in/laura-bohigas-69916394/">

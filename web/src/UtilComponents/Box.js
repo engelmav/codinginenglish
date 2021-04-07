@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { space, color, layout, flexbox, flexGrow, flexWrap } from "styled-system";
+import { debugBorder } from "./sharedStyles";
 
 
 export const Box = styled.div(
@@ -11,5 +12,6 @@ export const Box = styled.div(
   color,
   layout,
   flexbox,
-  flexWrap
+  flexWrap,
+  debugBorder
 );

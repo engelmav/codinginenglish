@@ -1,7 +1,7 @@
 import React from "react";
 import { compose } from "../compose";
 import { UpcomingSessions } from "../UpcomingSessions";
-import { ModuleCard as _ModuleCard } from "../ModuleCard";
+import { ModuleCard as _ModuleCard } from "../ModuleCard/ModuleCard";
 import { makeAppStore } from "../stores/AppStore";
 
 export default {

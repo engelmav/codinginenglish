@@ -1,7 +1,7 @@
 import { css } from 'styled-components';
 
 export const debugBorder = css`
-  border: 1px dotted blue;
+  /* border: 1px dotted blue; */
 `;
 
 const fontColor = css`
@@ -16,14 +16,31 @@ const lightGray = css`
 export const darkGray = "#3d3636";
 export const cieOrange = "#ff3e00";
 
+
+export const fontFamily = "'Arial', sans-serif"
 const font = css`
-  font-family: 'Roboto', serif;
+  font-family: ${fontFamily};
   ${fontColor}  
+`;
+
+export const fontMonospace = css`
+  font-family: Andale Mono, AndaleMono, monospace;
 `;
 
 const orangeBgColor = css`
   background: #ff3e00;
 `;
+
+export const whenSmallScreen = (...args) => css`
+  @media only screen and (max-width: 40em) {
+    ${css(...args)}
+  }
+`;
+
+export const smMediaQuery = "(max-width: 40em)";
+export const smInputFontSize = "16px"; // using absolutes because of stripe nonsense
+export const lgInputFontSize = "16px";
+export const inputPadding = "15px";
 
 export {
   font,
@@ -31,3 +48,4 @@ export {
   lightGray,
   orangeBgColor
  };
+

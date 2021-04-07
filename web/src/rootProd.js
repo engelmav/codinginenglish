@@ -4,7 +4,7 @@ import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
-import { CheckoutForm as _CheckoutForm } from "./CheckoutForm";
+import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Header as _Header } from "./Header";
@@ -46,9 +46,9 @@ console.log("here is the clearStore method:", appStore.clearStore);
 auth.addOnAuthSuccess(initializeUser);
 auth.addOnLogout(appStore.clearStore);
 
-const Header = compose(_Header, { appStore, auth });
+const Header = compose(_Header, { appStore, auth, settings });
 
-const CheckoutForm = compose(_CheckoutForm, { appStore });
+const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
 const ModuleCard = compose(_ModuleCard, {
   cieApi,
   appStore,

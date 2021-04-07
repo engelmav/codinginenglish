@@ -1,6 +1,7 @@
-import React from "react";
-import { Main, ContentSection } from "../UtilComponents";
-import { Title } from "../UtilComponents/Typography/Typography";
+import React, { useState } from "react";
+import { Main, ContentSection, Button } from "../UtilComponents";
+import { Title, P } from "../UtilComponents/Typography/Typography";
+import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import { Box } from "../UtilComponents/Box";
 import {
@@ -11,6 +12,22 @@ import {
 } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import Dialog from "@material-ui/core/Dialog";
+import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
+
+const SectionImage = styled.img`
+  width: 225px;
+  padding-bottom: 20px;
+  ${whenSmallScreen`
+    width: 70px;
+    height: auto;`}
+`;
+
+const LPButton = styled(Button)`
+  padding: 10px;
+  color: white;
+  ${fontMonospace}
+`;
 
 const MainLanding = styled(Main)`
   width: min(90%, 700px);
@@ -27,20 +44,11 @@ const MainLanding = styled(Main)`
 `;
 
 const ContentSectionLanding = styled(ContentSection)`
-  padding-bottom: 20px;
   line-height: 1.5em;
-  margin-bottom: 1.5rem;
 `;
-
 
 const I = styled.p`
   font-style: italic;
-`;
-
-const ImgContainer = styled.div`
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
 `;
 
 const RegisterLink = styled(Link)`
@@ -50,37 +58,22 @@ const RegisterLink = styled(Link)`
   text-align: center;
   padding: 10px;
   color: white;
+  ${fontMonospace}
   a {
     color: ${cieOrange};
   }
 `;
 
-const RegisterButton = () => (
-  <div style={{ textAlign: "center" }}>
-    <RegisterLink to="/classes">Go to classes</RegisterLink>
-  </div>
-);
-
 const TaglineTitle = styled.h1`
-  // background-color: ${darkGray}
-  // color: white;
-  font-family: sans-serif;
+  font-family: Andale Mono, AndaleMono, monospace;
   color: ${darkGray};
-  text-transform: uppercase;
-  font-size: max(1rem, min(2.5rem, 2.5vw));
+  /* font-size: max(1rem, min(2.5rem, 2.5vw)); */
+  ${whenSmallScreen`
+    font-size: 1.25rem;`}
   font-weight: bolder;
   text-align: center;
-  padding:0;
-  margin:0;
-`;
-
-const TaglineSubtitle = styled.h2`
   padding: 0;
   margin: 0;
-  font-family: sans-serif;
-  text-transform: uppercase;
-  text-align: center;
-  font-size: max(0.75rem, min(1.5rem, 1.5vw));
 `;
 
 const SectionTitle = styled(Title)`
@@ -89,16 +82,32 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
-
+const TechStackImg = styled.img`
+  width: 100%;
+  height: auto;
+  padding-bottom: 20px;
+`;
 
 const Home = (props) => {
+  const { settings } = props;
+  const [isOpenLiveTeaching, setIsOpenLiveTeaching] = useState(false);
   return (
-    <MainLanding>
-      <Box mb={20}>
-        <Box mb={10}>
+    <MainLanding p={20}>
+      <Box display="flex" flexDirection="column" alignItems="center" mb={20}>
+        <Box mt={4}>
           <TaglineTitle>Jump into the global mainstream.</TaglineTitle>
         </Box>
-        <TaglineSubtitle>Learn English as you learn to code.</TaglineSubtitle>
+        <Box mt={40}>
+          <RegisterLink to="/upcoming-classes">
+            Learn English as you learn to code.
+          </RegisterLink>
+        </Box>
+      </Box>
+      <Box mt={40} alignSelf="center">
+        <SectionImage
+          alt="Speak English, Build Apps"
+          src={`${settings.assets}/home/chat-icon-green-red.png`}
+        />
       </Box>
       <SectionTitle>Speak English, Build Apps</SectionTitle>
       <ContentSectionLanding>
@@ -112,8 +121,13 @@ const Home = (props) => {
           documentation, and many more.
         </p>
         <I>And build real software in the process.</I>
-        <RegisterButton />
       </ContentSectionLanding>
+      <Box mt={40} alignSelf="center">
+        <TechStackImg
+          alt={"Software Stack"}
+          src={`${props.settings.assets}/home/3-tech.png`}
+        />
+      </Box>
       <SectionTitle>Create Your Technical Portfolio</SectionTitle>
       <ContentSectionLanding>
         <p>Build your portfolio as you go.</p>
@@ -123,32 +137,26 @@ const Home = (props) => {
           Python, and MySQL, with professional code in a GitHub repository, and
           a real, deployed WebApp.
         </p>
-        <Box p={20}>
-          <ImgContainer>
-            {[
-              "react-logo-150.png",
-              "python-logo-150.png",
-              "mysql-logo-150.png",
-            ].map((src, idx) => (
-              <img
-                alt={src}
-                key={idx}
-                style={{ height: "150px" }}
-                src={`${props.settings.assets}/${src}`}
-              />
-            ))}
-          </ImgContainer>
-        </Box>
-        <RegisterButton />
       </ContentSectionLanding>
+      <Box mt={40} alignSelf="center">
+        <SectionImage
+          alt="Learn Vocabulary and Grammar in Real Context"
+          src={`${settings.assets}/home/dictionary.png`}
+        />
+      </Box>
       <SectionTitle>Learn Vocabulary and Grammar in Real Context</SectionTitle>
       <ContentSectionLanding>
         <p>
           We supplement all courses with grammar and vocabulary practices,
           tightly integrated into technical lessons.
         </p>
-        <RegisterButton />
       </ContentSectionLanding>
+      <Box mt={40} alignSelf="center">
+        <SectionImage
+          alt="Learn in a Live Teaching Environment"
+          src={`${settings.assets}/home/meeting.png`}
+        />
+      </Box>
       <SectionTitle>Learn in a Live Teaching Environment</SectionTitle>
       <ContentSectionLanding>
         <p>
@@ -158,7 +166,44 @@ const Home = (props) => {
           activities in class, ask your instructor questions, laugh, and share
           your doubts and your accomplishments!
         </p>
-        <RegisterButton />
+        <LPButton
+          alignSelf="center"
+          onClick={() => setIsOpenLiveTeaching(true)}
+        >
+          Learn more
+        </LPButton>
+        <Dialog
+          open={isOpenLiveTeaching}
+          onBackdropClick={() => setIsOpenLiveTeaching(false)}
+        >
+          <ContentSectionLanding p={10}>
+            <CloseBox
+              size="30"
+              alignSelf="flex-end"
+              onClick={() => setIsOpenLiveTeaching(false)}
+            />
+            <Title>Live Teaching</Title>
+            <P>
+              Students work with instructors as a group and one-on-one. The
+              virtual classroom is equipped with embedded video and chat, with
+              interactive English and programming exercises. The programming
+              exercises are even performed in a fully-equipped Ubuntu virtual
+              machine, right in the virtual classroom!{" "}
+            </P>
+            <P>
+              Get live help from your instructor when you're stuck or don't
+              understand a lesson. No more dry discussion boards (although we'll
+              have those too.) Shout out when you're lost! Get help from a
+              patient and knowledgeable instructor. You're not in this alone!
+            </P>
+            <LPButton
+              alignSelf="center"
+              onClick={() => setIsOpenLiveTeaching(false)}
+            >
+              Done!
+            </LPButton>
+          </ContentSectionLanding>
+        </Dialog>
         <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
           <p>
             "As a foreign student, learning any subject ... was extremely tough.
