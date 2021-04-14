@@ -6,6 +6,8 @@ import { FaGripLines, FaRegWindowClose } from "react-icons/fa";
 const TitleBar = styled.div`
   ${font}
   border: 1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,7 +23,7 @@ const Window = (props) => {
       <div>{title}</div>
       {!hideClose ? (
         <FaRegWindowClose
-          style={{ marginRight: "3px", cursor: "pointer" }}
+          style={{ marginRight: "10px", cursor: "pointer" }}
           onClick={onClose}
         />
       ) : (

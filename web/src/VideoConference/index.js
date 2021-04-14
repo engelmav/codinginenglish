@@ -5,6 +5,7 @@ const room = "cie";
 const password = "hardcodednonsense";
 const VideoCall = (props) => {
   const { participantName, videoChannel } = props;
+  console.log("Rendering Jutsu with participantName", participantName);
   return (
     <Jutsu
       roomName={videoChannel}

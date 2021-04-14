@@ -82,9 +82,9 @@ def session_start_date_now():
 
 
 def create_2_hour_session(module_id, session_start_dt):
-    session_start_dt_str = session_start_dt.strftime("%Y-%m-%d %H:%M:%S")
+    # session_start_dt_str = session_start_dt.strftime("%Y-%m-%d %H:%M:%S")
     _url = f"{config.current_url}/cie-modules/{module_id}/sessions"
-    resp = requests.post(_url, params={"cie_module_id": module_id}, json={"session_datetime": session_start_dt_str})
+    resp = requests.post(_url, params={"cie_module_id": module_id}, json={"session_datetime": session_start_dt})
     session_id = resp.json().get('data').get('id')
     print(f">>>> created_2_hour_session(): session_id {session_id}")
     pp.pprint(resp.json())
@@ -171,7 +171,7 @@ def create_test_data(test_data_spec, add_user_to_session=True, activate_session=
     module_data = create_beginners_module()
     test_data.module_id = module_data.get('data').get('id')
 
-    session_data = create_2_hour_session(test_data.module_id, session_start_date)
+    session_data = create_2_hour_session(test_data.module_id, session_start_date.get("session_datetime"))
     if add_user_to_session:
         test_data.session_id = session_data.get('data').get('id')
         register_user_to_session(test_user_id, test_data.session_id)
