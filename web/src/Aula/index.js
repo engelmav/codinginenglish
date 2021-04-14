@@ -18,8 +18,8 @@ const ChatSignIn = (props) => {
   const authenticateChat = () => {
     const chatIframe = divRef.current.firstElementChild;
     chatIframe.addEventListener("load", function () {
-      setTimeout(() =>{
-        console.log("posting message with", props.appStore.rocketchatAuthToken)
+      setTimeout(() => {
+        console.log("posting message with", props.appStore.rocketchatAuthToken);
         this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
@@ -41,6 +41,15 @@ const Taskbar = styled.div`
   padding: 4px;
 `;
 
+const CoverIframeOnDrag = styled.div`
+  height: 100%;
+  width: 100%;
+  z-index: 101;
+  position: absolute;
+  background-color: lightGray;
+  /* opacity: 50%; */
+`;
+
 @observer
 class Aula extends Component {
   constructor(props) {
@@ -54,6 +63,7 @@ class Aula extends Component {
       slidesWindow: true,
       videoWindow: true,
       popupActivityWindow: false,
+      isWindowDragging: false,
 
       rocketchatAuthToken: null,
       chatChannel: null,
@@ -80,21 +90,18 @@ class Aula extends Component {
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
+
     const {
       chat_channel,
       prezzie_link,
       video_channel,
     } = activeSessionData.data;
 
-    this.setState(
-      {
-        chatChannel: chat_channel,
-        prezzieLink: prezzie_link,
-        videoChannel: video_channel,
-      },
-      () => console.log("state updated:", this.state)
-    );
-    console.log("After set state");
+    this.setState({
+      chatChannel: chat_channel,
+      prezzieLink: prezzie_link,
+      videoChannel: video_channel,
+    });
   }
 
   componentDidMount() {
@@ -132,7 +139,6 @@ class Aula extends Component {
     this.setState({ chatWindow: !this.state.chatWindow });
   };
   toggleSlides = () => {
-    console.log("toggle slides");
     this.setState({ slidesWindow: !this.state.slidesWindow });
   };
   toggleVideo = () => {
@@ -140,6 +146,13 @@ class Aula extends Component {
   };
   togglePopupActivity = () => {
     this.setState({ popupActivityWindow: !this.state.popupActivityWindow });
+  };
+
+  handleWindowMove = (windowName) => {
+    this.setState({ onTop: windowName, isWindowDragging: true });
+  };
+  handleWindowRelease = () => {
+    this.setState({ isWindowDragging: false });
   };
 
   render() {
@@ -157,6 +170,7 @@ class Aula extends Component {
       videoChannel,
 
       onTop,
+      isWindowDragging,
     } = this.state;
 
     const {
@@ -175,7 +189,6 @@ class Aula extends Component {
 
     return (
       <div>
-        <h1>{this.state.event}</h1>
         <Taskbar>
           {!slidesWindow && (
             <Button mr={2} onClick={this.toggleSlides}>
@@ -209,9 +222,11 @@ class Aula extends Component {
               height: 400,
             }}
             style={{ zIndex: onTop === slidesWindowTop ? 200 : 0 }}
-            onClick={() => this.setState({ onTop: slidesWindowTop })}
+            onMouseDown={() => this.handleWindowMove(slidesWindowTop)}
+            onDragStop={this.handleWindowRelease}
           >
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
+            {isWindowDragging && <CoverIframeOnDrag />}
             <Iframe
               id="slidesView"
               url={prezzieLink}
@@ -234,9 +249,11 @@ class Aula extends Component {
               height: 400,
             }}
             style={{ zIndex: onTop === chatWindowTop ? 200 : 0 }}
-            onClick={() => this.setState({ onTop: chatWindowTop })}
+            onMouseDown={() => this.handleWindowMove(chatWindowTop)}
+            onDragStop={this.handleWindowRelease}
           >
             <Window title="CIE Chat" onClose={toggleChat} />
+            {isWindowDragging && <CoverIframeOnDrag />}
             <ChatSignIn appStore={this.props.appStore}>
               <Iframe
                 url={rocketChatUrl}
@@ -257,9 +274,11 @@ class Aula extends Component {
               height: 400,
             }}
             style={{ zIndex: onTop === videoWindowTop ? 200 : 0 }}
-            onClick={() => this.setState({ onTop: videoWindowTop })}
+            onMouseDown={() => this.handleWindowMove(videoWindowTop)}
+            onDragStop={this.handleWindowRelease}
           >
             <Window title="Video" onClose={toggleVideo} />
+            {isWindowDragging && <CoverIframeOnDrag />}
             <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
                 participantName={appStore.firstName}
@@ -278,10 +297,11 @@ class Aula extends Component {
               height: 600,
             }}
             style={{ zIndex: onTop === guacWindowTop ? 200 : 0 }}
-            onClick={() => this.setState({ onTop: guacWindowTop })}
+            onMouseDown={() => this.handleWindowMove(guacWindowTop)}
+            onDragStop={this.handleWindowRelease}
           >
             <Window title="Dev Environment" onClose={toggleGuac} />
-
+            {isWindowDragging && <CoverIframeOnDrag />}
             {browserDetect.isSafari ? (
               <>
                 <p>
