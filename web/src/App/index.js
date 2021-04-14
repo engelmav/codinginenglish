@@ -7,17 +7,6 @@ import { observer } from "mobx-react";
 import { Flex } from "rebass";
 import { Box } from "../UtilComponents/Box";
 
-const Footer = styled.footer`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ff3e00;
-  text-align: center;
-  color: white;
-  padding: 10px;
-}
-`;
-
 const RoutesBox = styled(Box)`
   flex: 1;
 `;
@@ -25,7 +14,7 @@ const RoutesBox = styled(Box)`
 @observer
 class App extends Component {
   render() {
-    const { appStore, auth, Header, Routes } = this.props;
+    const { Header, Routes, Footer } = this.props;
     return (
       <Router history={history}>
         <Flex
@@ -37,9 +26,7 @@ class App extends Component {
           <RoutesBox>
             <Routes />
           </RoutesBox>
-          <Footer>
-            <i>Made with love in Encinitas, California.</i>
-          </Footer>
+          <Footer />
         </Flex>
       </Router>
     );

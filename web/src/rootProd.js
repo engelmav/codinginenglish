@@ -8,6 +8,8 @@ import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Header as _Header } from "./Header";
+import { Footer as _Footer } from "./Footer/Footer";
+import { Login as _Login } from "./Login";
 import history from "./history";
 import { Home as _Home } from "./Home";
 import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
@@ -20,7 +22,6 @@ import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 
 const cieApi = new CieApi();
-// const appStore = new AppStore();
 const appStore = makeAppStore();
 
 const studentSessionMgr = new StudentSessionManager(EventSource);
@@ -46,7 +47,9 @@ console.log("here is the clearStore method:", appStore.clearStore);
 auth.addOnAuthSuccess(initializeUser);
 auth.addOnLogout(appStore.clearStore);
 
-const Header = compose(_Header, { appStore, auth, settings });
+const Login = compose(_Login, { auth, appStore });
+const Header = compose(_Header, { appStore, auth, settings, Login });
+const Footer = compose(_Footer, { appStore, auth, Login });
 
 const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
 const ModuleCard = compose(_ModuleCard, {
@@ -91,6 +94,6 @@ const routesProps = {
 
 const Routes = compose(_Routes, routesProps);
 
-const App = compose(_App, { appStore, auth, Header, Routes });
+const App = compose(_App, { appStore, auth, Header, Routes, Footer });
 
 export { App, Routes, UpcomingSessions, appStore, auth, withAuth };
