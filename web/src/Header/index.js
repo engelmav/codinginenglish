@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import Login from "../Login";
 import { Link, Route, Switch } from "react-router-dom";
 import styled, { css } from "styled-components";
 import {
-  darkGray,
   debugBorder,
   whenSmallScreen,
 } from "../UtilComponents/sharedStyles";
+import { navbarCommonStyle } from "../Navbar";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { observer } from "mobx-react";
 import { FaRegWindowClose } from "react-icons/fa";
@@ -59,41 +58,8 @@ const Img = styled.img`
       height: 25px;`}
 `;
 
-const RoutesUL = styled.ul`
-  ${debugBorder}
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
-  font-weight: 900;
-  text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  font-family: "Roboto Mono", monospace;
-  font-size: clamp(1rem, 1.25vw, 1.25rem);
-  list-style-type: none;
-  padding: 0;
-  margin: 0px;
-  align-self: center;
-  li {
-    display: inline-block;
-    padding-right: 10px;
-  }
-  li a {
-    color: white;
-    font-weight: 900;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-family: "Roboto Mono", monospace;
-    padding-right: 4px;
-    padding-left: 4px;
-  }
-  li a:hover {
-    background-color: #ff3e00;
-    color: white;
-    padding: 4px;
-  }
+const NavbarHeader = styled.ul`
+  ${navbarCommonStyle}
   ${whenSmallScreen`
     li {
       margin-bottom: 2rem;
@@ -115,11 +81,11 @@ const RoutesUL = styled.ul`
 `;
 
 const HeaderContainer = observer((props) => {
-  const { auth, appStore, settings } = props;
+  const { auth, appStore, settings, Login } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
 
-  const closeNavMenu = (event) => {
+  const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
       return;
     }
@@ -127,16 +93,16 @@ const HeaderContainer = observer((props) => {
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", closeNavMenu);
+    document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
-    return () => document.removeEventListener("mousedown", closeNavMenu);
+    return () => document.removeEventListener("mousedown", detectBackgroundClickAndCloseNav);
   }, [navMenuRef]);
 
-  const hideNav = { onClick: closeNavMenu };
+  const hideNav = { onClick: () => setNavMenu(false) };
   const links = [
     { text: "upcoming_sessions", location: "/upcoming-sessions", ...hideNav },
     { text: "about_us", location: "/about-us", ...hideNav },
-    { text: "technique", location: "/", ...hideNav },
+    { text: "technique", location: "/technique", ...hideNav },
   ];
 
   return (
@@ -146,14 +112,20 @@ const HeaderContainer = observer((props) => {
       </Route>
       <Route path="*">
         <Header>
-          <Img
-            alt="cie logo"
-            src={`${settings.assets}/cie-logo-horizontal-black.png`}
-          ></Img>
-          <RoutesUL navMenu={navMenu} ref={navMenuRef}>
+          <Link to="/">
+            <Img
+              alt="cie logo"
+              src={`${settings.assets}/cie-logo-horizontal-black.png`}
+            ></Img>
+          </Link>
+
+          <NavbarHeader navMenu={navMenu} ref={navMenuRef}>
+            <li>
+              <CloseBox size="20" onClick={() => setNavMenu(false)} />
+            </li>
             {links.map((link, idx) => (
               <li onClick={link.onClick} key={idx}>
-                <Link to={link.location} >{link.text}</Link>
+                <Link to={link.location}>{link.text}</Link>
               </li>
             ))}
             {appStore.authData && (
@@ -169,9 +141,9 @@ const HeaderContainer = observer((props) => {
               </>
             )}
             <li>
-              <Login auth={auth} appStore={appStore} />
+              <Login />
             </li>
-          </RoutesUL>
+          </NavbarHeader>
           <Hamburger size="20" onClick={() => setNavMenu(true)} />
         </Header>
       </Route>

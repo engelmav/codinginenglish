@@ -26,7 +26,6 @@ import { AlertMessage, Button, Spinner } from "../UtilComponents";
 import {
   CcySelect,
   EmailNote,
-  font,
   Form,
   PaymentInfo,
   PmtFormLabel,
@@ -62,7 +61,6 @@ const CardElementContainer = styled.div`
 
 const PaymentFormContainer = styled.div`
   max-width: 600px;
-  ${font}
   display: flex;
   flex-wrap: wrap;
   ${debugBorder}
