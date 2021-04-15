@@ -41,13 +41,12 @@ const Taskbar = styled.div`
   padding: 4px;
 `;
 
-const CoverIframeOnDrag = styled.div`
+const CoverWindowOnDrag = styled.div`
   height: 100%;
   width: 100%;
   z-index: 101;
   position: absolute;
   background-color: lightGray;
-  /* opacity: 50%; */
 `;
 
 @observer
@@ -71,8 +70,6 @@ class Aula extends Component {
       exerciseContent: null,
       onTop: null,
     };
-
-    // this.eventSource = new EventSource("/api/stream");
 
     this.setGuacViewerRef = (element) => {
       this.guacViewer = element;
@@ -106,30 +103,39 @@ class Aula extends Component {
 
   componentDidMount() {
     this.configureActiveSession();
-    // this.eventSource.addEventListener("classUpdate", (e) => {
-    //   console.log("received SSE event data:");
-    //   const { data } = e;
-    //   let commmandData;
-    //   try {
-    //     commmandData = JSON.parse(data);
-    //     console.log(commmandData);
-    //   } catch (ex) {
-    //     console.error("Exception thrown", ex.stack);
-    //     console.log(e);
-    //     console.log(data);
-    //     return;
-    //   }
 
-    //   if (
-    //     commmandData.hasOwnProperty("command") &&
-    //     commmandData.command.name === "SHOW_ACTIVITY_POPUP"
-    //   ) {
-    //     this.setState(
-    //       { activityData: commmandData.command.data },
-    //       this.togglePopupActivity
-    //     );
-    //   }
-    // });
+    this.props.websocket.addEventListener("message", (event) => {
+      const { data } = event;
+      if (data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          console.log(
+            "Aula: received websocket event data. Here it is, unparsed:",
+            reader.result
+          );
+          let commmandData;
+          try {
+            commmandData = JSON.parse(reader.result);
+            console.log(commmandData);
+          } catch (ex) {
+            console.error("Failed to parse websocket event data.", ex.stack);
+            console.log(reader.result);
+            return;
+          }
+
+          if (
+            commmandData.hasOwnProperty("command") &&
+            commmandData.command.name === "SHOW_ACTIVITY_POPUP"
+          ) {
+            this.setState(
+              { activityData: commmandData.command.data },
+              this.togglePopupActivity
+            );
+          }
+        };
+        reader.readAsText(data);
+      }
+    });
   }
 
   toggleGuac = () => {
@@ -186,6 +192,7 @@ class Aula extends Component {
     const videoWindowTop = "videoWindow";
     const guacWindowTop = "guacWindow";
     const chatWindowTop = "chatWindow";
+    const activityWindowOnTop = "activityWindow";
 
     return (
       <div>
@@ -226,7 +233,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
-            {isWindowDragging && <CoverIframeOnDrag />}
+            {isWindowDragging && <CoverWindowOnDrag />}
             <Iframe
               id="slidesView"
               url={prezzieLink}
@@ -253,7 +260,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="CIE Chat" onClose={toggleChat} />
-            {isWindowDragging && <CoverIframeOnDrag />}
+            {isWindowDragging && <CoverWindowOnDrag />}
             <ChatSignIn appStore={this.props.appStore}>
               <Iframe
                 url={rocketChatUrl}
@@ -278,7 +285,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Video" onClose={toggleVideo} />
-            {isWindowDragging && <CoverIframeOnDrag />}
+            {isWindowDragging && <CoverWindowOnDrag />}
             <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
                 participantName={appStore.firstName}
@@ -301,7 +308,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Dev Environment" onClose={toggleGuac} />
-            {isWindowDragging && <CoverIframeOnDrag />}
+            {isWindowDragging && <CoverWindowOnDrag />}
             {browserDetect.isSafari ? (
               <>
                 <p>
@@ -344,12 +351,14 @@ class Aula extends Component {
                 width: 800,
               }}
               style={{ zIndex: 300 }}
+              onMouseDown={() => this.setState({ onTop: popupActivityWindow })}
             >
               <Window
                 className="rnd-header"
                 title="Vocab Exercise"
                 onClose={togglePopupActivity}
               />
+              {isWindowDragging && <CoverWindowOnDrag />}
               <PopupActivity
                 activities={activityData}
                 onClose={togglePopupActivity}

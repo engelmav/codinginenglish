@@ -19,7 +19,7 @@ const Window = (props) => {
   const { title, onClose, hideClose } = props;
   return (
     <TitleBar>
-      <FaGripLines style={{ marginLeft: "6px" }} />
+      <FaGripLines style={{ marginLeft: "10px" }} />
       <div>{title}</div>
       {!hideClose ? (
         <FaRegWindowClose

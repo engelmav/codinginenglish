@@ -24,8 +24,9 @@ import { withRouter } from "react-router-dom";
 const cieApi = new CieApi();
 const appStore = makeAppStore();
 
-const studentSessionMgr = new StudentSessionManager(EventSource);
-studentSessionMgr.start();
+const websocket = new WebSocket("ws://127.0.0.1:5000/ws/stream");
+websocket.onerror = (err) => console.log("websockets error:", err);
+const studentSessionMgr = new StudentSessionManager(websocket);
 studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
 
 const auth = new Auth(appStore);
@@ -40,7 +41,7 @@ async function initializeUser(authResult) {
     userData,
     initializedUser.data.rocketchat_auth_token
   );
-  studentSessionMgr.start();
+  studentSessionMgr.initialize();
   history.push("/my-dashboard");
 }
 console.log("here is the clearStore method:", appStore.clearStore);
@@ -73,6 +74,7 @@ const _ClassroomInjected = compose(_Classroom, {
   authData,
   cieApi,
   settings,
+  websocket
 });
 
 const Classroom = withAuth(_ClassroomInjected);
