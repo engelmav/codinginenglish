@@ -2,6 +2,8 @@ import json
 import logging
 import threading
 from datetime import datetime, timedelta, timezone
+
+import gevent
 import pytz
 import time
 
@@ -194,3 +196,40 @@ class StudentSessionService:
                           f"already_started: {already_started}, ended: {ended}")
                 break
             time.sleep(2)
+
+
+class MessagesBackend(object):
+    """Interface for registering and updating WebSocket clients."""
+
+    def __init__(self, pubsub):
+        self.clients = list()
+        self.pubsub = pubsub
+
+    def __iter_data(self):
+        for message in self.pubsub.listen():
+            data = message.get('data')
+            if message['type'] == 'message':
+                LOG.info(u'Sending message: {}'.format(data))
+                yield data
+
+    def register(self, client):
+        """Register a WebSocket connection for Redis updates."""
+        self.clients.append(client)
+
+    def send(self, client, data):
+        """Send given data to the registered client.
+        Automatically discards invalid connections."""
+        try:
+            client.send(data)
+        except Exception:
+            self.clients.remove(client)
+
+    def run(self):
+        """Listens for new messages in Redis, and sends them to clients."""
+        for data in self.__iter_data():
+            for client in self.clients:
+                gevent.spawn(self.send, client, data)
+
+    def start(self):
+        """Maintains Redis subscription in the background."""
+        gevent.spawn(self.run)

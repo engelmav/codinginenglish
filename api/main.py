@@ -2,7 +2,7 @@ from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
 from database.providers import base_provider
-from events import create_event_stream, create_publish_message, StudentSessionService
+from events import create_event_stream, create_publish_message, StudentSessionService, MessagesBackend
 import redis
 from simplekv.memory.redisstore import RedisStore
 
@@ -32,11 +32,13 @@ student_session_service = StudentSessionService(red, models)
 
 pubsub = red.pubsub()
 pubsub.subscribe('cie')
-pub_sub_listener = pubsub.listen()
+# pub_sub_listener = pubsub.listen()
 event_stream = create_event_stream(red)
 publish_message = create_publish_message(red)
 rc_service = RocketChatService()
 
+message_backend = MessagesBackend(pubsub)
+message_backend.start()
 payment_api = create_payment_api(module_service, user_service)
 
 app = create_main_api(
@@ -50,6 +52,7 @@ app = create_main_api(
     schema,
     red,
     rc_service,
-    payment_api
+    payment_api,
+    message_backend
 )
 

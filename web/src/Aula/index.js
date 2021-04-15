@@ -72,7 +72,7 @@ class Aula extends Component {
       onTop: null,
     };
 
-    this.eventSource = new EventSource("/api/stream");
+    // this.eventSource = new EventSource("/api/stream");
 
     this.setGuacViewerRef = (element) => {
       this.guacViewer = element;
@@ -106,30 +106,30 @@ class Aula extends Component {
 
   componentDidMount() {
     this.configureActiveSession();
-    this.eventSource.addEventListener("classUpdate", (e) => {
-      console.log("received SSE event data:");
-      const { data } = e;
-      let commmandData;
-      try {
-        commmandData = JSON.parse(data);
-        console.log(commmandData);
-      } catch (ex) {
-        console.error("Exception thrown", ex.stack);
-        console.log(e);
-        console.log(data);
-        return;
-      }
+    // this.eventSource.addEventListener("classUpdate", (e) => {
+    //   console.log("received SSE event data:");
+    //   const { data } = e;
+    //   let commmandData;
+    //   try {
+    //     commmandData = JSON.parse(data);
+    //     console.log(commmandData);
+    //   } catch (ex) {
+    //     console.error("Exception thrown", ex.stack);
+    //     console.log(e);
+    //     console.log(data);
+    //     return;
+    //   }
 
-      if (
-        commmandData.hasOwnProperty("command") &&
-        commmandData.command.name === "SHOW_ACTIVITY_POPUP"
-      ) {
-        this.setState(
-          { activityData: commmandData.command.data },
-          this.togglePopupActivity
-        );
-      }
-    });
+    //   if (
+    //     commmandData.hasOwnProperty("command") &&
+    //     commmandData.command.name === "SHOW_ACTIVITY_POPUP"
+    //   ) {
+    //     this.setState(
+    //       { activityData: commmandData.command.data },
+    //       this.togglePopupActivity
+    //     );
+    //   }
+    // });
   }
 
   toggleGuac = () => {

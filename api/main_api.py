@@ -3,12 +3,13 @@ import json
 import threading
 from typing import List
 
-from flask import Flask, jsonify, request, session
-import flask
+import gevent
+from flask import Flask, jsonify, request
+from flask_sockets import Sockets
 from sqlalchemy import func
 
 from database.models import Models
-from events import StudentSessionService
+from events import StudentSessionService, MessagesBackend
 from config import config
 import services.cie as cie
 
@@ -23,6 +24,7 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
+sockets = Sockets(app)
 
 
 def create_main_api(event_stream,
@@ -35,7 +37,8 @@ def create_main_api(event_stream,
                     schema: Schema,
                     redis,
                     rc_service: RocketChatService,
-                    payment_api):
+                    payment_api,
+                    messages_backend: MessagesBackend):
 
     app.register_blueprint(payment_api)
 
@@ -44,29 +47,44 @@ def create_main_api(event_stream,
         db_session.remove()
 
     # MESSAGING TO FRONTEND
-    @app.route('/api/command', methods=['POST'])
+    @app.route('/api/command', methods=['GET'])
     def send_sse():
         command = request.get_json()
-        # we are doing this twice to clean up control characters
+        # # we are doing this twice to clean up control characters
         command_str = json.dumps(command)
-        res = publish_message(command_str)
 
+        """
+        while not ws.closed:
+            gevent.sleep(0.5)
+            message = ws.receive()
+
+            if message:
+                LOG.debug(f"Inserting message {message}")
+                publish_message(message)
+        """
+        res = publish_message(command_str)
         return jsonify(res)
 
-    @app.route('/api/stream')
-    def stream_sse():
+    # @app.route('/api/stream')
+    @sockets.route("/ws/stream")
+    def stream_sse(ws):
 
-        sse_message = flask.Response(
-            event_stream(),
-            mimetype="text/event-stream",
-        )
-        # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
-        sse_message.headers['Cache-Control'] = "no-transform"
-        # the below header prevents nginx from swallowing SSEs.
-        sse_message.headers['X-Accel-Buffering'] = "no"
-        # browsers will close after 2 min of inactivity unless Connection=keep-alive
-        sse_message.headers['Connection'] = "keep-alive"
-        return sse_message
+        # sse_message = flask.Response(
+        #     event_stream(),
+        #     mimetype="text/event-stream",
+        # )
+        # # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
+        # sse_message.headers['Cache-Control'] = "no-transform"
+        # # the below header prevents nginx from swallowing SSEs.
+        # sse_message.headers['X-Accel-Buffering'] = "no"
+        # # browsers will close after 2 min of inactivity unless Connection=keep-alive
+        # sse_message.headers['Connection'] = "keep-alive"
+        # return sse_message
+        messages_backend.register(ws)
+        while not ws.closed:
+            # seriously, wtf does this do?
+            # Context switch while `ChatBackend.start` is running in the background.
+            gevent.sleep(0.5)
 
     def _get(key, default=None):
         j = request.get_json()
