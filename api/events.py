@@ -2,6 +2,8 @@ import json
 import logging
 import threading
 from datetime import datetime, timedelta, timezone
+
+import gevent
 import pytz
 import time
 
@@ -194,3 +196,45 @@ class StudentSessionService:
                           f"already_started: {already_started}, ended: {ended}")
                 break
             time.sleep(2)
+
+
+class MessagesBackend:
+    """Interface for registering and updating WebSocket clients."""
+
+    def __init__(self, pubsub):
+        self.clients = list()
+        self.pubsub = pubsub
+
+    def __iter_data(self):
+        for message in self.pubsub.listen():
+            data = message.get('data')
+            LOG.debug(f"Got message of type {message.get('type', None)}")
+            if message['type'] == 'message':
+                LOG.info(u'Sending message: {}'.format(data))
+                yield data
+
+    def register(self, client):
+        """Register a WebSocket connection for Redis updates."""
+        LOG.debug(f"Registering new websocket client {client}")
+        self.clients.append(client)
+
+    def send(self, client, data):
+        """Send given data to the registered client.
+        Automatically discards invalid connections."""
+        try:
+            LOG.debug(f"Sending data {data} using client instance {client}")
+            client.send(data)
+        except Exception:
+            LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
+            self.clients.remove(client)
+
+    def run(self):
+        """Listens for new messages in Redis, and sends them to clients."""
+        for data in self.__iter_data():
+            for client in self.clients:
+                gevent.spawn(self.send, client, data)
+
+    def start(self):
+        """Maintains Redis subscription in the background."""
+        LOG.debug("Spawning gevent thread for Websocket.")
+        gevent.spawn(self.run)

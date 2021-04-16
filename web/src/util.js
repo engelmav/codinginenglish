@@ -5,8 +5,8 @@ let userAgentString = navigator.userAgent;
 let isChrome = userAgentString.indexOf("Chrome") > -1;
 let isSafari = userAgentString.indexOf("Safari") > -1;
 
-// Discard Safari since it also matches Chrome 
-if ((isChrome) && (isSafari)) isSafari = false;
+// Discard Safari since it also matches Chrome
+if (isChrome && isSafari) isSafari = false;
 
 const browserDetect = {
   // isOpera: (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0,
@@ -14,7 +14,7 @@ const browserDetect = {
   // Firefox 1.0+
   // isFirefox: typeof InstallTrigger !== 'undefined',
 
-  // Safari 3.0+ "[object HTMLElementConstructor]" 
+  // Safari 3.0+ "[object HTMLElementConstructor]"
   isSafari: isSafari,
   // Internet Explorer 6-11
   // isIE: /*@cc_on!@*/false || !!document.documentMode,
@@ -27,7 +27,7 @@ const browserDetect = {
 
   // Blink engine detection
   // isBlink: (isChrome || isOpera) && !!window.CSS
-}
+};
 
 /**
  * Returns whether or not a class in session right now.
@@ -41,25 +41,23 @@ const isInSession = (startDateTime, durationMinutes) => {
   const end = start.plus(duration);
   const interval = Interval.fromDateTimes(start, end);
   return interval.contains(nowUtc);
-}
-
+};
 
 function hasActiveSession(userSessions) {
   let _hasActiveSession = false;
-  userSessions.forEach(userSession => {
+  userSessions.forEach((userSession) => {
     if (isInSession(userSession.start_time)) {
-      console.log("User has an active session!")
+      console.log("User has an active session!");
       _hasActiveSession = true;
     }
   });
   return _hasActiveSession;
 }
 
-
 class StudentSessionManager {
-  constructor(_EventSource) {
-    this.EventSource = _EventSource;
-    this.start = this.start.bind(this);
+  constructor(websocket) {
+    this.websocket = websocket;
+    this.start = this.initialize.bind(this);
     this.onSessionStartCallbacks = [];
   }
 
@@ -67,47 +65,48 @@ class StudentSessionManager {
     this.onSessionStartCallbacks.push(callback);
   }
   onSessionStart(event) {
-    this.onSessionStartCallbacks.forEach(cb => cb(event));
+    this.onSessionStartCallbacks.forEach((cb) => cb(event));
   }
   onSessionEnd(callback) {
     this.onSessionEndCallback = callback;
   }
-  start() {
-    const eventSource = new this.EventSource('/api/stream');
-    console.log("Adding event listener to student-session-manager on /api/stream");
-    eventSource.addEventListener('student-session-manager', event => {
-      console.log('Received event from stream student-session-manager:', event);
-      const { data } = event;
-      try {
-        const eventData = JSON.parse(data);
-        console.log("Event data:", eventData);
-        const isStartEvent = eventData.hasOwnProperty("event_type")
-          && eventData.event_type === "session_start";
-        if (isStartEvent) {
-          this.onSessionStart(eventData);
-        }
-      } catch (ex) {
-        console.log("student-session-manager unable to parse event data:", data);
-        throw (ex);
+
+  delegateEvent(data) {
+    try {
+      const eventData = JSON.parse(data);
+      console.log("Event data:", eventData);
+      const isStartEvent =
+        eventData.hasOwnProperty("event_type") &&
+        eventData.event_type === "session_start";
+      if (isStartEvent) {
+        console.log("Received sessionStart event");
+        this.onSessionStart(eventData);
       }
-    })
-    eventSource.onerror = function (err) {
-      console.log("Error ocurred on event student-session-manager /api/stream:", err);
+    } catch (ex) {
+      console.log("student-session-manager unable to parse event data:", data);
+      throw ex;
     }
+  }
+
+  initialize() {
+    console.log("websocket object:", this.websocket)
+    this.websocket.addEventListener("message", (event) => {
+      const { data } = event;
+      if (data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.delegateEvent(reader.result);
+        };
+        reader.readAsText(data);
+      }
+    });
   }
 }
 
 export function toLocalTime(dt) {
   var dtFromISO = DateTime.fromISO(dt);
-  const localDt = dtFromISO.toLocaleString(
-    DateTime.DATETIME_FULL
-  );
+  const localDt = dtFromISO.toLocaleString(DateTime.DATETIME_FULL);
   return localDt;
-  }
+}
 
-export {
-  browserDetect,
-  hasActiveSession,
-  isInSession,
-  StudentSessionManager
-};
+export { browserDetect, hasActiveSession, isInSession, StudentSessionManager };

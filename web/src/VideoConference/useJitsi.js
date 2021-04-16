@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { IoK8sApiAdmissionregistrationV1beta1RuleWithOperations } from "kubernetes-models/_definitions/IoK8sApiAdmissionregistrationV1beta1RuleWithOperations";
 
 const useJitsi = ({
   domain = "meet.jit.si",

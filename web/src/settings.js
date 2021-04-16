@@ -9,7 +9,8 @@ const settings = {
     slidesUrl:     "https://slides.com/vincentengelmann",
     auth0LogoutUrl:"https://www.codinginenglish.com",
     assets:        "https://cie-assets.nyc3.digitaloceanspaces.com",
-    stripePK:      "pk_live_ciL7BF5syCv4uC1KPjHEq2Sa00raFPFo6w"
+    stripePK:      "pk_live_ciL7BF5syCv4uC1KPjHEq2Sa00raFPFo6w",
+    websocketAddress: "wss://ws.codinginenglish.com:443/ws/stream"
 
   },
   development: {
@@ -19,7 +20,8 @@ const settings = {
     slidesUrl:     "https://slides.com/vincentengelmann",
     auth0LogoutUrl: (__DEV_SERVER__ === "1") ? 'http://localhost:8080/': 'http://192.168.1.43/',
     assets:        "https://cie-assets.nyc3.digitaloceanspaces.com",
-    stripePK:      "pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP"
+    stripePK:      "pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP",
+    websocketAddress: "ws://127.0.0.1:5000/ws/stream"
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Main, ContentSection, Button } from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";

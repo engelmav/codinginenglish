@@ -20,12 +20,60 @@ import settings from "./settings";
 import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
+var log = console.log;
+
+console.log = function () {
+  var first_parameter = arguments[0];
+  var other_parameters = Array.prototype.slice.call(arguments, 1);
+
+  function formatConsoleDate(date) {
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    var milliseconds = date.getMilliseconds();
+
+    return (
+      "[" +
+      (hour < 10 ? "0" + hour : hour) +
+      ":" +
+      (minutes < 10 ? "0" + minutes : minutes) +
+      ":" +
+      (seconds < 10 ? "0" + seconds : seconds) +
+      "." +
+      ("00" + milliseconds).slice(-3) +
+      "] "
+    );
+  }
+
+  log.apply(
+    console,
+    [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters)
+  );
+};
 
 const cieApi = new CieApi();
 const appStore = makeAppStore();
 
-const studentSessionMgr = new StudentSessionManager(EventSource);
-studentSessionMgr.start();
+const websocket = new ReconnectingWebSocket(settings.websocketAddress);
+websocket.onopen = (openMessage) => {
+  console.log("sending Hello to CIE:", openMessage);
+  websocket.send(`Hello from ${openMessage}`);
+};
+websocket.onerror = (err) =>
+  console.log(
+    "There was an error with the Websocket connection to CIE backend:",
+    err
+  );
+websocket.onclose = (closeObject) =>
+  console.log("Websocket connection to CIE backend closed:", closeObject);
+
+websocket.addEventListener("message", (e) =>
+  console.log("got websocket message", e)
+);
+
+const studentSessionMgr = new StudentSessionManager(websocket);
 studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
 
 const auth = new Auth(appStore);
@@ -40,7 +88,7 @@ async function initializeUser(authResult) {
     userData,
     initializedUser.data.rocketchat_auth_token
   );
-  studentSessionMgr.start();
+  studentSessionMgr.initialize();
   history.push("/my-dashboard");
 }
 console.log("here is the clearStore method:", appStore.clearStore);
@@ -73,6 +121,7 @@ const _ClassroomInjected = compose(_Classroom, {
   authData,
   cieApi,
   settings,
+  websocket,
 });
 
 const Classroom = withAuth(_ClassroomInjected);

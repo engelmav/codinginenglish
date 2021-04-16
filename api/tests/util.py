@@ -2,6 +2,7 @@ from datetime import datetime, timezone, timedelta
 import pprint
 
 import requests
+from main import red
 
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -202,6 +203,12 @@ def create_test_data_session_in_5_days():
         "session_start_date": session_start_date_5_days_from_now()
     }
     create_test_data(test_data_spec, add_user_to_session=False, activate_session=False)
+
+
+def nuke_redis():
+    for key in red.scan_iter("*"):
+        red.delete(key)
+
 
 
 

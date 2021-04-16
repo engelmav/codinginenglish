@@ -3,12 +3,13 @@ import json
 import threading
 from typing import List
 
-from flask import Flask, jsonify, request, session
-import flask
+import gevent
+from flask import Flask, jsonify, request
+from flask_sockets import Sockets
 from sqlalchemy import func
 
 from database.models import Models
-from events import StudentSessionService
+from events import StudentSessionService, MessagesBackend
 from config import config
 import services.cie as cie
 
@@ -23,6 +24,7 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='../zoom_frontend',
             template_folder='../zoom_frontend')
+sockets = Sockets(app)
 
 
 def create_main_api(event_stream,
@@ -35,7 +37,8 @@ def create_main_api(event_stream,
                     schema: Schema,
                     redis,
                     rc_service: RocketChatService,
-                    payment_api):
+                    payment_api,
+                    messages_backend: MessagesBackend):
 
     app.register_blueprint(payment_api)
 
@@ -44,29 +47,33 @@ def create_main_api(event_stream,
         db_session.remove()
 
     # MESSAGING TO FRONTEND
-    @app.route('/api/command', methods=['POST'])
+    @app.route('/api/command', methods=['GET'])
     def send_sse():
         command = request.get_json()
-        # we are doing this twice to clean up control characters
+        # # we are doing this twice to clean up control characters
         command_str = json.dumps(command)
-        res = publish_message(command_str)
 
+        """
+        while not ws.closed:
+            gevent.sleep(0.5)
+            message = ws.receive()
+
+            if message:
+                LOG.debug(f"Inserting message {message}")
+                publish_message(message)
+        """
+        res = publish_message(command_str)
         return jsonify(res)
 
-    @app.route('/api/stream')
-    def stream_sse():
-
-        sse_message = flask.Response(
-            event_stream(),
-            mimetype="text/event-stream",
-        )
-        # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
-        sse_message.headers['Cache-Control'] = "no-transform"
-        # the below header prevents nginx from swallowing SSEs.
-        sse_message.headers['X-Accel-Buffering'] = "no"
-        # browsers will close after 2 min of inactivity unless Connection=keep-alive
-        sse_message.headers['Connection'] = "keep-alive"
-        return sse_message
+    @sockets.route("/ws/stream")
+    def websocket(ws):
+        messages_backend.register(ws)
+        while not ws.closed:
+            message = ws.receive()
+            LOG.debug(f"message: {message}")
+            ws.handler.websocket.send_frame("HB", ws.OPCODE_PING)
+            # Context switch while `MessagesBackend.start` is running in the background.
+            gevent.sleep(1)
 
     def _get(key, default=None):
         j = request.get_json()
@@ -412,8 +419,10 @@ def create_main_api(event_stream,
             student_session_service.set_user_id(user_id)
             # student_session_manager is already configured at initialize_user()
             if student_session_service.is_session_in_progress():
+                LOG.debug("Student session already seen as in progress; handle_session_start ending")
                 return
             student_session_service.set_session_in_progress()
+            LOG.debug("Publishing session_start message in handle_session_start")
             publish_message(session_start_message)
 
         # TODO: make this a singleton

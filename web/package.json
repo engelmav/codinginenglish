@@ -70,6 +70,7 @@
     "react-spinners": "^0.8.1",
     "react-vnc-display": "^2.0.1",
     "rebass": "^4.0.7",
+    "reconnecting-websocket": "^4.4.0",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
