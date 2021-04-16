@@ -65,26 +65,15 @@ def create_main_api(event_stream,
         res = publish_message(command_str)
         return jsonify(res)
 
-    # @app.route('/api/stream')
     @sockets.route("/ws/stream")
-    def stream_sse(ws):
-
-        # sse_message = flask.Response(
-        #     event_stream(),
-        #     mimetype="text/event-stream",
-        # )
-        # # the below header tells any proxy not to compress server-sent events (SSEs) - useful for Webpack DevServer
-        # sse_message.headers['Cache-Control'] = "no-transform"
-        # # the below header prevents nginx from swallowing SSEs.
-        # sse_message.headers['X-Accel-Buffering'] = "no"
-        # # browsers will close after 2 min of inactivity unless Connection=keep-alive
-        # sse_message.headers['Connection'] = "keep-alive"
-        # return sse_message
+    def websocket(ws):
         messages_backend.register(ws)
         while not ws.closed:
-            # seriously, wtf does this do?
-            # Context switch while `ChatBackend.start` is running in the background.
-            gevent.sleep(0.5)
+            message = ws.receive()
+            LOG.debug(f"message: {message}")
+            ws.handler.websocket.send_frame("HB", ws.OPCODE_PING)
+            # Context switch while `MessagesBackend.start` is running in the background.
+            gevent.sleep(1)
 
     def _get(key, default=None):
         j = request.get_json()
@@ -430,8 +419,10 @@ def create_main_api(event_stream,
             student_session_service.set_user_id(user_id)
             # student_session_manager is already configured at initialize_user()
             if student_session_service.is_session_in_progress():
+                LOG.debug("Student session already seen as in progress; handle_session_start ending")
                 return
             student_session_service.set_session_in_progress()
+            LOG.debug("Publishing session_start message in handle_session_start")
             publish_message(session_start_message)
 
         # TODO: make this a singleton

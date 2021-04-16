@@ -6,5 +6,5 @@ exec gunicorn -b :80 \
   --log-level DEBUG \
   --workers=3 \
   --threads=4 \
-  --worker-class=gevent \
+  --worker-class flask_sockets.worker \
   main:app

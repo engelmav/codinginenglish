@@ -20,12 +20,59 @@ import settings from "./settings";
 import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
+var log = console.log;
+
+console.log = function () {
+  var first_parameter = arguments[0];
+  var other_parameters = Array.prototype.slice.call(arguments, 1);
+
+  function formatConsoleDate(date) {
+    var hour = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    var milliseconds = date.getMilliseconds();
+
+    return (
+      "[" +
+      (hour < 10 ? "0" + hour : hour) +
+      ":" +
+      (minutes < 10 ? "0" + minutes : minutes) +
+      ":" +
+      (seconds < 10 ? "0" + seconds : seconds) +
+      "." +
+      ("00" + milliseconds).slice(-3) +
+      "] "
+    );
+  }
+
+  log.apply(
+    console,
+    [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters)
+  );
+};
 
 const cieApi = new CieApi();
 const appStore = makeAppStore();
 
-const websocket = new WebSocket("ws://127.0.0.1:5000/ws/stream");
-websocket.onerror = (err) => console.log("websockets error:", err);
+const websocket = new ReconnectingWebSocket(settings.websocketAddress);
+websocket.onopen = (openMessage) => {
+  console.log("sending Hello to CIE:", openMessage);
+  websocket.send(`Hello from ${openMessage}`);
+};
+websocket.onerror = (err) =>
+  console.log(
+    "There was an error with the Websocket connection to CIE backend:",
+    err
+  );
+websocket.onclose = (closeObject) =>
+  console.log("Websocket connection to CIE backend closed:", closeObject);
+
+websocket.addEventListener("message", (e) =>
+  console.log("got websocket message", e)
+);
+
 const studentSessionMgr = new StudentSessionManager(websocket);
 studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
 
@@ -74,7 +121,7 @@ const _ClassroomInjected = compose(_Classroom, {
   authData,
   cieApi,
   settings,
-  websocket
+  websocket,
 });
 
 const Classroom = withAuth(_ClassroomInjected);
