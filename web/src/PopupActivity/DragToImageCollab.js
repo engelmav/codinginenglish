@@ -34,8 +34,8 @@ export const DragToImageCollab = ({ settings }) => {
   };
   const canvasRef = useRef(null);
   useEffect(() => {
-    async function init(){
-      await drawCanvas(canvasSpec, canvasRef, settings)
+    async function init() {
+      await drawCanvas(canvasSpec, canvasRef, settings);
     }
     init();
   });
@@ -81,8 +81,15 @@ async function renderGif(all, layer) {
   layer.canvas.scaleX = 900; //all[0].imageData.width;
   layer.canvas.scaleY = 900; //all[0].imageData.height;
   while (true) {
-
-    layer.canvas.context.putImageData(all[frame].imageData, 0, 0);
+    layer.canvas.context.putImageData(
+      all[frame].imageData,
+      150,
+      0,
+      50,
+      50,
+      25,
+      25
+    );
     await new Promise((resolve) =>
       window.setTimeout(resolve, all[frame].delay)
     );
@@ -101,13 +108,13 @@ async function drawCanvas(canvasSpec, canvasRef, settings) {
   var stage = new Konva.Stage({
     width: 500,
     height: 800,
-    container: '#drag-to-image-collab'
+    container: "#drag-to-image-collab",
+    draggable: true,
   });
   const canvas = canvasRef.current;
-  var layer = new Konva.Layer({
-    draggable: true
-  });
-  stage.add(layer);
+  var gifLayer = new Konva.Layer();
+  stage.add(gifLayer);
+  const layer = new Konva.Layer();
 
   canvasSpec.images.forEach(async (image) => {
     if (!window.WebAssembly) {
@@ -115,33 +122,33 @@ async function drawCanvas(canvasSpec, canvasRef, settings) {
     }
     const buf = await fetchToBuffer(`${settings.assets}${image.imageSource}`);
     const wasmDecoder = new fastgif.Decoder();
-    renderGif(await wasmDecoder.decode(buf), layer);
+    renderGif(await wasmDecoder.decode(buf), gifLayer);
   });
 
-  // var rectX = stage.width() / 2 - 50;
-  // var rectY = stage.height() / 2 - 25;
+  var rectX = stage.width() / 2 - 50;
+  var rectY = stage.height() / 2 - 25;
 
-  // var box = new Konva.Rect({
-  //   x: rectX,
-  //   y: rectY,
-  //   width: 100,
-  //   height: 50,
-  //   fill: "#00D2FF",
-  //   stroke: "black",
-  //   strokeWidth: 4,
-  //   draggable: true,
-  // });
+  var box = new Konva.Rect({
+    x: rectX,
+    y: rectY,
+    width: 100,
+    height: 50,
+    fill: "#00D2FF",
+    stroke: "black",
+    strokeWidth: 4,
+    draggable: true,
+  });
 
-  // // add cursor styling
-  // box.on("mouseover", function () {
-  //   document.body.style.cursor = "pointer";
-  // });
-  // box.on("mouseout", function () {
-  //   document.body.style.cursor = "default";
-  // });
+  // add cursor styling
+  box.on("mouseover", function () {
+    document.body.style.cursor = "pointer";
+  });
+  box.on("mouseout", function () {
+    document.body.style.cursor = "default";
+  });
 
-  // layer.add(box);
-  // stage.add(layer);
+  layer.add(box);
+  stage.add(layer);
 }
 
 // var c = document.getElementById("canv");
