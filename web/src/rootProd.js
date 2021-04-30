@@ -1,5 +1,9 @@
 import { App as _App } from "./App";
 import { makeAppStore } from "./stores/AppStore";
+
+import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
+import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
+import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab"
 import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
@@ -20,7 +24,7 @@ import settings from "./settings";
 import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
-import ReconnectingWebSocket from 'reconnecting-websocket';
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 var log = console.log;
 
@@ -91,7 +95,6 @@ async function initializeUser(authResult) {
   studentSessionMgr.initialize();
   history.push("/my-dashboard");
 }
-console.log("here is the clearStore method:", appStore.clearStore);
 auth.addOnAuthSuccess(initializeUser);
 auth.addOnLogout(appStore.clearStore);
 
@@ -113,6 +116,18 @@ const UpcomingSessions = compose(_UpcomingSessions, {
   ModuleCard,
 });
 
+/** Configure Aula */
+const MultipleChoice = compose(_MultipleChoice, { cieApi });
+const DragToImageCollab = compose(_DragToImageCollab, {
+  cieApi,
+  settings,
+  websocket,
+});
+
+const PopupActivity = compose(_PopupActivity, {
+  MultipleChoice,
+  DragToImageCollab,
+});
 const withAuth = createWithAuth(auth);
 
 const { authData } = appStore;
@@ -122,9 +137,12 @@ const _ClassroomInjected = compose(_Classroom, {
   cieApi,
   settings,
   websocket,
+  PopupActivity,
 });
 
 const Classroom = withAuth(_ClassroomInjected);
+/** End Configure Aula */
+
 const CallbackWithRouter = withRouter(Callback);
 const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
 const Home = compose(_Home, { auth, cieApi, settings });

@@ -47,7 +47,7 @@ def create_main_api(event_stream,
         db_session.remove()
 
     # MESSAGING TO FRONTEND
-    @app.route('/api/command', methods=['GET'])
+    @app.route('/api/command', methods=['POST'])
     def send_sse():
         command = request.get_json()
         # # we are doing this twice to clean up control characters

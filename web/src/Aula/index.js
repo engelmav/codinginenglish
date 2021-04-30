@@ -5,11 +5,11 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styled from "styled-components";
 import { Window, Button } from "../UtilComponents";
-import { PopupActivity } from "../PopupActivity";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
 import Bounce from "react-reveal/Bounce";
 import { browserDetect } from "../util";
+import { DraggableCore } from "react-draggable";
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -103,7 +103,6 @@ class Aula extends Component {
 
   componentDidMount() {
     this.configureActiveSession();
-
     this.props.websocket.addEventListener("message", (event) => {
       const { data } = event;
       if (data instanceof Blob) {
@@ -162,7 +161,7 @@ class Aula extends Component {
   };
 
   render() {
-    const { appStore, settings } = this.props;
+    const { appStore, settings, PopupActivity } = this.props;
     const {
       guacWindow,
       chatWindow,
@@ -219,7 +218,16 @@ class Aula extends Component {
           )}
           {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
         </Taskbar>
-
+        {popupActivityWindow && (
+          <DraggableCore>
+            <div>
+              <PopupActivity
+                activities={activityData}
+                onClose={togglePopupActivity}
+              />
+            </div>
+          </DraggableCore>
+        )}
         {slidesWindow && prezzieLink && (
           <Rnd
             default={{
@@ -341,30 +349,6 @@ class Aula extends Component {
               />
             )}
           </Rnd>
-        )}
-        {popupActivityWindow && (
-          <Bounce left>
-            <Rnd
-              default={{
-                x: 605,
-                y: 0,
-                width: 800,
-              }}
-              style={{ zIndex: 300 }}
-              onMouseDown={() => this.setState({ onTop: popupActivityWindow })}
-            >
-              <Window
-                className="rnd-header"
-                title="Vocab Exercise"
-                onClose={togglePopupActivity}
-              />
-              {isWindowDragging && <CoverWindowOnDrag />}
-              <PopupActivity
-                activities={activityData}
-                onClose={togglePopupActivity}
-              />
-            </Rnd>
-          </Bounce>
         )}
       </div>
     );

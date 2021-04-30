@@ -4,7 +4,6 @@ import threading
 from datetime import datetime, timedelta, timezone
 
 import gevent
-import pytz
 import time
 
 
@@ -208,7 +207,7 @@ class MessagesBackend:
     def __iter_data(self):
         for message in self.pubsub.listen():
             data = message.get('data')
-            LOG.debug(f"Got message of type {message.get('type', None)}")
+            LOG.debug(f"MessagesBackend got message of type {message.get('type', None)}")
             if message['type'] == 'message':
                 LOG.info(u'Sending message: {}'.format(data))
                 yield data

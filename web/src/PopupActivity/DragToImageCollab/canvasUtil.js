@@ -1,57 +1,74 @@
-/**
- * OMG. This thing needs to synch with websockets. OMG.
- */
-
-/**
- *
- * Will need to take some sort of websockets service subscribed to its topic.
- * It's topic will hjave to be the activeSessionId + the activity id. (activity Id?!?)
- */
-
-import React, { useEffect, useRef } from "react";
 import Konva from "konva";
-import * as fastgif from "../../node_modules/fastgif/fastgif.js";
-import { Stage, Layer, Image } from "react-konva";
-fastgif.setDebug();
+import * as fastgif from "../../../node_modules/fastgif/fastgif.js";
 
-const Gif = ({ src }) => {
-  const imageRef = useRef(null);
-};
-
-export const DragToImageCollab = ({ settings }) => {
-  /**
-   * this thing will have to have some sort of assetId or activityId.
-   * when queried from the backend, it'll return the "definition" of the
-   * activity. e.g. images: [{imageUrl: url, pos: {x: xval, y: yval}}]
-   */
-  const canvasSpec = {
-    images: [
-      {
-        imageSource: "/activities/dragToImage/basic-01-horse.gif",
-        pos: { x: 3, y: 49 },
-      },
-    ],
-  };
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    async function init() {
-      await drawCanvas(canvasSpec, canvasRef, settings);
-    }
-    init();
+export async function drawCanvas(canvasSpec, settings, websocket) {
+  const stage = new Konva.Stage({
+    width: 800,
+    height: 800,
+    container: "#drag-to-image-collab",
   });
-  return (
-    <div id="drag-to-image-collab">
-      <canvas ref={canvasRef}></canvas>
-      <Stage>
-        <Layer>
-          <Image></Image>
-        </Layer>
-      </Stage>
-    </div>
-  );
-};
 
-function drawImage(imageObj, layer, stage) {
+  const gifLayer = new Konva.Layer();
+  stage.add(gifLayer);
+  const layer = new Konva.Layer();
+
+  canvasSpec.images.forEach(async (image) => {
+    if (!window.WebAssembly) {
+      alert(
+        "Sorry, you need to use a newer version of Firefox or Chrome to view this!"
+      );
+    }
+    const buf = await fetchToBuffer(`${settings.assets}${image.imageSource}`);
+    const wasmDecoder = new fastgif.Decoder();
+    renderGif(await wasmDecoder.decode(buf), gifLayer);
+  });
+
+  var rectX = stage.width() / 2 - 50;
+  var rectY = stage.height() / 2 - 25;
+
+  const labelBox = LabelBox("a phrase", rectX, rectY, websocket);
+
+  layer.add(labelBox);
+  stage.add(layer);
+}
+
+export function LabelBox(text, rectX, rectY, websocket) {
+  console.log("LabelBox using websocket object", websocket);
+  const rectangleGroup = new Konva.Group({
+    x: rectX,
+    y: rectY,
+    width: 130,
+    height: 25,
+    rotation: 0,
+    draggable: true,
+  });
+  rectangleGroup.on('dragmove', function (e) {
+    console.log("clientX, clientY", e.evt.clientX, e.evt.clientY);
+    websocket.send(e.evt.clientX);
+  });
+  const box = new Konva.Rect({
+    width: 100,
+    height: 50,
+    fill: "#00D2FF",
+    stroke: "black",
+    strokeWidth: 4,
+  });
+  rectangleGroup.add(box);
+  const label = new Konva.Text({
+    text: text,
+    fontSize: 18,
+    fontFamily: "Calibri",
+    fill: "#000",
+    width: 130,
+    padding: 5,
+    align: "center",
+  });
+  rectangleGroup.add(label);
+  return rectangleGroup;
+}
+
+
+export function drawImage(imageObj, layer, stage) {
   var image = new Konva.Image({
     image: imageObj,
     x: stage.width() / 2 - 200 / 2,
@@ -73,13 +90,11 @@ function drawImage(imageObj, layer, stage) {
   stage.add(layer);
 }
 
-async function renderGif(all, layer) {
+export async function renderGif(all, layer) {
   if (all.length === 0) {
     throw new Error("can't play image with no frames");
   }
   let frame = 0;
-  layer.canvas.scaleX = 900; //all[0].imageData.width;
-  layer.canvas.scaleY = 900; //all[0].imageData.height;
   while (true) {
     layer.canvas.context.putImageData(
       all[frame].imageData,
@@ -100,56 +115,11 @@ async function renderGif(all, layer) {
   }
 }
 
-async function fetchToBuffer(url) {
+export async function fetchToBuffer(url) {
   return window.fetch(url).then((response) => response.arrayBuffer());
 }
 
-async function drawCanvas(canvasSpec, canvasRef, settings) {
-  var stage = new Konva.Stage({
-    width: 500,
-    height: 800,
-    container: "#drag-to-image-collab",
-    draggable: true,
-  });
-  const canvas = canvasRef.current;
-  var gifLayer = new Konva.Layer();
-  stage.add(gifLayer);
-  const layer = new Konva.Layer();
 
-  canvasSpec.images.forEach(async (image) => {
-    if (!window.WebAssembly) {
-      globalErr("Your browser doesn't have WebAssembly!");
-    }
-    const buf = await fetchToBuffer(`${settings.assets}${image.imageSource}`);
-    const wasmDecoder = new fastgif.Decoder();
-    renderGif(await wasmDecoder.decode(buf), gifLayer);
-  });
-
-  var rectX = stage.width() / 2 - 50;
-  var rectY = stage.height() / 2 - 25;
-
-  var box = new Konva.Rect({
-    x: rectX,
-    y: rectY,
-    width: 100,
-    height: 50,
-    fill: "#00D2FF",
-    stroke: "black",
-    strokeWidth: 4,
-    draggable: true,
-  });
-
-  // add cursor styling
-  box.on("mouseover", function () {
-    document.body.style.cursor = "pointer";
-  });
-  box.on("mouseout", function () {
-    document.body.style.cursor = "default";
-  });
-
-  layer.add(box);
-  stage.add(layer);
-}
 
 // var c = document.getElementById("canv");
 // var $ = c.getContext("2d");
