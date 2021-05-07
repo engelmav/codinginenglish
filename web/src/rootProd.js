@@ -1,5 +1,7 @@
 import { App as _App } from "./App";
-import { makeAppStore } from "./stores/AppStore";
+import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
+import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
+import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
 import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
@@ -20,7 +22,7 @@ import settings from "./settings";
 import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
-import ReconnectingWebSocket from 'reconnecting-websocket';
+import { WebsocketManager } from "./messaging";
 
 var log = console.log;
 
@@ -53,96 +55,98 @@ console.log = function () {
   );
 };
 
-const cieApi = new CieApi();
-const appStore = makeAppStore();
+export function main(appStore) {
+  const cieApi = new CieApi();
+  const websocketManager = new WebsocketManager(settings);
+  const auth = new Auth(appStore);
 
-const websocket = new ReconnectingWebSocket(settings.websocketAddress);
-websocket.onopen = (openMessage) => {
-  console.log("sending Hello to CIE:", openMessage);
-  websocket.send(`Hello from ${openMessage}`);
-};
-websocket.onerror = (err) =>
-  console.log(
-    "There was an error with the Websocket connection to CIE backend:",
-    err
-  );
-websocket.onclose = (closeObject) =>
-  console.log("Websocket connection to CIE backend closed:", closeObject);
+  async function initializeUser(authResult) {
+    console.log("Initializing user...");
+    const initializedUser = await cieApi.initializeUser(authResult);
+    appStore.user = initializedUser;
+    const userData = initializedUser.data.user;
+    appStore.configureUser(
+      authResult,
+      userData,
+      initializedUser.data.rocketchat_auth_token
+    );
+    const websocket = websocketManager.createWebsocket(
+      `ws-general-user-${appStore.userId}`
+    );
+    const studentSessionMgr = new StudentSessionManager(websocket);
+    studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
+    console.log("initializedUser.data.has_session_in_progress:", initializedUser.data.has_session_in_progress)
+    appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
+    studentSessionMgr.initialize();
+    history.push("/my-dashboard");
+  }
+  auth.addOnAuthSuccess(initializeUser);
+  auth.addOnLogout(appStore.clearStore);
 
-websocket.addEventListener("message", (e) =>
-  console.log("got websocket message", e)
-);
+  const Login = compose(_Login, { auth, appStore });
+  const Header = compose(_Header, { appStore, auth, settings, Login });
+  const Footer = compose(_Footer, { appStore, auth, Login });
 
-const studentSessionMgr = new StudentSessionManager(websocket);
-studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
+  const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
+  const ModuleCard = compose(_ModuleCard, {
+    cieApi,
+    appStore,
+    settings,
+    CheckoutForm,
+  });
+  const UpcomingSessions = compose(_UpcomingSessions, {
+    cieApi,
+    auth,
+    appStore,
+    ModuleCard,
+  });
 
-const auth = new Auth(appStore);
+  /** Configure Aula */
+  const MultipleChoice = compose(_MultipleChoice, { cieApi });
+  const DragToImageCollab = compose(_DragToImageCollab, {
+    appStore,
+    cieApi,
+    settings,
+  });
 
-async function initializeUser(authResult) {
-  console.log("Initializing user...");
-  const initializedUser = await cieApi.initializeUser(authResult);
-  appStore.user = initializedUser;
-  const userData = initializedUser.data.user;
-  appStore.configureUser(
-    authResult,
-    userData,
-    initializedUser.data.rocketchat_auth_token
-  );
-  studentSessionMgr.initialize();
-  history.push("/my-dashboard");
+  const PopupActivity = compose(_PopupActivity, {
+    MultipleChoice,
+    DragToImageCollab,
+    websocketManager,
+  });
+  const withAuth = createWithAuth(auth);
+
+  const { authData } = appStore;
+  const _ClassroomInjected = compose(_Classroom, {
+    appStore,
+    authData,
+    cieApi,
+    settings,
+    PopupActivity,
+    websocketManager,
+  });
+
+  const Classroom = withAuth(_ClassroomInjected);
+  /** End Configure Aula */
+
+  const CallbackWithRouter = withRouter(Callback);
+  const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
+  const Home = compose(_Home, { auth, cieApi, settings });
+  const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
+  const routesProps = {
+    appStore,
+    auth,
+    cieApi,
+    AboutUs,
+    CallbackRoute,
+    Classroom,
+    Home,
+    MyDashboard,
+    UpcomingSessions,
+  };
+
+  const Routes = compose(_Routes, routesProps);
+
+  const App = compose(_App, { appStore, auth, Header, Routes, Footer });
+  return App;
 }
-console.log("here is the clearStore method:", appStore.clearStore);
-auth.addOnAuthSuccess(initializeUser);
-auth.addOnLogout(appStore.clearStore);
-
-const Login = compose(_Login, { auth, appStore });
-const Header = compose(_Header, { appStore, auth, settings, Login });
-const Footer = compose(_Footer, { appStore, auth, Login });
-
-const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
-const ModuleCard = compose(_ModuleCard, {
-  cieApi,
-  appStore,
-  settings,
-  CheckoutForm,
-});
-const UpcomingSessions = compose(_UpcomingSessions, {
-  cieApi,
-  auth,
-  appStore,
-  ModuleCard,
-});
-
-const withAuth = createWithAuth(auth);
-
-const { authData } = appStore;
-const _ClassroomInjected = compose(_Classroom, {
-  appStore,
-  authData,
-  cieApi,
-  settings,
-  websocket,
-});
-
-const Classroom = withAuth(_ClassroomInjected);
-const CallbackWithRouter = withRouter(Callback);
-const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
-const Home = compose(_Home, { auth, cieApi, settings });
-const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
-const routesProps = {
-  appStore,
-  auth,
-  cieApi,
-  AboutUs,
-  CallbackRoute,
-  Classroom,
-  Home,
-  MyDashboard,
-  UpcomingSessions,
-};
-
-const Routes = compose(_Routes, routesProps);
-
-const App = compose(_App, { appStore, auth, Header, Routes, Footer });
-
-export { App, Routes, UpcomingSessions, appStore, auth, withAuth };

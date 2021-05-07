@@ -15,6 +15,13 @@ const AboutUs = () => {
         espousing the ideals of kindness, encouragement, and the thrill of
         pedagogy.
       </P>
+      <BlockQuote>
+        It is through hearing the learners, a task unacceptable to authoritarian
+        educators, that democratic teachers increasingly prepare themselves to
+        be heard by learners. But by listening to and so learning to talk with
+        learners, democratic teachers teach the learners to listen to them as
+        well. --Freire{" "}
+      </BlockQuote>
       <TitleH2>Instructors</TitleH2>
       <P>
         The first instructor at Coding in English,{" "}
@@ -56,9 +63,7 @@ const AboutUs = () => {
       </P>
       <BlockQuote>
         <P>Levantaremos un mundo mejor.</P>
-        <footer>
-          —Txarango{" "}
-        </footer>
+        <footer>—Txarango </footer>
       </BlockQuote>
     </Main>
   );

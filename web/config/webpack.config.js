@@ -571,6 +571,7 @@ module.exports = function (webpackEnv) {
     performance: false,
     devServer: {
       host: '0.0.0.0',
+      disableHostCheck: true,
       proxy: {
         '**': {
           target: 'http://localhost:5000',

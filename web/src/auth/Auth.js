@@ -7,7 +7,6 @@ var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 class Auth {
   accessToken;
   idToken;
-  expiresAt;
 
   auth0 = new auth0.WebAuth({
     domain: "login.codinginenglish.com",
@@ -52,6 +51,7 @@ class Auth {
           return reject(err);
         }
         resolve();
+        console.log("handleAuthentication() setSession")
         this.setSession(authResult);
         console.log(
           "Auth module successfully authenticated. Calling callbacks..."
@@ -70,7 +70,8 @@ class Auth {
   setSession(authResult) {
     this.idToken = authResult.idToken;
     this.profile = authResult.idTokenPayload;
-    this.expiresAt = authResult.idTokenPayload.exp * 1000;
+    this.appStore.setLoginExpiry(authResult.idTokenPayload.exp * 1000);
+    console.log("set login expiry:", this.appStore.loginExpiresAt);
   }
 
   signOut() {
@@ -85,6 +86,7 @@ class Auth {
     return new Promise((resolve, reject) => {
       this.auth0.checkSession({}, (err, authResult) => {
         if (err) return reject(err);
+        console.log("silentAuth() setSession")
         this.setSession(authResult);
         resolve();
       });
@@ -96,7 +98,7 @@ class Auth {
     // Remove tokens and expiry time.
     this.accessToken = null;
     this.idToken = null;
-    this.expiresAt = 0;
+    this.appStore.setLoginExpiry(0);
 
     this.auth0.logout({
       returnTo: window.location.origin,
@@ -104,11 +106,14 @@ class Auth {
   }
 
   isAuthenticated() {
-    const isAuth = new Date().getTime() < this.expiresAt;
+    const currentTime = new Date().getTime();
+    console.log("isAuthenticated() sees loginExpiresAt:",  this.appStore.loginExpiresAt);
+    const isAuth = currentTime < this.appStore.loginExpiresAt;
     return isAuth;
   }
 
   renewSession() {
+    console.log("renewing session")
     this.auth0.checkSession({}, (err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);

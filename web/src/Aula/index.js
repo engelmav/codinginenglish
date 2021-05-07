@@ -5,11 +5,11 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import styled from "styled-components";
 import { Window, Button } from "../UtilComponents";
-import { PopupActivity } from "../PopupActivity";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
 import Bounce from "react-reveal/Bounce";
 import { browserDetect } from "../util";
+import { DraggableCore } from "react-draggable";
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -83,10 +83,12 @@ class Aula extends Component {
   }
 
   async configureActiveSession() {
-    const { appStore, cieApi } = this.props;
+    const { appStore, cieApi, websocketManager } = this.props;
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
+    const activeSessionId = `aula-${activeSessionData.data.id}`;
+    console.log("creating activeSessionId", activeSessionId);
 
     const {
       chat_channel,
@@ -98,21 +100,16 @@ class Aula extends Component {
       chatChannel: chat_channel,
       prezzieLink: prezzie_link,
       videoChannel: video_channel,
+      activeSessionId: activeSessionId 
     });
-  }
 
-  componentDidMount() {
-    this.configureActiveSession();
-
-    this.props.websocket.addEventListener("message", (event) => {
+    console.log("Current userId in Aula configureActiveSession()", appStore.userId)
+    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId, appStore.userId);
+    this.aulaWebsocket.addEventListener("message", (event) => {
       const { data } = event;
       if (data instanceof Blob) {
         const reader = new FileReader();
         reader.onload = () => {
-          console.log(
-            "Aula: received websocket event data. Here it is, unparsed:",
-            reader.result
-          );
           let commmandData;
           try {
             commmandData = JSON.parse(reader.result);
@@ -136,6 +133,11 @@ class Aula extends Component {
         reader.readAsText(data);
       }
     });
+
+  }
+
+  componentDidMount() {
+    this.configureActiveSession();
   }
 
   toggleGuac = () => {
@@ -162,7 +164,7 @@ class Aula extends Component {
   };
 
   render() {
-    const { appStore, settings } = this.props;
+    const { appStore, settings, PopupActivity } = this.props;
     const {
       guacWindow,
       chatWindow,
@@ -174,6 +176,7 @@ class Aula extends Component {
       chatChannel,
       prezzieLink,
       videoChannel,
+      activeSessionId,
 
       onTop,
       isWindowDragging,
@@ -212,14 +215,26 @@ class Aula extends Component {
               Chat
             </Button>
           )}
-          {!videoWindow && (
+        {!videoWindow && (
             <Button mr={2} onClick={this.toggleVideo}>
               Video
             </Button>
           )}
           {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
         </Taskbar>
-
+        <div>Class Basic Session</div>
+        {popupActivityWindow && (
+          <DraggableCore>
+            <div>
+              <PopupActivity
+                activities={activityData}
+                activeSessionId={activeSessionId}
+                websocket={this.aulaWebsocket}
+                onClose={togglePopupActivity}
+              />
+            </div>
+          </DraggableCore>
+        )}
         {slidesWindow && prezzieLink && (
           <Rnd
             default={{
@@ -341,30 +356,6 @@ class Aula extends Component {
               />
             )}
           </Rnd>
-        )}
-        {popupActivityWindow && (
-          <Bounce left>
-            <Rnd
-              default={{
-                x: 605,
-                y: 0,
-                width: 800,
-              }}
-              style={{ zIndex: 300 }}
-              onMouseDown={() => this.setState({ onTop: popupActivityWindow })}
-            >
-              <Window
-                className="rnd-header"
-                title="Vocab Exercise"
-                onClose={togglePopupActivity}
-              />
-              {isWindowDragging && <CoverWindowOnDrag />}
-              <PopupActivity
-                activities={activityData}
-                onClose={togglePopupActivity}
-              />
-            </Rnd>
-          </Bounce>
         )}
       </div>
     );

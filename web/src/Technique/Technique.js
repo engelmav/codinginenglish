@@ -17,8 +17,8 @@ export const Technique = () => {
         topic that <i>uses</i> the English topic.
       </p>
       <p>
-        The English topics are taught using Cambridge English Language
-        Teaching for Adults (CELTA).
+        The English topics are taught using a blend of Cambridge English Language
+        Teaching for Adults (CELTA) and Content and Language Integrated Learning (CLIL).
       </p>
       <p>
         Here is an example. This is taken from the 11th session of the Basic
