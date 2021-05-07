@@ -83,10 +83,12 @@ class Aula extends Component {
   }
 
   async configureActiveSession() {
-    const { appStore, cieApi } = this.props;
+    const { appStore, cieApi, websocketManager } = this.props;
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
+    const activeSessionId = `aula-${activeSessionData.data.id}`;
+    console.log("creating activeSessionId", activeSessionId);
 
     const {
       chat_channel,
@@ -98,20 +100,17 @@ class Aula extends Component {
       chatChannel: chat_channel,
       prezzieLink: prezzie_link,
       videoChannel: video_channel,
+      activeSessionId: activeSessionId 
     });
-  }
 
-  componentDidMount() {
-    this.configureActiveSession();
-    this.props.websocket.addEventListener("message", (event) => {
+
+    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId);
+    this.aulaWebsocket.addEventListener("message", (event) => {
       const { data } = event;
+      console.log("aulaWebsocket received message:", data)
       if (data instanceof Blob) {
         const reader = new FileReader();
         reader.onload = () => {
-          console.log(
-            "Aula: received websocket event data. Here it is, unparsed:",
-            reader.result
-          );
           let commmandData;
           try {
             commmandData = JSON.parse(reader.result);
@@ -135,6 +134,11 @@ class Aula extends Component {
         reader.readAsText(data);
       }
     });
+
+  }
+
+  componentDidMount() {
+    this.configureActiveSession();
   }
 
   toggleGuac = () => {
@@ -173,6 +177,7 @@ class Aula extends Component {
       chatChannel,
       prezzieLink,
       videoChannel,
+      activeSessionId,
 
       onTop,
       isWindowDragging,
@@ -211,18 +216,20 @@ class Aula extends Component {
               Chat
             </Button>
           )}
-          {!videoWindow && (
+        {!videoWindow && (
             <Button mr={2} onClick={this.toggleVideo}>
               Video
             </Button>
           )}
           {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
         </Taskbar>
+        <div>Class Basic Session</div>
         {popupActivityWindow && (
           <DraggableCore>
             <div>
               <PopupActivity
                 activities={activityData}
+                activeSessionId={activeSessionId}
                 onClose={togglePopupActivity}
               />
             </div>

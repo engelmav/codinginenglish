@@ -9,7 +9,7 @@ from flask_sockets import Sockets
 from sqlalchemy import func
 
 from database.models import Models
-from events import StudentSessionService, MessagesBackend
+from events import StudentSessionService, WebsocketManager
 from config import config
 import services.cie as cie
 
@@ -20,25 +20,20 @@ from rest_schema import Schema
 from services.rocketchat import RocketChatService
 
 LOG = logging.getLogger(__name__)
-app = Flask(__name__,
-            static_url_path='',
-            static_folder='../zoom_frontend',
-            template_folder='../zoom_frontend')
+app = Flask(__name__)
 sockets = Sockets(app)
 
 
-def create_main_api(event_stream,
-                    publish_message,
+def create_main_api(publish_message,
                     module_service: cie.ModuleService,
                     student_session_service: StudentSessionService,
                     user_service: cie.UserService,
                     db_session,
                     models: Models,
                     schema: Schema,
-                    redis,
                     rc_service: RocketChatService,
                     payment_api,
-                    messages_backend: MessagesBackend):
+                    websocket_manager: WebsocketManager):
 
     app.register_blueprint(payment_api)
 
@@ -50,6 +45,7 @@ def create_main_api(event_stream,
     @app.route('/api/command', methods=['POST'])
     def send_sse():
         command = request.get_json()
+        channels = command.get("command").get("channels")
         # # we are doing this twice to clean up control characters
         command_str = json.dumps(command)
 
@@ -62,18 +58,21 @@ def create_main_api(event_stream,
                 LOG.debug(f"Inserting message {message}")
                 publish_message(message)
         """
-        res = publish_message(command_str)
-        return jsonify(res)
+        results = []
+        for channel in channels:
+            res = websocket_manager.channels[channel].publish_to_redis(command_str)
+            results.append(res)
+        return jsonify(results)
+
+    @app.route("/api/ws/stats")
+    def ws_stats():
+        return jsonify([])
 
     @sockets.route("/ws/stream")
     def websocket(ws):
-        messages_backend.register(ws)
-        while not ws.closed:
-            message = ws.receive()
-            LOG.debug(f"message: {message}")
-            ws.handler.websocket.send_frame("HB", ws.OPCODE_PING)
-            # Context switch while `MessagesBackend.start` is running in the background.
-            gevent.sleep(1)
+        # the below line is executed when this endpoint is hit, and this endpoint is hit
+        # only when opening a new websocket connection.
+        websocket_manager.initialize_socket(ws)
 
     def _get(key, default=None):
         j = request.get_json()

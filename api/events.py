@@ -21,13 +21,18 @@ class Event:
         )
 
 
-def create_publish_message(redis_client):
+def create_message_publisher(redis_client, channel_name):
     def publish_message(message_str):
-        LOG.debug(f"Publishing message on cie channel: {message_str}")
-        res = redis_client.publish('cie', message_str)
+        res = redis_client.publish(channel_name, message_str)
         return res
 
     return publish_message
+
+
+def create_message_listener(redis_client, channel_name):
+    pubsub = redis_client.pubsub()
+    pubsub.subscribe(channel_name)
+    return pubsub
 
 
 class ThreadSafeIter:
@@ -64,9 +69,6 @@ def create_event_stream(red):
             event = Event("student-session-manager", message_data)
             LOG.debug(f"Emitting event {str(event)}")
             yield str(event)
-
-    # thread_safe_event_stream = ThreadSafeIter(event_stream())
-    # return thread_safe_event_stream
     return event_stream
 
 
@@ -197,31 +199,101 @@ class StudentSessionService:
             time.sleep(2)
 
 
-class MessagesBackend:
+class WebsocketManager:
+    def __init__(self, redis):
+        self.redis = redis
+        self.channels = {}
+        self.clients = []
+
+    def initialize_socket(self, websocket):
+        """
+        Expects an initial message with the following payload:
+        {
+            command: "subscribe",
+            identifier: { channel: "main" },
+            <clientId: clientId>
+        }
+        (clientId is optional)
+        """
+        open_message = websocket.receive()
+        open_msg_dict = json.loads(open_message)
+        if open_msg_dict.get("command") is None or open_msg_dict.get("command") != "subscribe":
+            raise Exception("We received an initial message that does not contain a subscribe request.")
+        channel = open_msg_dict.get("identifier").get("channel")
+        client_id = open_msg_dict.get("clientId", "anon")
+        LOG.debug(f"/ws/stream initializing websocket connection for channel {channel} and client id {client_id}.")
+        self.join_or_create(websocket, channel, client_id)
+
+    def join_or_create(self, ws_client, channel_name, client_id):
+        # A WSM has many channels
+        # a channel has a backend (pubsub)
+        # a channel has many clients
+
+        # In this way, each websocket channel has a redis pubsub channel behind it.
+        # And each pubsub/websocket channel has many clients.
+
+        # two message types:
+        #    1) an "open"
+        #    2) a "message"
+        # By virtue of being the "first message" you will be an "open" (given the websocket.onopen in frontend)
+        # After opening, you can "start listening" for the second type, "message"
+        # create a redis publisher on the channel name
+
+        if channel_name not in self.channels:
+            message_publisher = create_message_publisher(self.redis, channel_name)
+            message_listener = create_message_listener(self.redis, channel_name)
+            mb = MessagingBackend(channel_name, message_listener, message_publisher)
+            mb.start()
+            self.channels[channel_name] = mb
+        # Channel and its backend already exist; add client to existing backend.
+        self.channels[channel_name].register_and_listen(ws_client)
+
+
+class MessagingBackend:
     """Interface for registering and updating WebSocket clients."""
 
-    def __init__(self, pubsub):
-        self.clients = list()
-        self.pubsub = pubsub
+    def __init__(self, channel, listener, publish):
+        self.channel = channel
+        self.clients = []
+        self.listener = listener
+        self.publish = publish
+
+    def publish_to_redis(self, message):
+        LOG.debug(f"Publishing message on channel {self.channel}: {message}")
+        self.publish(message)
 
     def __iter_data(self):
-        for message in self.pubsub.listen():
+        for message in self.listener.listen():
             data = message.get('data')
-            LOG.debug(f"MessagesBackend got message of type {message.get('type', None)}")
             if message['type'] == 'message':
-                LOG.info(u'Sending message: {}'.format(data))
                 yield data
 
-    def register(self, client):
+    def register_and_listen(self, client):
         """Register a WebSocket connection for Redis updates."""
         LOG.debug(f"Registering new websocket client {client}")
         self.clients.append(client)
+        self.listen_on_socket(client)
+
+    def listen_on_socket(self, websocket):
+        # spin up thread for this ws_client
+        # this ensures the incoming websocket messages are published to the correct redis pubsub channel.
+        while not websocket.closed:
+            self.heartbeat(websocket)
+            message = websocket.receive()
+            if message is None:
+                LOG.debug(f"websocket channel {self.channel} received message None message. Skipping.")
+                break
+            LOG.debug(f"websocket channel {self.channel} received message {message}. Publishing to redis.")
+            self.publish_to_redis(message)
+            gevent.sleep(0.1)
+
+    def heartbeat(self, ws_client):
+        ws_client.handler.websocket.send_frame("HB", ws_client.OPCODE_PING)
 
     def send(self, client, data):
         """Send given data to the registered client.
         Automatically discards invalid connections."""
         try:
-            LOG.debug(f"Sending data {data} using client instance {client}")
             client.send(data)
         except Exception:
             LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
@@ -231,6 +303,10 @@ class MessagesBackend:
         """Listens for new messages in Redis, and sends them to clients."""
         for data in self.__iter_data():
             for client in self.clients:
+                loaded_message = json.loads(data)
+                client_id = loaded_message.get("cid")
+                # recursive = (client_id == client.client_id and client_id is not None)
+                # if not recursive:
                 gevent.spawn(self.send, client, data)
 
     def start(self):

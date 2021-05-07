@@ -21,7 +21,7 @@ const settings = {
     auth0LogoutUrl: (__DEV_SERVER__ === "1") ? 'http://localhost:8080/': 'http://192.168.1.43/',
     assets:        "https://cie-assets.nyc3.digitaloceanspaces.com",
     stripePK:      "pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP",
-    websocketAddress: "ws://127.0.0.1:5000/ws/stream"
+    websocketAddress: "ws://192.168.1.156:5000/ws/stream"
   }
 }
 

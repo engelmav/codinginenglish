@@ -41,6 +41,7 @@ class AppStore {
     this.firstName = given_name || firstname;
     this.userId = storedUser.id;
     this.rocketchatAuthToken = rcAuthToken;
+    this.setSessionInProgress(authData)
   }
 
   @action setFirstname(firstname) {

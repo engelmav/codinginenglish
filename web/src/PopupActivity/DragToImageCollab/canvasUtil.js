@@ -1,11 +1,69 @@
 import Konva from "konva";
 import * as fastgif from "../../../node_modules/fastgif/fastgif.js";
 
-export async function drawCanvas(canvasSpec, settings, websocket) {
+const CHANNEL = "active-session-01-exercise-01";
+const OBJ_MOVE_EVENT = "object-move-event";
+
+function updateCanvas(clientId, objectId, websocket, x, y) {
+  websocket.send(
+    JSON.stringify({
+      ch : CHANNEL,
+      et: OBJ_MOVE_EVENT,
+      cid: clientId,
+      oid: objectId,
+      c: [x, y],
+    })
+  );
+}
+
+function addObjectListeners(websocket, canvasSpec, stage) {
+  const objectCache = {};
+  canvasSpec.wordBag.forEach((_, index) => {
+    objectCache[`labelBox-${index}`] = stage.findOne(`#labelBox-${index}`);
+  });
+
+  websocket.addEventListener("message", (event) => {
+    const { data } = event;
+    if (data instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        let eventData;
+        try {
+          eventData = JSON.parse(reader.result);
+          console.log(eventData);
+        } catch (ex) {
+          console.error("Failed to parse websocket event data.", ex.stack);
+          console.log(reader.result);
+          return;
+        }
+
+        if (
+          eventData.hasOwnProperty("et") &&
+          eventData.et === OBJ_MOVE_EVENT
+        ) {
+          const { oid, c } = eventData;
+          objectCache[oid].to({
+            x: c[0],// dprValue(c[0]),
+            y: c[1], // dprValue(c[1]),
+            duration: 0.5,
+          });
+        }
+      };
+      reader.readAsText(data);
+    }
+  });
+}
+
+export async function drawCanvas(canvasSpec, settings, websocket, actorId) {
   const stage = new Konva.Stage({
     width: 800,
     height: 800,
     container: "#drag-to-image-collab",
+  });
+
+  stage.on("click", function () {
+    var pos = stage.getPointerPosition();
+    console.log("clicked position:", pos);
   });
 
   const gifLayer = new Konva.Layer();
@@ -20,20 +78,67 @@ export async function drawCanvas(canvasSpec, settings, websocket) {
     }
     const buf = await fetchToBuffer(`${settings.assets}${image.imageSource}`);
     const wasmDecoder = new fastgif.Decoder();
-    renderGif(await wasmDecoder.decode(buf), gifLayer);
+    const imageDataFrames = await wasmDecoder.decode(buf);
+    console.log("imageDataFrames:", imageDataFrames)
+    const imageBitmapFrames = [];
+
+    for (const frame of imageDataFrames) {
+      console.log("Converting frame", frame)
+      const bitmapData = await createImageBitmap(frame.imageData)
+      imageBitmapFrames.push({imageData: bitmapData, delay: frame.delay});
+    }
+    console.log("imageBitmapFrames:", imageBitmapFrames);
+    renderGif(imageBitmapFrames, gifLayer, stage);
   });
 
-  var rectX = stage.width() / 2 - 50;
-  var rectY = stage.height() / 2 - 25;
+  canvasSpec.labelBuckets.forEach((labelBucket) => {
+    layer.add(LabelBucket(labelBucket.lineBegin, labelBucket.lineEnd));
+  });
 
-  const labelBox = LabelBox("a phrase", rectX, rectY, websocket);
-
-  layer.add(labelBox);
+  canvasSpec.wordBag.forEach((word, index) => {
+    const x = randomIntFromInterval(0, stage.width() - 300);
+    const y = randomIntFromInterval(0, stage.height() - 300);
+    layer.add(LabelBox(word, x, y, index, websocket, actorId));
+  });
   stage.add(layer);
+  addObjectListeners(websocket, canvasSpec, stage);
 }
 
-export function LabelBox(text, rectX, rectY, websocket) {
-  console.log("LabelBox using websocket object", websocket);
+function LabelBucket(lineStart, lineEnd) {
+  const group = new Konva.Group({
+    // x: rectX,
+    // y: rectY,
+    width: 130,
+    height: 25,
+    rotation: 0,
+    draggable: false,
+  });
+  const line = new Konva.Line({
+    points: lineStart.concat(lineEnd),
+    stroke: "black",
+    strokeWidth: 2,
+  });
+  const box = new Konva.Rect({
+    x: lineEnd[0],
+    y: lineEnd[1],
+    width: 310,
+    height: 60,
+    fill: "#d3d3d3",
+    stroke: "black",
+    strokeWidth: 2,
+  });
+  group.add(line);
+  group.add(box);
+  return group;
+}
+
+function dprValue(value) {
+  const dpr = window.devicePixelRatio || 1;
+  return dpr * value;
+}
+
+function LabelBox(text, rectX, rectY, index, websocket, actorId) {
+  const objectId = `labelBox-${index}`;
   const rectangleGroup = new Konva.Group({
     x: rectX,
     y: rectY,
@@ -41,25 +146,27 @@ export function LabelBox(text, rectX, rectY, websocket) {
     height: 25,
     rotation: 0,
     draggable: true,
+    id: objectId,
   });
-  rectangleGroup.on('dragmove', function (e) {
-    console.log("clientX, clientY", e.evt.clientX, e.evt.clientY);
-    websocket.send(e.evt.clientX);
+  rectangleGroup.on("dragmove", (e) => {
+    const pos = e.target.absolutePosition()
+    const { x, y } = pos;
+    updateCanvas(actorId, objectId, websocket, x, y);
   });
   const box = new Konva.Rect({
-    width: 100,
+    width: 300,
     height: 50,
     fill: "#00D2FF",
     stroke: "black",
-    strokeWidth: 4,
+    strokeWidth: 2,
   });
   rectangleGroup.add(box);
   const label = new Konva.Text({
     text: text,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Calibri",
     fill: "#000",
-    width: 130,
+    width: 300,
     padding: 5,
     align: "center",
   });
@@ -67,6 +174,32 @@ export function LabelBox(text, rectX, rectY, websocket) {
   return rectangleGroup;
 }
 
+export async function renderGif(frames, layer, stage) {
+  console.log("This is an imageData:", frames[0].imageData)
+  if (frames.length === 0) {
+    throw new Error("can't play image with no frames");
+  }
+  let frame = 0;
+  console.log("stage width:", stage.width());
+  while (true) {
+    // void ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    layer.canvas.context.drawImage(frames[frame].imageData, 1, 1, 400, 300, 200, 200, 200, 150);
+    await new Promise((resolve) => window.setTimeout(resolve, frames[frame].delay));
+
+    if (++frame === frames.length) {
+      frame = 0;
+    }
+  }
+}
+
+export async function fetchToBuffer(url) {
+  return window.fetch(url).then((response) => response.arrayBuffer());
+}
+
+export function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 export function drawImage(imageObj, layer, stage) {
   var image = new Konva.Image({
@@ -89,93 +222,3 @@ export function drawImage(imageObj, layer, stage) {
   layer.add(image);
   stage.add(layer);
 }
-
-export async function renderGif(all, layer) {
-  if (all.length === 0) {
-    throw new Error("can't play image with no frames");
-  }
-  let frame = 0;
-  while (true) {
-    layer.canvas.context.putImageData(
-      all[frame].imageData,
-      150,
-      0,
-      50,
-      50,
-      25,
-      25
-    );
-    await new Promise((resolve) =>
-      window.setTimeout(resolve, all[frame].delay)
-    );
-
-    if (++frame === all.length) {
-      frame = 0;
-    }
-  }
-}
-
-export async function fetchToBuffer(url) {
-  return window.fetch(url).then((response) => response.arrayBuffer());
-}
-
-
-
-// var c = document.getElementById("canv");
-// var $ = c.getContext("2d");
-// c.width = window.innerWidth;
-// c.height = window.innerHeight;
-// var imgURL = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/131045/colorful-triangles.jpg';
-
-// loadImage(imgURL);
-
-// window.addEventListener('paste', function(e){
-// 	if(e.clipboardData == false) return false;
-//   var imgs = e.clipboardData.items;
-//   if(imgs == undefined) return false;
-//     for (var i = 0; i < imgs.length; i++) {
-//         if (imgs[i].type.indexOf("image") == -1) continue;
-//           var imgObj = imgs[i].getAsFile();
-//           var url = window.URL || window.webkitURL;
-//           var src = url.createObjectURL(imgObj);
-//           $.clearRect(0,0,c.width,c.height);
-//           loadImage(src);
-//         }
-// 	  });
-
-// function loadImage(src){
-//   var img = new Image();
-//   img.onload = function(e) {
-//     $.drawImage(img,0,0);
-//   };
-//   img.src = src;
-// }
-
-// const src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/208665/large.gif';
-
-// async function render(all, stat, label) {
-//   const canvas = document.createElement('canvas');
-//   if (all.length === 0) {
-//     throw new Error('can\'t play image with no frames');
-//   }
-//   canvas.width = all[0].imageData.width;
-//   canvas.height = all[0].imageData.height;
-
-//   holder.appendChild(heading);
-//   holder.appendChild(canvas);
-//   out.appendChild(holder);
-
-//   const ctx = canvas.getContext('2d');
-
-//   let frame = 0;
-//   while (true) {
-//     ctx.putImageData(all[frame].imageData, 0, 0);
-//     await new Promise((resolve) => window.setTimeout(resolve, all[frame].delay));
-
-//     if (++frame === all.length) {
-//       frame = 0;
-//     }
-//   }
-// }
-
-// rerun.href += "?" + Math.random();

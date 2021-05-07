@@ -13,7 +13,7 @@ const Footer = styled.div`
   justify-content: center;
 `;
 
-export const PopupActivity = ({ onClose, activities, MultipleChoice, DragToImageCollab }) => {
+export const PopupActivity = ({ onClose, activities, MultipleChoice, DragToImageCollab, activeSessionId }) => {
   // Resume here:
   // implement callback (or mobx class) to collect responses from child component
   // and send them to backend when student clicks "DONE!"
@@ -25,7 +25,7 @@ export const PopupActivity = ({ onClose, activities, MultipleChoice, DragToImage
         if (activityType === "multipleChoice") {
           return <MultipleChoice key={idx} {...model} />;
         } else if (activityType === "dragAndDropToImageCollab") {
-          return <DragToImageCollab key={idx} />;
+          return <DragToImageCollab key={idx} model={model} activeSessionId={activeSessionId} />;
         } else {
           return <div></div>;
         }

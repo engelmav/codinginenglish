@@ -2,7 +2,7 @@ from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
 from database.providers import base_provider
-from events import create_event_stream, create_publish_message, StudentSessionService, MessagesBackend
+from events import create_event_stream, create_message_publisher, StudentSessionService, MessagingBackend, WebsocketManager
 import redis
 from simplekv.memory.redisstore import RedisStore
 
@@ -19,7 +19,7 @@ we need to import its models AFTER we configure the database session.
 base_provider.configure_custom_base(mysql_session)
 CustomBase = base_provider.get_base()
 models = model_factory(CustomBase)  # API routes (blueprints) dependency
-schema = schema_factory(mysql_session, models)     # API routes (blueprints) dependency
+schema = schema_factory(mysql_session, models)   # API routes (blueprints) dependency
 
 redis_pw = config["cie.redis.password"]
 redis_host = config["cie.redis.host"]
@@ -29,20 +29,14 @@ redis_store = RedisStore(red)
 module_service = ModuleService(models)
 user_service = UserService(models)
 student_session_service = StudentSessionService(red, models)
+publish_message = create_message_publisher(red, "command")
 
-pubsub = red.pubsub()
-pubsub.subscribe('cie')
-# pub_sub_listener = pubsub.listen()
-event_stream = create_event_stream(red)
-publish_message = create_publish_message(red)
+websocket_manager = WebsocketManager(red)
+
 rc_service = RocketChatService()
-
-message_backend = MessagesBackend(pubsub)
-message_backend.start()
 payment_api = create_payment_api(module_service, user_service)
 
 app = create_main_api(
-    event_stream,
     publish_message,
     module_service,
     student_session_service,
@@ -50,9 +44,8 @@ app = create_main_api(
     mysql_session,
     models,
     schema,
-    red,
     rc_service,
     payment_api,
-    message_backend
+    websocket_manager
 )
 
