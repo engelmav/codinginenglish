@@ -103,11 +103,10 @@ class Aula extends Component {
       activeSessionId: activeSessionId 
     });
 
-
-    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId);
+    console.log("Current userId in Aula configureActiveSession()", appStore.userId)
+    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId, appStore.userId);
     this.aulaWebsocket.addEventListener("message", (event) => {
       const { data } = event;
-      console.log("aulaWebsocket received message:", data)
       if (data instanceof Blob) {
         const reader = new FileReader();
         reader.onload = () => {
@@ -230,6 +229,7 @@ class Aula extends Component {
               <PopupActivity
                 activities={activityData}
                 activeSessionId={activeSessionId}
+                websocket={this.aulaWebsocket}
                 onClose={togglePopupActivity}
               />
             </div>

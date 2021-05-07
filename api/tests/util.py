@@ -29,7 +29,7 @@ config = Config()
 test_data = TestData()
 
 config.current_url = None
-test_users = [10, 20]
+test_users = [10, 20, 21]
 
 
 def site_map():

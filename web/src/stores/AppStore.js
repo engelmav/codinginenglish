@@ -2,6 +2,7 @@ import { action, configure, makeAutoObservable } from "mobx";
 import {
   clearPersist,
   isSynchronized,
+  rehydrate,
   persistence,
   stopPersist,
   StorageAdapter,
@@ -13,6 +14,7 @@ configure({
 
 class AppStore {
   isAuthenticated = false;
+  loginExpiresAt = null;
   authData = null;
   userId = null;
   firstName = null;
@@ -31,6 +33,10 @@ class AppStore {
     this.isAuthenticated = !this.isAuthenticated;
   }
 
+  @action setLoginExpiry(expiresAt){
+    this.loginExpiresAt = expiresAt;
+  }
+
   @action async configureUser(authData, storedUser, rcAuthToken) {
     this.authData = authData;
     const { email, given_name } = authData.idTokenPayload;
@@ -41,15 +47,14 @@ class AppStore {
     this.firstName = given_name || firstname;
     this.userId = storedUser.id;
     this.rocketchatAuthToken = rcAuthToken;
-    this.setSessionInProgress(authData)
   }
 
   @action setFirstname(firstname) {
     this.firstName = firstname;
   }
 
-  setSessionInProgress() {
-    this.sessionInProgress = true;
+  setSessionInProgress(isInProgress) {
+    this.sessionInProgress = isInProgress;
   }
   clearStore() {
     clearPersist(this);
@@ -59,7 +64,12 @@ class AppStore {
     stopPersist(this);
   }
 
+  async rehydrate() {
+    rehydrate(this);
+  }
+
   get isSynchronized() {
+    console.log("running isSynchronized()")
     return isSynchronized(this);
   }
 }
@@ -69,6 +79,7 @@ export const makeAppStore = (appStoreName = "default") => {
     name: `AppStore.${appStoreName}`,
     properties: [
       "isAuthenticated",
+      "loginExpiresAt",
       "authData",
       "userId",
       "firstName",

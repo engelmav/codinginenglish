@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 import gevent
 import time
 
+from geventwebsocket.websocket import WebSocket
 
 LOG = logging.getLogger(__name__)
 
@@ -224,7 +225,7 @@ class WebsocketManager:
         LOG.debug(f"/ws/stream initializing websocket connection for channel {channel} and client id {client_id}.")
         self.join_or_create(websocket, channel, client_id)
 
-    def join_or_create(self, ws_client, channel_name, client_id):
+    def join_or_create(self, ws_client, channel_name, client_id=None):
         # A WSM has many channels
         # a channel has a backend (pubsub)
         # a channel has many clients
@@ -246,7 +247,15 @@ class WebsocketManager:
             mb.start()
             self.channels[channel_name] = mb
         # Channel and its backend already exist; add client to existing backend.
-        self.channels[channel_name].register_and_listen(ws_client)
+        client = WSClient(ws_client, client_id)
+        self.channels[channel_name].register_and_listen(client)
+
+
+class WSClient:
+    """Simple wrapper to associate a client_id to the websocket to prevent recursive websockets."""
+    def __init__(self, websocket: WebSocket, client_id):
+        self.websocket = websocket
+        self.client_id = client_id
 
 
 class MessagingBackend:
@@ -259,7 +268,7 @@ class MessagingBackend:
         self.publish = publish
 
     def publish_to_redis(self, message):
-        LOG.debug(f"Publishing message on channel {self.channel}: {message}")
+        # LOG.debug(f"Publishing message on channel {self.channel}: {message}")
         self.publish(message)
 
     def __iter_data(self):
@@ -268,33 +277,33 @@ class MessagingBackend:
             if message['type'] == 'message':
                 yield data
 
-    def register_and_listen(self, client):
+    def register_and_listen(self, client: WSClient):
         """Register a WebSocket connection for Redis updates."""
         LOG.debug(f"Registering new websocket client {client}")
         self.clients.append(client)
         self.listen_on_socket(client)
 
-    def listen_on_socket(self, websocket):
+    def listen_on_socket(self, client: WSClient):
         # spin up thread for this ws_client
         # this ensures the incoming websocket messages are published to the correct redis pubsub channel.
-        while not websocket.closed:
-            self.heartbeat(websocket)
-            message = websocket.receive()
+        while not client.websocket.closed:
+            self.heartbeat(client.websocket)
+            message = client.websocket.receive()
             if message is None:
-                LOG.debug(f"websocket channel {self.channel} received message None message. Skipping.")
+                # LOG.debug(f"websocket channel {self.channel} received message None message. Skipping.")
                 break
-            LOG.debug(f"websocket channel {self.channel} received message {message}. Publishing to redis.")
+            # LOG.debug(f"websocket channel {self.channel} received message {message}. Publishing to redis.")
             self.publish_to_redis(message)
             gevent.sleep(0.1)
 
-    def heartbeat(self, ws_client):
-        ws_client.handler.websocket.send_frame("HB", ws_client.OPCODE_PING)
+    def heartbeat(self, socket: WebSocket):
+        socket.handler.websocket.send_frame("HB", socket.OPCODE_PING)
 
     def send(self, client, data):
         """Send given data to the registered client.
         Automatically discards invalid connections."""
         try:
-            client.send(data)
+            client.websocket.send(data)
         except Exception:
             LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
             self.clients.remove(client)
@@ -302,12 +311,17 @@ class MessagingBackend:
     def run(self):
         """Listens for new messages in Redis, and sends them to clients."""
         for data in self.__iter_data():
+            loaded_message = json.loads(data)
+            client_id = loaded_message.get("cid")
+            broadcast_to = []
             for client in self.clients:
-                loaded_message = json.loads(data)
-                client_id = loaded_message.get("cid")
-                # recursive = (client_id == client.client_id and client_id is not None)
-                # if not recursive:
-                gevent.spawn(self.send, client, data)
+                if client.client_id != client_id:
+                    broadcast_to.append(client)
+
+            for client in broadcast_to:
+                recursive = (client_id == client.client_id and client_id is not None)
+                if not recursive:
+                    gevent.spawn(self.send, client, data)
 
     def start(self):
         """Maintains Redis subscription in the background."""

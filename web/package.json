@@ -42,6 +42,7 @@
     "jest-resolve": "23.6.0",
     "konva": "^7.2.5",
     "location": "0.0.1",
+    "lodash": "^4.17.21",
     "luxon": "^1.17.2",
     "mini-css-extract-plugin": "0.5.0",
     "mobx": "^6.1.8",

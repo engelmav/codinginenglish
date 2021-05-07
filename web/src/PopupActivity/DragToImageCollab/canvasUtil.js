@@ -1,5 +1,6 @@
 import Konva from "konva";
 import * as fastgif from "../../../node_modules/fastgif/fastgif.js";
+import _ from "lodash";
 
 const CHANNEL = "active-session-01-exercise-01";
 const OBJ_MOVE_EVENT = "object-move-event";
@@ -7,7 +8,7 @@ const OBJ_MOVE_EVENT = "object-move-event";
 function updateCanvas(clientId, objectId, websocket, x, y) {
   websocket.send(
     JSON.stringify({
-      ch : CHANNEL,
+      ch: CHANNEL,
       et: OBJ_MOVE_EVENT,
       cid: clientId,
       oid: objectId,
@@ -37,14 +38,11 @@ function addObjectListeners(websocket, canvasSpec, stage) {
           return;
         }
 
-        if (
-          eventData.hasOwnProperty("et") &&
-          eventData.et === OBJ_MOVE_EVENT
-        ) {
+        if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
           const { oid, c } = eventData;
           objectCache[oid].to({
-            x: c[0],// dprValue(c[0]),
-            y: c[1], // dprValue(c[1]),
+            x: c[0],
+            y: c[1],
             duration: 0.5,
           });
         }
@@ -52,6 +50,22 @@ function addObjectListeners(websocket, canvasSpec, stage) {
       reader.readAsText(data);
     }
   });
+}
+
+function throttle(callback, limit) {
+  var wait = false; // Initially, we're not waiting
+  return function () {
+    // We return a throttled function
+    if (!wait) {
+      // If we're not waiting
+      callback.call(); // Execute users function
+      wait = true; // Prevent future invocations
+      setTimeout(function () {
+        // After a period of time
+        wait = false; // And allow future invocations
+      }, limit);
+    }
+  };
 }
 
 export async function drawCanvas(canvasSpec, settings, websocket, actorId) {
@@ -79,15 +93,12 @@ export async function drawCanvas(canvasSpec, settings, websocket, actorId) {
     const buf = await fetchToBuffer(`${settings.assets}${image.imageSource}`);
     const wasmDecoder = new fastgif.Decoder();
     const imageDataFrames = await wasmDecoder.decode(buf);
-    console.log("imageDataFrames:", imageDataFrames)
     const imageBitmapFrames = [];
 
     for (const frame of imageDataFrames) {
-      console.log("Converting frame", frame)
-      const bitmapData = await createImageBitmap(frame.imageData)
-      imageBitmapFrames.push({imageData: bitmapData, delay: frame.delay});
+      const bitmapData = await createImageBitmap(frame.imageData);
+      imageBitmapFrames.push({ imageData: bitmapData, delay: frame.delay });
     }
-    console.log("imageBitmapFrames:", imageBitmapFrames);
     renderGif(imageBitmapFrames, gifLayer, stage);
   });
 
@@ -106,8 +117,6 @@ export async function drawCanvas(canvasSpec, settings, websocket, actorId) {
 
 function LabelBucket(lineStart, lineEnd) {
   const group = new Konva.Group({
-    // x: rectX,
-    // y: rectY,
     width: 130,
     height: 25,
     rotation: 0,
@@ -132,11 +141,6 @@ function LabelBucket(lineStart, lineEnd) {
   return group;
 }
 
-function dprValue(value) {
-  const dpr = window.devicePixelRatio || 1;
-  return dpr * value;
-}
-
 function LabelBox(text, rectX, rectY, index, websocket, actorId) {
   const objectId = `labelBox-${index}`;
   const rectangleGroup = new Konva.Group({
@@ -148,11 +152,15 @@ function LabelBox(text, rectX, rectY, index, websocket, actorId) {
     draggable: true,
     id: objectId,
   });
-  rectangleGroup.on("dragmove", (e) => {
-    const pos = e.target.absolutePosition()
+
+  function onDragMove(e) {
+    const pos = e.target.absolutePosition();
     const { x, y } = pos;
     updateCanvas(actorId, objectId, websocket, x, y);
-  });
+  }
+  const throttledOnDragMove = _.throttle(onDragMove, 100);
+
+  rectangleGroup.on("dragmove", throttledOnDragMove);
   const box = new Konva.Rect({
     width: 300,
     height: 50,
@@ -175,16 +183,26 @@ function LabelBox(text, rectX, rectY, index, websocket, actorId) {
 }
 
 export async function renderGif(frames, layer, stage) {
-  console.log("This is an imageData:", frames[0].imageData)
   if (frames.length === 0) {
     throw new Error("can't play image with no frames");
   }
   let frame = 0;
-  console.log("stage width:", stage.width());
   while (true) {
     // void ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-    layer.canvas.context.drawImage(frames[frame].imageData, 1, 1, 400, 300, 200, 200, 200, 150);
-    await new Promise((resolve) => window.setTimeout(resolve, frames[frame].delay));
+    layer.canvas.context.drawImage(
+      frames[frame].imageData,
+      1,
+      1,
+      400,
+      300,
+      200,
+      200,
+      200,
+      150
+    );
+    await new Promise((resolve) =>
+      window.setTimeout(resolve, frames[frame].delay)
+    );
 
     if (++frame === frames.length) {
       frame = 0;

@@ -1,6 +1,4 @@
 import { App as _App } from "./App";
-import { makeAppStore } from "./stores/AppStore";
-
 import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
 import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
 import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
@@ -57,98 +55,98 @@ console.log = function () {
   );
 };
 
-const cieApi = new CieApi();
-const appStore = makeAppStore();
+export function main(appStore) {
+  const cieApi = new CieApi();
+  const websocketManager = new WebsocketManager(settings);
+  const auth = new Auth(appStore);
 
-const websocketManager = new WebsocketManager(settings);
+  async function initializeUser(authResult) {
+    console.log("Initializing user...");
+    const initializedUser = await cieApi.initializeUser(authResult);
+    appStore.user = initializedUser;
+    const userData = initializedUser.data.user;
+    appStore.configureUser(
+      authResult,
+      userData,
+      initializedUser.data.rocketchat_auth_token
+    );
+    const websocket = websocketManager.createWebsocket(
+      `ws-general-user-${appStore.userId}`
+    );
+    const studentSessionMgr = new StudentSessionManager(websocket);
+    studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
+    console.log("initializedUser.data.has_session_in_progress:", initializedUser.data.has_session_in_progress)
+    appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
+    studentSessionMgr.initialize();
+    history.push("/my-dashboard");
+  }
+  auth.addOnAuthSuccess(initializeUser);
+  auth.addOnLogout(appStore.clearStore);
 
+  const Login = compose(_Login, { auth, appStore });
+  const Header = compose(_Header, { appStore, auth, settings, Login });
+  const Footer = compose(_Footer, { appStore, auth, Login });
 
-const auth = new Auth(appStore);
+  const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
+  const ModuleCard = compose(_ModuleCard, {
+    cieApi,
+    appStore,
+    settings,
+    CheckoutForm,
+  });
+  const UpcomingSessions = compose(_UpcomingSessions, {
+    cieApi,
+    auth,
+    appStore,
+    ModuleCard,
+  });
 
-async function initializeUser(authResult) {
-  console.log("Initializing user...");
-  const initializedUser = await cieApi.initializeUser(authResult);
-  appStore.user = initializedUser;
-  const userData = initializedUser.data.user;
-  appStore.configureUser(
-    authResult,
-    userData,
-    initializedUser.data.rocketchat_auth_token
-  );
-  const websocket = websocketManager.createWebsocket(`ws-general-user-${appStore.userId}`);
-  const studentSessionMgr = new StudentSessionManager(websocket);
-  studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
-  appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
-  studentSessionMgr.initialize();
-  history.push("/my-dashboard");
+  /** Configure Aula */
+  const MultipleChoice = compose(_MultipleChoice, { cieApi });
+  const DragToImageCollab = compose(_DragToImageCollab, {
+    appStore,
+    cieApi,
+    settings,
+  });
+
+  const PopupActivity = compose(_PopupActivity, {
+    MultipleChoice,
+    DragToImageCollab,
+    websocketManager,
+  });
+  const withAuth = createWithAuth(auth);
+
+  const { authData } = appStore;
+  const _ClassroomInjected = compose(_Classroom, {
+    appStore,
+    authData,
+    cieApi,
+    settings,
+    PopupActivity,
+    websocketManager,
+  });
+
+  const Classroom = withAuth(_ClassroomInjected);
+  /** End Configure Aula */
+
+  const CallbackWithRouter = withRouter(Callback);
+  const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
+  const Home = compose(_Home, { auth, cieApi, settings });
+  const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
+  const routesProps = {
+    appStore,
+    auth,
+    cieApi,
+    AboutUs,
+    CallbackRoute,
+    Classroom,
+    Home,
+    MyDashboard,
+    UpcomingSessions,
+  };
+
+  const Routes = compose(_Routes, routesProps);
+
+  const App = compose(_App, { appStore, auth, Header, Routes, Footer });
+  return App;
 }
-auth.addOnAuthSuccess(initializeUser);
-auth.addOnLogout(appStore.clearStore);
-
-const Login = compose(_Login, { auth, appStore });
-const Header = compose(_Header, { appStore, auth, settings, Login });
-const Footer = compose(_Footer, { appStore, auth, Login });
-
-const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
-const ModuleCard = compose(_ModuleCard, {
-  cieApi,
-  appStore,
-  settings,
-  CheckoutForm,
-});
-const UpcomingSessions = compose(_UpcomingSessions, {
-  cieApi,
-  auth,
-  appStore,
-  ModuleCard,
-});
-
-/** Configure Aula */
-const MultipleChoice = compose(_MultipleChoice, { cieApi });
-const DragToImageCollab = compose(_DragToImageCollab, {
-  appStore,
-  cieApi,
-  settings,
-});
-
-const PopupActivity = compose(_PopupActivity, {
-  MultipleChoice,
-  DragToImageCollab,
-  websocketManager
-});
-const withAuth = createWithAuth(auth);
-
-const { authData } = appStore;
-const _ClassroomInjected = compose(_Classroom, {
-  appStore,
-  authData,
-  cieApi,
-  settings,
-  PopupActivity,
-  websocketManager
-});
-
-const Classroom = withAuth(_ClassroomInjected);
-/** End Configure Aula */
-
-const CallbackWithRouter = withRouter(Callback);
-const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
-const Home = compose(_Home, { auth, cieApi, settings });
-const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
-const routesProps = {
-  appStore,
-  auth,
-  cieApi,
-  AboutUs,
-  CallbackRoute,
-  Classroom,
-  Home,
-  MyDashboard,
-  UpcomingSessions,
-};
-
-const Routes = compose(_Routes, routesProps);
-
-const App = compose(_App, { appStore, auth, Header, Routes, Footer });
-
-export { App, Routes, UpcomingSessions, appStore, auth, withAuth };
