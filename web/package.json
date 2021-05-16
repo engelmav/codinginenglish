@@ -62,6 +62,7 @@
     "react-alert-template-basic": "^1.0.0",
     "react-app-polyfill": "^0.2.2",
     "react-beautiful-dnd": "^13.0.0",
+    "react-color": "^2.19.3",
     "react-dev-utils": "^8.0.0",
     "react-dom": "^16.8.6",
     "react-draggable": "^4.4.3",
