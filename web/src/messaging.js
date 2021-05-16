@@ -30,3 +30,22 @@ export class WebsocketManager {
   }
 }
 
+export function readSocketDataAnd(onSuccess, event){
+  const { data } = event;
+  if (data instanceof Blob) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let eventData;
+      try {
+        eventData = JSON.parse(reader.result);
+        console.log(eventData);
+        onSuccess(eventData);
+      } catch (ex) {
+        console.error("Failed to parse websocket event data.", ex.stack);
+        console.log(reader.result);
+        return;
+      }
+    };
+    reader.readAsText(data);
+  }
+}

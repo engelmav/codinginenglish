@@ -1,6 +1,7 @@
 import Konva from "konva";
 import * as fastgif from "../../../node_modules/fastgif/fastgif.js";
 import _ from "lodash";
+import { readSocketDataAnd } from "../../messaging";
 
 const CHANNEL = "active-session-01-exercise-01";
 const OBJ_MOVE_EVENT = "object-move-event";
@@ -23,33 +24,18 @@ function addObjectListeners(websocket, canvasSpec, stage) {
     objectCache[`labelBox-${index}`] = stage.findOne(`#labelBox-${index}`);
   });
 
-  websocket.addEventListener("message", (event) => {
-    const { data } = event;
-    if (data instanceof Blob) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        let eventData;
-        try {
-          eventData = JSON.parse(reader.result);
-          console.log(eventData);
-        } catch (ex) {
-          console.error("Failed to parse websocket event data.", ex.stack);
-          console.log(reader.result);
-          return;
-        }
-
-        if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
-          const { oid, c } = eventData;
-          objectCache[oid].to({
-            x: c[0],
-            y: c[1],
-            duration: 0.5,
-          });
-        }
-      };
-      reader.readAsText(data);
+  function updateObjectLocations(eventData){
+    if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
+      const { oid, c } = eventData;
+      objectCache[oid].to({
+        x: c[0],
+        y: c[1],
+        duration: 0.5,
+      });
     }
-  });
+  }
+  const handleSocketData = _.partial = readSocketDataAnd(updateObjectLocations);
+  websocket.addEventListener("message", handleSocketData);
 }
 
 function throttle(callback, limit) {

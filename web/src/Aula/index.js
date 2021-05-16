@@ -7,9 +7,10 @@ import styled from "styled-components";
 import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
-import Bounce from "react-reveal/Bounce";
 import { browserDetect } from "../util";
 import { DraggableCore } from "react-draggable";
+import _ from "lodash";
+import { readSocketDataAnd } from "../messaging";
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -32,6 +33,28 @@ const ChatSignIn = (props) => {
   };
   useEffect(() => authenticateChat(), []);
   return <div ref={divRef}>{props.children}</div>;
+};
+
+const SlidesController = ({ websocketManager, activeSessionId, children }) => {
+  const divRef = useRef(null);
+  useEffect(() => {
+    
+    const slidesSocket = websocketManager.createWebsocket(
+      activeSessionId + "-slides", "slides-client"
+    );
+    console.log("Created websocket", slidesSocket);
+    function sendSlideCommand(eventData) {
+      console.log("got slide command", eventData);
+      slidesIframe.contentWindow.postMessage(
+        JSON.stringify(eventData.command.data),
+        "*"
+      );
+    }
+    const handleWebsocketEvent = _.partial(readSocketDataAnd, sendSlideCommand);
+    const slidesIframe = divRef.current.firstElementChild;
+    slidesSocket.addEventListener("message", handleWebsocketEvent);
+  }, []);
+  return <div style={{height: "100%"}} ref={divRef}>{children}</div>;
 };
 
 const Taskbar = styled.div`
@@ -100,11 +123,17 @@ class Aula extends Component {
       chatChannel: chat_channel,
       prezzieLink: prezzie_link,
       videoChannel: video_channel,
-      activeSessionId: activeSessionId 
+      activeSessionId: activeSessionId,
     });
 
-    console.log("Current userId in Aula configureActiveSession()", appStore.userId)
-    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId, appStore.userId);
+    console.log(
+      "Current userId in Aula configureActiveSession()",
+      appStore.userId
+    );
+    this.aulaWebsocket = websocketManager.createWebsocket(
+      activeSessionId,
+      appStore.userId
+    );
     this.aulaWebsocket.addEventListener("message", (event) => {
       const { data } = event;
       if (data instanceof Blob) {
@@ -133,7 +162,6 @@ class Aula extends Component {
         reader.readAsText(data);
       }
     });
-
   }
 
   componentDidMount() {
@@ -164,7 +192,7 @@ class Aula extends Component {
   };
 
   render() {
-    const { appStore, settings, PopupActivity } = this.props;
+    const { appStore, settings, PopupActivity, websocketManager } = this.props;
     const {
       guacWindow,
       chatWindow,
@@ -215,7 +243,7 @@ class Aula extends Component {
               Chat
             </Button>
           )}
-        {!videoWindow && (
+          {!videoWindow && (
             <Button mr={2} onClick={this.toggleVideo}>
               Video
             </Button>
@@ -249,17 +277,19 @@ class Aula extends Component {
           >
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
             {isWindowDragging && <CoverWindowOnDrag />}
-            <Iframe
-              id="slidesView"
-              url={prezzieLink}
-              width="100%"
-              height="100%"
-              scrolling="no"
-              frameborder="0"
-              webkitallowfullscreen
-              mozallowfullscreen
-              allowfullscreen
-            />
+            <SlidesController activeSessionId={activeSessionId} websocketManager={websocketManager}>
+              <Iframe
+                id="slidesView"
+                url={prezzieLink}
+                width="100%"
+                height="100%"
+                scrolling="no"
+                frameborder="0"
+                webkitallowfullscreen
+                mozallowfullscreen
+                allowfullscreen
+              />
+            </SlidesController>
           </Rnd>
         )}
         {chatWindow && chatChannel && (
