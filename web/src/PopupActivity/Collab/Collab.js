@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import fabric from "fabric";
 import styled from "styled-components";
 import { Button } from "../../UtilComponents";
+import Dialog from "@material-ui/core/Dialog";
+import { v4 as uuidv4 } from "uuid";
 
 class PostProcess {
   constructor(canvasObjects, exerciseObjectProperties) {
@@ -37,7 +39,18 @@ export const Collab = ({
   createWebsocket,
 }) => {
   const { canvasData, exerciseObjectProperties, studentDrawOptions } = model;
-  console.log("jsonModel:", model);
+
+  const [drawOn, setDrawOn] = useState(false);
+  const [selectedObject, setSelectedObject] = useState(null);
+  const [canvasObjects, addCanvasObject] = useState([]);
+  const addCanvasObjectToState = (obj) => {
+    addCanvasObject(canvasObjects.concat(obj));
+  };
+  const toggleDrawMode = () => {};
+  const addText = () => {};
+  const addImage = () => {};
+  const canvasShapes = new CanvasShapes(null, setSelectedObject, addCanvasObjectToState);
+
   useEffect(() => {
     async function init() {
       const pp = new PostProcess(canvasData, exerciseObjectProperties);
@@ -47,15 +60,11 @@ export const Collab = ({
         canvas.renderAll.bind(canvas),
         pp.applyProperties
       );
+      canvasShapes.canvas = canvas;
     }
     init();
   }, []);
-  const [drawOn, setDrawOn] = useState(false);
-  const toggleDrawMode = () => {};
-  const addText = () => {};
-  const addImage = () => {};
-  const addCircle = () => {};
-  const addRectangle = () => {};
+
   return (
     <CollabContainer>
       <canvas id="canvas" width={800} height={600} />
@@ -65,7 +74,7 @@ export const Collab = ({
             case "freeDraw":
               return (
                 <Button onClick={toggleDrawMode} mb={1}>
-                  {drawOn ? "Stop Drawing": "Start Drawing"}
+                  {drawOn ? "Stop Drawing" : "Start Drawing"}
                 </Button>
               );
             case "addText":
@@ -83,10 +92,10 @@ export const Collab = ({
             case "addShapes":
               return (
                 <>
-                  <Button mb={1} onClick={addCircle}>
+                  <Button mb={1} onClick={canvasShapes.createCircle}>
                     Add Circle
                   </Button>
-                  <Button mb={1} onClick={addRectangle}>
+                  <Button mb={1} onClick={canvasShapes.createRectangle}>
                     Add Rectangle
                   </Button>
                 </>
@@ -98,3 +107,95 @@ export const Collab = ({
     </CollabContainer>
   );
 };
+
+class CanvasShapes {
+  constructor(canvas, setSelectedObject, addToState) {
+    this.canvas = canvas;
+    this.setSelectedObject = setSelectedObject;
+    this.addCanvasObjToState = addToState;
+  }
+  applyGenericAttrs = (obj, uuid) => {
+    obj.set({
+      onDeselect: () => this.setSelectedObject(null),
+      onSelect: () => {
+        this.setSelectedObject(uuid);
+      },
+    });
+    return obj;
+  };
+  createCircle = () => {
+    const uuid = uuidv4();
+    const rect = new fabric.fabric.Circle({
+      id: uuid,
+      left: 100,
+      top: 100,
+      radius: 50,
+      fill: "black",
+    });
+    const rectNormal = this.applyGenericAttrs(rect, uuid);
+    const obj = {
+      uuid: uuid,
+      lockMovementX: true,
+      lockMovementY: true,
+    };
+    this.addCanvasObjToState(obj);
+    this.canvas.add(rectNormal);
+    this.canvas.setActiveObject(rectNormal);
+  };
+  createRectangle = () => {
+    const uuid = uuidv4();
+    const rect = new fabric.fabric.Rect({
+      id: uuid,
+      left: 100,
+      top: 100,
+      width: 50,
+      height: 50,
+    });
+    const rectNormal = this.applyGenericAttrs(rect, uuid);
+    const obj = {
+      uuid: uuid,
+      lockMovementX: true,
+      lockMovementY: true,
+    };
+    this.addCanvasObjToState(obj);
+    this.canvas.add(rectNormal);
+    this.canvas.setActiveObject(rectNormal);
+  };
+  createImage = () => {
+    const uuid = uuidv4();
+    const _ = fabric.fabric.Image.fromURL(this.state.temp, (img) => {
+      var img1 = img.set({
+        id: uuid,
+        left: 0,
+        top: 0,
+      });
+      const imgNormal = this.applyGenericAttrs(img1, uuid);
+      const obj = {
+        uuid,
+        lockMovementX: false,
+        lockMovementY: false,
+      };
+      this.addCanvasObjToState(obj);
+      this.canvas.add(imgNormal);
+    });
+
+    this.setState({ dialogOpen: false, temp: "" });
+  };
+
+  bringForward = () => {
+    this.canvas.bringForward(this.canvas.getActiveObject());
+    this.canvas.renderAll();
+  };
+
+  bringBackward = () => {
+    this.canvas.sendBackwards(this.canvas.getActiveObject());
+    this.canvas.renderAll();
+  };
+
+  handleColorChange = (color, _) => {
+    const obj = this.canvas.getActiveObject();
+    obj.set({ fill: color.hex });
+    // this.state.currentColor = color.hex;
+    this.canvas.renderAll();
+  };
+}
