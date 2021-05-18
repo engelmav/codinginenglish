@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Route } from "react-router-dom";
 import { observer } from "mobx-react";
 import { Technique } from "../Technique/Technique";
-import Designer from "../ExerciseDesigner";
+import { Designer } from "../ExerciseDesigner";
 
 @observer
 class Routes extends Component {
@@ -62,11 +62,7 @@ class Routes extends Component {
             auth.login();
           }}
         />
-        <Route
-          exact
-          path="/designer"
-          component={(props) => <Designer />}
-        />
+        <Route exact path="/designer" component={(props) => <Designer />} />
       </>
     );
   }

@@ -1,13 +1,18 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 export class WebsocketManager {
-  constructor(settings){
+  constructor(settings) {
     this.settings = settings;
   }
   createWebsocket(channel, clientId = null) {
     const websocket = new ReconnectingWebSocket(this.settings.websocketAddress);
     websocket.onopen = function () {
-      console.log("Created new websocket, subscribing to channel", channel, "with clientId", clientId);
+      console.log(
+        "Created new websocket, subscribing to channel",
+        channel,
+        "with clientId",
+        clientId
+      );
       websocket.send(
         JSON.stringify({
           command: "subscribe",
@@ -30,7 +35,7 @@ export class WebsocketManager {
   }
 }
 
-export function readSocketDataAnd(onSuccess, event){
+export function readSocketDataAnd(doSomething, event) {
   const { data } = event;
   if (data instanceof Blob) {
     const reader = new FileReader();
@@ -39,7 +44,7 @@ export function readSocketDataAnd(onSuccess, event){
       try {
         eventData = JSON.parse(reader.result);
         console.log(eventData);
-        onSuccess(eventData);
+        doSomething(eventData);
       } catch (ex) {
         console.error("Failed to parse websocket event data.", ex.stack);
         console.log(reader.result);
@@ -49,3 +54,30 @@ export function readSocketDataAnd(onSuccess, event){
     reader.readAsText(data);
   }
 }
+
+class ReadAndDo {
+  constructor(cb) {
+    this.cb = cb;
+  }
+  read = (event) => {
+    const { data } = event;
+    if (data instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        let eventData;
+        try {
+          eventData = JSON.parse(reader.result);
+          console.log(eventData);
+          this.cb(eventData);
+        } catch (ex) {
+          console.error("Failed to parse websocket event data.", ex.stack);
+          console.log(reader.result);
+          return;
+        }
+      };
+      reader.readAsText(data);
+    }
+  };
+}
+
+export { ReadAndDo };

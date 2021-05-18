@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import fabric from "fabric";
 import Dialog from "@material-ui/core/Dialog";
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from "nanoid";
 import styled from "styled-components";
 import { CompactPicker } from "react-color";
 
@@ -39,8 +39,8 @@ class DesignCanvas extends React.Component {
     dialogOpen: false,
     temp: "",
     selectable: true,
-    selectedObjectUuid: null,
-    objects: [],
+    selectedObjectId: null,
+    objects: {},
     exerciseTitle: null,
 
     addImages: true,
@@ -59,16 +59,28 @@ class DesignCanvas extends React.Component {
   toggleAddImages = () => this.setState({ addImages: !this.state.addImages });
   toggleAddShapes = () => this.setState({ addShapes: !this.state.addShapes });
   toggleAddText = () => this.setState({ addText: !this.state.addText });
-  toggleFreeDraw = () => this.setState({ freeDraw: !this.state.freeDraw });
-
-  setSelectedObject = (uuid) => {
-    this.setState({ selectedObjectUuid: uuid });
+  toggleFreeDraw = () => {
+    this.setState({ freeDraw: !this.state.freeDraw });
   };
 
-  findObject = (uuid) => {
+  setSelectedObject = (_id) => {
+    console.log("Selected Object:", _id);
+    this.setState({ selectedObjectId: _id });
+  };
+
+  addObjectToState = (_id, obj) => {
+    console.log("adding object", obj, "with id", _id, "to state.");
+    const newObjects = {
+      ...this.state.objects,
+      [_id]: obj,
+    };
+    this.setState({ objects: newObjects });
+  };
+
+  findObject = (_id) => {
     let foundObj;
     this.state.canvas.getObjects().forEach(function (o) {
-      if (o.id === uuid) {
+      if (o.id === _id) {
         foundObj = o;
       }
     });
@@ -82,90 +94,85 @@ class DesignCanvas extends React.Component {
   };
 
   saveExercise = () => {
-    const {
-      addImages,
-      addShapes,
-      addText,
-      freeDraw
-    } = this.state;
+    const { addImages, addShapes, addText, freeDraw } = this.state;
     const savedExercise = {
-      canvasData: this.state.canvas.toJSON(['id']),
+      canvasData: this.state.canvas.toJSON(["id"]),
       exerciseTitle: this.state.exerciseTitle,
       exerciseObjectProperties: this.state.objects,
       studentDrawOptions: {
         addImages,
         addShapes,
         addText,
-        freeDraw
-      }
-    }
+        freeDraw,
+      },
+    };
     console.log(JSON.stringify(savedExercise));
   };
 
   createCircle = () => {
-    const uuid = uuidv4();
-    const rect = new fabric.fabric.Circle({
-      id: uuid,
+    const _id = nanoid();
+    const canvasCircle = new fabric.fabric.Circle({
+      id: _id,
       left: 100,
       top: 100,
       radius: 50,
       fill: "black",
     });
-    const rectNormal = this.applyGenericAttrs(rect, uuid);
-    const obj = {
-      uuid: uuid,
+    const circNormal = this.applyGenericAttrs(canvasCircle, _id);
+    const circObj = {
+      _id: _id,
       lockMovementX: true,
       lockMovementY: true,
+      type: "circle",
     };
-    this.setState({ objects: this.state.objects.concat(obj) });
-    this.state.canvas.add(rectNormal);
-    this.state.canvas.setActiveObject(rectNormal);
+    this.addObjectToState(_id, circObj);
+    this.state.canvas.add(circNormal);
+    this.state.canvas.setActiveObject(circNormal);
   };
 
   createRectangle = () => {
-    const uuid = uuidv4();
-    const rect = new fabric.fabric.Rect({
-      id: uuid,
+    const _id = nanoid();
+    const canvasRect = new fabric.fabric.Rect({
+      id: _id,
       left: 100,
       top: 100,
       width: 50,
       height: 50,
     });
-    const rectNormal = this.applyGenericAttrs(rect, uuid);
-    const obj = {
-      uuid: uuid,
+    const rectNormal = this.applyGenericAttrs(canvasRect, _id);
+    const rectObj = {
+      _id: _id,
       lockMovementX: true,
       lockMovementY: true,
+      type: "rect",
     };
-    this.setState({ objects: this.state.objects.concat(obj) });
+    this.addObjectToState(_id, rectObj);
     this.state.canvas.add(rectNormal);
     this.state.canvas.setActiveObject(rectNormal);
   };
 
   createImage = () => {
-    {
-      const uuid = uuidv4();
-      const _ = fabric.fabric.Image.fromURL(this.state.temp, (img) => {
-        //i create an extra var for to change some image properties
-        var img1 = img.set({
-          id: uuid,
-          left: 0,
-          top: 0,
-          // width: 150,
-          // height: 150,
-        });
-        const imgNormal = this.applyGenericAttrs(img1, uuid);
-        const obj = {
-          uuid,
-          lockMovementX: false,
-          lockMovementY: false,
-        };
-        this.setState({ objects: this.state.objects.concat(obj) });
-        this.state.canvas.add(imgNormal);
+    const _id = nanoid();
+    const _ = fabric.fabric.Image.fromURL(this.state.temp, (img) => {
+      //i create an extra var for to change some image properties
+      var img1 = img.set({
+        id: _id,
+        left: 0,
+        top: 0,
+        // width: 150,
+        // height: 150,
       });
+      const imgNormal = this.applyGenericAttrs(img1, _id);
+      const obj = {
+        _id,
+        lockMovementX: true,
+        lockMovementY: true,
+      };
+      this.addObjectToState(_id, obj);
+      this.state.canvas.add(imgNormal);
+    });
 
-      this.setState({ dialogOpen: false, temp: "" });
-    }
+    this.setState({ dialogOpen: false, temp: "" });
   };
 
   bringForward = () => {
@@ -178,47 +185,68 @@ class DesignCanvas extends React.Component {
     this.state.canvas.renderAll();
   };
 
-  applyGenericAttrs = (obj, uuid) => {
-    obj.set({
-      onDeselect: () => this.setState({ selectedObjectUuid: null }),
+  applyGenericAttrs = (canvasObj, _id) => {
+    canvasObj.set({
+      onDeselect: () => this.setSelectedObject(null),
       onSelect: () => {
-        this.setSelectedObject(uuid);
+        this.setSelectedObject(_id);
       },
     });
-    return obj;
+    return canvasObj;
+  };
+
+  handleDrawing = () => {
+    this.state.canvas.isDrawingMode = !this.state.canvas.isDrawingMode;
+    this.setState(
+      {
+        isDrawingMode: this.state.canvas.isDrawingMode,
+      },
+      () => {
+        if (this.state.isDrawingMode) {
+          this.state.canvas.on("path:created", (freeDraw) => {
+            const _id = nanoid();
+            freeDraw.path.id = _id;
+            const obj = {
+              _id,
+              lockMovementY: true,
+              lockMovementX: true,
+              type: "freeDraw",
+            };
+            this.applyGenericAttrs(freeDraw.path, _id);
+            this.addObjectToState(_id, obj);
+            // this.state.canvas.renderAll();
+          });
+        } else {
+          this.state.canvas.__eventListeners["path:created"] = [];
+        }
+      }
+    );
   };
 
   handleColorChange = (color, _) => {
     const obj = this.state.canvas.getActiveObject();
     obj.set({ fill: color.hex });
-    this.state.currentColor = color.hex;
+    this.setState({ currentColor: color.hex });
     this.state.canvas.renderAll();
   };
 
-  lockObjectMovement = () => {
+  toggleAllowMovement = () => {
     const selectedObj = this.state.canvas.getActiveObject();
     console.log("got selected object", selectedObj);
     // obj.hasControls = false;
     // obj.hasBorders = false;
     // obj.editable = false;
-    // this.state.canvas.selection = selectable;
-    const { selectedObjectUuid } = this.state;
-    const newObjects = this.state.objects.map((obj) => {
-      if (selectedObjectUuid === obj.uuid) {
-        return {
-          ...obj,
-          lockMovementX: !obj.lockMovementX,
-          lockMovementY: !obj.lockMovementY,
-        };
-      }
-      return obj;
-    });
-    console.log("setting new object array to lock:", newObjects);
-    this.setState({
-      objects: newObjects,
-    });
+    const { selectedObjectId } = this.state;
+    console.log("Locking object", selectedObjectId);
+    const { objects } = this.state;
+    const { lockMovementX, lockMovementY } = objects[selectedObjectId];
+    objects[selectedObjectId].lockMovementX = !lockMovementX;
+    objects[selectedObjectId].lockMovementY = !lockMovementY;
 
-    this.state.canvas.renderAll();
+    console.log("Setting new object array to:", objects);
+    this.setState({
+      objects: objects,
+    });
   };
 
   setCanvasJson = (event) => {
@@ -240,21 +268,26 @@ class DesignCanvas extends React.Component {
 
   render() {
     const { width, height } = this.props;
-    const { selectedObjectUuid } = this.state;
+    const { selectedObjectId } = this.state;
     let selectedObj;
-    if (selectedObjectUuid) {
-      selectedObj = this.state.objects.find(
-        (obj) => (obj.uuid = selectedObjectUuid)
-      );
+    if (selectedObjectId) {
+      selectedObj = this.state.objects[selectedObjectId];
     } else {
       selectedObj = null;
     }
+    console.log("render() selectedObj found in state.objects:", selectedObj);
     let isMovable;
     if (selectedObj) {
-      isMovable = selectedObj.lockMovementX && selectedObj.lockMovementY;
+      isMovable = !selectedObj.lockMovementX && !selectedObj.lockMovementY;
     } else {
       isMovable = false;
     }
+    console.log("render() isMovable:", isMovable);
+
+    console.log(
+      "render() this.state.objects:",
+      JSON.stringify(this.state.objects)
+    );
 
     return (
       <>
@@ -267,7 +300,12 @@ class DesignCanvas extends React.Component {
               placeholder="exercise title"
               onChange={this.setExerciseTitle}
             />
-            <button disabled={!this.state.exerciseTitle} onClick={this.saveExercise}>Save Exercise</button>
+            <button
+              disabled={!this.state.exerciseTitle}
+              onClick={this.saveExercise}
+            >
+              Save Exercise
+            </button>
           </label>
           <CanvasAndToolbar>
             <canvas
@@ -312,36 +350,28 @@ class DesignCanvas extends React.Component {
                 Free Draw
               </label>
               {this.state.canvas && (
-                <button
-                  onClick={() => {
-                    this.state.canvas.isDrawingMode = !this.state.canvas
-                      .isDrawingMode;
-                    this.setState({
-                      isDrawingMode: this.state.canvas.isDrawingMode,
-                    });
-                  }}
-                >
+                <button onClick={this.handleDrawing}>
                   {this.state.isDrawingMode ? "Stop Drawing" : "Start Drawing"}
                 </button>
               )}
               <button
                 onClick={() => {
-                  const uuid = uuidv4();
+                  const uuid = nanoid();
                   const text = new fabric.fabric.IText("Click to edit", {
                     id: uuid,
                     fontFamily: "arial black",
                     fontSize: 16,
                     left: 100,
                     top: 100,
-                    fill: "#efef",
+                    fill: "black",
                   });
                   const textNormal = this.applyGenericAttrs(text, uuid);
                   const obj = {
-                    uuid: uuid,
+                    _id: uuid,
                     lockMovementX: true,
                     lockMovementY: true,
                   };
-                  this.setState({ objects: this.state.objects.concat(obj) });
+                  this.addObjectToState(uuid, obj);
                   this.state.canvas.add(textNormal);
                   this.state.canvas.setActiveObject(textNormal);
                 }}
@@ -371,7 +401,7 @@ class DesignCanvas extends React.Component {
                       right: "0px",
                       bottom: "0px",
                       left: "0px",
-                      width: "400px"
+                      width: "400px",
                     }}
                   >
                     <CompactPicker
@@ -390,11 +420,12 @@ class DesignCanvas extends React.Component {
                   <button
                     onClick={() => {
                       const obj = this.state.canvas.getActiveObject();
-                      const newObjList = this.state.objects.filter(
-                        (fobj) => fobj.uuid !== obj.id
-                      );
-                      this.setState({ objects: newObjList });
-                      this.state.canvas.remove(obj);
+                      console.log("selected object:", obj);
+                      const { objects } = this.state;
+                      const newObjects = delete objects[obj.id]
+                      this.state.canvas.remove(obj)
+                      console.log("newObjects:", newObjects);
+                      this.setState({ objects: newObjects });
                       this.state.canvas.renderAll();
                     }}
                   >
@@ -409,7 +440,7 @@ class DesignCanvas extends React.Component {
                         name="selectable"
                         type="checkbox"
                         checked={isMovable}
-                        onChange={this.lockObjectMovement}
+                        onChange={this.toggleAllowMovement}
                       />
                     )}
                   </label>
@@ -436,4 +467,4 @@ class DesignCanvas extends React.Component {
   }
 }
 
-export default DesignCanvas;
+export { DesignCanvas };

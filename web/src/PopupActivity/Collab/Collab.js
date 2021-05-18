@@ -4,6 +4,20 @@ import styled from "styled-components";
 import { Button } from "../../UtilComponents";
 import Dialog from "@material-ui/core/Dialog";
 import { v4 as uuidv4 } from "uuid";
+import { ReadAndDo, readSocketDataAnd} from "../../messaging";
+
+var objectCache = {};
+const updateObjectLocations = (eventData) => {
+  console.log("updateObjectLocations()")
+  if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
+    const { oid, c } = eventData;
+    objectCache[oid].to({
+      x: c[0],
+      y: c[1],
+      duration: 0.5,
+    });
+  }
+}
 
 class PostProcess {
   constructor(canvasObjects, exerciseObjectProperties) {
@@ -12,10 +26,10 @@ class PostProcess {
     this.applyProperties = this.applyProperties.bind(this);
   }
   applyProperties(o, object) {
-    const exercisePropertiesObj = this.exerciseObjectProperties.find(
-      (eop) => (eop.uuid = object.id)
-    );
+    const exercisePropertiesObj = this.exerciseObjectProperties[object.id];
     if (exercisePropertiesObj) object.set(exercisePropertiesObj);
+    object.on("moving", (e) => console.log("moving"));
+    objectCache[object.id] = object;
   }
 }
 
@@ -42,14 +56,22 @@ export const Collab = ({
 
   const [drawOn, setDrawOn] = useState(false);
   const [selectedObject, setSelectedObject] = useState(null);
-  const [canvasObjects, addCanvasObject] = useState([]);
-  const addCanvasObjectToState = (obj) => {
-    addCanvasObject(canvasObjects.concat(obj));
+  const [canvasObjects, setCanvasObjects] = useState({});
+  const addCanvasObjectToState = (_id, obj) => {
+    const newObjects = {
+      ...canvasObjects,
+      [_id]: obj,
+    };
+    setCanvasObjects(newObjects);
   };
   const toggleDrawMode = () => {};
   const addText = () => {};
   const addImage = () => {};
-  const canvasShapes = new CanvasShapes(null, setSelectedObject, addCanvasObjectToState);
+  const canvasShapes = new CanvasShapes(
+    null,
+    setSelectedObject,
+    addCanvasObjectToState
+  );
 
   useEffect(() => {
     async function init() {
@@ -61,6 +83,8 @@ export const Collab = ({
         pp.applyProperties
       );
       canvasShapes.canvas = canvas;
+      const readAndDo = new ReadAndDo(updateObjectLocations);
+      websocket.addEventListener("message", readAndDo.read);
     }
     init();
   }, []);
