@@ -16,10 +16,10 @@ const settings = {
 
 class FakeWebsocket {
   send(data) {
-    console.log(`fake websocket send() data:`, data);
+    console.log(data);
   }
 
-  addEventListener = () => {}
+  addEventListener = () => {};
 }
 const websocket = new FakeWebsocket();
 const model = {
@@ -775,14 +775,26 @@ const model = {
   },
 };
 
-const appStore = makeAppStore();
-appStore.userId = 1;
+const appStore = makeAppStore("collab");
+appStore.userId = "someUserId";
+
+console.log("Collab.stories appStore.userId", appStore.userId);
 
 let props = {
+  appStore,
   model,
   ...settings,
   websocket,
-  appStore,
 };
+let props2 = {
+  ...props,
+  editorMode: true
+}
 
 export const Collab = () => <_Collab {...props} />;
+export const CollabEditor = () => (
+
+    <_Collab {...props2} />
+
+);
+

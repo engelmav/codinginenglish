@@ -5,7 +5,7 @@ import { Button } from "../UtilComponents/Button";
 const ActivityBorder = styled.div`
   background: white;
   border: 1px black solid;
-  width: 600px;
+  width: 800px;
 `;
 
 const Footer = styled.div`

@@ -68,12 +68,12 @@ class ReadAndDo {
         try {
           eventData = JSON.parse(reader.result);
           console.log(eventData);
-          this.cb(eventData);
         } catch (ex) {
           console.error("Failed to parse websocket event data.", ex.stack);
-          console.log(reader.result);
+          console.log("Original websocket event received was:", event.data);
           return;
         }
+        this.cb(eventData);
       };
       reader.readAsText(data);
     }

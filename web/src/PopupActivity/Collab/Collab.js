@@ -1,48 +1,28 @@
 import React, { useState, useEffect } from "react";
 import fabric from "fabric";
-import styled from "styled-components";
 import { Button } from "../../UtilComponents";
 import Dialog from "@material-ui/core/Dialog";
-import { v4 as uuidv4 } from "uuid";
-import { ReadAndDo, readSocketDataAnd} from "../../messaging";
+import { CanvasObjectCreator } from "../../services/CanvasObjectCreator";
+import * as S from "./styles";
+import { CanvasWebsocketHandler } from "./CanvasWebsocketHandler";
+import { observable, computed } from "mobx";
+import { observer } from "mobx-react";
 
-var objectCache = {};
-const updateObjectLocations = (eventData) => {
-  console.log("updateObjectLocations()")
-  if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
-    const { oid, c } = eventData;
-    objectCache[oid].to({
-      x: c[0],
-      y: c[1],
-      duration: 0.5,
-    });
-  }
+class CollabStore {
+  @observable allowAddImages = true;
+  @observable allowAddShapes = true;
+  @observable allowAddText = true;
+  @observable allowFreeDraw = true;
+  @observable drawOn = false;
+  @observable exerciseTitle = "";
+  saveExercise = () => {}
 }
 
-class PostProcess {
-  constructor(canvasObjects, exerciseObjectProperties) {
-    this.canvasObjects = canvasObjects;
-    this.exerciseObjectProperties = exerciseObjectProperties;
-    this.applyProperties = this.applyProperties.bind(this);
-  }
-  applyProperties(o, object) {
-    const exercisePropertiesObj = this.exerciseObjectProperties[object.id];
-    if (exercisePropertiesObj) object.set(exercisePropertiesObj);
-    object.on("moving", (e) => console.log("moving"));
-    objectCache[object.id] = object;
-  }
-}
+const collabStore = new CollabStore();
 
-const CollabContainer = styled.div`
-  display: flex;
-  border: 1px black solid;
-`;
-const Toolbar = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-items: stretch;
-`;
+export const CHANNEL = "e01"; // exercise 01
+export const OBJ_MOVE_EVENT = 0;
+export const OBJ_CREATE_EVENT = 1;
 
 export const Collab = ({
   appStore,
@@ -51,10 +31,16 @@ export const Collab = ({
   websocket,
   activeSessionId,
   createWebsocket,
+  editorMode = false,
 }) => {
   const { canvasData, exerciseObjectProperties, studentDrawOptions } = model;
 
-  const [drawOn, setDrawOn] = useState(false);
+  /**Editor mode */
+  const handleSetExerciseTitle = (e) => {
+    setExericseTitle(e.target.value);
+  };
+  const [canvas, setCanvas] = useState(null);
+  const [canvasObjectCreator, setCanvasObjectCreator] = useState(null);
   const [selectedObject, setSelectedObject] = useState(null);
   const [canvasObjects, setCanvasObjects] = useState({});
   const addCanvasObjectToState = (_id, obj) => {
@@ -64,162 +50,166 @@ export const Collab = ({
     };
     setCanvasObjects(newObjects);
   };
+
   const toggleDrawMode = () => {};
-  const addText = () => {};
-  const addImage = () => {};
-  const canvasShapes = new CanvasShapes(
-    null,
-    setSelectedObject,
-    addCanvasObjectToState
-  );
 
   useEffect(() => {
     async function init() {
-      const pp = new PostProcess(canvasData, exerciseObjectProperties);
-      const canvas = new fabric.fabric.Canvas("canvas");
-      canvas.loadFromJSON(
-        canvasData,
-        canvas.renderAll.bind(canvas),
-        pp.applyProperties
-      );
-      canvasShapes.canvas = canvas;
-      const readAndDo = new ReadAndDo(updateObjectLocations);
-      websocket.addEventListener("message", readAndDo.read);
+      setCanvas(new fabric.fabric.Canvas("canvas"));
     }
     init();
   }, []);
 
+  useEffect(() => {
+    console.log("in second useEffect");
+    if (canvas !== null) {
+      setCanvasObjectCreator(
+        new CanvasObjectCreator(null, setSelectedObject, addCanvasObjectToState)
+      );
+    }
+  }, [canvas]);
+
+  useEffect(() => {
+    if (canvasObjectCreator) {
+      const canvasWebsocketHandler = new CanvasWebsocketHandler(
+        canvasData,
+        exerciseObjectProperties,
+        websocket,
+        appStore.userId,
+        canvasObjectCreator
+      );
+      canvas.loadFromJSON(
+        canvasData,
+        () => {
+          console.log("completed loading JSON");
+          canvas.renderAll.bind(canvas);
+          canvasObjectCreator.setCanvas(canvas);
+          canvasWebsocketHandler.listenForRemoteCanvasChanges();
+          canvasWebsocketHandler.broadcastCanvasChanges();
+        },
+        canvasWebsocketHandler.applyExerciseProperties
+      );
+    }
+  }, [canvasObjectCreator]);
+  const toolbarProps = {
+    canvasObjectCreator,
+    studentDrawOptions,
+    editorMode,
+  };
   return (
-    <CollabContainer>
-      <canvas id="canvas" width={800} height={600} />
-      <Toolbar>
-        {Object.keys(studentDrawOptions).map((drawOption) => {
-          switch (drawOption) {
-            case "freeDraw":
-              return (
-                <Button onClick={toggleDrawMode} mb={1}>
-                  {drawOn ? "Stop Drawing" : "Start Drawing"}
-                </Button>
-              );
-            case "addText":
-              return (
-                <Button mb={1} onClick={addText}>
-                  Text
-                </Button>
-              );
-            case "addImages":
-              return (
-                <Button mb={1} onClick={addImage}>
-                  Add Image
-                </Button>
-              );
-            case "addShapes":
-              return (
-                <>
-                  <Button mb={1} onClick={canvasShapes.createCircle}>
-                    Add Circle
-                  </Button>
-                  <Button mb={1} onClick={canvasShapes.createRectangle}>
-                    Add Rectangle
-                  </Button>
-                </>
-              );
-          }
-          return;
-        })}
-      </Toolbar>
-    </CollabContainer>
+    <S.CollabContainer>
+      {editorMode && (
+        <>
+          <h1>Exercise Designer</h1>
+          <label>
+            Title:
+            <input
+              type="text"
+              placeholder="exercise title"
+              onChange={(e) => (collabStore.exerciseTitle = e.target.value)}
+            />
+          </label>
+          <Button
+            disabled={collabStore.exerciseTitle === ""}
+            onClick={() => saveExercise()}
+          >
+            Save Exercise
+          </Button>
+        </>
+      )}
+      <canvas
+        style={{ border: "1px black solid" }}
+        id="canvas"
+        width={600}
+        height={600}
+      />
+      {canvasObjectCreator && <Toolbar {...toolbarProps} />}
+    </S.CollabContainer>
   );
 };
 
-class CanvasShapes {
-  constructor(canvas, setSelectedObject, addToState) {
-    this.canvas = canvas;
-    this.setSelectedObject = setSelectedObject;
-    this.addCanvasObjToState = addToState;
-  }
-  applyGenericAttrs = (obj, uuid) => {
-    obj.set({
-      onDeselect: () => this.setSelectedObject(null),
-      onSelect: () => {
-        this.setSelectedObject(uuid);
-      },
-    });
-    return obj;
-  };
-  createCircle = () => {
-    const uuid = uuidv4();
-    const rect = new fabric.fabric.Circle({
-      id: uuid,
-      left: 100,
-      top: 100,
-      radius: 50,
-      fill: "black",
-    });
-    const rectNormal = this.applyGenericAttrs(rect, uuid);
-    const obj = {
-      uuid: uuid,
-      lockMovementX: true,
-      lockMovementY: true,
-    };
-    this.addCanvasObjToState(obj);
-    this.canvas.add(rectNormal);
-    this.canvas.setActiveObject(rectNormal);
-  };
-  createRectangle = () => {
-    const uuid = uuidv4();
-    const rect = new fabric.fabric.Rect({
-      id: uuid,
-      left: 100,
-      top: 100,
-      width: 50,
-      height: 50,
-    });
-    const rectNormal = this.applyGenericAttrs(rect, uuid);
-    const obj = {
-      uuid: uuid,
-      lockMovementX: true,
-      lockMovementY: true,
-    };
-    this.addCanvasObjToState(obj);
-    this.canvas.add(rectNormal);
-    this.canvas.setActiveObject(rectNormal);
-  };
-  createImage = () => {
-    const uuid = uuidv4();
-    const _ = fabric.fabric.Image.fromURL(this.state.temp, (img) => {
-      var img1 = img.set({
-        id: uuid,
-        left: 0,
-        top: 0,
-      });
-      const imgNormal = this.applyGenericAttrs(img1, uuid);
-      const obj = {
-        uuid,
-        lockMovementX: false,
-        lockMovementY: false,
-      };
-      this.addCanvasObjToState(obj);
-      this.canvas.add(imgNormal);
-    });
-
-    this.setState({ dialogOpen: false, temp: "" });
-  };
-
-  bringForward = () => {
-    this.canvas.bringForward(this.canvas.getActiveObject());
-    this.canvas.renderAll();
-  };
-
-  bringBackward = () => {
-    this.canvas.sendBackwards(this.canvas.getActiveObject());
-    this.canvas.renderAll();
-  };
-
-  handleColorChange = (color, _) => {
-    const obj = this.canvas.getActiveObject();
-    obj.set({ fill: color.hex });
-    // this.state.currentColor = color.hex;
-    this.canvas.renderAll();
-  };
-}
+const Toolbar = ({ editorMode, studentDrawOptions, canvasObjectCreator }) => {
+  return (
+    <S.Toolbar>
+      {editorMode && (
+        <>
+          <label>Allow students to:</label>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() =>
+                (collabStore.allowAddImages = !collabStore.allowAddImages)
+              }
+              checked={collabStore.allowAddImages}
+            />
+            Add Images
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() =>
+                (collabStore.allowAddShapes = !collabStore.allowAddShapes)
+              }
+              checked={collabStore.allowAddShapes}
+            />
+            Add Shapes
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() =>
+                (collabStore.allowAddImages = !collabStore.allowAddImages)
+              }
+              checked={collabStore.allowAddText}
+            />
+            Add Text
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() =>
+                (collabStore.allowFreeDraw = !collabStore.allowGreeDraw)
+              }
+              checked={collabStore.allowFreeDraw}
+            />
+            Free Draw
+          </label>
+        </>
+      )}
+      {Object.keys(studentDrawOptions).map((drawOption) => {
+        switch (drawOption) {
+          case "freeDraw" || editorMode:
+            return (
+              <Button onClick={canvasObjectCreator.handleDrawing} mb={1}>
+                {collabStore.drawOn ? "Stop Drawing" : "Start Drawing"}
+              </Button>
+            );
+          case "addText" || editorMode:
+            return (
+              <Button mb={1} onClick={canvasObjectCreator.addText}>
+                Text
+              </Button>
+            );
+          case "addImages" || editorMode:
+            return (
+              <Button mb={1} onClick={canvasObjectCreator.addImage}>
+                Add Image
+              </Button>
+            );
+          case "addShapes" || editorMode:
+            return (
+              <>
+                <Button mb={1} onClick={canvasObjectCreator.createCircle}>
+                  Add Circle
+                </Button>
+                <Button mb={1} onClick={canvasObjectCreator.createRectangle}>
+                  Add Rectangle
+                </Button>
+              </>
+            );
+        }
+        return;
+      })}
+    </S.Toolbar>
+  );
+};

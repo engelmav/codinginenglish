@@ -103,7 +103,7 @@ export function main(appStore) {
   });
 
   /** Configure Aula */
-  const Collab = compose(_Collab, { cieApi });
+  const Collab = compose(_Collab, { cieApi, appStore });
   const MultipleChoice = compose(_MultipleChoice, { cieApi });
   const DragToImageCollab = compose(_DragToImageCollab, {
     appStore,

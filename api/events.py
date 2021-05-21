@@ -318,10 +318,13 @@ class MessagingBackend:
             broadcast_to = []
             for client in self.clients:
                 if client.client_id != client_id:
+                    LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
                     broadcast_to.append(client)
 
             for client in broadcast_to:
                 recursive = (client_id == client.client_id and client_id is not None)
+                LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
+                LOG.debug(f"recursive = {recursive}")
                 if not recursive:
                     gevent.spawn(self.send_to_socket, client, data)
 
