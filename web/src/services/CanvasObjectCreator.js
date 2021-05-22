@@ -54,9 +54,9 @@ export class CanvasObjectCreator {
     });
     this.addCanvasObject(rect);
   };
-  createImage = () => {
+  createImage = (imgUrl) => {
     const uuid = nanoid();
-    const _ = fabric.fabric.Image.fromURL(this.state.temp, (img) => {
+    const _ = fabric.fabric.Image.fromURL(imgUrl, (img) => {
       var img1 = img.set({
         id: uuid,
         left: 0,
@@ -64,8 +64,6 @@ export class CanvasObjectCreator {
       });
       this.addCanvasObject(img1);
     });
-
-    this.setState({ dialogOpen: false, temp: "" });
   };
   addLock = (canvasObj) => {
     return canvasObj;

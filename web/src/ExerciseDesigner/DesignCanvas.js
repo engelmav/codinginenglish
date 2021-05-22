@@ -64,11 +64,7 @@ class DesignCanvas extends React.Component {
     this.setState({ objects: newObjects });
   };
 
-  setExerciseTitle = (e) => {
-    this.setState({
-      exerciseTitle: e.target.value /*  */,
-    });
-  };
+
 
   saveExercise = () => {
     const { addImages, addShapes, addText, freeDraw } = this.state;
@@ -86,33 +82,7 @@ class DesignCanvas extends React.Component {
     console.log(JSON.stringify(savedExercise));
   };
 
-  handleDrawing = () => {
-    this.state.canvas.isDrawingMode = !this.state.canvas.isDrawingMode;
-    this.setState(
-      {
-        isDrawingMode: this.state.canvas.isDrawingMode,
-      },
-      () => {
-        if (this.state.isDrawingMode) {
-          this.state.canvas.on("path:created", (freeDraw) => {
-            const _id = nanoid();
-            freeDraw.path.id = _id;
-            const obj = {
-              _id,
-              lockMovementY: true,
-              lockMovementX: true,
-              type: "freeDraw",
-            };
-            this.applyGenericAttrs(freeDraw.path, _id);
-            this.addObjectToState(_id, obj);
-            // this.state.canvas.renderAll();
-          });
-        } else {
-          this.state.canvas.__eventListeners["path:created"] = [];
-        }
-      }
-    );
-  };
+
 
   handleColorChange = (color, _) => {
     const obj = this.state.canvas.getActiveObject();
