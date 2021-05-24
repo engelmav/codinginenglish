@@ -1,7 +1,12 @@
 import fabric from "fabric";
 import { ReadAndDo } from "../../messaging";
 import _ from "lodash";
-import { OBJ_CREATE_EVENT, OBJ_MOVE_EVENT, CHANNEL } from "./Collab";
+import {
+  OBJ_CREATE_EVENT,
+  OBJ_MOVE_EVENT,
+  CHANNEL,
+  OBJ_MOD_EVENT,
+} from "./Collab";
 
 export class CanvasWebsocketHandler {
   /**
@@ -28,17 +33,56 @@ export class CanvasWebsocketHandler {
   }
 
   broadcastCanvasChanges() {
+    /**
+     * these include object added and path added.
+     */
     this.canvasObjectCreator.canvas.on("object:added", (e) => {
-      if (e.target?.remoteAdd)
-        return; // if the object was added as a result of a remote canvas add, ignore it. Avoids infinite loop.
+      if (e.target?.remoteAdd) return; // if the object was added as a result of a remote canvas add, ignore it. Avoids infinite loop.
       const canvasObject = e.target;
-      this.bindCanvasObjectToWebsocket(canvasObject);
+      this.assignEventListeners(canvasObject);
       const objectDef = JSON.stringify(canvasObject.toJSON(["id"]));
-      this.broadcastChange({ et: OBJ_CREATE_EVENT, objectDef });
+      this.broadcastChangeType({ et: OBJ_CREATE_EVENT, objectDef });
+    });
+    this.canvasObjectCreator.on("path:created", (freeDraw) => {
+      const _id = nanoid();
+      freeDraw.path.id = _id;
+      const obj = {
+        _id,
+        lockMovementY: true,
+        lockMovementX: true,
+        type: "freeDraw",
+      };
+      this.applyGenericAttrs(freeDraw.path);
+      this.onAdd(obj);
+    });
+  };
+  }
+
+  assignEventListeners(canvasObj) {
+    const onObjectMove = (e) => {
+      const { top, left } = e.transform.target;
+      const objectId = e.transform.target.id;
+      const et = OBJ_MOVE_EVENT;
+      this.broadcastChangeType({ et, objectId, top, left });
+    };
+    const handleMod = (e) => {
+      console.log("scale event:", e)
+      const objectId = e.transform.target.id;
+      const modAction = e.transform.target;
+      const et = OBJ_MOD_EVENT;
+      this.broadcastChangeType({ et, objectId, mod: modAction });
+    };
+    const handleObjectMove = _.throttle(onObjectMove, 200);
+    const handleObjMod = _.throttle(handleMod, 200);
+    canvasObj.on({
+      moving: handleObjectMove,
+      scaling: handleMod,
+      skewing: handleMod,
+      rotating: handleMod,
     });
   }
 
-  broadcastChange = (changeObj) => {
+  broadcastChangeType = (changeObj) => {
     const { et } = changeObj;
     let changeMessage;
     if (et === OBJ_MOVE_EVENT) {
@@ -60,33 +104,33 @@ export class CanvasWebsocketHandler {
         od: objectDef,
       });
     }
+    if (et === OBJ_MOD_EVENT) {
+      const { eventObj, objectId } = changeObj;
+      changeMessage = JSON.stringify({
+        ch: CHANNEL,
+        et: OBJ_MOD_EVENT,
+        cid: this.userId,
+        oid: objectId,
+        od: eventObj,
+      });
+    }
+    if (et === OBJ_MOD_EVENT) {
+      const { objectId, mod } = changeObj;
+      changeMessage = JSON.stringify({
+        ch: CHANNEL,
+        et: OBJ_MOD_EVENT,
+        cid: this.userId,
+        oid: objectId,
+        data: mod,
+      });
+    }
     console.log("broadcasting change event", changeMessage);
     this.websocket.send(changeMessage);
   };
-
-  bindCanvasObjectToWebsocket(canvasObj) {
-    const onObjectMove = (e) => {
-      const { top, left } = e.transform.target;
-      const objectId = e.transform.target.id;
-      const et = OBJ_MOVE_EVENT;
-      this.broadcastChange({ et, objectId, top, left });
-    };
-    const handleObjectMove = _.throttle(onObjectMove, 200);
-    canvasObj.on("moving", handleObjectMove);
-  }
-
-  applyExerciseProperties = (o, object) => {
-    const exercisePropertiesObj = this.exerciseObjectProperties[object.id];
-    this.canvasObjectCreator.objectCache[object.id] = object;
-    if (exercisePropertiesObj)
-      object.set(exercisePropertiesObj);
-    this.bindCanvasObjectToWebsocket(object);
-  };
-
   updateLocalCanvasFromRemote = (eventData) => {
-    if (!eventData.hasOwnProperty("et"))
-      return;
-    if (eventData.et === OBJ_MOVE_EVENT) {
+    if (!eventData.hasOwnProperty("et")) return;
+    const { et: eventType } = eventData;
+    if (eventType === OBJ_MOVE_EVENT) {
       const { oid, c } = eventData;
       const targetObj = this.canvasObjectCreator.objectCache[oid];
       targetObj.top = c[0];
@@ -94,18 +138,32 @@ export class CanvasWebsocketHandler {
       targetObj.setCoords();
       this.canvasObjectCreator.objectCache[oid].canvas.renderAll();
     }
-    if (eventData.et === OBJ_CREATE_EVENT) {
+    if (eventType === OBJ_CREATE_EVENT) {
       const objToAdd = JSON.parse(eventData.od);
       fabric.fabric.util.enlivenObjects([objToAdd], (o) => {
         const obj = o[0];
-        const origRenderOnAddRemove = canvas.renderOnAddRemove;
+        const origRenderOnAddRemove = this.canvasObjectCreator.canvas
+          .renderOnAddRemove;
         this.canvasObjectCreator.canvas.renderOnAddRemove = false;
         obj.set({ remoteAdd: true }); // prevents infinite loop between local and remote canvases; see broadcastCanvasChanges()
         this.canvasObjectCreator.addCanvasObject(obj);
-        this.bindCanvasObjectToWebsocket(obj);
+        this.assignEventListeners(obj);
         this.canvasObjectCreator.canvas.renderOnAddRemove = origRenderOnAddRemove;
       });
     }
+    if (eventType === OBJ_MOD_EVENT) {
+      const { oid, data } = eventData;
+      this.canvasObjectCreator.objectCache[oid].set(data);
+      this.canvasObjectCreator.objectCache[oid].setCoords();
+      this.canvasObjectCreator.objectCache[oid].canvas.requestRenderAll();
+    }
+  };
+
+  applyExerciseProperties = (o, object) => {
+    const exercisePropertiesObj = this.exerciseObjectProperties[object.id];
+    this.canvasObjectCreator.objectCache[object.id] = object;
+    if (exercisePropertiesObj) object.set(exercisePropertiesObj);
+    this.assignEventListeners(object);
   };
   listenForRemoteCanvasChanges = () => {
     const readAndDo = new ReadAndDo(this.updateLocalCanvasFromRemote);

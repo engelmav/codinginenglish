@@ -21,9 +21,11 @@ export class CanvasObjectCreator {
     return canvasObj;
   };
   addCanvasObject = (canvasObj) => {
+
     const canvasObjNormalized = this.applyGenericAttrs(canvasObj);
+
     this.canvas.add(canvasObjNormalized);
-    console.log("object added to canvas", this.canvas)
+    console.log("object added to canvas", this.canvas);
     this.objectCache[canvasObjNormalized.id] = canvasObjNormalized;
     if (!canvasObjNormalized.remoteAdd)
       this.canvas.setActiveObject(canvasObjNormalized);
@@ -67,7 +69,7 @@ export class CanvasObjectCreator {
   };
   addLock = (canvasObj) => {
     return canvasObj;
-  } 
+  };
   addText = () => {
     const uuid = nanoid();
     const text = new fabric.fabric.IText("double-click to edit", {
@@ -79,35 +81,27 @@ export class CanvasObjectCreator {
       fill: "black",
     });
     this.addCanvasObject(text);
-  }
-
-  handleDrawing = () => {
-    this.state.canvas.isDrawingMode = !this.state.canvas.isDrawingMode;
-    this.setState(
-      {
-        isDrawingMode: this.state.canvas.isDrawingMode,
-      },
-      () => {
-        if (this.state.isDrawingMode) {
-          this.state.canvas.on("path:created", (freeDraw) => {
-            const _id = nanoid();
-            freeDraw.path.id = _id;
-            const obj = {
-              _id,
-              lockMovementY: true,
-              lockMovementX: true,
-              type: "freeDraw",
-            };
-            this.applyGenericAttrs(freeDraw.path, _id);
-            this.addObjectToState(_id, obj);
-            // this.state.canvas.renderAll();
-          });
-        } else {
-          this.state.canvas.__eventListeners["path:created"] = [];
-        }
-      }
-    );
   };
+
+  startDrawing = () => {
+    this.canvas.isDrawingMode = true;
+    this.canvas.on("path:created", (freeDraw) => {
+      const _id = nanoid();
+      freeDraw.path.id = _id;
+      const obj = {
+        _id,
+        lockMovementY: true,
+        lockMovementX: true,
+        type: "freeDraw",
+      };
+      this.applyGenericAttrs(freeDraw.path);
+      this.onAdd(obj);
+    });
+  };
+  stopDrawing = () => {
+    this.canvas.isDrawingMode = false;
+    this.canvas.__eventListeners["path:created"] = [];
+  }
 
   bringForward = () => {
     this.canvas.bringForward(this.canvas.getActiveObject());

@@ -147,10 +147,6 @@ class Aula extends Component {
       activeSessionId: activeSessionId,
     });
 
-    console.log(
-      "Current userId in Aula configureActiveSession()",
-      appStore.userId
-    );
     this.aulaWebsocket = websocketManager.createWebsocket(
       activeSessionId,
       appStore.userId
@@ -162,15 +158,12 @@ class Aula extends Component {
         reader.onload = () => {
           let commandData = null;
           try {
-            console.log("attempting to parse commandData", reader.result)
             commandData = JSON.parse(reader.result);
-            console.log("parsed commandData:", JSON.stringify(commandData));
           } catch (ex) {
             console.error("Failed to parse websocket event data.", ex.stack);
             console.log(reader.result);
             return;
           }
-          console.log("finished attempting to parse commandData:", commandData)
           if (!commandData.hasOwnProperty("command")) return;
           const { name } = commandData.command;
           if (name === "SHOW_ACTIVITY_POPUP") {

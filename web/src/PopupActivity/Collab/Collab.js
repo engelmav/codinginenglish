@@ -22,8 +22,9 @@ class CollabStore {
   }
   saveExercise = () => {};
   openDialog = () => (this.dialogOpen = true);
-  closeDialog = () => (this.dialogOpen = false)
-
+  closeDialog = () => (this.dialogOpen = false);
+  toggleDraw = () => (this.drawOn = !this.drawOn)
+  setExerciseTitle = (title) => (this.exerciseTitle = title);
 }
 
 const collabStore = new CollabStore();
@@ -31,6 +32,7 @@ const collabStore = new CollabStore();
 export const CHANNEL = "e01"; // exercise 01
 export const OBJ_MOVE_EVENT = 0;
 export const OBJ_CREATE_EVENT = 1;
+export const OBJ_MOD_EVENT = 2;
 
 export const Collab = observer(
   ({
@@ -46,7 +48,7 @@ export const Collab = observer(
 
     /**Editor mode */
     const handleSetExerciseTitle = (e) => {
-      setExericseTitle(e.target.value);
+      collabStore.setExericseTitle(e.target.value);
     };
     const [canvas, setCanvas] = useState(null);
     const [canvasObjectCreator, setCanvasObjectCreator] = useState(null);
@@ -61,6 +63,8 @@ export const Collab = observer(
     };
 
     const toggleDrawMode = () => {};
+
+    const saveExercise = () => console.log("saving");
 
     useEffect(() => {
       async function init() {
@@ -204,8 +208,19 @@ const Toolbar = observer(
           switch (drawOption) {
             case "freeDraw" || editorMode:
               return (
-                <Button onClick={canvasObjectCreator.handleDrawing} mb={1}>
-                  {collabStore.drawOn ? "Stop Drawing" : "Start Drawing"}
+                <Button
+                  onClick={() => {
+                    if (collabStore.drawOn){
+                      collabStore.toggleDraw();
+                      canvasObjectCreator.stopDrawing();
+                    } else{
+                      collabStore.toggleDraw();
+                      canvasObjectCreator.startDrawing();
+                    }
+                  }}
+                  mb={1}
+                >
+                  {collabStore.drawOn == true ? "Stop Drawing" : "Start Drawing"}
                 </Button>
               );
             case "addText" || editorMode:

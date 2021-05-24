@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, Route, Switch } from "react-router-dom";
 import styled, { css } from "styled-components";
-import {
-  debugBorder,
-  whenSmallScreen,
-} from "../UtilComponents/sharedStyles";
+import { debugBorder, whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { navbarCommonStyle } from "../Navbar";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { observer } from "mobx-react";
 import { FaRegWindowClose } from "react-icons/fa";
+import { CSSTransition } from "react-transition-group";
 
 const headerMarginSm = css`
   padding: 1rem;
@@ -80,6 +78,23 @@ const NavbarHeader = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
+const GradualLi = styled.li`
+  .my-node-enter {
+    opacity: 0;
+  }
+  .my-node-enter-active {
+    opacity: 1;
+    transition: opacity 200ms;
+  }
+  .my-node-exit {
+    opacity: 1;
+  }
+  .my-node-exit-active {
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+`;
+
 const HeaderContainer = observer((props) => {
   const { auth, appStore, settings, Login } = props;
   const [navMenu, setNavMenu] = useState(false);
@@ -95,7 +110,11 @@ const HeaderContainer = observer((props) => {
   useEffect(() => {
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
-    return () => document.removeEventListener("mousedown", detectBackgroundClickAndCloseNav);
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        detectBackgroundClickAndCloseNav
+      );
   }, [navMenuRef]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
@@ -133,11 +152,16 @@ const HeaderContainer = observer((props) => {
                 <li>
                   <Link to="/my-dashboard">my_dashboard</Link>
                 </li>
-                {appStore.sessionInProgress && (
-                  <li>
+
+                <CSSTransition
+                  in={appStore.sessionInProgress}
+                  timeout={200}
+                  classNames="my-node"
+                >
+                  <GradualLi>
                     <Link to="/class">in_session!</Link>
-                  </li>
-                )}
+                  </GradualLi>
+                </CSSTransition>
               </>
             )}
             <li>
