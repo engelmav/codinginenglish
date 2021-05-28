@@ -772,6 +772,7 @@ const model = {
     addShapes: true,
     addText: true,
     freeDraw: true,
+    delete: true
   },
 };
 

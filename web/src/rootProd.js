@@ -136,6 +136,7 @@ export function main(appStore) {
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
+  const CollabEditor = compose(_Collab, { appStore, editorMode: true })
   const routesProps = {
     appStore,
     auth,
@@ -143,6 +144,7 @@ export function main(appStore) {
     AboutUs,
     CallbackRoute,
     Classroom,
+    CollabEditor,
     Home,
     MyDashboard,
     UpcomingSessions,

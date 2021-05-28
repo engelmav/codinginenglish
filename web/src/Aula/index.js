@@ -172,7 +172,7 @@ class Aula extends Component {
               { activityData: commandData.command.data },
               this.openPopupActivity()
             );
-          } else if (commandData.command.name === "HIDE_ACTIVITY_POPUP") {
+          } else if (name === "HIDE_ACTIVITY_POPUP") {
             this.closePopupActivity();
           }
         };
@@ -209,7 +209,7 @@ class Aula extends Component {
   };
 
   openPopupActivity = () => this.setState({ popupActivityWindow: true });
-  hidePopupActivity = () => this.setState({ popupActivityWindow: false });
+  closePopupActivity = () => this.setState({ popupActivityWindow: false, activityData: [] });
 
   render() {
     const { appStore, settings, PopupActivity, websocketManager } = this.props;
@@ -235,7 +235,6 @@ class Aula extends Component {
       toggleChat,
       toggleSlides,
       toggleVideo,
-      togglePopupActivity,
     } = this;
 
     const rocketChatUrl = `${settings.rocketchatUrl}${chatChannel}?layout=embedded`;
@@ -282,7 +281,7 @@ class Aula extends Component {
         {popupActivityWindow && (
           <div>
             <PopupActivity
-              activities={activityData}
+              activities={activityData || []}
               activeSessionId={activeSessionId}
               websocket={this.aulaWebsocket}
               onClose={this.closePopupActivity}

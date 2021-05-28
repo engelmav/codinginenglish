@@ -2,15 +2,17 @@ import fabric from "fabric";
 import { nanoid } from "nanoid";
 
 export class CanvasObjectCreator {
-  constructor(canvas, setSelectedObject, onAdd) {
+  constructor(canvas, setSelectedObject, onAdd, onDelete) {
     this.canvas = canvas;
     this.setSelectedObject = setSelectedObject;
     this.onAdd = onAdd;
+    this.onDelete = onDelete;
     this.objectCache = {};
   }
-  setCanvas(canvas) {
-    this.canvas = canvas;
-  }
+  uniqueId = () => {
+    return nanoid();
+  };
+
   applyGenericAttrs = (canvasObj) => {
     canvasObj.set({
       onDeselect: () => this.setSelectedObject(null),
@@ -21,11 +23,8 @@ export class CanvasObjectCreator {
     return canvasObj;
   };
   addCanvasObject = (canvasObj) => {
-
     const canvasObjNormalized = this.applyGenericAttrs(canvasObj);
-
     this.canvas.add(canvasObjNormalized);
-    console.log("object added to canvas", this.canvas);
     this.objectCache[canvasObjNormalized.id] = canvasObjNormalized;
     if (!canvasObjNormalized.remoteAdd)
       this.canvas.setActiveObject(canvasObjNormalized);
@@ -85,23 +84,31 @@ export class CanvasObjectCreator {
 
   startDrawing = () => {
     this.canvas.isDrawingMode = true;
-    this.canvas.on("path:created", (freeDraw) => {
-      const _id = nanoid();
-      freeDraw.path.id = _id;
-      const obj = {
-        _id,
-        lockMovementY: true,
-        lockMovementX: true,
-        type: "freeDraw",
-      };
-      this.applyGenericAttrs(freeDraw.path);
-      this.onAdd(obj);
-    });
   };
   stopDrawing = () => {
     this.canvas.isDrawingMode = false;
-    this.canvas.__eventListeners["path:created"] = [];
-  }
+  };
+
+  addPath = (pathObj) => {
+    pathObj.id = this.uniqueId();
+    this.applyGenericAttrs(pathObj);
+    this.objectCache[pathObj.id] = pathObj;
+    this.onAdd(pathObj);
+    return pathObj;
+  };
+
+  deleteObject = (objId = null) => {
+    console.log("CanvasObjectCreator.deleteObject()", objId)
+    let id;
+    if (objId){
+      id = objId;
+    } else {
+      const activeObj = this.canvas.getActiveObject();
+      const { id } = activeObj;
+      this.canvas.remove(activeObj);
+    }
+    this.onDelete(id);
+  };
 
   bringForward = () => {
     this.canvas.bringForward(this.canvas.getActiveObject());
@@ -113,10 +120,13 @@ export class CanvasObjectCreator {
     this.canvas.renderAll();
   };
 
-  handleColorChange = (color, _) => {
+  setActiveObjectFillColor = (color) => {
+    
     const obj = this.canvas.getActiveObject();
-    obj.set({ fill: color.hex });
+    obj.set({ fill: color });
     // this.state.currentColor = color.hex;
     this.canvas.renderAll();
+    this.canvas.fire("object:fillColorChange", { objId: obj.id, data: {fill: color } });
+    
   };
 }
