@@ -7,9 +7,26 @@ import styled from "styled-components";
 import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
-import Bounce from "react-reveal/Bounce";
 import { browserDetect } from "../util";
 import { DraggableCore } from "react-draggable";
+import _ from "lodash";
+import { readSocketDataAnd } from "../messaging";
+import { Link } from "react-router-dom";
+
+const ClassroomContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+const ClassroomHeader = styled.div`
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  justify-self: stretch;
+  background-color: black;
+  padding: 5px;
+  width: 100%;
+`;
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -19,7 +36,7 @@ const ChatSignIn = (props) => {
     const chatIframe = divRef.current.firstElementChild;
     chatIframe.addEventListener("load", function () {
       setTimeout(() => {
-        console.log("posting message with", props.appStore.rocketchatAuthToken);
+
         this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
@@ -27,14 +44,41 @@ const ChatSignIn = (props) => {
           },
           "*"
         );
-      }, 8000);
+      }, 10000);
     });
   };
   useEffect(() => authenticateChat(), []);
   return <div ref={divRef}>{props.children}</div>;
 };
 
+const SlidesController = ({ websocketManager, activeSessionId, children }) => {
+  const divRef = useRef(null);
+  useEffect(() => {
+    const slidesSocket = websocketManager.createWebsocket(
+      activeSessionId + "-slides",
+      "slides-client"
+    );
+    console.log("Created websocket", slidesSocket);
+    function sendSlideCommand(eventData) {
+      console.log("got slide command", eventData);
+      slidesIframe.contentWindow.postMessage(
+        JSON.stringify(eventData.command.data),
+        "*"
+      );
+    }
+    const handleWebsocketEvent = _.partial(readSocketDataAnd, sendSlideCommand);
+    const slidesIframe = divRef.current.firstElementChild;
+    slidesSocket.addEventListener("message", handleWebsocketEvent);
+  }, []);
+  return (
+    <div style={{ height: "100%" }} ref={divRef}>
+      {children}
+    </div>
+  );
+};
+
 const Taskbar = styled.div`
+  display: inline;
   border-radius: 3px;
   margin-top: 3px;
   margin-left: 3px;
@@ -56,7 +100,7 @@ class Aula extends Component {
     this.slidesWindow = React.createRef();
 
     this.state = {
-      activityData: null,
+      activityData: [],
       guacWindow: true,
       chatWindow: true,
       slidesWindow: true,
@@ -100,40 +144,41 @@ class Aula extends Component {
       chatChannel: chat_channel,
       prezzieLink: prezzie_link,
       videoChannel: video_channel,
-      activeSessionId: activeSessionId 
+      activeSessionId: activeSessionId,
     });
 
-    console.log("Current userId in Aula configureActiveSession()", appStore.userId)
-    this.aulaWebsocket = websocketManager.createWebsocket(activeSessionId, appStore.userId);
+    this.aulaWebsocket = websocketManager.createWebsocket(
+      activeSessionId,
+      appStore.userId
+    );
     this.aulaWebsocket.addEventListener("message", (event) => {
       const { data } = event;
       if (data instanceof Blob) {
         const reader = new FileReader();
         reader.onload = () => {
-          let commmandData;
+          let commandData = null;
           try {
-            commmandData = JSON.parse(reader.result);
-            console.log(commmandData);
+            commandData = JSON.parse(reader.result);
           } catch (ex) {
             console.error("Failed to parse websocket event data.", ex.stack);
             console.log(reader.result);
             return;
           }
-
-          if (
-            commmandData.hasOwnProperty("command") &&
-            commmandData.command.name === "SHOW_ACTIVITY_POPUP"
-          ) {
+          if (!commandData.hasOwnProperty("command")) return;
+          const { name } = commandData.command;
+          if (name === "SHOW_ACTIVITY_POPUP") {
+            console.log("setting state activityData to", commandData.command.data);
             this.setState(
-              { activityData: commmandData.command.data },
-              this.togglePopupActivity
+              { activityData: commandData.command.data },
+              this.openPopupActivity()
             );
+          } else if (name === "HIDE_ACTIVITY_POPUP") {
+            this.closePopupActivity();
           }
         };
         reader.readAsText(data);
       }
     });
-
   }
 
   componentDidMount() {
@@ -163,8 +208,11 @@ class Aula extends Component {
     this.setState({ isWindowDragging: false });
   };
 
+  openPopupActivity = () => this.setState({ popupActivityWindow: true });
+  closePopupActivity = () => this.setState({ popupActivityWindow: false, activityData: [] });
+
   render() {
-    const { appStore, settings, PopupActivity } = this.props;
+    const { appStore, settings, PopupActivity, websocketManager } = this.props;
     const {
       guacWindow,
       chatWindow,
@@ -187,7 +235,6 @@ class Aula extends Component {
       toggleChat,
       toggleSlides,
       toggleVideo,
-      togglePopupActivity,
     } = this;
 
     const rocketChatUrl = `${settings.rocketchatUrl}${chatChannel}?layout=embedded`;
@@ -198,42 +245,48 @@ class Aula extends Component {
     const activityWindowOnTop = "activityWindow";
 
     return (
-      <div>
-        <Taskbar>
-          {!slidesWindow && (
-            <Button mr={2} onClick={this.toggleSlides}>
-              Slides
-            </Button>
-          )}
-          {!guacWindow && (
-            <Button mr={2} onClick={this.toggleGuac}>
-              Dev Environment
-            </Button>
-          )}
-          {!chatWindow && (
-            <Button mr={2} onClick={this.toggleChat}>
-              Chat
-            </Button>
-          )}
-        {!videoWindow && (
-            <Button mr={2} onClick={this.toggleVideo}>
-              Video
-            </Button>
-          )}
-          {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
-        </Taskbar>
-        <div>Class Basic Session</div>
+      <ClassroomContainer>
+        <ClassroomHeader>
+          <Link to="/">
+            <img
+              style={{ height: "40px", display: "inline" }}
+              alt="cie logo"
+              src={`${settings.assets}/cie-logo-horizontal-black.png`}
+            ></img>
+          </Link>
+          <Taskbar>
+            {!slidesWindow && (
+              <Button mr={2} onClick={this.toggleSlides}>
+                Slides
+              </Button>
+            )}
+            {!guacWindow && (
+              <Button mr={2} onClick={this.toggleGuac}>
+                Dev Environment
+              </Button>
+            )}
+            {!chatWindow && (
+              <Button mr={2} onClick={this.toggleChat}>
+                Chat
+              </Button>
+            )}
+            {!videoWindow && (
+              <Button mr={2} onClick={this.toggleVideo}>
+                Video
+              </Button>
+            )}
+            {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
+          </Taskbar>
+        </ClassroomHeader>
         {popupActivityWindow && (
-          <DraggableCore>
-            <div>
-              <PopupActivity
-                activities={activityData}
-                activeSessionId={activeSessionId}
-                websocket={this.aulaWebsocket}
-                onClose={togglePopupActivity}
-              />
-            </div>
-          </DraggableCore>
+          <div>
+            <PopupActivity
+              activities={activityData || []}
+              activeSessionId={activeSessionId}
+              websocket={this.aulaWebsocket}
+              onClose={this.closePopupActivity}
+            />
+          </div>
         )}
         {slidesWindow && prezzieLink && (
           <Rnd
@@ -249,17 +302,22 @@ class Aula extends Component {
           >
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
             {isWindowDragging && <CoverWindowOnDrag />}
-            <Iframe
-              id="slidesView"
-              url={prezzieLink}
-              width="100%"
-              height="100%"
-              scrolling="no"
-              frameborder="0"
-              webkitallowfullscreen
-              mozallowfullscreen
-              allowfullscreen
-            />
+            <SlidesController
+              activeSessionId={activeSessionId}
+              websocketManager={websocketManager}
+            >
+              <Iframe
+                id="slidesView"
+                url={prezzieLink}
+                width="100%"
+                height="100%"
+                scrolling="no"
+                frameborder="0"
+                webkitallowfullscreen
+                mozallowfullscreen
+                allowfullscreen
+              />
+            </SlidesController>
           </Rnd>
         )}
         {chatWindow && chatChannel && (
@@ -357,7 +415,7 @@ class Aula extends Component {
             )}
           </Rnd>
         )}
-      </div>
+      </ClassroomContainer>
     );
   }
 }

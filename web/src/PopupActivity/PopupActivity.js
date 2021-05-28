@@ -5,7 +5,7 @@ import { Button } from "../UtilComponents/Button";
 const ActivityBorder = styled.div`
   background: white;
   border: 1px black solid;
-  width: 600px;
+  width: 800px;
 `;
 
 const Footer = styled.div`
@@ -16,6 +16,7 @@ const Footer = styled.div`
 export const PopupActivity = ({
   onClose,
   activities,
+  Collab,
   MultipleChoice,
   DragToImageCollab,
   activeSessionId,
@@ -24,7 +25,6 @@ export const PopupActivity = ({
   // Resume here:
   // implement callback (or mobx class) to collect responses from child component
   // and send them to backend when student clicks "DONE!"
-  console.log("The two components , ", MultipleChoice, DragToImageCollab);
   return (
     <ActivityBorder>
       {activities.map((activity, idx) => {
@@ -34,6 +34,15 @@ export const PopupActivity = ({
         } else if (activityType === "dragAndDropToImageCollab") {
           return (
             <DragToImageCollab
+              key={idx}
+              model={model}
+              websocket={websocket}
+              activeSessionId={activeSessionId}
+            />
+          );
+        } else if (activityType === "collab") {
+          return (
+            <Collab
               key={idx}
               model={model}
               websocket={websocket}

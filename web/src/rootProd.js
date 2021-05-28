@@ -2,6 +2,7 @@ import { App as _App } from "./App";
 import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
 import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
 import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
+import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
 import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
@@ -102,6 +103,7 @@ export function main(appStore) {
   });
 
   /** Configure Aula */
+  const Collab = compose(_Collab, { cieApi, appStore });
   const MultipleChoice = compose(_MultipleChoice, { cieApi });
   const DragToImageCollab = compose(_DragToImageCollab, {
     appStore,
@@ -110,6 +112,7 @@ export function main(appStore) {
   });
 
   const PopupActivity = compose(_PopupActivity, {
+    Collab,
     MultipleChoice,
     DragToImageCollab,
     websocketManager,
@@ -133,6 +136,7 @@ export function main(appStore) {
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
+  const CollabEditor = compose(_Collab, { appStore, editorMode: true })
   const routesProps = {
     appStore,
     auth,
@@ -140,6 +144,7 @@ export function main(appStore) {
     AboutUs,
     CallbackRoute,
     Classroom,
+    CollabEditor,
     Home,
     MyDashboard,
     UpcomingSessions,

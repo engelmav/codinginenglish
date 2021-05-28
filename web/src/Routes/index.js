@@ -23,10 +23,11 @@ class Routes extends Component {
   render() {
     const {
       auth,
-
+      appStore,
       AboutUs,
       CallbackRoute,
       Classroom,
+      CollabEditor,
       Home,
       MyDashboard,
       UpcomingSessions,
@@ -61,6 +62,7 @@ class Routes extends Component {
             auth.login();
           }}
         />
+        <Route exact path="/editor" component={(props) => <CollabEditor />} />
       </>
     );
   }

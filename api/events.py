@@ -222,7 +222,6 @@ class WebsocketManager:
             raise Exception("We received an initial message that does not contain a subscribe request.")
         channel = open_msg_dict.get("identifier").get("channel")
         client_id = open_msg_dict.get("clientId", "anon")
-        LOG.debug(f"/ws/stream initializing websocket connection for channel {channel} and client id {client_id}.")
         self.join_or_create(websocket, channel, client_id)
 
     def join_or_create(self, ws_client, channel_name, client_id=None):
@@ -239,15 +238,17 @@ class WebsocketManager:
         # By virtue of being the "first message" you will be an "open" (given the websocket.onopen in frontend)
         # After opening, you can "start listening" for the second type, "message"
         # create a redis publisher on the channel name
-
+        client = WSClient(ws_client, client_id)
         if channel_name not in self.channels:
+            LOG.debug(f"Creating new websocket channel `{channel_name}`, initiated by client {client}, client id "
+                      f"{client_id}.")
             message_publisher = create_message_publisher(self.redis, channel_name)
             message_listener = create_message_listener(self.redis, channel_name)
             mb = MessagingBackend(channel_name, message_listener, message_publisher)
             mb.start()
             self.channels[channel_name] = mb
         # Channel and its backend already exist; add client to existing backend.
-        client = WSClient(ws_client, client_id)
+        LOG.debug(f"Adding new client `{client}` to existing channel `{channel_name}`.")
         self.channels[channel_name].register_and_listen(client)
 
 
@@ -279,13 +280,13 @@ class MessagingBackend:
 
     def register_and_listen(self, client: WSClient):
         """Register a WebSocket connection for Redis updates."""
-        LOG.debug(f"Registering new websocket client {client}")
         self.clients.append(client)
         self.listen_on_socket(client)
 
     def listen_on_socket(self, client: WSClient):
         # spin up thread for this ws_client
         # this ensures the incoming websocket messages are published to the correct redis pubsub channel.
+        LOG.debug(f"Client `{client}` now listening for websocket messages on channel {self.channel}.")
         while not client.websocket.closed:
             self.heartbeat(client.websocket)
             message = client.websocket.receive()
@@ -299,10 +300,11 @@ class MessagingBackend:
     def heartbeat(self, socket: WebSocket):
         socket.handler.websocket.send_frame("HB", socket.OPCODE_PING)
 
-    def send(self, client, data):
+    def send_to_socket(self, client, data):
         """Send given data to the registered client.
         Automatically discards invalid connections."""
         try:
+            LOG.debug(f"channel {self.channel}: sending data {data} to client {client}")
             client.websocket.send(data)
         except Exception:
             LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
@@ -316,14 +318,17 @@ class MessagingBackend:
             broadcast_to = []
             for client in self.clients:
                 if client.client_id != client_id:
+                    LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
                     broadcast_to.append(client)
 
             for client in broadcast_to:
                 recursive = (client_id == client.client_id and client_id is not None)
+                LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
+                LOG.debug(f"recursive = {recursive}")
                 if not recursive:
-                    gevent.spawn(self.send, client, data)
+                    gevent.spawn(self.send_to_socket, client, data)
 
     def start(self):
         """Maintains Redis subscription in the background."""
-        LOG.debug("Spawning gevent thread for Websocket.")
+        LOG.debug(f"Spawning gevent thread for Websocket channel {self.channel}.")
         gevent.spawn(self.run)

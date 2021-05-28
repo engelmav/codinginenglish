@@ -24,6 +24,12 @@ app = Flask(__name__)
 sockets = Sockets(app)
 
 
+def make_response(payload_dict, status_code):
+    resp = jsonify(payload_dict)
+    resp.status_code = status_code
+    return resp
+
+
 def create_main_api(publish_message,
                     module_service: cie.ModuleService,
                     student_session_service: StudentSessionService,
@@ -59,14 +65,20 @@ def create_main_api(publish_message,
                 publish_message(message)
         """
         results = []
+        messages = []
+        status = "success"
+        resp_code = 200
         for channel in channels:
-            res = websocket_manager.channels[channel].publish_to_redis(command_str)
-            results.append(res)
-        return jsonify(results)
+            try:
+                res = websocket_manager.channels[channel].publish_to_redis(command_str)
+                results.append[res]
+            except KeyError:
+                messages.append(f"Channel {channel} is not currently registered in the WebsocketManager")
+                status = "error"
+                resp_code = 500
+        return make_response(dict(status=status, messages=messages, data=results), resp_code)
 
-    @app.route("/api/ws/stats")
-    def ws_stats():
-        return jsonify([])
+
 
     @sockets.route("/ws/stream")
     def websocket(ws):
@@ -94,11 +106,6 @@ def create_main_api(publish_message,
         _schema = clazz()
         loaded = _schema.load(data)
         return loaded.data
-
-    def make_response(payload_dict, status_code):
-        resp = jsonify(payload_dict)
-        resp.status_code = status_code
-        return resp
 
     @app.route('/api/modules', methods=['GET'])
     def get_cie_modules():
@@ -291,9 +298,6 @@ def create_main_api(publish_message,
         User object fields. Will also return whether the user currently has a class that
         is in session.
         :return: UserSchema
-        """
-        # TODO: pair down to what we need for unique user identification.
-        """
         {
           "accessToken": "<access token>",
           "idToken": "<id token>",
@@ -324,12 +328,7 @@ def create_main_api(publish_message,
 
         messages = []
         try:
-            # rc_username = make_rocketchat_username(given_name, family_name)
-            # rc_name = f"{given_name}  {family_name}"
-            # rc_login_resp = rc_service.create_or_login_user(rc_username, rc_name, email)
-            # session["rocketchat_auth_token"] = rc_login_resp.get("authToken")
             auth0_login_resp = rc_service.login_with_auth0(auth0_access_token, config.get("cie.auth0.secretkey"))
-            print(auth0_login_resp)
             rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
             messages.append("Retrieved RocketChat auth token.")
         except Exception as e:
@@ -362,12 +361,13 @@ def create_main_api(publish_message,
         resp = make_response(dict(status="success", data=payload, messages=messages), 200)
         return resp
 
-    @app.route('/api/threads', methods=['GET'])
+    @app.route('/api/monitor', methods=['GET'])
     def get_threads():
         threads = []
         for thread in threading.enumerate():
             threads.append(thread.name)
-        return jsonify(threads)
+        monitor = {"channels": list(websocket_manager.channels.keys()), "threads": threads}
+        return jsonify(monitor)
 
     @app.route('/api/users/<int:user_id>/module-sessions', methods=['GET'])
     def get_user_sessions(user_id):

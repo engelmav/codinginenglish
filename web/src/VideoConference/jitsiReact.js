@@ -12,7 +12,6 @@ const Jutsu = ({
   onJitsi,
   ...options
 }) => {
-  console.log("options in Jutsu:", options);
   const {loading, error, jitsi} = useJitsi({
     parentNode: 'jitsi-container',
     ...options
