@@ -9,6 +9,7 @@ import { SketchPicker } from "react-color";
 import { computed, observable, makeObservable, toJS } from "mobx";
 import { observer } from "mobx-react";
 import jsonFormat from "json-format";
+import { Box } from "../../UtilComponents/Box";
 
 const mapToObj = (_map) => {
   const obj = {};
@@ -45,10 +46,10 @@ class CollabStore {
   setExerciseTitle = (title) => (this.exerciseTitle = title);
   setSelectedObject = (objectId) => {
     this.selectedObject = objectId;
+    console.log("selectedObject is", this.selectedObject);
     // if (objectId) this.computeIsMovable();
   };
   addCanvasObject = (obj) => {
-    console.log("addCanvasObject");
     const { id } = obj;
     const detatchedFromFabric = obj.toJSON([
       "id",
@@ -86,8 +87,8 @@ class CollabStore {
         (err) => console.log("failed:", err)
       );
     } catch (err) {
-      console.log("json parse error:", err)
-       fmtjs = jsonEditorVal;
+      console.log("json parse error:", err);
+      fmtjs = jsonEditorVal;
     }
     return fmtjs;
   }
@@ -189,7 +190,7 @@ export const Collab = observer(
       console.log("saving exercise");
       console.log(JSON.stringify(collabStore.getCanvasObjects()));
       const allowedFunctions = collabStore.getAllowedFunctions();
-      const canvasJson = canvas.toJSON();
+      const canvasJson = canvas.toJSON(["id"]);
       collabStore.setExerciseData(
         JSON.stringify({
           allowedFunctions,
@@ -468,27 +469,32 @@ const Dialogs = observer(({ canvasObjectCreator }) => {
         </Button>
       </Dialog>
       <Dialog open={collabStore.jsonEditorOpen}>
-        <textarea
-          rows="200"
-          cols="200"
-          value={collabStore.exerciseDataOrEdited}
-          onChange={(e) => {
-            collabStore.setExerciseDataDraft(e.target.value);
-          }}
-        >
-          {collabStore.exerciseData}
-        </textarea>
-        <Button
-          onClick={() => {
-            collabStore.applyEditedExerciseData();
-            canvasObjectCreator.canvas.loadFromJSON(
-              JSON.parse(collabStore.exerciseData).canvasJson
-            );
-            collabStore.closeJsonEditor();
-          }}
-        >
-          Apply
-        </Button>
+          <textarea
+            rows="200"
+            cols="200"
+            value={collabStore.exerciseDataOrEdited}
+            onChange={(e) => {
+              collabStore.setExerciseDataDraft(e.target.value);
+            }}
+          >
+            {collabStore.exerciseData}
+          </textarea>
+          <Box display="flex" flexDirection="row" justifyContent="flex-end">
+            <Button onClick={collabStore.closeJsonEditor}>Cancel</Button>
+            <Button
+              onClick={() => {
+                collabStore.applyEditedExerciseData();
+                canvasObjectCreator.canvas.loadFromJSON(
+                  JSON.parse(collabStore.exerciseData).canvasJson,
+                  () => console.log("Applied edited JSON to canvas."),
+                  (_, obj) => canvasObjectCreator.applyGenericAttrs(obj)
+                );
+                collabStore.closeJsonEditor();
+              }}
+            >
+              Apply
+            </Button>
+          </Box>
       </Dialog>
     </>
   );

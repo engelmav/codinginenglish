@@ -1,7 +1,8 @@
 import React from "react";
 import { Aula as _Aula } from ".";
-import { compose } from '../compose';
+import { compose } from "../compose";
 import { makeAppStore } from "../stores/AppStore";
+import { Router } from "react-router-dom";
 
 export default {
   title: "Views/Aula",
@@ -29,6 +30,10 @@ const Aula = compose(_Aula, {
   settings,
 });
 
-
-export const DefaultView = () =>
-  <Aula />
+import { createBrowserHistory } from "history";
+const history = createBrowserHistory();
+export const DefaultView = () => (
+  <Router location={history}>
+    <Aula />
+  </Router>
+);
