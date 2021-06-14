@@ -6,5 +6,9 @@ module.exports = {
   "addons": [
     "@storybook/addon-links",
     "@storybook/addon-essentials"
-  ]
+  ],
+  babel: async (options) => {
+    console.log(JSON.stringify(options));
+    return options;
+  },
 }

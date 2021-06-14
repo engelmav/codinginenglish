@@ -1,5 +1,6 @@
 import pytz
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Text
+from sqlalchemy.dialects.mysql.json import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -11,13 +12,15 @@ class Models:
                  _UserModuleRegistration,
                  _User,
                  _ActiveSession,
-                 _UserActiveSession):
+                 _UserActiveSession,
+                 _AulaConfig):
         self.CieModule = _CieModule
         self.ModuleSession = _ModuleSession
         self.UserModuleRegistration = _UserModuleRegistration
         self.User = _User
         self.ActiveSession = _ActiveSession
         self.UserActiveSession = _UserActiveSession
+        self.AulaConfig = _AulaConfig
 
 
 def model_factory(Base):
@@ -98,13 +101,20 @@ def model_factory(Base):
         active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
         active_session = relationship('ActiveSession')
 
+    class AulaConfig(Base):
+        __tablename__ = 'aula_config'
+        id = Column(Integer, primary_key=True)
+        active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
+        config = Column(JSON)
+
     models = Models(
         CieModule,
         ModuleSession,
         UserModuleRegistration,
         User,
         ActiveSession,
-        UserActiveSession)
+        UserActiveSession,
+        AulaConfig)
     return models
 
 

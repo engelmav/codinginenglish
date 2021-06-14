@@ -13,7 +13,7 @@ class Auth {
     clientID: CLIENT_ID,
     redirectUri: settings.auth0Host,
     responseType: "token id_token",
-    scope: "openid email profile",
+    scope: "openid email profile https://codinginenglish.com/roles",
   });
 
   constructor(appStore) {

@@ -7,6 +7,7 @@ import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
+import { InstructorApi } from "./services/InstructorApi";
 import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
@@ -24,6 +25,7 @@ import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
+import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel"
 
 var log = console.log;
 
@@ -62,7 +64,6 @@ export function main(appStore) {
   const auth = new Auth(appStore);
 
   async function initializeUser(authResult) {
-    console.log("Initializing user...");
     const initializedUser = await cieApi.initializeUser(authResult);
     appStore.user = initializedUser;
     const userData = initializedUser.data.user;
@@ -103,6 +104,8 @@ export function main(appStore) {
   });
 
   /** Configure Aula */
+  const instructorApi = new InstructorApi();
+  const InstructorPanel = compose(_InstructorPanel, { appStore, instructorApi });
   const Collab = compose(_Collab, { cieApi, appStore });
   const MultipleChoice = compose(_MultipleChoice, { cieApi });
   const DragToImageCollab = compose(_DragToImageCollab, {
@@ -125,6 +128,7 @@ export function main(appStore) {
     authData,
     cieApi,
     settings,
+    InstructorPanel,
     PopupActivity,
     websocketManager,
   });

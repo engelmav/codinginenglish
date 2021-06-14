@@ -19,7 +19,6 @@ export const PopupActivity = ({
   Collab,
   MultipleChoice,
   DragToImageCollab,
-  activeSessionId,
   websocket,
 }) => {
   // Resume here:
@@ -46,7 +45,6 @@ export const PopupActivity = ({
               key={idx}
               model={model}
               websocket={websocket}
-              activeSessionId={activeSessionId}
             />
           );
         } else {

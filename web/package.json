@@ -5,12 +5,14 @@
   "dependencies": {
     "@babel/runtime": "^7.6.3",
     "@material-ui/core": "^4.11.3",
+    "@material-ui/data-grid": "^4.0.0-alpha.24",
     "@novnc/novnc": "^1.1.0",
     "@rebass/preset": "^4.0.5",
     "@stripe/react-stripe-js": "^1.1.2",
     "@stripe/stripe-js": "^1.5.0",
     "@svgr/webpack": "^4.2.0",
     "@zoomus/websdk": "^1.7.8",
+    "animal-id": "0.0.1",
     "auth0-js": "^9.10.2",
     "axios": "^0.18.1",
     "babel-core": "7.0.0-bridge.0",
@@ -43,6 +45,7 @@
     "jest-resolve": "23.6.0",
     "json-format": "^1.0.1",
     "json-string-formatter": "^1.0.1",
+    "jwt-decode": "^3.1.2",
     "konva": "^7.2.5",
     "location": "0.0.1",
     "lodash": "^4.17.21",
@@ -160,28 +163,17 @@
       "/home/vengelmann/repos/cie_platform/frontend/node_modules/jest-watch-typeahead/testname.js"
     ]
   },
-  "babel": {
-    "presets": [
-      "react-app"
-    ],
-    "plugins": [
-      [
-        "@babel/plugin-proposal-decorators",
-        {
-          "legacy": true
-        }
-      ]
-    ]
-  },
   "proxy": "http://localhost:5000",
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.11.5",
+    "@babel/core": "^7.14.3",
+    "@babel/plugin-proposal-unicode-property-regex": "^7.12.13",
+    "@babel/preset-env": "^7.14.4",
     "@storybook/addon-actions": "^6.1.11",
     "@storybook/addon-essentials": "^6.1.11",
     "@storybook/addon-links": "^6.1.11",
     "@storybook/react": "^6.1.11",
     "babel-jest": "^23.6.0",
+    "caniuse-lite": "^1.0.30001235",
     "core-js": "^3.8.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.1",

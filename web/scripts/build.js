@@ -111,7 +111,7 @@ checkBrowsers(paths.appPath, isInteractive)
       );
     },
     err => {
-      console.log(chalk.red('Failed to compile.\n'));
+      console.log(chalk.red('Failed to cdsfdgompile.\n'));
       printBuildError(err);
       process.exit(1);
     }

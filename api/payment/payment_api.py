@@ -1,5 +1,5 @@
-from services.auth import create_auth0_user, create_auth0_passwd_reset_ticket, get_auth0_user
 from config import config
+from services.auth import AuthService
 from services.cie import ModuleService, UserService
 from services.mailjet import send_mail
 
@@ -19,7 +19,7 @@ stripe_publishable_key = config.get('cie.api.stripe.publishablekey')
 stripe.api_key = stripe_secret
 
 
-def create_payment_api(module_service: ModuleService, user_service: UserService):
+def create_payment_api(auth_service: AuthService, module_service: ModuleService, user_service: UserService):
     def calc_order_amount(item):
         # TODO: pull from database
         # get_module_session_by_id
@@ -88,7 +88,7 @@ def create_payment_api(module_service: ModuleService, user_service: UserService)
         student_name = confirmation_details.get('name')
 
         is_authenticated = confirmation_details.get('isAuthenticated')
-        no_auth0_user = get_auth0_user(student_email).get('total') == 0
+        no_auth0_user = auth_service.get_auth0_user(student_email).get('total') == 0
 
         if student_name is None or "":
             student_name = 'Student'
@@ -147,11 +147,11 @@ def create_payment_api(module_service: ModuleService, user_service: UserService)
 
     def handle_new_user(student_email, student_name, template_params):
         # TODO: UUID not serializable
-        auth0_user = create_auth0_user(student_name, student_email)
+        auth0_user = auth_service.create_auth0_user(student_name, student_email)
         # TODO: link auth0 user to "local" user by user_id
         auth0_user_id = auth0_user.get("user_id")
         new_user = user_service.create_user(student_email, full_name=student_name)
-        ticket = create_auth0_passwd_reset_ticket(student_email)
+        ticket = auth_service.create_auth0_passwd_reset_ticket(student_email)
         template_params.append(ticket)
         body_parts = templates.confirm_reg_create_account(*template_params)
         return body_parts, new_user

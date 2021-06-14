@@ -3,6 +3,8 @@ from marshmallow.fields import Nested
 from marshmallow_sqlalchemy import ModelSchema, auto_field
 
 
+
+
 class Schema:
     def __init__(self,
                  _UserSchema,
@@ -10,13 +12,15 @@ class Schema:
                  _ModuleSessionSchema,
                  _UserModuleRegistrationSchema,
                  _ActiveSessionSchema,
-                 _UserActiveSessionSchema):
+                 _UserActiveSessionSchema,
+                 _AulaConfigSchema):
         self.UserSchema = _UserSchema
         self.CieModuleSchema = _CieModuleSchema
         self.ModuleSessionSchema = _ModuleSessionSchema
         self.UserModuleRegistrationSchema = _UserModuleRegistrationSchema
         self.ActiveSessionSchema = _ActiveSessionSchema
         self.UserActiveSessionSchema = _UserActiveSessionSchema
+        self.AulaConfigSchema = _AulaConfigSchema
 
 
 def schema_factory(db_session, models):
@@ -29,6 +33,7 @@ def schema_factory(db_session, models):
     """
     class CieModuleSchema(ModelSchema):
         module_sessions = Nested("ModuleSessionSchema", many=True, exclude=("cie_module",))
+
         class Meta:
             model = models.CieModule
             sqla_session = db_session
@@ -72,13 +77,19 @@ def schema_factory(db_session, models):
             model = models.UserActiveSession
             sqla_session = db_session
 
+    class AulaConfigSchema(ModelSchema):
+        class Meta:
+            model = models.AulaConfig
+            sqla_session = db_session
+
     schema = Schema(
         UserSchema,
         CieModuleSchema,
         ModuleSessionSchema,
         UserModuleRegistrationSchema,
         ActiveSessionSchema,
-        UserActiveSessionSchema
+        UserActiveSessionSchema,
+        AulaConfigSchema
     )
     return schema
 

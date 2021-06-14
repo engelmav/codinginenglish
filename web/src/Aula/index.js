@@ -8,7 +8,6 @@ import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
 import { browserDetect } from "../util";
-import { DraggableCore } from "react-draggable";
 import _ from "lodash";
 import { readSocketDataAnd } from "../messaging";
 import { Link } from "react-router-dom";
@@ -36,7 +35,6 @@ const ChatSignIn = (props) => {
     const chatIframe = divRef.current.firstElementChild;
     chatIframe.addEventListener("load", function () {
       setTimeout(() => {
-
         this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
@@ -105,6 +103,7 @@ class Aula extends Component {
       chatWindow: true,
       slidesWindow: true,
       videoWindow: true,
+      instructorPanel: true,
       popupActivityWindow: false,
       isWindowDragging: false,
 
@@ -128,11 +127,12 @@ class Aula extends Component {
 
   async configureActiveSession() {
     const { appStore, cieApi, websocketManager } = this.props;
+    console.log("Getting activeSessionData by userId", appStore.userId)
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
     const activeSessionId = `aula-${activeSessionData.data.id}`;
-    console.log("creating activeSessionId", activeSessionId);
+    appStore.activeSessionId = activeSessionId
 
     const {
       chat_channel,
@@ -144,7 +144,6 @@ class Aula extends Component {
       chatChannel: chat_channel,
       prezzieLink: prezzie_link,
       videoChannel: video_channel,
-      activeSessionId: activeSessionId,
     });
 
     this.aulaWebsocket = websocketManager.createWebsocket(
@@ -167,7 +166,10 @@ class Aula extends Component {
           if (!commandData.hasOwnProperty("command")) return;
           const { name } = commandData.command;
           if (name === "SHOW_ACTIVITY_POPUP") {
-            console.log("setting state activityData to", commandData.command.data);
+            console.log(
+              "setting state activityData to",
+              commandData.command.data
+            );
             this.setState(
               { activityData: commandData.command.data },
               this.openPopupActivity()
@@ -201,6 +203,9 @@ class Aula extends Component {
     this.setState({ popupActivityWindow: !this.state.popupActivityWindow });
   };
 
+  toggleInstructorPanel = () =>
+    this.setState({ instructorPanel: !this.state.instructorPanel });
+
   handleWindowMove = (windowName) => {
     this.setState({ onTop: windowName, isWindowDragging: true });
   };
@@ -209,32 +214,42 @@ class Aula extends Component {
   };
 
   openPopupActivity = () => this.setState({ popupActivityWindow: true });
-  closePopupActivity = () => this.setState({ popupActivityWindow: false, activityData: [] });
+  closePopupActivity = () =>
+    this.setState({ popupActivityWindow: false, activityData: [] });
 
   render() {
-    const { appStore, settings, PopupActivity, websocketManager } = this.props;
+    const {
+      appStore,
+      settings,
+      InstructorPanel,
+      PopupActivity,
+      websocketManager,
+    } = this.props;
     const {
       guacWindow,
       chatWindow,
       slidesWindow,
       videoWindow,
       popupActivityWindow,
+      instructorPanel,
 
       activityData,
       chatChannel,
       prezzieLink,
       videoChannel,
-      activeSessionId,
 
       onTop,
       isWindowDragging,
     } = this.state;
+    console.log("Aula state instructorPanel:", instructorPanel)
+    console.log("Aula appStore.userRole:", appStore.userRole)
 
     const {
       toggleGuac,
       toggleChat,
       toggleSlides,
       toggleVideo,
+      toggleInstructorPanel,
     } = this;
 
     const rocketChatUrl = `${settings.rocketchatUrl}${chatChannel}?layout=embedded`;
@@ -243,7 +258,6 @@ class Aula extends Component {
     const guacWindowTop = "guacWindow";
     const chatWindowTop = "chatWindow";
     const activityWindowOnTop = "activityWindow";
-
     return (
       <ClassroomContainer>
         <ClassroomHeader>
@@ -282,11 +296,36 @@ class Aula extends Component {
           <div>
             <PopupActivity
               activities={activityData || []}
-              activeSessionId={activeSessionId}
               websocket={this.aulaWebsocket}
               onClose={this.closePopupActivity}
             />
           </div>
+        )}
+        {instructorPanel && appStore.userRole === "instructor" && (
+          <Rnd
+            default={{
+              x: 0,
+              y: 50,
+              width: 600,
+              height: 560,
+            }}
+            style={{
+              zIndex: onTop === slidesWindowTop ? 200 : 0,
+              borderBottom: "1px black solid",
+              backgroundColor: "white",
+
+            }}
+            onMouseDown={() => this.handleWindowMove(slidesWindowTop)}
+            onDragStop={this.handleWindowRelease}
+            dragHandleClassName={"drag-handle"}
+          >
+            <Window
+              title="Instructor Panel"
+              hideClose={false}
+              onClose={toggleInstructorPanel}
+            />
+            <InstructorPanel />
+          </Rnd>
         )}
         {slidesWindow && prezzieLink && (
           <Rnd
@@ -303,7 +342,7 @@ class Aula extends Component {
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
             {isWindowDragging && <CoverWindowOnDrag />}
             <SlidesController
-              activeSessionId={activeSessionId}
+              activeSessionId={appStore.activeSessionId}
               websocketManager={websocketManager}
             >
               <Iframe

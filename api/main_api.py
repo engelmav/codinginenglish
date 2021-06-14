@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from flask_sockets import Sockets
 from sqlalchemy import func
 
+from aula.aula import AulaService
 from database.models import Models
 from events import StudentSessionService, WebsocketManager
 from config import config
@@ -37,11 +38,13 @@ def create_main_api(publish_message,
                     db_session,
                     models: Models,
                     schema: Schema,
+                    aula_service: AulaService,
                     rc_service: RocketChatService,
-                    payment_api,
+                    blueprints,
                     websocket_manager: WebsocketManager):
 
-    app.register_blueprint(payment_api)
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     @app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -53,7 +56,7 @@ def create_main_api(publish_message,
         command = request.get_json()
         channels = command.get("command").get("channels")
         # # we are doing this twice to clean up control characters
-        command_str = json.dumps(command)
+        message = json.dumps(command)
 
         """
         while not ws.closed:
@@ -70,7 +73,7 @@ def create_main_api(publish_message,
         resp_code = 200
         for channel in channels:
             try:
-                res = websocket_manager.channels[channel].publish_to_redis(command_str)
+                res = websocket_manager.broadcast(message, channel)
                 results.append[res]
             except KeyError:
                 messages.append(f"Channel {channel} is not currently registered in the WebsocketManager")
@@ -78,10 +81,8 @@ def create_main_api(publish_message,
                 resp_code = 500
         return make_response(dict(status=status, messages=messages, data=results), resp_code)
 
-
-
     @sockets.route("/ws/stream")
-    def websocket(ws):
+    def initialize_websocket_connection(ws):
         # the below line is executed when this endpoint is hit, and this endpoint is hit
         # only when opening a new websocket connection.
         websocket_manager.initialize_socket(ws)
@@ -207,14 +208,17 @@ def create_main_api(publish_message,
             )
             _as.add()
             as_schema = schema.ActiveSessionSchema()
-            created_as = as_schema.dump(_as)
-            data["active_session"] = created_as
+            active_session_json = as_schema.dump(_as)
+            data["active_session"] = active_session_json
             messages.append(f"Created ActiveSession with id {_as.id}")
         except Exception:
             LOG.error("Failed to create ActiveSession in database.", exc_info=True)
             messages.append("An error occurred adding the ActiveSession: please check logs.")
             make_response(dict(status="error", messages=messages))
 
+        initial_aula_config = aula_service.initialize_aula_config(_as.id)
+        acs = schema.AulaConfigSchema()
+        data["aula_config"] = acs.dump(initial_aula_config)
         created_uas = []
         uas_schema = schema.UserActiveSessionSchema()
         for user_id in teacher_ids + student_ids:
@@ -356,7 +360,11 @@ def create_main_api(publish_message,
             student_session_service.notify_on_session_start(session_id, session_start_dt)
         messages.append("Initialized user successfully.")
         user_schema = schema.UserSchema()
-        payload = dict(user=user_schema.dump(_user), has_session_in_progress=has_session_in_progress,
+        user_payload = user_schema.dump(_user)
+        # TODO https://github.com/engelmav/codinginenglish/issues/110
+        if email.startswith("vincent.engelmann1@"):
+            user_payload["role"] = "instructor"
+        payload = dict(user=user_payload, has_session_in_progress=has_session_in_progress,
                        rocketchat_auth_token=rocketchat_auth_token)
         resp = make_response(dict(status="success", data=payload, messages=messages), 200)
         return resp

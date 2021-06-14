@@ -442,6 +442,9 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      // new webpack.ProgressPlugin((percentage, message, ...args) => {
+      //   console.log(percentage, message, ...args);
+      // }),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin({
         inject: true,

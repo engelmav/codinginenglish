@@ -7,7 +7,6 @@ const Button = styled.button`
   background-color: ${cieOrange};
   border: solid #ff3e00;
   border-width: 1px;
-  // color: #ff3e00;
   color: white;
   padding: 8px;
   border-radius: 2px;
@@ -19,7 +18,12 @@ const Button = styled.button`
     border: 1px solid #999999;
     background-color: #cccccc;
     color: #666666;
-}
+    &:hover {  };
+  };
+  &:hover:enabled { 
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 15px rgba(145, 92, 182, .4);
+  };
 `;
 
 /** @component */

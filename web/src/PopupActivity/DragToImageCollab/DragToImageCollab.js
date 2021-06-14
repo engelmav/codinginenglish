@@ -16,8 +16,6 @@ export const DragToImageCollab = ({
   model,
   settings,
   websocket,
-  activeSessionId,
-  createWebsocket,
 }) => {
   useEffect(() => {
     async function init() {

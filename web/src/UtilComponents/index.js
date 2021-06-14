@@ -1,13 +1,12 @@
-import { Button } from './Button';
-import { Title } from './Typography/Typography';
-import { Window } from './Window';
-import { Spinner } from './Spinner';
-import { TextInput } from './TextInput';
-import { AlertMessage } from './AlertMessage';
-import { ContentSection } from './ContentSection';
-import { Main } from './Main';
-
-
+import { Button } from "./Button";
+import { Title } from "./Typography/Typography";
+import { Window } from "./Window";
+import { Spinner } from "./Spinner";
+import { TextInput } from "./TextInput";
+import { AlertMessage } from "./AlertMessage";
+import { ContentSection } from "./ContentSection";
+import { Main } from "./Main";
+import { Select } from "./Select/Select";
 
 export {
   AlertMessage,
@@ -17,5 +16,6 @@ export {
   Window,
   TextInput,
   ContentSection,
-  Main
+  Main,
+  Select,
 };

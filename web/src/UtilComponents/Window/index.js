@@ -15,14 +15,19 @@ const TitleBar = styled.div`
   border-radius: 2px;
 `;
 
+const WindowTitle = styled.div`
+  font-weight: bold;
+`
+
 const Window = (props) => {
   const { title, onClose, hideClose } = props;
   return (
-    <TitleBar>
+    <TitleBar className="drag-handle" style={{position: "sticky"}}>
       <FaGripLines style={{ marginLeft: "10px" }} />
-      <div>{title}</div>
+      <WindowTitle>{title}</WindowTitle>
       {!hideClose ? (
         <FaRegWindowClose
+          size={25}
           style={{ marginRight: "10px", cursor: "pointer" }}
           onClick={onClose}
         />
