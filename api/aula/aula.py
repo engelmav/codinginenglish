@@ -21,10 +21,15 @@ class AulaService:
         self.models = models
         self.on_change = on_change
 
-    def initialize_aula_config(self, active_session_id):
+    def initialize_aula_config(self, active_session_id, student_ids):
+        student_objects = {}
+        for student_id in student_ids:
+            student = self.models.User.query.filter_by(id=student_id).one()
+            student_objects[f"{student.firstname} {student.lastname}"] = {}
+
         rooms = {
             "main": {
-                "students": {}
+                "students": student_objects
             }
         }
         aula_config = {"rooms": rooms }

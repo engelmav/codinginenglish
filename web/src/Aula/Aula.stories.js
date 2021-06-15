@@ -53,12 +53,12 @@ appStore.setUserRole("instructor");
  */
 const roomsDb = ["main", "conscious-puma", "moldy-vulture"];
 
-const studentDb = [
-  { id: 1, name: "Carlo" },
-  { id: 2, name: "Xavier" },
-];
-
-let studentSessionData = { rooms: { main: { students: {} } } };
+let aulaConfig = {
+  rooms: {
+    main: { students: { Carlo: {}, Xavier: {} } },
+    "conscious-puma": { students: {} },
+  },
+};
 
 class MockInstructorApi {
   getStudentsInSession(activeSessionId) {}
@@ -87,7 +87,7 @@ class MockInstructorApi {
   }
   getAulaConfig(activeSessionId) {
     /* HAR HAR! It's a joiner table. */
-    return studentSessionData;
+    return aulaConfig;
   }
   getRooms(activeSessionId) {
     /*
@@ -95,20 +95,13 @@ class MockInstructorApi {
     */
     return roomsDb;
   }
-  createRoom(roomName) {
-    const newId = Math.round(Math.random() * (500 - 10) + 10);
-    const newRoom = { id: newId, name: roomName, students: "" };
-    roomsDb.push(newRoom);
-    return newRoom;
+  createRoom(activeSessionId, roomName) {
+    aulaConfig.rooms[roomName] = { students: {} }
+    return aulaConfig;
   }
-  deleteRooms(roomIds) {
-    roomsDb.filter((room) => {
-      return !roomIds.includes(room.id);
-    });
-    studentSessionData = studentSessionData.filter(
-      (ssd) => !roomIds.includes(ssd.roomId)
-    );
-    return studentSessionData;
+  deleteRooms(roomName) {
+    delete aulaConfig.rooms[roomName]
+    return aulaConfig;
   }
 
   renameRoom(roomId) {}
@@ -118,16 +111,19 @@ class MockInstructorApi {
      * Not needed. Student is always in a room.
      */
   }
-  moveStudent(studentId, toRoomId) {
-    console.log("putting studentId", studentId, "to room", toRoomId);
-    studentSessionData = studentSessionData.map((session) => {
-      if (session.id === studentId) {
-        return { ...session, roomId: toRoomId };
-      } else {
-        return { ...session };
-      }
-    });
-    return studentSessionData;
+  moveStudent(studentName, fromRoomName, toRoomName) {
+
+    /**
+     *
+
+        aula_config.config["rooms"][from_room]["students"].pop(student, None)
+        student_entry = {student: {}}
+        aula_config.config["rooms"][to_room]["students"].update(student_entry)
+     */
+    console.log("MockInstructorApi.moveStudent: fromRoomName", fromRoomName)
+    delete aulaConfig.rooms[fromRoomName].students[studentName];
+    aulaConfig.rooms[toRoomName].students[studentName] = {};
+    return aulaConfig;
   }
 }
 

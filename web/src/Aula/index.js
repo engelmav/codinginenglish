@@ -241,8 +241,6 @@ class Aula extends Component {
       onTop,
       isWindowDragging,
     } = this.state;
-    console.log("Aula state instructorPanel:", instructorPanel)
-    console.log("Aula appStore.userRole:", appStore.userRole)
 
     const {
       toggleGuac,
@@ -258,6 +256,8 @@ class Aula extends Component {
     const guacWindowTop = "guacWindow";
     const chatWindowTop = "chatWindow";
     const activityWindowOnTop = "activityWindow";
+
+    const videoEnabled = false;
     return (
       <ClassroomContainer>
         <ClassroomHeader>
@@ -384,7 +384,7 @@ class Aula extends Component {
           </Rnd>
         )}
 
-        {videoWindow && videoChannel && (
+        {videoWindow && videoChannel && videoEnabled && (
           <Rnd
             default={{
               x: 600,

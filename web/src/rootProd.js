@@ -115,6 +115,7 @@ export function main(appStore) {
   });
 
   const PopupActivity = compose(_PopupActivity, {
+    appStore,
     Collab,
     MultipleChoice,
     DragToImageCollab,

@@ -74,6 +74,7 @@ def model_factory(Base):
         lastname = Column(String(50))
         fullname = Column(String(120))
         email = Column(String(120), unique=True)
+        # TODO: add nickname
         registered_modules = relationship(
             'UserModuleRegistration',
             backref='User',

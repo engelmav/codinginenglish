@@ -216,7 +216,7 @@ def create_main_api(publish_message,
             messages.append("An error occurred adding the ActiveSession: please check logs.")
             make_response(dict(status="error", messages=messages))
 
-        initial_aula_config = aula_service.initialize_aula_config(_as.id)
+        initial_aula_config = aula_service.initialize_aula_config(_as.id, student_ids)
         acs = schema.AulaConfigSchema()
         data["aula_config"] = acs.dump(initial_aula_config)
         created_uas = []

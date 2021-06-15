@@ -21,11 +21,6 @@ class InstructorPanelStore {
     id: number
     */
   ];
-  rooms = [
-    /*
-    id: number, name: string
-    */
-  ];
   selectedRooms = [
     /*
     id: number
@@ -42,9 +37,7 @@ class InstructorPanelStore {
     makeObservable(this, {
       selectedStudents: observable,
       roomAddDialogOpen: observable,
-      rooms: observable.deep,
-      setRooms: action,
-      addRoom: action,
+      rooms: computed,
       selectedRooms: observable,
       newRoomName: observable,
       aulaConfig: observable,
@@ -59,39 +52,18 @@ class InstructorPanelStore {
   addStudent(student) {
     this.students.push(student);
   }
-  // addStudentToRoom(studentId){ should not need if we return the "world" and let computeds run
-
-  // }
   setSelectedStudents(students) {
     this.selectedStudents = students;
   }
-  getStudentFromSessionDataById(studentId) {
-    const foundStudent = this.aulaConfig.find(
-      (studentSession) => studentSession.id === studentId
-    );
-    return foundStudent;
-  }
-  setRooms(rooms) {
-    /**
-     * [ { id: 1, room: "conscious-puma", students: "Maria, Carlo" }, ]
-     */
-    console.log("setRooms() rooms =", toJS(rooms));
-    this.rooms = rooms;
-  }
-  addRoom(newRoom) {
-    /**
-     * { id: newId, name: string, students: "" };
-     */
-    this.rooms.push(newRoom);
-  }
-  deleteRooms(rooms) {
-    this.rooms = this.rooms.filter((room) => !rooms.includes(room.id));
+  @computed get rooms() {
+    return Object.keys(this.aulaConfig.rooms);
   }
   getRoomNameById(roomId) {
     const roomName = this.rooms.find((r) => r.id === roomId)?.name;
     return roomName;
   }
   setSelectedRooms(rooms) {
+    console.log("setSelectedRooms:", rooms);
     this.selectedRooms = rooms;
   }
   closeAddRoomDialog = () => {
@@ -114,119 +86,87 @@ class InstructorPanelStore {
      * "takes"
      * [ { id: number, studentId: number, roomId: number, vmId: link },]
      * returns
-     * [ { id: number, name: string, vm: link, room: string }, ]
+     * [ { id: number, studentName: string, vm?: link, roomName: string }, ]
      */
-    const viewData = [];
+    const studentsOfRoom = (roomName) =>
+      Object.keys(this.aulaConfig.rooms[roomName].students);
     if (!this.aulaConfig || Object.keys(this.aulaConfig).length === 0) {
       return [];
     }
-    // this.aulaConfig.forEach((studentSession) => {
-    //   const studentName = this.students.find(
-    //     (student) => student.id === studentSession.id
-    //   )?.name;
-    //   const vmLink = "";
-    //   viewData.push({
-    //     id: studentSession.id,
-    //     name: studentName,
-    //     vm: vmLink,
-    //   });
-    // });
-    // return viewData;
+    let studentId = 0;
+    const getStudentsInRoom = (roomName) => {
+      const students = [];
+      studentsOfRoom(roomName).forEach((studentName) => {
+        studentId += 1;
+        students.push({
+          id: studentId,
+          studentName: studentName,
+          roomName: roomName,
+        });
+      });
+      return students;
+    };
+    let studentsInAllRooms = [];
+    const roomsInAula = () => Object.keys(this.aulaConfig.rooms);
+    roomsInAula().forEach((room) => {
+      const studentsInRoom = getStudentsInRoom(room);
+      console.log("studentsInRoom for", room, "is", studentsInRoom);
+      console.log(
+        "concatenating studentsInAllRooms",
+        studentsInAllRooms,
+        "with",
+        { studentsInRoom }
+      );
+      studentsInAllRooms = [...studentsInAllRooms, ...studentsInRoom];
+      console.log("studentsInAllRooms:", studentsInAllRooms);
+    });
+    return studentsInAllRooms;
   }
   @computed get roomGridData() {
-    /* this is a weird and inefficient query to do on the frontend. Move to separate backend endpoint */
     /**
      * "takes"
      * [ { id: number, studentId: number, roomId: number, vmId: link },]
      * returns
      * [ { id: number, roomName: string, students: string } ]
      */
-    const populatedRooms = {}; // use this to determine which rooms are empty
-    const populatedViewData = [];
     if (!this.aulaConfig || Object.keys(this.aulaConfig).length === 0) {
       return [];
     }
     // {'rooms': {'main': {'students': {}}}}
     const roomRows = [];
     let roomId = 0;
-    console.log("roomGridData: this.aulaConfig: ", toJS(this.aulaConfig))
     Object.keys(toJS(this.aulaConfig).rooms).forEach((roomKey) => {
+      roomId += 1;
       const room = this.aulaConfig.rooms[roomKey];
       const studentsInRoom = [];
       Object.keys(room.students).forEach((student) => {
-        studentsInRoom.push(room.students[student].student);
+        studentsInRoom.push(student);
       });
+      const studentsStr =
+        studentsInRoom.length > 0 ? studentsInRoom.join(", ") : "empty";
       roomRows.push(
         // { id: number, roomName: string, students: string }
-        { id: roomId, roomName: roomKey, students: studentsInRoom.join(", ") }
+        { id: roomId, roomName: roomKey, students: studentsStr }
       );
     });
-    // this.studentSessionData.forEach((studentSession) => {
-    //   const roomName = this.rooms.find(
-    //     (room) => room.id === studentSession.roomId
-    //   )?.name;
-    //   const roomId = studentSession.roomId;
-    //   if (roomId in populatedRooms) {
-    //     populatedRooms[roomId]++;
-    //   } else {
-    //     populatedRooms[roomId] = 0;
-    //   }
-
-    //   const studentIdsInRoom = [];
-    //   this.studentSessionData.forEach((sessionDataInner) => {
-    //     if (sessionDataInner.roomId === studentSession.roomId)
-    //       studentIdsInRoom.push(sessionDataInner.id);
-    //   });
-    //   const studentsInRoom = [];
-    //   studentIdsInRoom.forEach((studentId) => {
-    //     studentsInRoom.push(
-    //       this.students.find((s) => s.id === studentId)?.name
-    //     );
-    //   });
-    //   populatedViewData.push({
-    //     id: studentSession.roomId,
-    //     room: roomName,
-    //     students: `(${studentsInRoom.length}) ${studentsInRoom.join(", ")}`,
-    //   });
-    // });
-
-    /**
-     * we accumulate a table of rooms that are already populated.
-     * this way, we can look at the list of rooms and see which ones
-     * are NOT populated, and append them to the end of the viewData.
-     * So, how do we determine which ones are NOT populated? We'd
-     * have to do a NOT IN operation. And that would look something like,
-     * unpopulatedRooms = []
-     * for room in rooms:
-     *   if room not in populatedRooms:
-     *     unpopulatedRooms.push(room)
-     *
-     * So we need to do this after we add the view data.
-     */
-    const unpopulatedViewData = [];
-    this.rooms.forEach((room) => {
-      if (!(room.id in populatedRooms)) {
-        unpopulatedViewData.push({
-          id: room.id,
-          room: room.name,
-          students: "empty!",
-        });
-      }
-    });
-    const viewData = populatedViewData.concat(unpopulatedViewData);
-    return viewData;
+    return roomRows;
   }
 
-  studentIdsByRoomIds(roomIds) {
-    const studentIds = [];
-    this.aulaConfig.forEach((studentSession) => {
-      roomIds.forEach((roomId) => {
-        if (studentSession.roomId === roomId) {
-          studentIds.push(studentSession.id);
-        }
+  studentsByRooms(rooms) {
+    console.log("studentsByRooms rooms:", toJS(rooms));
+    const students = [];
+    rooms.forEach((roomName) => {
+      const studentsObj = this.aulaConfig.rooms[roomName].students;
+
+      Object.keys(studentsObj).forEach((studentName) => {
+        const studentAndRoom = {
+          studentName: studentName,
+          roomName: roomName,
+        };
+        students.push(studentAndRoom);
       });
     });
-    return studentIds;
+    return students;
   }
 }
 
@@ -247,17 +187,11 @@ const Border = styled.div`
 `;
 
 export const InstructorPanel = observer(({ appStore, instructorApi }) => {
-  console.log("instructor panel  body");
   useEffect(() => {
     async function init() {
-      console.log(
-        "getting aula studentSessionData with activeSessionId =",
-        appStore.activeSessionId
-      );
       const aulaConfig = await instructorApi.getAulaConfig(
         appStore.activeSessionId
       );
-      console.log("retrieved studentSessionData:", aulaConfig);
       ipStore.setAulaConfig(aulaConfig);
     }
     init();
@@ -292,36 +226,26 @@ const StudentList = observer(({ appStore, instructorApi }) => {
       const [currentRoom, setCurrentRoom] = useState(null);
       const [student, setStudent] = useState(null);
       useEffect(() => {
-        console.log("RoomDropdown params", params);
-        console.log("RoomDropdown searching for studentId =", studentId);
-        const studentInRoom = ipStore.getStudentFromSessionDataById(studentId);
-        if (!studentInRoom) return; // re-render happens after student is removed.
-        console.log(
-          "RoomDropdown ipStore.studentSessionData =",
-          toJS(ipStore.aulaConfig)
-        );
-        console.log("RoomDropdown studentInRoom =", toJS(studentInRoom));
-        setStudent(studentInRoom);
-        setCurrentRoom(ipStore.getRoomNameById(studentInRoom.roomId));
+        setCurrentRoom(params.row.roomName);
       }, [currentRoom]);
 
       const moveStudent = (e) => {
-        const fromRoomId = student.roomId;
-        const toRoomId = e.target.value;
-        const newStudentSessionData = instructorApi.moveStudent(
-          studentId,
-          parseInt(toRoomId)
+        const toRoomName = e.target.value;
+        const aulaConfig = instructorApi.moveStudent(
+          params.row.studentName,
+          currentRoom,
+          toRoomName
         );
-        console.log("newStudentSessionData =", newStudentSessionData);
-        ipStore.setAulaConfig(newStudentSessionData);
+        ipStore.setAulaConfig(aulaConfig);
       };
-      // const currentRoom = ipStore.rooms.find((room) => student.roomId === room.id).id;
       return (
         <Select onChange={moveStudent}>
           <option>{currentRoom}</option>
-          {ipStore.rooms.map((room) => {
-            return <option value={room.id}>{room.name}</option>;
-          })}
+          {ipStore.rooms
+            .filter((room) => room !== currentRoom)
+            .map((room) => {
+              return <option value={room}>{room}</option>;
+            })}
         </Select>
       );
     });
@@ -338,9 +262,9 @@ const StudentList = observer(({ appStore, instructorApi }) => {
 
   const cols = [
     { field: "id", headerName: "ID", width: 20 },
-    { field: "name", headerName: "Name", width: 130 },
+    { field: "studentName", headerName: "Name", width: 130 },
     {
-      field: "room",
+      field: "roomName",
       headerName: "Room",
       width: 130,
       renderCell: renderRoomDropdown,
@@ -397,21 +321,30 @@ const RoomList = observer(({ appStore, instructorApi }) => {
     <>
       <p>Rooms</p>
       <div style={{ width: "100%" }}>
-        <SmBtn onClick={() => (ipStore.roomAddDialogOpen = true)}>Add</SmBtn>
+        <SmBtn
+          onClick={() => {
+            ipStore.newRoomName = animal.getId();
+            ipStore.roomAddDialogOpen = true;
+          }}
+        >
+          Add
+        </SmBtn>
         <SmBtn
           onClick={() => {
             // Students will be orphaned. Identify them and put them into "main".
-            const orphanIds = ipStore.studentIdsByRoomIds(
+            const orphanedStudents = ipStore.studentsByRooms(
               ipStore.selectedRooms
             );
-            orphanIds.forEach((orphanId) =>
-              instructorApi.moveStudent(orphanId, MAIN_ROOM_ID)
-            );
-            const newStudentSessionData = instructorApi.deleteRooms(
+            console.log("orphanedStudents:", orphanedStudents);
+            orphanedStudents.forEach((orphanedStudent) => {
+              const { studentName, roomName } = orphanedStudent;
+              instructorApi.moveStudent(studentName, roomName, "main");
+            });
+
+            const newAulaConfig = instructorApi.deleteRooms(
               ipStore.selectedRooms
             );
-            ipStore.deleteRooms(ipStore.selectedRooms);
-            ipStore.setAulaConfig(newStudentSessionData);
+            ipStore.setAulaConfig(newAulaConfig);
           }}
           disabled={
             ipStore.selectedRooms.length === 0 || ipStore.rooms.length === 1
@@ -425,8 +358,14 @@ const RoomList = observer(({ appStore, instructorApi }) => {
           rows={toJS(ipStore.roomGridData)}
           columns={cols}
           checkboxSelection
+          onS
           onSelectionModelChange={(e) => {
-            ipStore.setSelectedRooms(e.selectionModel);
+            const data = toJS(ipStore.roomGridData);
+            const selectedIds = e.selectionModel;
+            const selectedRowData = data
+              .filter((row) => selectedIds.includes(row.id.toString()))
+              .map((room) => room.roomName);
+            ipStore.setSelectedRooms(selectedRowData);
           }}
           rowsPerPageOptions={[]}
         />
@@ -439,9 +378,6 @@ const RoomList = observer(({ appStore, instructorApi }) => {
 });
 
 const NewRoomDialog = observer(({ appStore, instructorApi }) => {
-  useEffect(() => {
-    ipStore.newRoomName = animal.getId();
-  }, []);
   return (
     <Box display="flex" flexDirection="column">
       <h1>New Room Name</h1>
@@ -461,12 +397,12 @@ const NewRoomDialog = observer(({ appStore, instructorApi }) => {
       </Button>
       <Button
         onClick={async () => {
-          const newRoom = await instructorApi.createRoom(
+          const newAulaConfig = await instructorApi.createRoom(
             appStore.activeSessionId,
             ipStore.newRoomName
           );
-          console.log("newRoom created:", newRoom);
-          ipStore.addRoom(newRoom);
+          console.log("newAulaConfig:");
+          ipStore.setAulaConfig(newAulaConfig);
           ipStore.newRoomName = "";
           ipStore.closeAddRoomDialog();
         }}

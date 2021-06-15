@@ -14,6 +14,7 @@ const Footer = styled.div`
 `;
 
 export const PopupActivity = ({
+  appStore,
   onClose,
   activities,
   Collab,
@@ -36,7 +37,7 @@ export const PopupActivity = ({
               key={idx}
               model={model}
               websocket={websocket}
-              activeSessionId={activeSessionId}
+              activeSessionId={appStore.activeSessionId}
             />
           );
         } else if (activityType === "collab") {
