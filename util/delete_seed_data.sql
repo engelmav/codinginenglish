@@ -1,3 +1,4 @@
+delete from aula_config;
 delete from user_active_sessions ;
 delete from user_module_registration ;
 delete from active_sessions ;
@@ -18,3 +19,4 @@ FROM active_sessions
 
 
 select * from active_sessions
+select * from aula_config ac 

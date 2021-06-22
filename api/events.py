@@ -319,7 +319,7 @@ class MessagingBackend:
         """Send given data to the registered client.
         Automatically discards invalid connections."""
         try:
-            LOG.debug(f"channel {self.channel}: sending data {data} to client {client}")
+            LOG.debug(f"channel {self.channel}:  ta {data} to client {client}")
             client.websocket.send(data)
         except Exception:
             LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
@@ -333,13 +333,11 @@ class MessagingBackend:
             broadcast_to = []
             for client in self.clients:
                 if client.client_id != client_id:
-                    LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
                     broadcast_to.append(client)
 
             for client in broadcast_to:
                 recursive = (client_id == client.client_id and client_id is not None)
-                LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
-                LOG.debug(f"recursive = {recursive}")
+                LOG.debug(f"client.client_id = {client.client_id} recursive = {recursive}")
                 if not recursive:
                     gevent.spawn(self._send_to_socket, client, data)
 

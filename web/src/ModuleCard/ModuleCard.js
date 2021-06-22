@@ -1,14 +1,30 @@
 import { Button, ContentSection, Title } from "../UtilComponents";
+import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 import { toLocalTime } from "../util";
 import Dialog from "@material-ui/core/Dialog";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Flex, Text, Image } from "rebass";
+import { Link } from "react-router-dom";
 
 import React, { useState } from "react";
+
+// TODO: duped in Home/index.js
+const RegisterLink = styled(Link)`
+  background: ${cieOrange};
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  padding: 10px;
+  color: white;
+  ${fontMonospace}
+  a {
+    color: ${cieOrange};
+  }
+`;
 
 const CardBox = styled(Flex)`
   justify-content: center;
@@ -23,12 +39,13 @@ const CardBox = styled(Flex)`
 
 const DialogContent = styled(Flex)`
   flex-direction: column;
+  height: 100%;
 `;
 
 export const ModuleCard = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  // 
+  //
   const fullScreen = useMediaQuery("(max-width: 40em)");
   const { appStore, CheckoutForm, settings } = props;
   const {
@@ -52,22 +69,23 @@ export const ModuleCard = (props) => {
         </TitleH2>
 
         <P>{moduleDescription}</P>
-        <P>Choose a start time:</P>
+        <P>del 20 septiembre al 20 diciembre</P>
         {moduleSessions.map((ms, index) => {
           const sessionDtLocalTime = toLocalTime(ms._session_datetime);
           return (
-            <Button
-              key={index}
-              m={1}
-              alignSelf="center"
-              maxWidth="500px"
-              onClick={() => {
-                setDialogOpen(true);
-                setSelectedSession(sessionDtLocalTime);
-              }}
-            >
-              {sessionDtLocalTime}
-            </Button>
+            // <Button
+            //   key={index}
+            //   m={1}
+            //   alignSelf="center"
+            //   maxWidth="500px"
+            //   onClick={() => {
+            //     setDialogOpen(true);
+            //     setSelectedSession(sessionDtLocalTime);
+            //   }}
+            // >
+            //   {`Apply for ${sessionDtLocalTime}`}
+            // </Button>
+            <RegisterLink to="/apply">{`Solicita el curso`}</RegisterLink>
           );
         })}
       </CardBox>
@@ -86,10 +104,7 @@ export const ModuleCard = (props) => {
           <Title>{moduleName}</Title>
 
           <ContentSection>
-            <P>
-              This class begins on <b>{selectedSession}</b>.
-            </P>
-            {appStore.authData == null && (
+            {/* {appStore.authData == null && (
               <>
                 <P>Already registered as a student? Sign in!</P>
                 <P>
@@ -97,12 +112,12 @@ export const ModuleCard = (props) => {
                   a student profile later.
                 </P>
               </>
-            )}
+            )} */}
           </ContentSection>
-          <CheckoutForm
+          {/* <CheckoutForm
             // sessionData={sessionData}
             onCloseClick={() => setDialogOpen(false)}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
     </>

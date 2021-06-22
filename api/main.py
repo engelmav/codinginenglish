@@ -3,7 +3,7 @@ from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
 from database.providers import base_provider
-from events import create_event_stream, create_message_publisher, StudentSessionService, MessagingBackend, WebsocketManager
+from events import create_message_publisher, StudentSessionService, MessagingBackend, WebsocketManager
 import redis
 from simplekv.memory.redisstore import RedisStore
 

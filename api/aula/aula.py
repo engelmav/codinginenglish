@@ -9,7 +9,8 @@ LOG = logging.getLogger(__name__)
 def broadcast_to_aula(websocket_manager, event):
     """ Adapts AulaService's messages to the WebsocketManager's broadcast interface"""
     active_session_id = event.get("active_session_id")
-    websocket_manager.broadcast(event, active_session_id)
+    aula_channel = f"aula-{active_session_id}"
+    websocket_manager.broadcast(event, aula_channel)
 
 
 # TODO: in initialize_user method (or in the configureAula method) we need to make a main
@@ -32,7 +33,7 @@ class AulaService:
                 "students": student_objects
             }
         }
-        aula_config = {"rooms": rooms }
+        aula_config = {"rooms": rooms}
         ac = self.models.AulaConfig(
             active_session_id=active_session_id,
             config=aula_config
@@ -40,11 +41,15 @@ class AulaService:
         ac.add()
         return ac
 
-    def get_aula_config(self, active_session_id):
+    def _get_aula_config(self, active_session_id):
         ac = self.models.AulaConfig.query.filter_by(
-            active_session_id=active_session_id
+            active_session_id=int(active_session_id)
         ).one()
         return ac
+
+    def get_aula_config(self, active_session_id) -> dict:
+        config_model = self._get_aula_config(active_session_id)
+        return config_model.config
 
     def create_room(self, active_session_id, room):
         change_message = {
@@ -54,7 +59,7 @@ class AulaService:
         }
         self.on_change(change_message, )
 
-        aula_config = self.get_aula_config(active_session_id)
+        aula_config = self._get_aula_config(active_session_id)
         aula_config.config = deepcopy(aula_config.config)
         empty_students = {"students": {}}
         aula_config.config["rooms"].update({room: empty_students})
@@ -62,25 +67,26 @@ class AulaService:
         return aula_config.config
 
     def get_rooms(self, active_session_id):
-        ac = self.get_aula_config(active_session_id)
+        ac = self._get_aula_config(active_session_id)
         return list(ac.config["rooms"].keys())
 
-    def delete_room(self, active_session_id, room):
-        aula_config = self.get_aula_config(active_session_id)
+    def delete_rooms(self, active_session_id, rooms):
+        aula_config = self._get_aula_config(active_session_id)
         aula_config.config = deepcopy(aula_config.config)
-        aula_config.config["rooms"].pop(room, None)
+        for room in rooms:
+            aula_config.config["rooms"].pop(room, None)
         aula_config.add()
         return aula_config.config
 
     def add_student_to_main(self, active_session_id, student_name):
-        aula_config = self.get_aula_config(active_session_id)
+        aula_config = self._get_aula_config(active_session_id)
         aula_config.config = deepcopy(aula_config.config)
         aula_config.config["rooms"]["main"]["students"].update({student_name: {}})
         aula_config.add()
         return aula_config.config
 
     def move_student(self, active_session_id, student, from_room, to_room):
-        aula_config = self.get_aula_config(active_session_id)
+        aula_config = self._get_aula_config(active_session_id)
         aula_config.config = deepcopy(aula_config.config)
         aula_config.config["rooms"][from_room]["students"].pop(student, None)
         student_entry = {student: {}}
@@ -145,7 +151,7 @@ def create_aula_endpoints(aula_service, websocket_manager):
         [
             {"aula.create_room": aula_service.create_room},
             {"aula.get_rooms": aula_service.get_rooms},
-            {"aula.delete_room": aula_service.delete_room},
+            {"aula.delete_rooms": aula_service.delete_rooms},
             {"aula.add_student_to_main": aula_service.add_student_to_main},
             {"aula.move_student": aula_service.move_student},
             {"aula.get_aula_config": aula_service.get_aula_config}

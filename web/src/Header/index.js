@@ -3,9 +3,9 @@ import { Link, Route, Switch } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { debugBorder, whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { navbarCommonStyle } from "../Navbar";
-import { GiHamburgerMenu } from "react-icons/gi";
+import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { observer } from "mobx-react";
-import { FaRegWindowClose } from "react-icons/fa";
+import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import { CSSTransition } from "react-transition-group";
 
 const headerMarginSm = css`
@@ -66,6 +66,7 @@ const NavbarHeader = styled.ul`
     }
     position: fixed;
     right: -10px;
+    z-index: 1;
     top: 0;
     height: 100%;
     flex-direction: column;
@@ -119,6 +120,7 @@ const HeaderContainer = observer((props) => {
 
   const hideNav = { onClick: () => setNavMenu(false) };
   const links = [
+    { text: "apply", location: "/apply", ...hideNav },
     { text: "upcoming_sessions", location: "/upcoming-sessions", ...hideNav },
     { text: "about_us", location: "/about-us", ...hideNav },
     { text: "technique", location: "/technique", ...hideNav },

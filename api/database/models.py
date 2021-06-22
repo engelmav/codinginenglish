@@ -13,7 +13,8 @@ class Models:
                  _User,
                  _ActiveSession,
                  _UserActiveSession,
-                 _AulaConfig):
+                 _AulaConfig,
+                 _StudentApplication):
         self.CieModule = _CieModule
         self.ModuleSession = _ModuleSession
         self.UserModuleRegistration = _UserModuleRegistration
@@ -21,6 +22,7 @@ class Models:
         self.ActiveSession = _ActiveSession
         self.UserActiveSession = _UserActiveSession
         self.AulaConfig = _AulaConfig
+        self.StudentApplication = _StudentApplication
 
 
 def model_factory(Base):
@@ -108,6 +110,11 @@ def model_factory(Base):
         active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
         config = Column(JSON)
 
+    class StudentApplication(Base):
+        __tablename__ = 'student_applications'
+        id = Column(Integer, primary_key=True)
+        app = Column(JSON)
+
     models = Models(
         CieModule,
         ModuleSession,
@@ -115,7 +122,8 @@ def model_factory(Base):
         User,
         ActiveSession,
         UserActiveSession,
-        AulaConfig)
+        AulaConfig,
+        StudentApplication)
     return models
 
 

@@ -1,7 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { font } from "../sharedStyles";
-import { FaGripLines, FaRegWindowClose } from "react-icons/fa";
+import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
+import { FaGripLines } from "@react-icons/all-files/fa/FaGripLines";
+
 
 const TitleBar = styled.div`
   ${font}

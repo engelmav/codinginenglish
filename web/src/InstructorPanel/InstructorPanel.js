@@ -56,7 +56,7 @@ class InstructorPanelStore {
     this.selectedStudents = students;
   }
   @computed get rooms() {
-    return Object.keys(this.aulaConfig.rooms);
+    return Object.keys(this.aulaConfig?.rooms || {});
   }
   getRoomNameById(roomId) {
     const roomName = this.rooms.find((r) => r.id === roomId)?.name;
@@ -211,10 +211,11 @@ export const InstructorPanel = observer(({ appStore, instructorApi }) => {
 });
 
 const StudentList = observer(({ appStore, instructorApi }) => {
-  useEffect(() => {
+  useEffect(() => { 
     async function init() {
+      console.log("getting connected students")
       const connectedStudents = await instructorApi.getConnectedStudents(
-        appStore.activeSessionId
+        `aula-${appStore.activeSessionId}`
       );
       ipStore.setStudents(connectedStudents);
     }
@@ -229,14 +230,15 @@ const StudentList = observer(({ appStore, instructorApi }) => {
         setCurrentRoom(params.row.roomName);
       }, [currentRoom]);
 
-      const moveStudent = (e) => {
+      const moveStudent = async (e) => {
         const toRoomName = e.target.value;
-        const aulaConfig = instructorApi.moveStudent(
+        const newAulaConfig = await instructorApi.moveStudent(
+          appStore.activeSessionId,
           params.row.studentName,
           currentRoom,
           toRoomName
         );
-        ipStore.setAulaConfig(aulaConfig);
+        ipStore.setAulaConfig(newAulaConfig);
       };
       return (
         <Select onChange={moveStudent}>
@@ -244,14 +246,18 @@ const StudentList = observer(({ appStore, instructorApi }) => {
           {ipStore.rooms
             .filter((room) => room !== currentRoom)
             .map((room) => {
-              return <option value={room}>{room}</option>;
+              return (
+                <option key={room} value={room}>
+                  {room}
+                </option>
+              );
             })}
         </Select>
       );
     });
     return (
       <RoomDropdown
-        activeSessionId={appStore.activeSessionId}
+        appStore={appStore}
         studentId={studentId}
         instructorApi={instructorApi}
       >
@@ -310,10 +316,7 @@ const RoomList = observer(({ appStore, instructorApi }) => {
   ];
 
   useEffect(() => {
-    async function init() {
-      const rooms = await instructorApi.getRooms(appStore.activeSessionId);
-      ipStore.setRooms(rooms);
-    }
+    async function init() {}
     init();
   }, []);
 
@@ -330,18 +333,25 @@ const RoomList = observer(({ appStore, instructorApi }) => {
           Add
         </SmBtn>
         <SmBtn
-          onClick={() => {
+          onClick={async () => {
             // Students will be orphaned. Identify them and put them into "main".
             const orphanedStudents = ipStore.studentsByRooms(
               ipStore.selectedRooms
             );
-            console.log("orphanedStudents:", orphanedStudents);
-            orphanedStudents.forEach((orphanedStudent) => {
-              const { studentName, roomName } = orphanedStudent;
-              instructorApi.moveStudent(studentName, roomName, "main");
-            });
-
-            const newAulaConfig = instructorApi.deleteRooms(
+            Promise.all(
+              orphanedStudents.map(async (orphan) => {
+                const { studentName, roomName } = orphan;
+                const newAulaConfig = await instructorApi.moveStudent(
+                  appStore.activeSessionId,
+                  studentName,
+                  roomName,
+                  "main"
+                );
+                ipStore.setAulaConfig(newAulaConfig);
+              })
+            );
+            const newAulaConfig = await instructorApi.deleteRooms(
+              appStore.activeSessionId,
               ipStore.selectedRooms
             );
             ipStore.setAulaConfig(newAulaConfig);

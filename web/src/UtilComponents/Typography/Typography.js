@@ -38,4 +38,6 @@ export const P = styled.p`
   ${font}
   ${fontColor}
   ${debugBorder}
+  ${space}
+  ${typography}
 `

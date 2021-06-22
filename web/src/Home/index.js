@@ -10,10 +10,17 @@ import {
   debugBorder,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
 import Dialog from "@material-ui/core/Dialog";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
+import { rollIn } from "react-animations";
+
+const animation = keyframes`${rollIn}`;
+
+const BouncyDiv = styled.div`
+  animation: 1s ${animation};
+`;
 
 const SectionImage = styled.img`
   width: 225px;
@@ -58,9 +65,14 @@ const RegisterLink = styled(Link)`
   text-align: center;
   padding: 10px;
   color: white;
+  border-radius: 2px;
   ${fontMonospace}
   a {
     color: ${cieOrange};
+  }
+  &:hover:enabled {
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
   }
 `;
 
@@ -97,10 +109,17 @@ const Home = (props) => {
         <Box mt={4}>
           <TaglineTitle>Jump into the global mainstream.</TaglineTitle>
         </Box>
-        <Box mt={40}>
-          <RegisterLink to="/upcoming-classes">
-            Learn English as you learn to code.
-          </RegisterLink>
+
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <ContentSection justifyContent="center">
+            <p style={{textAlign: "center"}}>
+              Se ha abierto el plazo de matrícula para el curso{" "}
+              <i>Webapp Development - Basic</i>
+            </p>
+          </ContentSection>
+          <BouncyDiv>
+            <RegisterLink to="/apply">Solicita el curso aquí</RegisterLink>
+          </BouncyDiv>
         </Box>
       </Box>
       <Box mt={40} alignSelf="center">

@@ -438,6 +438,21 @@ def create_main_api(publish_message,
 
         return serialize(user_reg, schema.UserModuleRegistrationSchema)
 
+    @app.route("/api/student-application", methods=["POST"])
+    def save_student_application():
+        app_json = request.get_json()
+        LOG.info(f"storing user application {app_json}")
+        student_app = models.StudentApplication(
+            app=app_json
+        )
+        student_app.add()
+        LOG.info(f"application stored successfully")
+        return jsonify(dict(
+                data={},
+                status="success",
+                messages=["Successfully submitted student application."]
+            ))
+
     @app.route("/api/site-map")
     def site_map():
         links = []

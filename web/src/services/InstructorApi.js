@@ -2,7 +2,19 @@ import axios from "axios";
 
 class InstructorApi {
   async _call(payload) {
-    const resp = await axios.post("/aula/call", payload);
+    console.log(
+      "issuing call to /aula/call with payload",
+      JSON.stringify(payload)
+    );
+    let resp;
+    try {
+       resp = await axios.post("/aula/call", payload);
+    } catch  (error) {
+      const { response } = error;
+      const { request, ...errorObject } = response; // take everything but 'request'
+      console.log("backend call failed with error:", errorObject);
+    }
+    
     console.log("result of call", payload, "is", resp);
     return resp.data.data;
   }
@@ -23,11 +35,11 @@ class InstructorApi {
     ];
     return await this._call(command);
   }
-  async moveStudent(studentName, fromRoomName, toRoomName) {
+  async moveStudent(activeSessionId, studentName, fromRoomName, toRoomName) {
     const command = [
       {
         method: "aula.move_student",
-        params: [studentName, fromRoomName, toRoomName],
+        params: [activeSessionId, studentName, fromRoomName, toRoomName],
       },
     ];
     return await this._call(command);
@@ -40,8 +52,15 @@ class InstructorApi {
       },
     ]);
   }
+  async deleteRooms(activeSessionId, rooms) {
+    return await this._call([
+      {
+        method: "aula.delete_rooms",
+        params: [activeSessionId, rooms]
+      }
+    ])
+  }
   async getAulaConfig(activeSessionId) {
-    console.log("in getBreakoutConfig");
     const resp = await this._call([
       {
         method: "aula.get_aula_config",

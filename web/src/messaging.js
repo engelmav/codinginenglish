@@ -4,7 +4,7 @@ export class WebsocketManager {
   constructor(settings) {
     this.settings = settings;
   }
-  createWebsocket(channel, clientId = null) {
+  async createWebsocket(channel, clientId = null) {
     const websocket = new ReconnectingWebSocket(this.settings.websocketAddress);
     websocket.onopen = function () {
       console.log(
@@ -21,7 +21,19 @@ export class WebsocketManager {
         })
       );
     };
+    await this.waitForOpenSocket(websocket);
     return websocket;
+  }
+  async waitForOpenSocket(socket) {
+    return new Promise((resolve) => {
+      if (socket.readyState !== socket.OPEN) {
+        socket.addEventListener("open", (_) => {
+          resolve();
+        })
+      } else {
+        resolve();
+      }
+    });
   }
   subscribeToChannel(websocket, channelName, clientId = null) {
     console.log("Subscribing to websocket channel", channelName);

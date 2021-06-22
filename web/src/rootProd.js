@@ -19,6 +19,7 @@ import { Home as _Home } from "./Home";
 import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
 import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { AboutUs } from "./AboutUs";
+import { BasicCourseForm as _Application} from "./CourseApplications/BasicCourse"
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -72,7 +73,7 @@ export function main(appStore) {
       userData,
       initializedUser.data.rocketchat_auth_token
     );
-    const websocket = websocketManager.createWebsocket(
+    const websocket = await websocketManager.createWebsocket(
       `ws-general-user-${appStore.userId}`
     );
     const studentSessionMgr = new StudentSessionManager(websocket);
@@ -138,6 +139,7 @@ export function main(appStore) {
   /** End Configure Aula */
 
   const CallbackWithRouter = withRouter(Callback);
+  const Application = compose(_Application, { appStore, cieApi });
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
@@ -147,6 +149,7 @@ export function main(appStore) {
     auth,
     cieApi,
     AboutUs,
+    Application,
     CallbackRoute,
     Classroom,
     CollabEditor,

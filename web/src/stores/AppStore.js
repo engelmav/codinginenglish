@@ -14,6 +14,7 @@ configure({
 
 class AppStore {
   activeSessionId = null;
+  applicationOpen = true;
   isAuthenticated = false;
   loginExpiresAt = null;
   authData = null;

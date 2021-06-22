@@ -6,6 +6,7 @@ COPY package*.json /app/
 RUN npm ci --only=production
 COPY ./ /app
 
+run npm install react-dev-utils
 RUN npm run build --production
 
 

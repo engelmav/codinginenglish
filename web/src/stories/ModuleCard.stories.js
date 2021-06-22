@@ -2,6 +2,8 @@ import React from "react";
 import { compose } from "../compose";
 import { makeAppStore } from "../stores/AppStore";
 import { ModuleCard as _ModuleCard } from "../ModuleCard/ModuleCard";
+import { createBrowserHistory } from "history";
+import { Router } from "react-router";
 
 const mockSettings = {
   assets: "https://cie-assets.nyc3.digitaloceanspaces.com",
@@ -30,9 +32,15 @@ const ModuleCard = compose(_ModuleCard, {
   CheckoutForm,
 });
 
+const history = createBrowserHistory();
+
 export default {
   title: "ModuleCard",
   component: ModuleCard,
 };
 
-export const DefaultView = () => <ModuleCard />;
+export const DefaultView = () => (
+  <Router history={history}>
+    <ModuleCard />
+  </Router>
+);

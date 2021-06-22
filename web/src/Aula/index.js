@@ -3,7 +3,7 @@ import "./styles.css";
 import Iframe from "react-iframe";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import styled from "styled-components";
+import * as S from "./styles";
 import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
@@ -11,21 +11,8 @@ import { browserDetect } from "../util";
 import _ from "lodash";
 import { readSocketDataAnd } from "../messaging";
 import { Link } from "react-router-dom";
-
-const ClassroomContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-const ClassroomHeader = styled.div`
-  display: flex;
-  justify-content: left;
-  align-items: center;
-  justify-self: stretch;
-  background-color: black;
-  padding: 5px;
-  width: 100%;
-`;
+import { ReadAndDo } from "../messaging";
+import Dialog from "@material-ui/core/Dialog"
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -35,13 +22,14 @@ const ChatSignIn = (props) => {
     const chatIframe = divRef.current.firstElementChild;
     chatIframe.addEventListener("load", function () {
       setTimeout(() => {
-        this.contentWindow.postMessage(
+        const result = this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
             token: props.appStore.rocketchatAuthToken,
           },
           "*"
         );
+        console.log("Result of contentWindow.postMessage:", result);
       }, 10000);
     });
   };
@@ -52,21 +40,27 @@ const ChatSignIn = (props) => {
 const SlidesController = ({ websocketManager, activeSessionId, children }) => {
   const divRef = useRef(null);
   useEffect(() => {
-    const slidesSocket = websocketManager.createWebsocket(
-      activeSessionId + "-slides",
-      "slides-client"
-    );
-    console.log("Created websocket", slidesSocket);
-    function sendSlideCommand(eventData) {
-      console.log("got slide command", eventData);
-      slidesIframe.contentWindow.postMessage(
-        JSON.stringify(eventData.command.data),
-        "*"
+    async function init() {
+      const slidesSocket = await websocketManager.createWebsocket(
+        activeSessionId + "-slides",
+        "slides-client"
       );
+      console.log("Created websocket", slidesSocket);
+      function sendSlideCommand(eventData) {
+        console.log("got slide command", eventData);
+        slidesIframe.contentWindow.postMessage(
+          JSON.stringify(eventData.command.data),
+          "*"
+        );
+      }
+      const handleWebsocketEvent = _.partial(
+        readSocketDataAnd,
+        sendSlideCommand
+      );
+      const slidesIframe = divRef.current.firstElementChild;
+      slidesSocket.addEventListener("message", handleWebsocketEvent);
     }
-    const handleWebsocketEvent = _.partial(readSocketDataAnd, sendSlideCommand);
-    const slidesIframe = divRef.current.firstElementChild;
-    slidesSocket.addEventListener("message", handleWebsocketEvent);
+    init();
   }, []);
   return (
     <div style={{ height: "100%" }} ref={divRef}>
@@ -74,22 +68,6 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
     </div>
   );
 };
-
-const Taskbar = styled.div`
-  display: inline;
-  border-radius: 3px;
-  margin-top: 3px;
-  margin-left: 3px;
-  padding: 4px;
-`;
-
-const CoverWindowOnDrag = styled.div`
-  height: 100%;
-  width: 100%;
-  z-index: 101;
-  position: absolute;
-  background-color: lightGray;
-`;
 
 @observer
 class Aula extends Component {
@@ -99,6 +77,7 @@ class Aula extends Component {
 
     this.state = {
       activityData: [],
+      aulaWebsocket: null,
       guacWindow: true,
       chatWindow: true,
       slidesWindow: true,
@@ -112,6 +91,8 @@ class Aula extends Component {
       prezzieLink: null,
       exerciseContent: null,
       onTop: null,
+
+      roomChangeNotification: null
     };
 
     this.setGuacViewerRef = (element) => {
@@ -127,12 +108,11 @@ class Aula extends Component {
 
   async configureActiveSession() {
     const { appStore, cieApi, websocketManager } = this.props;
-    console.log("Getting activeSessionData by userId", appStore.userId)
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
-    const activeSessionId = `aula-${activeSessionData.data.id}`;
-    appStore.activeSessionId = activeSessionId
+    const activeSessionId = activeSessionData.data.id;
+    appStore.activeSessionId = activeSessionId;
 
     const {
       chat_channel,
@@ -146,41 +126,31 @@ class Aula extends Component {
       videoChannel: video_channel,
     });
 
-    this.aulaWebsocket = websocketManager.createWebsocket(
-      activeSessionId,
+    const aulaWebsocket = await websocketManager.createWebsocket(
+      `aula-${activeSessionId}`,
       appStore.userId
     );
-    this.aulaWebsocket.addEventListener("message", (event) => {
-      const { data } = event;
-      if (data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          let commandData = null;
-          try {
-            commandData = JSON.parse(reader.result);
-          } catch (ex) {
-            console.error("Failed to parse websocket event data.", ex.stack);
-            console.log(reader.result);
-            return;
-          }
-          if (!commandData.hasOwnProperty("command")) return;
-          const { name } = commandData.command;
-          if (name === "SHOW_ACTIVITY_POPUP") {
-            console.log(
-              "setting state activityData to",
-              commandData.command.data
-            );
-            this.setState(
-              { activityData: commandData.command.data },
-              this.openPopupActivity()
-            );
-          } else if (name === "HIDE_ACTIVITY_POPUP") {
-            this.closePopupActivity();
-          }
-        };
-        reader.readAsText(data);
+    const handleAulaMessage = (eventData) => {
+      console.log("handleAuthMessage eventData:", eventData);
+      /**
+       * todo: handle the aulaconfig messages here.
+       */
+      if (eventData.hasOwnProperty("command")) {
+        const { name } = eventData.command;
+        if (name === "SHOW_ACTIVITY_POPUP") {
+          this.setState(
+            { activityData: eventData.command.data },
+            this.openPopupActivity()
+          );
+        } else if (name === "HIDE_ACTIVITY_POPUP") {
+          this.closePopupActivity();
+        }
+        return;
       }
-    });
+    };
+    const readAndDo = new ReadAndDo(handleAulaMessage);
+    aulaWebsocket.addEventListener("message", readAndDo.read);
+    this.setState({ aulaWebsocket }, () => console.log("websocket set"));
   }
 
   componentDidMount() {
@@ -226,6 +196,8 @@ class Aula extends Component {
       websocketManager,
     } = this.props;
     const {
+      aulaWebsocket,
+
       guacWindow,
       chatWindow,
       slidesWindow,
@@ -240,6 +212,8 @@ class Aula extends Component {
 
       onTop,
       isWindowDragging,
+
+      roomChangeNotification
     } = this.state;
 
     const {
@@ -258,9 +232,11 @@ class Aula extends Component {
     const activityWindowOnTop = "activityWindow";
 
     const videoEnabled = false;
+
+    const dialogOpen = roomChangeNotification; // && concatenate
     return (
-      <ClassroomContainer>
-        <ClassroomHeader>
+      <S.ClassroomContainer>
+        <S.ClassroomHeader>
           <Link to="/">
             <img
               style={{ height: "40px", display: "inline" }}
@@ -268,7 +244,7 @@ class Aula extends Component {
               src={`${settings.assets}/cie-logo-horizontal-black.png`}
             ></img>
           </Link>
-          <Taskbar>
+          <S.Taskbar>
             {!slidesWindow && (
               <Button mr={2} onClick={this.toggleSlides}>
                 Slides
@@ -290,43 +266,44 @@ class Aula extends Component {
               </Button>
             )}
             {guacWindow && chatWindow && videoWindow && slidesWindow && <></>}
-          </Taskbar>
-        </ClassroomHeader>
+          </S.Taskbar>
+        </S.ClassroomHeader>
         {popupActivityWindow && (
           <div>
             <PopupActivity
               activities={activityData || []}
-              websocket={this.aulaWebsocket}
+              websocket={aulaWebsocket}
               onClose={this.closePopupActivity}
             />
           </div>
         )}
-        {instructorPanel && appStore.userRole === "instructor" && (
-          <Rnd
-            default={{
-              x: 0,
-              y: 50,
-              width: 600,
-              height: 560,
-            }}
-            style={{
-              zIndex: onTop === slidesWindowTop ? 200 : 0,
-              borderBottom: "1px black solid",
-              backgroundColor: "white",
-
-            }}
-            onMouseDown={() => this.handleWindowMove(slidesWindowTop)}
-            onDragStop={this.handleWindowRelease}
-            dragHandleClassName={"drag-handle"}
-          >
-            <Window
-              title="Instructor Panel"
-              hideClose={false}
-              onClose={toggleInstructorPanel}
-            />
-            <InstructorPanel />
-          </Rnd>
-        )}
+        {instructorPanel &&
+          appStore.userRole === "instructor" &&
+          aulaWebsocket && (
+            <Rnd
+              default={{
+                x: 0,
+                y: 50,
+                width: 600,
+                height: 560,
+              }}
+              style={{
+                zIndex: onTop === slidesWindowTop ? 200 : 0,
+                borderBottom: "1px black solid",
+                backgroundColor: "white",
+              }}
+              onMouseDown={() => this.handleWindowMove(slidesWindowTop)}
+              onDragStop={this.handleWindowRelease}
+              dragHandleClassName={"drag-handle"}
+            >
+              <Window
+                title="Instructor Panel"
+                hideClose={false}
+                onClose={toggleInstructorPanel}
+              />
+              <InstructorPanel />
+            </Rnd>
+          )}
         {slidesWindow && prezzieLink && (
           <Rnd
             default={{
@@ -340,7 +317,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Slides" hideClose={false} onClose={toggleSlides} />
-            {isWindowDragging && <CoverWindowOnDrag />}
+            {isWindowDragging && <S.CoverWindowOnDrag />}
             <SlidesController
               activeSessionId={appStore.activeSessionId}
               websocketManager={websocketManager}
@@ -372,7 +349,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="CIE Chat" onClose={toggleChat} />
-            {isWindowDragging && <CoverWindowOnDrag />}
+            {isWindowDragging && <S.CoverWindowOnDrag />}
             <ChatSignIn appStore={this.props.appStore}>
               <Iframe
                 url={rocketChatUrl}
@@ -397,7 +374,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Video" onClose={toggleVideo} />
-            {isWindowDragging && <CoverWindowOnDrag />}
+            {isWindowDragging && <S.CoverWindowOnDrag />}
             <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
                 participantName={appStore.firstName}
@@ -420,7 +397,7 @@ class Aula extends Component {
             onDragStop={this.handleWindowRelease}
           >
             <Window title="Dev Environment" onClose={toggleGuac} />
-            {isWindowDragging && <CoverWindowOnDrag />}
+            {isWindowDragging && <S.CoverWindowOnDrag />}
             {browserDetect.isSafari ? (
               <>
                 <p>
@@ -428,13 +405,13 @@ class Aula extends Component {
                   you REALLY want to try with Safari, this remote session window
                   won't work due to iframe constraints.
                 </p>
-                <button
+                <Button
                   onClick={() =>
                     window.open("https://remote.codinginenglish.com/guacamole")
                   }
                 >
                   I'll try anyway.
-                </button>
+                </Button>
               </>
             ) : (
               <Iframe
@@ -454,9 +431,26 @@ class Aula extends Component {
             )}
           </Rnd>
         )}
-      </ClassroomContainer>
+      <Dialog open={dialogOpen}>
+        {roomChangeNotification && 
+          <RoomChangeNotification appStore={appStore}/>
+        }
+      </Dialog>  
+      </S.ClassroomContainer>
     );
   }
+}
+
+const RoomChangeNotification = ({appStore}) => {
+  const goToRoom = () => {
+    console.log("pretend going to room");
+  }
+  return (
+    <div>
+      <p>You've been invited to breakout room {appStore.currentRoom}.</p>
+      <Button onClick={goToRoom}>Take me there!</Button>
+    </div>
+  )
 }
 
 export { Aula };
