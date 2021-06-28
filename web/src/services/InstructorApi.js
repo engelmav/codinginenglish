@@ -26,20 +26,20 @@ class InstructorApi {
     return resp.data.data;
   }
 
-  async createRoom(activeSessionId, roomName) {
+  async createRoom(activeSessionId, roomName, slug) {
     const command = [
       {
         method: "aula.create_room",
-        params: [activeSessionId, roomName],
+        params: [activeSessionId, roomName, slug],
       },
     ];
     return await this._call(command);
   }
-  async moveStudent(activeSessionId, studentName, fromRoomName, toRoomName) {
+  async moveStudent(activeSessionId, studentId, fromRoomName, toRoomName) {
     const command = [
       {
         method: "aula.move_student",
-        params: [activeSessionId, studentName, fromRoomName, toRoomName],
+        params: [activeSessionId, studentId, fromRoomName, toRoomName],
       },
     ];
     return await this._call(command);

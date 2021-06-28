@@ -73,6 +73,7 @@
     "react-color": "^2.19.3",
     "react-dom": "^16.8.6",
     "react-draggable": "^4.4.3",
+    "react-ga": "^3.3.0",
     "react-grid-layout": "^0.16.6",
     "react-iframe": "^1.8.0",
     "react-konva": "^17.0.2-0",
@@ -184,12 +185,10 @@
     "enzyme-adapter-react-16": "^1.13.1",
     "jest": "^23.6.0",
     "jest-localstorage-mock": "^2.4.0",
-    "jest-mock-axios": "^2.4.0",
     "jest-watch-typeahead": "^0.2.1",
+    "mjml": "^4.10.1",
     "react-dev-utils": "^10.0.0",
     "react-scripts": "^4.0.3",
-    "react-styleguidist": "^10.6.2",
-    "react-test-renderer": "^16.8.6",
     "webpack-bundle-analyzer": "^4.4.2"
   }
 }

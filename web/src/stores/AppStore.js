@@ -14,13 +14,16 @@ configure({
 
 class AppStore {
   activeSessionId = null;
+  activeSessionSlug = null;
   applicationOpen = true;
   isAuthenticated = false;
   loginExpiresAt = null;
   authData = null;
   userId = null;
   userRole = null;
+  userLocation = null;
   firstName = null;
+  lastName = null;
   email = null;
   registeredSessions = [];
   sessionInProgress = false;
@@ -46,8 +49,9 @@ class AppStore {
     this.email = email;
 
     // TODO: perform official reconciliation of two user sources
-    const { firstname, id, role } = storedUser;
-    this.firstName = given_name || firstname;
+    const { firstname, lastname, id, role } = storedUser;
+    this.firstName = firstname;
+    this.lastName = lastname;
     this.userId = id;
     console.log("stored user object:", storedUser)
     this.userRole = role;

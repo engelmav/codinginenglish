@@ -13,7 +13,7 @@ import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Header as _Header } from "./Header";
 import { Footer as _Footer } from "./Footer/Footer";
-import { Login as _Login } from "./Login";
+import { Login as _Login } from "./Login/Login";
 import history from "./history";
 import { Home as _Home } from "./Home";
 import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
@@ -26,7 +26,7 @@ import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
-import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel"
+import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 
 var log = console.log;
 

@@ -72,10 +72,12 @@ def model_factory(Base):
     class User(Base):
         __tablename__ = 'users'
         id = Column(Integer, primary_key=True)
-        firstname: Column = Column(String(50))
+        firstname = Column(String(50))
         lastname = Column(String(50))
         fullname = Column(String(120))
         email = Column(String(120), unique=True)
+        rocketchat_id = Column(Text)
+        nickname = Column(Text)
         # TODO: add nickname
         registered_modules = relationship(
             'UserModuleRegistration',
@@ -95,6 +97,7 @@ def model_factory(Base):
         chat_channel = Column(Text)
         prezzie_link = Column(Text)
         video_channel = Column(Text)
+        slug = Column(Text)
         is_active = Column(Boolean)
 
     class UserActiveSession(Base):

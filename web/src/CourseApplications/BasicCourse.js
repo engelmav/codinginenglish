@@ -19,6 +19,15 @@ import {
   whenSmallScreen,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
+import ReactGA from "react-ga";
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
+
+ReactGA.event({
+  category: "Sign Up",
+  action: "User pressed the big blue sign up button",
+});
 
 const ApplicationSchema = Yup.object().shape({
   fullName: Yup.string()
@@ -37,7 +46,9 @@ const ApplicationSchema = Yup.object().shape({
     basicCourseForm.find((field) => field.fieldName === "whenAttend").choices,
     "Por favor elige unas horas"
   ),
-  location: Yup.string().required(
+  location: Yup.string()
+  .min(1, "Muy corto!")
+  .required(
     "Favor de decirnos el pais y la ciudad en que resides"
   ),
 });
@@ -85,6 +96,8 @@ const Timeline = styled.div`
 
   ul {
     padding: 0;
+    font-family: ${fontFamily};
+    font-weight: 900;
   }
 
   ul:nth-child(1) {
@@ -107,6 +120,12 @@ const Timeline = styled.div`
     background: #fff;
     color: #000;
     transition: all ease-in-out 0.3s;
+    ${whenSmallScreen`
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-width: 2px;
+    `}
   }
 
   .timeline li:after {
@@ -141,7 +160,46 @@ const MainAppl = styled(Main)`
   width: min(90%, 700px);
 `;
 
-export const BasicCourseForm = ({ cieApi }) => {
+const ClearableTextField = styled(TextInput)`
+  position: relative;
+  &:not(:valid) ~ .close-icon {
+    display: none;
+  }
+`;
+
+const ClearFieldButton = styled.button`
+  border: 1px solid transparent;
+  background-color: transparent;
+  display: inline-block;
+  vertical-align: middle;
+  outline: 0;
+  cursor: pointer;
+  position: relative;
+  padding: 10px;
+  &:after {
+    content: "X";
+    display: block;
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    background-color: ${cieOrange};
+    z-index: 1;
+    right: 10px;
+    top: -74px;
+    bottom: 0;
+    margin: auto;
+    padding: 2px;
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    box-shadow: 0 0 2px #e50f0f;
+    cursor: pointer;
+  }
+`;
+
+export const BasicCourseForm = ({ appStore, cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
   const initialValues = {};
   basicCourseForm.forEach((field) => {
@@ -149,11 +207,14 @@ export const BasicCourseForm = ({ cieApi }) => {
       ? field.initialValue
       : "";
   });
+  initialValues["location"] = appStore.userLocation || "";
 
   return (
     <MainAppl p={20}>
       <Title textAlign="center">Webapp Development - Basic</Title>
-      <P textAlign="center"><i>del 20 septiembre al 20 diciembre</i></P>
+      <P textAlign="center">
+        <i>del 20 septiembre al 20 diciembre</i>
+      </P>
       <Timeline>
         <ul class="timeline">
           <li class="active-tl">Solicitud</li>
@@ -198,6 +259,7 @@ export const BasicCourseForm = ({ cieApi }) => {
               handleChange,
               handleBlur,
               isSubmitting,
+              setFieldValue,
             }) => (
               <Form onSubmit={handleSubmit}>
                 {basicCourseForm.map((field) => {
@@ -213,6 +275,12 @@ export const BasicCourseForm = ({ cieApi }) => {
                           type="text"
                           id={fieldName}
                           name={fieldName}
+                          onFocus={() => {
+                            ReactGA.event({
+                              category: "applyFieldFocus",
+                              action: `user focused field ${field.title}`,
+                            });
+                          }}
                           onChange={(e) => {
                             handleChange(e);
                           }}
@@ -236,6 +304,12 @@ export const BasicCourseForm = ({ cieApi }) => {
                           type="email"
                           id={fieldName}
                           name={fieldName}
+                          onFocus={() => {
+                            ReactGA.event({
+                              category: "applyFieldFocus",
+                              action: `user focused field ${field.title}`,
+                            });
+                          }}
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
@@ -305,6 +379,12 @@ export const BasicCourseForm = ({ cieApi }) => {
                           as="textarea"
                           name={fieldName}
                           value={values[field.fieldName]}
+                          onFocus={() => {
+                            ReactGA.event({
+                              category: "applyFieldFocus",
+                              action: `user focused field ${field.title}`,
+                            });
+                          }}
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
@@ -317,6 +397,34 @@ export const BasicCourseForm = ({ cieApi }) => {
                     );
                   }
                 })}
+                <>
+                  <FieldLabel htmlFor={"location"}>
+                    Ciudad y país. (Lo necesitamos para saber tu zona horaria)
+                  </FieldLabel>
+
+                  <TextInput
+                    type="search"
+                    id={"location"}
+                    name={"location"}
+                    onFocus={() => {
+                      ReactGA.event({
+                        category: "applyFieldFocus",
+                        action: `user focused field location`,
+                      });
+                    }}
+                    onChange={handleChange}
+                    value={values["location"] || appStore.userLocation}
+                  />
+                  <ClearFieldButton
+                    onClick={() => setFieldValue("location", " ", false)}
+                  ></ClearFieldButton>
+
+                  {errors["location"] ? (
+                    <Error>{errors["location"]}</Error>
+                  ) : (
+                    <div style={{ color: "white" }}>empty</div>
+                  )}
+                </>
                 <Button type="submit">Submit</Button>
               </Form>
             )}

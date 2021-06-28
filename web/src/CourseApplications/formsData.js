@@ -36,33 +36,17 @@ export const basicCourseForm = [
       "Hablo inglés fluido o casi fluido",
     ],
   },
-
-  {
-    fieldName: "whyProgram",
-    title: "¿Por qué quieres aprender el inglés?",
-    fieldType: "paragraph",
-  },
   {
     fieldName: "whenAttend",
     title:
-      "¿Qué hora prefieres asistir a las clases? Haz clic en todas las que sean de tu interés.",
+      "¿Qué hora prefieres asistir a una clase de dos horas?",
     fieldType: "checkboxes",
     choices: [
-      "6am - 8am",
-      "8am - 10am",
-      "10am - 12pm",
-      "12pm - 2pm",
-      "2pm - 4pm",
-      "4pm 6pm",
-      "6pm - 8pm",
-      "8pm - 10pm",
+      "En la mañana (6:00 - 11:00)",
+      "Alrededor del mediodía (11:00 - 15:00)",
+      "En la noche (15:00 - 22:00)",
       "Ninguno",
     ],
-  },
-  {
-    fieldName: "location",
-    title:
-      "Ciudad y país. (Lo necesitamos para saber tu zona horaria)",
-    fieldType: "shortAnswer",
-  },
+  }
 ];
+

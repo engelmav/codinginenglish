@@ -1,4 +1,4 @@
-from aula.aula import create_aula_endpoints, AulaService, broadcast_to_aula
+from aula.aula import create_aula_endpoints, AulaService, broadcast_to_aula, on_add_room, AulaActor
 from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
@@ -14,6 +14,7 @@ from services.auth import AuthService
 from services.cie import UserService, ModuleService
 from services.rocketchat import RocketChatService
 from functools import partial
+
 
 """
 Because of the way sqlalchemy configures itself,
@@ -36,18 +37,18 @@ student_session_service = StudentSessionService(red, models)
 publish_message = create_message_publisher(red, "command")
 
 websocket_manager = WebsocketManager(red)
-broadcast_to_aula_websocket = partial(broadcast_to_aula, websocket_manager)
-aula_service = AulaService(models, on_change=broadcast_to_aula_websocket)
-aula_endpoints = create_aula_endpoints(aula_service, websocket_manager)
-
-
 rc_service = RocketChatService()
+
+aula_actor = AulaActor(websocket_manager, rc_service, models)
+aula_service = AulaService(models, schema, on_change=aula_actor.handle_aula_events)
+aula_endpoints = create_aula_endpoints(aula_service, websocket_manager)
 auth_service = AuthService()
 payment_api = create_payment_api(auth_service, module_service, user_service)
 blueprints = [
     payment_api,
     aula_endpoints
 ]
+
 app = create_main_api(
     publish_message,
     module_service,

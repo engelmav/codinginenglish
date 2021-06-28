@@ -88,40 +88,34 @@ class InstructorPanelStore {
      * returns
      * [ { id: number, studentName: string, vm?: link, roomName: string }, ]
      */
-    const studentsOfRoom = (roomName) =>
-      Object.keys(this.aulaConfig.rooms[roomName].students);
     if (!this.aulaConfig || Object.keys(this.aulaConfig).length === 0) {
       return [];
     }
-    let studentId = 0;
-    const getStudentsInRoom = (roomName) => {
-      const students = [];
-      studentsOfRoom(roomName).forEach((studentName) => {
-        studentId += 1;
+    console.log(
+      "computing studentGridData for this.aulaConfig",
+      toJS(this.aulaConfig)
+    );
+    const rooms = () => Object.keys(this.aulaConfig.rooms);
+    const studentIdsInRoom = (room) =>
+      Object.keys(this.aulaConfig.rooms[room].students);
+    const studentDetails = (room, studentId) =>
+      this.aulaConfig.rooms[room].students[studentId];
+
+    const students = [];
+    rooms().forEach((room) => {
+      studentIdsInRoom(room).forEach((studentId) => {
+        const { id, firstname, lastname } = studentDetails(room, studentId);
         students.push({
-          id: studentId,
-          studentName: studentName,
-          roomName: roomName,
+          id,
+          studentName: lastname ? `${firstname} ${lastname}` : firstname,
+          roomName: room,
         });
       });
-      return students;
-    };
-    let studentsInAllRooms = [];
-    const roomsInAula = () => Object.keys(this.aulaConfig.rooms);
-    roomsInAula().forEach((room) => {
-      const studentsInRoom = getStudentsInRoom(room);
-      console.log("studentsInRoom for", room, "is", studentsInRoom);
-      console.log(
-        "concatenating studentsInAllRooms",
-        studentsInAllRooms,
-        "with",
-        { studentsInRoom }
-      );
-      studentsInAllRooms = [...studentsInAllRooms, ...studentsInRoom];
-      console.log("studentsInAllRooms:", studentsInAllRooms);
     });
-    return studentsInAllRooms;
+
+    return students;
   }
+
   @computed get roomGridData() {
     /**
      * "takes"
@@ -133,22 +127,27 @@ class InstructorPanelStore {
       return [];
     }
     // {'rooms': {'main': {'students': {}}}}
-    const roomRows = [];
-    let roomId = 0;
-    Object.keys(toJS(this.aulaConfig).rooms).forEach((roomKey) => {
-      roomId += 1;
-      const room = this.aulaConfig.rooms[roomKey];
-      const studentsInRoom = [];
-      Object.keys(room.students).forEach((student) => {
-        studentsInRoom.push(student);
+
+    const rooms = () => Object.keys(this.aulaConfig.rooms);
+    const studentsInRoom = (room) => {
+      const studentIds =  Object.keys(this.aulaConfig.rooms[room].students);
+      if (studentIds.length === 0) return "empty";
+      const studentList = studentIds.map((studentId) => {
+        const { firstname, lastname } = this.aulaConfig.rooms[room].students[
+          studentId
+        ];
+        return lastname ? `${firstname} ${lastname}` : firstname;
       });
-      const studentsStr =
-        studentsInRoom.length > 0 ? studentsInRoom.join(", ") : "empty";
-      roomRows.push(
-        // { id: number, roomName: string, students: string }
-        { id: roomId, roomName: roomKey, students: studentsStr }
-      );
+      return studentList.join(", ")
+    };
+
+    const roomRows = [];
+
+    rooms().forEach((room, idx) => {
+      const studentsStr = studentsInRoom(room);
+      roomRows.push({ id: idx, roomName: room, students: studentsStr })
     });
+
     return roomRows;
   }
 
@@ -211,9 +210,9 @@ export const InstructorPanel = observer(({ appStore, instructorApi }) => {
 });
 
 const StudentList = observer(({ appStore, instructorApi }) => {
-  useEffect(() => { 
+  useEffect(() => {
     async function init() {
-      console.log("getting connected students")
+      console.log("getting connected students");
       const connectedStudents = await instructorApi.getConnectedStudents(
         `aula-${appStore.activeSessionId}`
       );
@@ -234,7 +233,7 @@ const StudentList = observer(({ appStore, instructorApi }) => {
         const toRoomName = e.target.value;
         const newAulaConfig = await instructorApi.moveStudent(
           appStore.activeSessionId,
-          params.row.studentName,
+          params.row.id,
           currentRoom,
           toRoomName
         );
@@ -409,7 +408,9 @@ const NewRoomDialog = observer(({ appStore, instructorApi }) => {
         onClick={async () => {
           const newAulaConfig = await instructorApi.createRoom(
             appStore.activeSessionId,
-            ipStore.newRoomName
+            ipStore.newRoomName,
+            // TODO: - add an assignment to activeSessionSlug in the appStore in configureSession of Aula
+            appStore.activeSessionSlug
           );
           console.log("newAulaConfig:");
           ipStore.setAulaConfig(newAulaConfig);

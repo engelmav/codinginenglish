@@ -10,7 +10,7 @@ class UserService:
     def __init__(self, models):
         self.models = models
 
-    def create_user(self, email, first_name=None, last_name=None):
+    def create_user(self, email, first_name=None, last_name=None, rocketchat_id=None):
         m = self.models
         existing_user = m.User.query.filter(
             or_(
@@ -33,7 +33,8 @@ class UserService:
         _user = m.User(
             firstname=first_name,
             lastname=last_name,
-            email=email
+            email=email,
+            rocketchat_i=rocketchat_id
         )
         _user.add()
 

@@ -1,16 +1,51 @@
 from flask import blueprints, request, jsonify
 import logging
 from copy import deepcopy
+from pymitter import EventEmitter
+
+
+from events import WebsocketManager
+from services.rocketchat import RocketChatService
 
 aula_endpoints = blueprints.Blueprint("aula", url_prefix="/aula", import_name=__name__)
 LOG = logging.getLogger(__name__)
 
 
-def broadcast_to_aula(websocket_manager, event):
-    """ Adapts AulaService's messages to the WebsocketManager's broadcast interface"""
-    active_session_id = event.get("active_session_id")
-    aula_channel = f"aula-{active_session_id}"
-    websocket_manager.broadcast(event, aula_channel)
+class AulaActor:
+    def __init__(self, websocket_manager, rc_service, models):
+        self.event_emitter =
+        self.websocket_manager = websocket_manager
+        self.rc_service = rc_service
+        self.models = models
+
+    def handle_aula_events(self, event):
+        self.event_emitter.on("add_room", self.on_add_room)
+        self.event_emitter.on("move_student", self.on_move_student)
+        self.event_emitter.on_any(func=self.broadcast_to_aula)
+
+    def broadcast_to_aula(self, event):
+        """ Adapts AulaService's messages to the WebsocketManager's broadcast interface"""
+        active_session_id = event.get("active_session_id")
+        aula_channel = f"aula-{active_session_id}"
+        self.websocket_manager.broadcast(event, aula_channel)
+
+    def on_add_room(self,event):
+        room_name = event.get("data").get("room")
+        slug = event.get("data").get("slug")
+        channel_name = f"{room_name}-{slug}"
+        self.rc_service.create_channel(channel_name)
+
+    # OK Vin Duder, when you get back tomorrow you can
+    # finish writing the rc_service.add_user or whatever
+    # in this method below, and test things out.
+    def on_move_student(self, event):
+        data = event.get("data")
+        slug = data.get("slug")
+        new_channel = data.get("to_room")
+        student = data.get("student")
+        channel_name = f"{new_channel}-{slug}"
+        # get rocketchat userid from self.models
+        rc_service.add_user_to_channel(user_id, channel_name)
 
 
 # TODO: in initialize_user method (or in the configureAula method) we need to make a main
@@ -18,15 +53,19 @@ def broadcast_to_aula(websocket_manager, event):
 
 
 class AulaService:
-    def __init__(self, models, on_change=None):
+    def __init__(self, models, schema, on_change=None):
         self.models = models
+        self.schema = schema
         self.on_change = on_change
 
     def initialize_aula_config(self, active_session_id, student_ids):
         student_objects = {}
         for student_id in student_ids:
-            student = self.models.User.query.filter_by(id=student_id).one()
-            student_objects[f"{student.firstname} {student.lastname}"] = {}
+            # this is actually stale/copied data because
+            # it's not retrieved until a student loads his or her aula.
+            # so let's store the pure user ID and then enrich it onload.
+            # where is it loaded from?
+            student_objects[student_id] = {}
 
         rooms = {
             "main": {
@@ -45,17 +84,34 @@ class AulaService:
         ac = self.models.AulaConfig.query.filter_by(
             active_session_id=int(active_session_id)
         ).one()
+        # bleeding back into needing to normalize everything
+        # but not really... users are the only non-ephemeral
+        # thing in this structure so far.
         return ac
+
+    def _enrich_userdata(self, rooms_config: dict) -> dict:
+        user_schema = self.schema.UserSchema()
+        rooms = rooms_config.keys()
+        for room in rooms:
+            students_in_room = rooms_config[room]["students"].keys()
+            for student_id in students_in_room:
+                student_user = self.models.User.query.filter_by(id=student_id).one()
+                user_dict = user_schema.dump(student_user)
+                rooms_config[room]["students"][student_id] = user_dict
+        return rooms_config
 
     def get_aula_config(self, active_session_id) -> dict:
         config_model = self._get_aula_config(active_session_id)
-        return config_model.config
+        aula_config = config_model.config
+        rooms_with_userdata = self._enrich_userdata(aula_config["rooms"])
+        aula_config["rooms"] = rooms_with_userdata
+        return aula_config
 
-    def create_room(self, active_session_id, room):
+    def create_room(self, active_session_id, room, slug):
         change_message = {
             "active_session_id": active_session_id,
             "action": "add_room",
-            "data": room
+            "data": {"room": room, "slug": slug}
         }
         self.on_change(change_message, )
 
@@ -64,7 +120,10 @@ class AulaService:
         empty_students = {"students": {}}
         aula_config.config["rooms"].update({room: empty_students})
         aula_config.add()
-        return aula_config.config
+        config = aula_config.config
+        rooms_with_userdata = self._enrich_userdata(config["rooms"])
+        config["rooms"] = rooms_with_userdata
+        return config
 
     def get_rooms(self, active_session_id):
         ac = self._get_aula_config(active_session_id)
@@ -76,21 +135,29 @@ class AulaService:
         for room in rooms:
             aula_config.config["rooms"].pop(room, None)
         aula_config.add()
-        return aula_config.config
+        config = aula_config.config
+        rooms_with_userdata = self._enrich_userdata(config["rooms"])
+        config["rooms"] = rooms_with_userdata
+        return config
 
     def add_student_to_main(self, active_session_id, student_name):
         aula_config = self._get_aula_config(active_session_id)
         aula_config.config = deepcopy(aula_config.config)
         aula_config.config["rooms"]["main"]["students"].update({student_name: {}})
         aula_config.add()
-        return aula_config.config
+        config = aula_config.config
+        rooms_with_userdata = self._enrich_userdata(config["rooms"])
+        config["rooms"] = rooms_with_userdata
+        return config
 
     def move_student(self, active_session_id, student, from_room, to_room):
         aula_config = self._get_aula_config(active_session_id)
-        aula_config.config = deepcopy(aula_config.config)
-        aula_config.config["rooms"][from_room]["students"].pop(student, None)
+        duped_config = deepcopy(aula_config.config)
+        duped_config["rooms"][from_room]["students"].pop(str(student), None)
         student_entry = {student: {}}
-        aula_config.config["rooms"][to_room]["students"].update(student_entry)
+        duped_config["rooms"][to_room]["students"].update(student_entry)
+        aula_config.config = duped_config
+        aula_config.add()
 
         change_message = {
             "active_session_id": active_session_id,
@@ -101,9 +168,13 @@ class AulaService:
                 "to_room": to_room
             }
         }
+
         self.on_change(change_message)
-        aula_config.add()
-        return aula_config.config
+
+        config = aula_config.config
+        rooms_with_userdata = self._enrich_userdata(config["rooms"])
+        config["rooms"] = rooms_with_userdata
+        return config
 
 
 class RPCExecutor:

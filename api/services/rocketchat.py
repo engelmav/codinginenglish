@@ -65,6 +65,9 @@ class RocketChatService:
             '/api/v1/users.list?fields={ "username":1 }&query={ "username": "%s" }' % username)
         return resp
 
+    def users(self):
+        return self._get("/api/v1/users.list")
+
     def create_user(self, username, name, email, password):
         resp = self._post('/api/v1/users.create',
                           json={

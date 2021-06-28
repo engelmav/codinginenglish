@@ -12,7 +12,7 @@ import _ from "lodash";
 import { readSocketDataAnd } from "../messaging";
 import { Link } from "react-router-dom";
 import { ReadAndDo } from "../messaging";
-import Dialog from "@material-ui/core/Dialog"
+import Dialog from "@material-ui/core/Dialog";
 
 const VideoCall = React.lazy(() => import("../VideoConference"));
 
@@ -22,14 +22,13 @@ const ChatSignIn = (props) => {
     const chatIframe = divRef.current.firstElementChild;
     chatIframe.addEventListener("load", function () {
       setTimeout(() => {
-        const result = this.contentWindow.postMessage(
+        this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
             token: props.appStore.rocketchatAuthToken,
           },
           "*"
         );
-        console.log("Result of contentWindow.postMessage:", result);
       }, 10000);
     });
   };
@@ -88,11 +87,12 @@ class Aula extends Component {
 
       rocketchatAuthToken: null,
       chatChannel: null,
+      videoChannel: null,
       prezzieLink: null,
       exerciseContent: null,
       onTop: null,
 
-      roomChangeNotification: null
+      roomChangeNotification: null,
     };
 
     this.setGuacViewerRef = (element) => {
@@ -106,6 +106,16 @@ class Aula extends Component {
     this.chatIframeRef = React.createRef();
   }
 
+  setChatChannel = (name) =>
+    this.setState({
+      chatChannel: `${name}-chat-${this.props.appStore.activeSessionSlug}`,
+    });
+  setVideoChannel = (name) => {
+    this.setState({
+      videoChannel: `${name}-video-${this.props.appStore.activeSessionSlug}`,
+    });
+  };
+
   async configureActiveSession() {
     const { appStore, cieApi, websocketManager } = this.props;
     const activeSessionData = await cieApi.getActiveSessionByUserId(
@@ -113,17 +123,12 @@ class Aula extends Component {
     );
     const activeSessionId = activeSessionData.data.id;
     appStore.activeSessionId = activeSessionId;
-
-    const {
-      chat_channel,
-      prezzie_link,
-      video_channel,
-    } = activeSessionData.data;
-
-    this.setState({
-      chatChannel: chat_channel,
-      prezzieLink: prezzie_link,
-      videoChannel: video_channel,
+    console.log("activeSessionData:", activeSessionData);
+    const { prezzie_link, slug } = activeSessionData.data;
+    appStore.activeSessionSlug = slug;
+    this.setState({ prezzieLink: prezzie_link }, () => {
+      this.setVideoChannel("main");
+      this.setChatChannel("main");
     });
 
     const aulaWebsocket = await websocketManager.createWebsocket(
@@ -132,9 +137,10 @@ class Aula extends Component {
     );
     const handleAulaMessage = (eventData) => {
       console.log("handleAuthMessage eventData:", eventData);
-      /**
-       * todo: handle the aulaconfig messages here.
-       */
+      if (eventData.hasOwnProperty("action")) {
+        this.handleAulaAction(eventData);
+        return;
+      }
       if (eventData.hasOwnProperty("command")) {
         const { name } = eventData.command;
         if (name === "SHOW_ACTIVITY_POPUP") {
@@ -150,12 +156,36 @@ class Aula extends Component {
     };
     const readAndDo = new ReadAndDo(handleAulaMessage);
     aulaWebsocket.addEventListener("message", readAndDo.read);
-    this.setState({ aulaWebsocket }, () => console.log("websocket set"));
+    this.setState({ aulaWebsocket });
   }
 
   componentDidMount() {
     this.configureActiveSession();
   }
+
+  handleAulaAction = (actionEvent) => {
+    const { appStore } = this.props;
+    console.log("event has student name", actionEvent.data.student);
+    if (
+      actionEvent.action === "move_student" &&
+      actionEvent.data.student === appStore.userId
+    ) {
+      const { to_room: newRoom } = actionEvent.data;
+      console.log("student move action");
+
+      document.addEventListener("acceptBreakout", () => {
+        this.setVideoChannel(newRoom);
+        this.setChatChannel(newRoom);
+        this.setState({ dialogOpen: false, roomChangeNotification: false });
+      });
+
+      this.openRoomChangePrompt(newRoom);
+    }
+  };
+  openRoomChangePrompt = async (roomName) => {
+    this.props.appStore.currentRoom = roomName;
+    this.setState({ dialogOpen: true, roomChangeNotification: true });
+  };
 
   toggleGuac = () => {
     this.setState({ guacWindow: !this.state.guacWindow });
@@ -208,13 +238,15 @@ class Aula extends Component {
       activityData,
       chatChannel,
       prezzieLink,
-      videoChannel,
-
+      mainVideoChannel,
+      currentRoomChannel,
       onTop,
       isWindowDragging,
 
-      roomChangeNotification
+      roomChangeNotification,
     } = this.state;
+
+    const derivedVideoChannel = currentRoomChannel || mainVideoChannel;
 
     const {
       toggleGuac,
@@ -348,7 +380,7 @@ class Aula extends Component {
             onMouseDown={() => this.handleWindowMove(chatWindowTop)}
             onDragStop={this.handleWindowRelease}
           >
-            <Window title="CIE Chat" onClose={toggleChat} />
+            <Window title={`CIE Chat (${chatChannel})`} onClose={toggleChat} />
             {isWindowDragging && <S.CoverWindowOnDrag />}
             <ChatSignIn appStore={this.props.appStore}>
               <Iframe
@@ -361,7 +393,7 @@ class Aula extends Component {
           </Rnd>
         )}
 
-        {videoWindow && videoChannel && videoEnabled && (
+        {videoWindow && derivedVideoChannel && videoEnabled && (
           <Rnd
             default={{
               x: 600,
@@ -378,7 +410,7 @@ class Aula extends Component {
             <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
                 participantName={appStore.firstName}
-                videoChannel={videoChannel}
+                videoChannel={derivedVideoChannel}
               />
             </Suspense>
           </Rnd>
@@ -431,26 +463,31 @@ class Aula extends Component {
             )}
           </Rnd>
         )}
-      <Dialog open={dialogOpen}>
-        {roomChangeNotification && 
-          <RoomChangeNotification appStore={appStore}/>
-        }
-      </Dialog>  
+        <Dialog open={dialogOpen}>
+          {roomChangeNotification && (
+            <RoomChangeNotification
+              appStore={appStore}
+              onAccept={this.moveToNewRoom}
+            />
+          )}
+        </Dialog>
       </S.ClassroomContainer>
     );
   }
 }
 
-const RoomChangeNotification = ({appStore}) => {
+const RoomChangeNotification = ({ appStore, onAccept }) => {
   const goToRoom = () => {
     console.log("pretend going to room");
-  }
+    const acceptBreakoutEvent = new Event("acceptBreakout");
+    document.dispatchEvent(acceptBreakoutEvent);
+  };
   return (
     <div>
       <p>You've been invited to breakout room {appStore.currentRoom}.</p>
       <Button onClick={goToRoom}>Take me there!</Button>
     </div>
-  )
-}
+  );
+};
 
 export { Aula };
