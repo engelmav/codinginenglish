@@ -4,23 +4,20 @@ from copy import deepcopy
 from pymitter import EventEmitter
 
 
-from events import WebsocketManager
-from services.rocketchat import RocketChatService
-
-aula_endpoints = blueprints.Blueprint("aula", url_prefix="/aula", import_name=__name__)
-LOG = logging.getLogger(__name__)
-
-
 class AulaActor:
     def __init__(self, websocket_manager, rc_service, models):
-        self.event_emitter =
         self.websocket_manager = websocket_manager
         self.rc_service = rc_service
         self.models = models
+        self.event_emitter = EventEmitter()
+        self.bind_events()
 
-    def handle_aula_events(self, event):
-        self.event_emitter.on("add_room", self.on_add_room)
-        self.event_emitter.on("move_student", self.on_move_student)
+    def emit_event(self, event):
+        self.event_emitter.emit(event.get("action"), event)
+
+    def bind_events(self):
+        self.event_emitter.on("aula.add_room", self.on_add_room)
+        self.event_emitter.on("aula.move_student", self.on_move_student)
         self.event_emitter.on_any(func=self.broadcast_to_aula)
 
     def broadcast_to_aula(self, event):
@@ -29,30 +26,28 @@ class AulaActor:
         aula_channel = f"aula-{active_session_id}"
         self.websocket_manager.broadcast(event, aula_channel)
 
-    def on_add_room(self,event):
+    def on_add_room(self, event):
         room_name = event.get("data").get("room")
         slug = event.get("data").get("slug")
         channel_name = f"{room_name}-{slug}"
-        self.rc_service.create_channel(channel_name)
+        res = self.rc_service.create_channel(channel_name)
+        LOG.info(f"Result of adding room:", res)
 
-    # OK Vin Duder, when you get back tomorrow you can
-    # finish writing the rc_service.add_user or whatever
-    # in this method below, and test things out.
     def on_move_student(self, event):
         data = event.get("data")
-        slug = data.get("slug")
-        new_channel = data.get("to_room")
-        student = data.get("student")
-        channel_name = f"{new_channel}-{slug}"
-        # get rocketchat userid from self.models
-        rc_service.add_user_to_channel(user_id, channel_name)
+        to_channel = data.get("to_room")
+        from_channel = data.get("from_room")
+        student_id = data.get("student")
+        user = self.models.User.query.filter_by(id=student_id)
+        self.rc_service.remove_user_from_channel(user.rocketchat_id, from_channel)
+        self.rc_service.add_user_to_channel(user.rocketchat_id, to_channel)
 
 
 # TODO: in initialize_user method (or in the configureAula method) we need to make a main
 # room and put the students in it
 
 
-class AulaService:
+class AulaDataService:
     def __init__(self, models, schema, on_change=None):
         self.models = models
         self.schema = schema
@@ -110,15 +105,16 @@ class AulaService:
     def create_room(self, active_session_id, room, slug):
         change_message = {
             "active_session_id": active_session_id,
-            "action": "add_room",
+            "action": "aula.add_room",
             "data": {"room": room, "slug": slug}
         }
-        self.on_change(change_message, )
+        self.on_change(change_message)
 
         aula_config = self._get_aula_config(active_session_id)
-        aula_config.config = deepcopy(aula_config.config)
+        duped_config = deepcopy(aula_config.config)
         empty_students = {"students": {}}
-        aula_config.config["rooms"].update({room: empty_students})
+        duped_config["rooms"].update({room: empty_students})
+        aula_config.config = duped_config
         aula_config.add()
         config = aula_config.config
         rooms_with_userdata = self._enrich_userdata(config["rooms"])
@@ -161,7 +157,7 @@ class AulaService:
 
         change_message = {
             "active_session_id": active_session_id,
-            "action": "move_student",
+            "action": "aula.move_student",
             "data": {
                 "student": student,
                 "from_room": from_room,
@@ -214,6 +210,10 @@ class RPCExecutor:
                                 is_terminal=is_last_line)
             if is_last_line:
                 return result
+
+
+aula_endpoints = blueprints.Blueprint("aula", url_prefix="/aula", import_name=__name__)
+LOG = logging.getLogger(__name__)
 
 
 def create_aula_endpoints(aula_service, websocket_manager):

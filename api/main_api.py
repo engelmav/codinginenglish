@@ -8,7 +8,7 @@ from flask import Flask, jsonify, request
 from flask_sockets import Sockets
 from sqlalchemy import func
 
-from aula.aula import AulaService
+from aula.aula import AulaDataService
 from database.models import Models
 from events import StudentSessionService, WebsocketManager
 from config import config
@@ -40,7 +40,7 @@ def create_main_api(publish_message,
                     db_session,
                     models: Models,
                     schema: Schema,
-                    aula_service: AulaService,
+                    aula_service: AulaDataService,
                     rc_service: RocketChatService,
                     blueprints,
                     websocket_manager: WebsocketManager):

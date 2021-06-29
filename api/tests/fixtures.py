@@ -9,7 +9,7 @@ from api.database.providers import base_provider
 import fakeredis
 from api.services.cie import UserService, ModuleService
 from api.events import StudentSessionService, WebsocketManager
-from aula.aula import create_aula_endpoints, AulaService
+from aula.aula import create_aula_endpoints, AulaDataService
 from database.handlers import init_db
 
 from database.models import model_factory
@@ -109,7 +109,7 @@ def make_test_app(upcoming_sessions, db_engine=None) -> TestApp:
     def broadcast_to_websocket(event):
         print(event)
 
-    aula_service = AulaService(models, on_change=broadcast_to_websocket)
+    aula_service = AulaDataService(models, on_change=broadcast_to_websocket)
     websocket_manager = WebsocketManager(fake_redis)
     aula_endpoints = create_aula_endpoints(aula_service, websocket_manager)
     blueprints = [

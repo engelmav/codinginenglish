@@ -1,4 +1,4 @@
-from aula.aula import create_aula_endpoints, AulaService, broadcast_to_aula, on_add_room, AulaActor
+from aula.aula import create_aula_endpoints, AulaDataService, AulaActor
 from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
@@ -13,7 +13,6 @@ from rest_schema import schema_factory
 from services.auth import AuthService
 from services.cie import UserService, ModuleService
 from services.rocketchat import RocketChatService
-from functools import partial
 
 
 """
@@ -40,7 +39,7 @@ websocket_manager = WebsocketManager(red)
 rc_service = RocketChatService()
 
 aula_actor = AulaActor(websocket_manager, rc_service, models)
-aula_service = AulaService(models, schema, on_change=aula_actor.handle_aula_events)
+aula_service = AulaDataService(models, schema, on_change=aula_actor.emit_event)
 aula_endpoints = create_aula_endpoints(aula_service, websocket_manager)
 auth_service = AuthService()
 payment_api = create_payment_api(auth_service, module_service, user_service)

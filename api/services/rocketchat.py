@@ -133,3 +133,16 @@ class RocketChatService:
                           {"roomName": channel_name})
         return resp
 
+    def channel_info(self, channel_name):
+        resp = self._post('/api/v1/channels.delete',
+                          {"roomName": channel_name})
+        return resp
+
+    def remove_user_from_channel(self, user_id, channel_id=None, channel_name=None):
+        if channel_id is None and channel_name:
+            channel_info = self.channel_info(channel_name)
+            channel_id = channel_info.get("channelId")
+
+        resp = self._post('/api/v1/channels.kick',
+                          {"roomId": channel_id, "userId": user_id})
+        return resp
