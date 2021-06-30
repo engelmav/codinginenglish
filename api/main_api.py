@@ -199,7 +199,7 @@ def create_main_api(publish_message,
         if first_active_session:
             latest_pk = 0
         active_sesssion_slug = f"{session_id}-{int(latest_pk) + 1}"
-        chat_channel = f"main-chat-{active_sesssion_slug}"
+        chat_channel = f"main-{active_sesssion_slug}"
         try:
             _as = models.ActiveSession(
                 is_active=True,

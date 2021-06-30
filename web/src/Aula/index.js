@@ -108,7 +108,7 @@ class Aula extends Component {
 
   setChatChannel = (name) =>
     this.setState({
-      chatChannel: `${name}-chat-${this.props.appStore.activeSessionSlug}`,
+      chatChannel: `${name}-${this.props.appStore.activeSessionSlug}`,
     });
   setVideoChannel = (name) => {
     this.setState({
@@ -165,9 +165,9 @@ class Aula extends Component {
 
   handleAulaAction = (actionEvent) => {
     const { appStore } = this.props;
-    console.log("event has student name", actionEvent.data.student);
+    console.log("action event:", actionEvent);
     if (
-      actionEvent.action === "move_student" &&
+      actionEvent.action === "aula.move_student" &&
       actionEvent.data.student === appStore.userId
     ) {
       const { to_room: newRoom } = actionEvent.data;

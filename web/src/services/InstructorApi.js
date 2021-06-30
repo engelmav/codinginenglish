@@ -35,11 +35,11 @@ class InstructorApi {
     ];
     return await this._call(command);
   }
-  async moveStudent(activeSessionId, studentId, fromRoomName, toRoomName) {
+  async moveStudent(activeSessionId, studentId, fromRoomName, toRoomName, slug) {
     const command = [
       {
         method: "aula.move_student",
-        params: [activeSessionId, studentId, fromRoomName, toRoomName],
+        params: [activeSessionId, studentId, fromRoomName, toRoomName, slug],
       },
     ];
     return await this._call(command);

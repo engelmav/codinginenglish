@@ -235,7 +235,8 @@ const StudentList = observer(({ appStore, instructorApi }) => {
           appStore.activeSessionId,
           params.row.id,
           currentRoom,
-          toRoomName
+          toRoomName,
+          appStore.activeSessionSlug
         );
         ipStore.setAulaConfig(newAulaConfig);
       };

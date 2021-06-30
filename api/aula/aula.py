@@ -38,9 +38,13 @@ class AulaActor:
         to_channel = data.get("to_room")
         from_channel = data.get("from_room")
         student_id = data.get("student")
-        user = self.models.User.query.filter_by(id=student_id)
-        self.rc_service.remove_user_from_channel(user.rocketchat_id, from_channel)
-        self.rc_service.add_user_to_channel(user.rocketchat_id, to_channel)
+        slug = data.get("slug")
+        from_room_name = f"{from_channel}-{slug}"
+        to_room_name = f"{to_channel}-{slug}"
+        user = self.models.User.query.filter_by(id=student_id).one()
+        remove_res = self.rc_service.remove_user_from_channel(user.rocketchat_id, channel_name=from_room_name)
+        add_res = self.rc_service.add_user_to_channel(user.rocketchat_id, channel_name=to_room_name)
+        LOG.debug(f"User channel add result: {add_res}")
 
 
 # TODO: in initialize_user method (or in the configureAula method) we need to make a main
@@ -146,7 +150,7 @@ class AulaDataService:
         config["rooms"] = rooms_with_userdata
         return config
 
-    def move_student(self, active_session_id, student, from_room, to_room):
+    def move_student(self, active_session_id, student, from_room, to_room, slug):
         aula_config = self._get_aula_config(active_session_id)
         duped_config = deepcopy(aula_config.config)
         duped_config["rooms"][from_room]["students"].pop(str(student), None)
@@ -161,7 +165,8 @@ class AulaDataService:
             "data": {
                 "student": student,
                 "from_room": from_room,
-                "to_room": to_room
+                "to_room": to_room,
+                "slug": slug
             }
         }
 

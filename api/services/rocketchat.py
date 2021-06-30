@@ -114,7 +114,7 @@ class RocketChatService:
                           {"name": channel_name, "members": members})
         return resp
 
-    def add_user_to_channel(self, user_id, channel_id):
+    def add_user_to_channel(self, user_id, channel_id=None, channel_name=None):
         """
         curl -H "X-Auth-Token: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq" \
         -H "X-User-Id: aobEdbYhXfu5hkeqG" \
@@ -124,6 +124,9 @@ class RocketChatService:
         :param users:
         :return:
         """
+        if channel_id is None and channel_name:
+            channel_info = self.channel_info(channel_name)
+            channel_id = channel_info.get("channelId")
         resp = self._post('/api/v1/channels.invite',
                           {"roomId": channel_id, "userId": user_id})
         return resp
@@ -134,7 +137,7 @@ class RocketChatService:
         return resp
 
     def channel_info(self, channel_name):
-        resp = self._post('/api/v1/channels.delete',
+        resp = self._get('/api/v1/channel.info',
                           {"roomName": channel_name})
         return resp
 
