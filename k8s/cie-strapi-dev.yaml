@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strapi-deployment
+  labels:
+    app: strapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strapi
+  template:
+    metadata:
+      labels:
+        app: strapi
+    spec:
+      containers:
+      - name: strapi
+        image: strapi/strapi:latest
+        env:
+        - name: DATABASE_CLIENT
+          value: "mysql"
+        - name: DATABASE_NAME
+          value: "strapi"
+        - name: DATABASE_HOST
+          value: "cie-db.default.svc.cluster.local"
+        - name: DATABASE_PORT
+          value: "3306"
+        - name: DATABASE_USERNAME
+          value: "strapiuser"
+        - name: DATABASE_PASSWORD
+          value: "strapiuser"
+        - name: DATABASE_SSL
+          value: "false"
+        ports:
+        - containerPort: 1337
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strapi-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 1337
+  selector:
+    app: strapi
