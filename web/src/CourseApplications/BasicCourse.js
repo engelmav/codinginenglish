@@ -209,8 +209,8 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
         <i>del 20 septiembre al 20 diciembre</i>
       </P>
       <Timeline>
-        <ul class="timeline">
-          <li class="active-tl">Solicitud</li>
+        <ul className="timeline">
+          <li className="active-tl">Solicitud</li>
           <li>Entrevista</li>
           <li>Matrícula</li>
         </ul>
@@ -255,12 +255,12 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
               setFieldValue,
             }) => (
               <Form onSubmit={handleSubmit}>
-                {basicCourseForm.map((field) => {
+                {basicCourseForm.map((field, idx) => {
                   const { fieldName } = field;
                   if (field.fieldType === "shortAnswer") {
                     return (
                       <>
-                        <FieldLabel htmlFor={field.title}>
+                        <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
                         </FieldLabel>
                         <TextInput
@@ -290,7 +290,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                   if (field.fieldType === "email") {
                     return (
                       <>
-                        <FieldLabel htmlFor={field.title}>
+                        <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
                         </FieldLabel>
                         <TextInput
@@ -317,12 +317,12 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                   if (field.fieldType === "multipleChoice") {
                     return (
                       <>
-                        <FieldLabel htmlFor={field.title}>
+                        <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
                         </FieldLabel>
-                        {field.choices.map((choice) => {
+                        {field.choices.map((choice, idx) => {
                           return (
-                            <MultiLabel>
+                            <MultiLabel key={idx}>
                               <Field
                                 type="radio"
                                 name={fieldName}
@@ -346,9 +346,9 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                         <FieldLabel htmlFor={field.title}>
                           {field.title}
                         </FieldLabel>
-                        {field.choices.map((choice) => {
+                        {field.choices.map((choice, idx) => {
                           return (
-                            <MultiLabel>
+                            <MultiLabel key={idx}>
                               <Field type="checkbox" name={choice} />
                               {choice}
                             </MultiLabel>
@@ -365,7 +365,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                   if (field.fieldType === "paragraph") {
                     return (
                       <>
-                        <FieldLabel htmlFor={field.title}>
+                        <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
                         </FieldLabel>
                         <TextInput
