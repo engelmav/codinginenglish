@@ -24,11 +24,6 @@ import ReactGA from "react-ga";
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
-ReactGA.event({
-  category: "Sign Up",
-  action: "User pressed the big blue sign up button",
-});
-
 const ApplicationSchema = Yup.object().shape({
   fullName: Yup.string()
     .min(2, "Muy corto!")
@@ -47,10 +42,8 @@ const ApplicationSchema = Yup.object().shape({
     "Por favor elige unas horas"
   ),
   location: Yup.string()
-  .min(1, "Muy corto!")
-  .required(
-    "Favor de decirnos el pais y la ciudad en que resides"
-  ),
+    .min(1, "Muy corto!")
+    .required("Favor de decirnos el pais y la ciudad en que resides"),
 });
 
 const MultiLabel = styled.label`
@@ -425,7 +418,17 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                     <div style={{ color: "white" }}>empty</div>
                   )}
                 </>
-                <Button type="submit">Submit</Button>
+                <Button
+                  type="submit"
+                  onClick={() =>
+                    ReactGA.event({
+                      category: "appliedCat",
+                      action: `userApplied`,
+                    })
+                  }
+                >
+                  Submit
+                </Button>
               </Form>
             )}
           </Formik>

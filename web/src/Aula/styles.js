@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import React from "react";
+import { HiUserGroup } from "@react-icons/all-files/hi/HiUserGroup";
+
 
 export const ClassroomContainer = styled.div`
   display: flex;
@@ -19,9 +20,7 @@ export const ClassroomHeader = styled.div`
 export const Taskbar = styled.div`
   display: inline;
   border-radius: 3px;
-  margin-top: 3px;
   margin-left: 3px;
-  padding: 4px;
 `;
 
 export const CoverWindowOnDrag = styled.div`
@@ -31,3 +30,13 @@ export const CoverWindowOnDrag = styled.div`
   position: absolute;
   background-color: lightGray;
 `;
+
+export const RoomStatus = styled.div`
+  color: white;
+`
+
+export const GroupIcon = styled(HiUserGroup)`
+  color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+`

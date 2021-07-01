@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: strapi
+    statefulset.kubernetes.io/pod-name: strapi-deployment-0
+  name: strapi-deployment-0
+  namespace: default
+spec:
+  containers:
+  - env:
+    - name: DATABASE_CLIENT
+      value: mysql
+    - name: DATABASE_NAME
+      value: strapi
+    - name: DATABASE_HOST
+      value: cie-db.default.svc.cluster.local
+    - name: DATABASE_PORT
+      value: "3306"
+    - name: DATABASE_USERNAME
+      value: strapiuser
+    - name: DATABASE_PASSWORD
+      value: strapiuser
+    - name: DATABASE_SSL
+      value: "false"
+    image: strapi/strapi:latest
+    imagePullPolicy: Always
+    name: strapi
+    ports:
+    - containerPort: 1337
+      protocol: TCP
+    volumeMounts:
+    - mountPath: /srv/app
+      name: strapi-pvc
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-hgxgj
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: strapi-deployment-0
+  nodeName: cie-nyc-k8s-cluster-pool-30mnf
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  subdomain: strapi-system
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: strapi-pvc
+    persistentVolumeClaim:
+      claimName: strapi-pvc-strapi-deployment-0
+  - name: default-token-hgxgj
+    secret:
+      defaultMode: 420
+      secretName: default-token-hgxgj

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Jutsu } from "./jitsiReact";
 
-const room = "cie";
 const password = "hardcodednonsense";
-const VideoCall = (props) => {
-  const { participantName, videoChannel } = props;
+const VideoCall = ({ participantName, videoChannel }) => {
+  console.log("videoChannel:", videoChannel)
+  useEffect(() => {}, [participantName, videoChannel]);
   return (
     <Jutsu
       roomName={videoChannel}

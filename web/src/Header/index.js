@@ -98,23 +98,6 @@ const NavbarList = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
-const GradualLi = styled.li`
-  .my-node-enter {
-    opacity: 0;
-  }
-  .my-node-enter-active {
-    opacity: 1;
-    transition: opacity 200ms;
-  }
-  .my-node-exit {
-    opacity: 1;
-  }
-  .my-node-exit-active {
-    opacity: 0;
-    transition: opacity 200ms;
-  }
-`;
-
 const LinkButton = styled(Link)`
   overflow: auto;
   font-size: 13.3333px;

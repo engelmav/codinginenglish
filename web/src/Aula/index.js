@@ -238,15 +238,12 @@ class Aula extends Component {
       activityData,
       chatChannel,
       prezzieLink,
-      mainVideoChannel,
-      currentRoomChannel,
+      videoChannel,
       onTop,
       isWindowDragging,
 
       roomChangeNotification,
     } = this.state;
-
-    const derivedVideoChannel = currentRoomChannel || mainVideoChannel;
 
     const {
       toggleGuac,
@@ -263,7 +260,9 @@ class Aula extends Component {
     const chatWindowTop = "chatWindow";
     const activityWindowOnTop = "activityWindow";
 
-    const videoEnabled = false;
+    const videoEnabled = true;
+
+    const showVideo = videoWindow && videoEnabled && videoChannel;
 
     const dialogOpen = roomChangeNotification; // && concatenate
     return (
@@ -276,6 +275,7 @@ class Aula extends Component {
               src={`${settings.assets}/cie-logo-horizontal-black.png`}
             ></img>
           </Link>
+          <S.RoomStatus><S.GroupIcon />{appStore.currentRoom || "main"}</S.RoomStatus>
           <S.Taskbar>
             {!slidesWindow && (
               <Button mr={2} onClick={this.toggleSlides}>
@@ -393,7 +393,7 @@ class Aula extends Component {
           </Rnd>
         )}
 
-        {videoWindow && derivedVideoChannel && videoEnabled && (
+        {showVideo && (
           <Rnd
             default={{
               x: 600,
@@ -409,8 +409,9 @@ class Aula extends Component {
             {isWindowDragging && <S.CoverWindowOnDrag />}
             <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
+                key={videoChannel}
                 participantName={appStore.firstName}
-                videoChannel={derivedVideoChannel}
+                videoChannel={videoChannel}
               />
             </Suspense>
           </Rnd>

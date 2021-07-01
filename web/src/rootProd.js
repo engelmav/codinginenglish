@@ -2,8 +2,8 @@ import { App as _App } from "./App";
 import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
 import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
 import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
-import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
-import { Aula as _Classroom } from "./Aula";
+// import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
+// import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
@@ -19,7 +19,7 @@ import { Home as _Home } from "./Home";
 import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
 import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { AboutUs } from "./AboutUs";
-import { BasicCourseForm as _Application} from "./CourseApplications/BasicCourse"
+import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -27,6 +27,10 @@ import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
 import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
+import React from "react";
+
+const _Classroom = React.lazy(() => import("./Aula"));
+const _Collab = React.lazy(() => import("./PopupActivity/Collab/Collab"));
 
 var log = console.log;
 
@@ -78,7 +82,10 @@ export function main(appStore) {
     );
     const studentSessionMgr = new StudentSessionManager(websocket);
     studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
-    console.log("initializedUser.data.has_session_in_progress:", initializedUser.data.has_session_in_progress)
+    console.log(
+      "initializedUser.data.has_session_in_progress:",
+      initializedUser.data.has_session_in_progress
+    );
     appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
     studentSessionMgr.initialize();
     history.push("/my-dashboard");
@@ -106,7 +113,10 @@ export function main(appStore) {
 
   /** Configure Aula */
   const instructorApi = new InstructorApi();
-  const InstructorPanel = compose(_InstructorPanel, { appStore, instructorApi });
+  const InstructorPanel = compose(_InstructorPanel, {
+    appStore,
+    instructorApi,
+  });
   const Collab = compose(_Collab, { cieApi, appStore });
   const MultipleChoice = compose(_MultipleChoice, { cieApi });
   const DragToImageCollab = compose(_DragToImageCollab, {
@@ -143,7 +153,7 @@ export function main(appStore) {
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
-  const CollabEditor = compose(_Collab, { appStore, editorMode: true })
+  const CollabEditor = compose(_Collab, { appStore, editorMode: true });
   const routesProps = {
     appStore,
     auth,
