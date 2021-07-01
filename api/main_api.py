@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from flask_sockets import Sockets
 from sqlalchemy import func
 
+from aula.aula import AulaDataService
 from database.models import Models
 from events import StudentSessionService, WebsocketManager
 from config import config
@@ -18,6 +19,8 @@ import logging
 
 from rest_schema import Schema
 from services.rocketchat import RocketChatService
+
+import requests
 
 LOG = logging.getLogger(__name__)
 app = Flask(__name__)
@@ -37,11 +40,13 @@ def create_main_api(publish_message,
                     db_session,
                     models: Models,
                     schema: Schema,
+                    aula_service: AulaDataService,
                     rc_service: RocketChatService,
-                    payment_api,
+                    blueprints,
                     websocket_manager: WebsocketManager):
 
-    app.register_blueprint(payment_api)
+    for blueprint in blueprints:
+        app.register_blueprint(blueprint)
 
     @app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -53,7 +58,7 @@ def create_main_api(publish_message,
         command = request.get_json()
         channels = command.get("command").get("channels")
         # # we are doing this twice to clean up control characters
-        command_str = json.dumps(command)
+        message = json.dumps(command)
 
         """
         while not ws.closed:
@@ -70,7 +75,7 @@ def create_main_api(publish_message,
         resp_code = 200
         for channel in channels:
             try:
-                res = websocket_manager.channels[channel].publish_to_redis(command_str)
+                res = websocket_manager.broadcast(message, channel)
                 results.append[res]
             except KeyError:
                 messages.append(f"Channel {channel} is not currently registered in the WebsocketManager")
@@ -78,10 +83,8 @@ def create_main_api(publish_message,
                 resp_code = 500
         return make_response(dict(status=status, messages=messages, data=results), resp_code)
 
-
-
     @sockets.route("/ws/stream")
-    def websocket(ws):
+    def initialize_websocket_connection(ws):
         # the below line is executed when this endpoint is hit, and this endpoint is hit
         # only when opening a new websocket connection.
         websocket_manager.initialize_socket(ws)
@@ -196,25 +199,29 @@ def create_main_api(publish_message,
         if first_active_session:
             latest_pk = 0
         active_sesssion_slug = f"{session_id}-{int(latest_pk) + 1}"
-        chat_channel = f"cie-chat-{active_sesssion_slug}"
+        chat_channel = f"main-{active_sesssion_slug}"
         try:
             _as = models.ActiveSession(
                 is_active=True,
                 module_session_id=session_id,
-                video_channel=f"codinginenglish-video-{active_sesssion_slug}",
+                video_channel=f"main-video-{active_sesssion_slug}",
                 prezzie_link=prezzie_link,
-                chat_channel=chat_channel
+                chat_channel=chat_channel,
+                slug=active_sesssion_slug
             )
             _as.add()
             as_schema = schema.ActiveSessionSchema()
-            created_as = as_schema.dump(_as)
-            data["active_session"] = created_as
+            active_session_json = as_schema.dump(_as)
+            data["active_session"] = active_session_json
             messages.append(f"Created ActiveSession with id {_as.id}")
         except Exception:
             LOG.error("Failed to create ActiveSession in database.", exc_info=True)
             messages.append("An error occurred adding the ActiveSession: please check logs.")
             make_response(dict(status="error", messages=messages))
 
+        initial_aula_config = aula_service.initialize_aula_config(_as.id, student_ids)
+        acs = schema.AulaConfigSchema()
+        data["aula_config"] = acs.dump(initial_aula_config)
         created_uas = []
         uas_schema = schema.UserActiveSessionSchema()
         for user_id in teacher_ids + student_ids:
@@ -225,6 +232,7 @@ def create_main_api(publish_message,
             uas.add()
             created_uas.append(uas_schema.dump(uas))
         data["user_active_sessions"] = created_uas
+        data["active_session_slug"] = active_sesssion_slug
         response = make_response(
             dict(status="success", messages=messages, data=data), 200)
         return response
@@ -235,8 +243,10 @@ def create_main_api(publish_message,
                .join(models.ActiveSession, models.ActiveSession.is_active == True)
                .filter(models.UserActiveSession.user_id == user_id)
                .one())
-
         _schema = schema.ActiveSessionSchema()
+        user = models.User.query.filter_by(id=user_id).one()
+        user_schema = schema.UserSchema()
+        user_serialized = user_schema.dumps(user)
         serialized = _schema.dump(uas.active_session)
         LOG.debug(f"Returning active session: {serialized}")
         return jsonify(
@@ -324,11 +334,11 @@ def create_main_api(publish_message,
         email = id_token_payload.get("email")
 
         auth0_access_token = req["accessToken"]
-        _user = user_service.create_user(email, first_name=given_name, last_name=family_name)
 
         messages = []
         try:
             auth0_login_resp = rc_service.login_with_auth0(auth0_access_token, config.get("cie.auth0.secretkey"))
+            rc_user_id = auth0_login_resp.get("data").get("userId")
             rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
             messages.append("Retrieved RocketChat auth token.")
         except Exception as e:
@@ -336,6 +346,7 @@ def create_main_api(publish_message,
             LOG.error(f"Error creating or logging in user {e}", exc_info=True)
             return make_response(dict(messages=messages, status="error"), 500)
 
+        _user = user_service.create_user(email, first_name=given_name, last_name=family_name, rocketchat_id=rc_user_id)
         messages.append("Stored Rocketchat auth token in session successfully.")
 
         user_id = _user.id
@@ -356,7 +367,11 @@ def create_main_api(publish_message,
             student_session_service.notify_on_session_start(session_id, session_start_dt)
         messages.append("Initialized user successfully.")
         user_schema = schema.UserSchema()
-        payload = dict(user=user_schema.dump(_user), has_session_in_progress=has_session_in_progress,
+        user_payload = user_schema.dump(_user)
+        # TODO https://github.com/engelmav/codinginenglish/issues/110
+        if email.startswith("vincent.engelmann1@"):
+            user_payload["role"] = "instructor"
+        payload = dict(user=user_payload, has_session_in_progress=has_session_in_progress,
                        rocketchat_auth_token=rocketchat_auth_token)
         resp = make_response(dict(status="success", data=payload, messages=messages), 200)
         return resp
@@ -429,6 +444,59 @@ def create_main_api(publish_message,
         student_session_service.notify_on_session_start(session_id, session_start_dt)
 
         return serialize(user_reg, schema.UserModuleRegistrationSchema)
+
+    @app.route("/api/student-application", methods=["POST"])
+    def save_student_application():
+        app_json = request.get_json()
+        LOG.info(f"storing user application {app_json}")
+        student_app = models.StudentApplication(
+            app=app_json
+        )
+        student_app.add()
+        LOG.info(f"application stored successfully")
+        return jsonify(dict(
+                data={},
+                status="success",
+                messages=["Successfully submitted student application."]
+            ))
+
+    blacklist = [
+        "192.168",
+        # "127.0.0.1"
+    ]
+
+    def ip_blacklisted(addr):
+        for item in blacklist:
+            if item in addr:
+                return True
+        return False
+
+    @app.route("/api/applicant-location")
+    def get_location():
+        data = {}
+        messages = []
+        status = "error"
+        http_x_forwarded_host = request.headers.environ["HTTP_X_FORWARDED_FOR"]
+        LOG.info(f"Got http_x_forwarded_host {http_x_forwarded_host}")
+        ip_addr = http_x_forwarded_host
+
+        if ip_blacklisted(ip_addr):
+            return jsonify(dict(data={}, status="error", messages=[f"ip {ip_addr} is blacklisted"]))
+        try:
+            resp = requests.get(f"http://api.ipstack.com/{ip_addr}?access_key=1cf9eb6bbf475a26fb0ad4ed4ece272e")
+            status = "success"
+            data = resp.json()
+            messages.append("retrieved user location")
+        except:
+            messages.append("failed to retrieve user location")
+            LOG.error(f"failed to retrieve user location for ip {ip_addr}", exc_info=True)
+
+        return jsonify(dict(
+            data=data,
+            status=status,
+            messages=messages
+        ))
+
 
     @app.route("/api/site-map")
     def site_map():

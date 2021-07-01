@@ -1,5 +1,6 @@
 import pytz
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Text
+from sqlalchemy.dialects.mysql.json import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -11,13 +12,17 @@ class Models:
                  _UserModuleRegistration,
                  _User,
                  _ActiveSession,
-                 _UserActiveSession):
+                 _UserActiveSession,
+                 _AulaConfig,
+                 _StudentApplication):
         self.CieModule = _CieModule
         self.ModuleSession = _ModuleSession
         self.UserModuleRegistration = _UserModuleRegistration
         self.User = _User
         self.ActiveSession = _ActiveSession
         self.UserActiveSession = _UserActiveSession
+        self.AulaConfig = _AulaConfig
+        self.StudentApplication = _StudentApplication
 
 
 def model_factory(Base):
@@ -67,10 +72,13 @@ def model_factory(Base):
     class User(Base):
         __tablename__ = 'users'
         id = Column(Integer, primary_key=True)
-        firstname: Column = Column(String(50))
+        firstname = Column(String(50))
         lastname = Column(String(50))
         fullname = Column(String(120))
         email = Column(String(120), unique=True)
+        rocketchat_id = Column(Text)
+        nickname = Column(Text)
+        # TODO: add nickname
         registered_modules = relationship(
             'UserModuleRegistration',
             backref='User',
@@ -89,6 +97,7 @@ def model_factory(Base):
         chat_channel = Column(Text)
         prezzie_link = Column(Text)
         video_channel = Column(Text)
+        slug = Column(Text)
         is_active = Column(Boolean)
 
     class UserActiveSession(Base):
@@ -98,13 +107,26 @@ def model_factory(Base):
         active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
         active_session = relationship('ActiveSession')
 
+    class AulaConfig(Base):
+        __tablename__ = 'aula_config'
+        id = Column(Integer, primary_key=True)
+        active_session_id = Column(Integer, ForeignKey('active_sessions.id'))
+        config = Column(JSON)
+
+    class StudentApplication(Base):
+        __tablename__ = 'student_applications'
+        id = Column(Integer, primary_key=True)
+        app = Column(JSON)
+
     models = Models(
         CieModule,
         ModuleSession,
         UserModuleRegistration,
         User,
         ActiveSession,
-        UserActiveSession)
+        UserActiveSession,
+        AulaConfig,
+        StudentApplication)
     return models
 
 

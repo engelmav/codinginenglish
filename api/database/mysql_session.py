@@ -22,7 +22,7 @@ def get_conn():
             host=db_host,
             port=3306,
             database="cie")
-    except Exception:
+    except Exception as ex:
         LOG.error("Could not connect to database. See exception below.", exc_info=True)
     return cnx
 

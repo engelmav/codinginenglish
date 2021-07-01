@@ -13,11 +13,17 @@ configure({
 });
 
 class AppStore {
+  activeSessionId = null;
+  activeSessionSlug = null;
+  applicationOpen = true;
   isAuthenticated = false;
   loginExpiresAt = null;
   authData = null;
   userId = null;
+  userRole = null;
+  userLocation = null;
   firstName = null;
+  lastName = null;
   email = null;
   registeredSessions = [];
   sessionInProgress = false;
@@ -43,14 +49,22 @@ class AppStore {
     this.email = email;
 
     // TODO: perform official reconciliation of two user sources
-    const { firstname } = storedUser;
-    this.firstName = given_name || firstname;
-    this.userId = storedUser.id;
+    const { firstname, lastname, id, role } = storedUser;
+    this.firstName = firstname;
+    this.lastName = lastname;
+    this.userId = id;
+    console.log("stored user object:", storedUser)
+    this.userRole = role;
+
     this.rocketchatAuthToken = rcAuthToken;
   }
 
   @action setFirstname(firstname) {
     this.firstName = firstname;
+  }
+
+  @action setUserRole(role){
+    this.userRole = role;
   }
 
   setSessionInProgress(isInProgress) {
@@ -78,10 +92,12 @@ export const makeAppStore = (appStoreName = "default") => {
   return persistence({
     name: `AppStore.${appStoreName}`,
     properties: [
+      "activeSessionId",
       "isAuthenticated",
       "loginExpiresAt",
       "authData",
       "userId",
+      "userRole",
       "firstName",
       "email",
       "registeredSessions",

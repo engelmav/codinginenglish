@@ -8,7 +8,6 @@ import {
   OBJ_MOD_EVENT,
   OBJ_DEL_EVENT,
 } from "./Collab";
-import { Technique } from "../../Technique/Technique";
 
 export class CanvasWebsocketHandler {
   /**

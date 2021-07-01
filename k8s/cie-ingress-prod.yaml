@@ -12,6 +12,7 @@ metadata:
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/nickname: "cie-ingress"
 spec:
   tls:
   - hosts:
@@ -21,6 +22,7 @@ spec:
     - remote-admin.codinginenglish.com
     - chat.codinginenglish.com
     - ws.codinginenglish.com
+    - content.codinginenglish.com
     secretName: cie-tls
   rules:
   - host: www.codinginenglish.com
@@ -62,4 +64,12 @@ spec:
         backend:
           serviceName: cie-web
           servicePort: 80
+  - host: content.codinginenglish.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: strapi-service
+          servicePort: 80
+
 

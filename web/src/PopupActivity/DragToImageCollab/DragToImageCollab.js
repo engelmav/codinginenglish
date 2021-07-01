@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 import styled from "styled-components";
-import { drawCanvas } from "./canvasUtil";
+// import { drawCanvas } from "./canvasUtil";
 
 const S = {
   canvas: styled.div`
@@ -16,11 +16,11 @@ export const DragToImageCollab = ({
   model,
   settings,
   websocket,
-  activeSessionId,
-  createWebsocket,
 }) => {
   useEffect(() => {
     async function init() {
+      const module = await import(/* webpackChunkName: "canvasUtil" */ './canvasUtil');
+      const drawCanvas = module.drawCanvas;
       await drawCanvas(model, settings, websocket, appStore.userId);
     }
     init();

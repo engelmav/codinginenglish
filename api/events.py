@@ -200,7 +200,18 @@ class StudentSessionService:
             time.sleep(2)
 
 
+class WSClient:
+    """Simple wrapper to associate a client_id to the websocket to prevent recursive websockets."""
+    def __init__(self, websocket: WebSocket, client_id):
+        self.websocket = websocket
+        self.client_id = client_id
+
+
 class WebsocketManager:
+    """
+    Interface that initializes WSClients and sets up their channels with the MessagingBackend.
+    Acts as a proxy for sending messages through MessagingBackend and out to connected WSClients.
+    """
     def __init__(self, redis):
         self.redis = redis
         self.channels = {}
@@ -225,9 +236,9 @@ class WebsocketManager:
         self.join_or_create(websocket, channel, client_id)
 
     def join_or_create(self, ws_client, channel_name, client_id=None):
-        # A WSM has many channels
-        # a channel has a backend (pubsub)
-        # a channel has many clients
+        # A WebsocketManager has many channels
+        #   * a channel has a backend (pubsub)
+        #   * a channel has many clients
 
         # In this way, each websocket channel has a redis pubsub channel behind it.
         # And each pubsub/websocket channel has many clients.
@@ -244,24 +255,28 @@ class WebsocketManager:
                       f"{client_id}.")
             message_publisher = create_message_publisher(self.redis, channel_name)
             message_listener = create_message_listener(self.redis, channel_name)
-            mb = MessagingBackend(channel_name, message_listener, message_publisher)
-            mb.start()
-            self.channels[channel_name] = mb
+            messaging_backend = MessagingBackend(channel_name, message_listener, message_publisher)
+            messaging_backend.start()
+            self.channels[channel_name] = messaging_backend
         # Channel and its backend already exist; add client to existing backend.
         LOG.debug(f"Adding new client `{client}` to existing channel `{channel_name}`.")
         self.channels[channel_name].register_and_listen(client)
 
+    def broadcast(self, message, channel):
+        event_str = json.dumps(message)
+        result = self.channels[channel].publish_to_redis(event_str)
+        return result
 
-class WSClient:
-    """Simple wrapper to associate a client_id to the websocket to prevent recursive websockets."""
-    def __init__(self, websocket: WebSocket, client_id):
-        self.websocket = websocket
-        self.client_id = client_id
+    def get_clients_on_channel(self, channel):
+        return self.channels[channel].clients
 
 
 class MessagingBackend:
-    """Interface for registering and updating WebSocket clients."""
-
+    """
+    Interface that binds websocket channel to a redis pubsub channel.
+    The functionality of this class is accessed through the "proxy" of
+    WebsocketManager.
+    """
     def __init__(self, channel, listener, publish):
         self.channel = channel
         self.clients = []
@@ -281,14 +296,14 @@ class MessagingBackend:
     def register_and_listen(self, client: WSClient):
         """Register a WebSocket connection for Redis updates."""
         self.clients.append(client)
-        self.listen_on_socket(client)
+        self._listen_on_socket(client)
 
-    def listen_on_socket(self, client: WSClient):
+    def _listen_on_socket(self, client: WSClient):
         # spin up thread for this ws_client
         # this ensures the incoming websocket messages are published to the correct redis pubsub channel.
         LOG.debug(f"Client `{client}` now listening for websocket messages on channel {self.channel}.")
         while not client.websocket.closed:
-            self.heartbeat(client.websocket)
+            self._heartbeat(client.websocket)
             message = client.websocket.receive()
             if message is None:
                 # LOG.debug(f"websocket channel {self.channel} received message None message. Skipping.")
@@ -297,14 +312,14 @@ class MessagingBackend:
             self.publish_to_redis(message)
             gevent.sleep(0.1)
 
-    def heartbeat(self, socket: WebSocket):
+    def _heartbeat(self, socket: WebSocket):
         socket.handler.websocket.send_frame("HB", socket.OPCODE_PING)
 
-    def send_to_socket(self, client, data):
+    def _send_to_socket(self, client, data):
         """Send given data to the registered client.
         Automatically discards invalid connections."""
         try:
-            LOG.debug(f"channel {self.channel}: sending data {data} to client {client}")
+            LOG.debug(f"channel {self.channel}:  ta {data} to client {client}")
             client.websocket.send(data)
         except Exception:
             LOG.warning(f"client send failed with exception. Removing client {client}", exc_info=True)
@@ -318,15 +333,13 @@ class MessagingBackend:
             broadcast_to = []
             for client in self.clients:
                 if client.client_id != client_id:
-                    LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
                     broadcast_to.append(client)
 
             for client in broadcast_to:
                 recursive = (client_id == client.client_id and client_id is not None)
-                LOG.debug(f"client.client_id = {client.client_id} client_id from message = {client_id}")
-                LOG.debug(f"recursive = {recursive}")
+                LOG.debug(f"client.client_id = {client.client_id} recursive = {recursive}")
                 if not recursive:
-                    gevent.spawn(self.send_to_socket, client, data)
+                    gevent.spawn(self._send_to_socket, client, data)
 
     def start(self):
         """Maintains Redis subscription in the background."""

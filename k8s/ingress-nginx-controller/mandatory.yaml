@@ -18,7 +18,11 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
+data:
+  use-proxy-protocol: "true"
+  compute-full-forwarded-for: "true"
+  use-forwarded-headers: "false"
+  real-ip-header: proxy_protocol
 ---
 kind: ConfigMap
 apiVersion: v1

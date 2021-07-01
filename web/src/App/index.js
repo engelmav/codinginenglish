@@ -6,6 +6,16 @@ import history from "../history";
 import { observer } from "mobx-react";
 import { Flex } from "rebass";
 import { Box } from "../UtilComponents/Box";
+import ReactGA from "react-ga";
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
+
+history.listen((location) => {
+  ReactGA.pageview(location.pathname);
+});
+
+history.listen(() => window.scrollTo(0, 0));
 
 const RoutesBox = styled(Box)`
   flex: 1;

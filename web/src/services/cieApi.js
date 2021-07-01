@@ -54,6 +54,10 @@ class CieApi {
     console.log("Attempting to update user with userId", userId, "and data", userData)
     return (await axios.patch(`/api/users/${userId}`, userData)).data;
   }
+
+  async submitApp(appData){
+    return (await axios.post(`/api/student-application`, appData)).data;
+  }
 }
 
 const cieApi = new CieApi("/api");

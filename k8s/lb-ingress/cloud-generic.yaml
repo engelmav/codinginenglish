@@ -3,6 +3,9 @@ apiVersion: v1
 metadata:
   name: ingress-nginx
   namespace: ingress-nginx
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "hello.codinginenglish.com"
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx

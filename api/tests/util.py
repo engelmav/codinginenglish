@@ -4,6 +4,9 @@ import pprint
 import requests
 from main import red
 
+from database.mysql_session import engine
+from sqlalchemy import text
+
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -30,6 +33,19 @@ test_data = TestData()
 
 config.current_url = None
 test_users = [10, 20, 21]
+
+
+def delete_everything():
+    delete_statements = [
+        "delete from aula_config;",
+        "delete from user_active_sessions ;",
+        "delete from user_module_registration ;",
+        "delete from active_sessions ;",
+        "delete from module_sessions ;",
+        "delete from cie_modules ;"
+    ]
+    for stmt in delete_statements:
+        engine.execute(text(stmt))
 
 
 def site_map():

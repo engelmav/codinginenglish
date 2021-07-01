@@ -65,6 +65,9 @@ class RocketChatService:
             '/api/v1/users.list?fields={ "username":1 }&query={ "username": "%s" }' % username)
         return resp
 
+    def users(self):
+        return self._get("/api/v1/users.list")
+
     def create_user(self, username, name, email, password):
         resp = self._post('/api/v1/users.create',
                           json={
@@ -111,7 +114,7 @@ class RocketChatService:
                           {"name": channel_name, "members": members})
         return resp
 
-    def add_user_to_channel(self, user_id, channel_id):
+    def add_user_to_channel(self, user_id, channel_id=None, channel_name=None):
         """
         curl -H "X-Auth-Token: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq" \
         -H "X-User-Id: aobEdbYhXfu5hkeqG" \
@@ -121,6 +124,9 @@ class RocketChatService:
         :param users:
         :return:
         """
+        if channel_id is None and channel_name:
+            channel_info = self.channel_info(channel_name)
+            channel_id = channel_info.get("channel").get("_id")
         resp = self._post('/api/v1/channels.invite',
                           {"roomId": channel_id, "userId": user_id})
         return resp
@@ -130,3 +136,16 @@ class RocketChatService:
                           {"roomName": channel_name})
         return resp
 
+    def channel_info(self, channel_name):
+        resp = self._get('/api/v1/channels.info',
+                          {"roomName": channel_name})
+        return resp
+
+    def remove_user_from_channel(self, user_id, channel_id=None, channel_name=None):
+        if channel_id is None and channel_name:
+            channel_info = self.channel_info(channel_name)
+            channel_id = channel_info.get("channel").get("_id")
+
+        resp = self._post('/api/v1/channels.kick',
+                          {"roomId": channel_id, "userId": user_id})
+        return resp

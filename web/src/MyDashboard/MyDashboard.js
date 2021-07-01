@@ -7,8 +7,6 @@ import { Main } from "../UtilComponents";
 import { Button } from "../UtilComponents/Button";
 import { P, Title, TitleH2 } from "../UtilComponents/Typography/Typography"
 import { Box } from "../UtilComponents/Box";
-import Loader from "react-spinners/PulseLoader";
-import { BeatLoader } from "react-spinners";
 import Dialog from "@material-ui/core/Dialog";
 import {
   flexDirection,

@@ -14,12 +14,12 @@ const Footer = styled.div`
 `;
 
 export const PopupActivity = ({
+  appStore,
   onClose,
   activities,
   Collab,
   MultipleChoice,
   DragToImageCollab,
-  activeSessionId,
   websocket,
 }) => {
   // Resume here:
@@ -37,7 +37,7 @@ export const PopupActivity = ({
               key={idx}
               model={model}
               websocket={websocket}
-              activeSessionId={activeSessionId}
+              activeSessionId={appStore.activeSessionId}
             />
           );
         } else if (activityType === "collab") {
@@ -46,7 +46,6 @@ export const PopupActivity = ({
               key={idx}
               model={model}
               websocket={websocket}
-              activeSessionId={activeSessionId}
             />
           );
         } else {
