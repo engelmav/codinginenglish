@@ -28,29 +28,6 @@ const settings = {
 const appStore = makeAppStore("aula_story");
 appStore.firstName = "Marc";
 appStore.setUserRole("instructor");
-/** student data
- * 
- *   const cols = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 130 },
-    {
-      field: "room",
-      headerName: "Room",
-      width: 130,
-      renderCell: renderRoomDropdown,
-    },
-    { field: "vm", headerName: "VM" },
-  ];
-  const rows = [
-    { id: 1, name: "Maria Elena", vm: "esp-01", room: "conscious-puma" },
-    { id: 2, name: "Xavier", vm: "esp-02" },
-    { id: 3, name: "Carlo", vm: "ita-03", room: "conscious-puma" },
-    { id: 4, name: "Karen", vm: "usa-04" },
-  ];
- */
-/**
- * {'rooms': {'main': {'students': {}}}}
- */
 const roomsDb = ["main", "conscious-puma", "moldy-vulture"];
 
 let aulaConfig = {
@@ -64,16 +41,6 @@ class MockInstructorApi {
   getStudentsInSession(activeSessionId) {}
   /**
    * 
-   *   const cols = [
-    { field: "id", headerName: "id", width: 70 },
-    { field: "room", headerName: "Room", width: 130, editable: true },
-    { field: "students", headerName: "students", width: 200 },
-  ];
-  const rows = [
-    { id: 1, room: "conscious-puma", students: "Maria, Carlo" },
-    { id: 2, room: "moldy-vulture", students: "Maria, Carlo" },
-  ];
-
    * @param {*} activeSessionId 
    * @returns 
    */
@@ -86,13 +53,9 @@ class MockInstructorApi {
     ];
   }
   getAulaConfig(activeSessionId) {
-    /* HAR HAR! It's a joiner table. */
     return aulaConfig;
   }
   getRooms(activeSessionId) {
-    /*
-    id: roomId, name: roomName
-    */
     return roomsDb;
   }
   createRoom(activeSessionId, roomName) {
@@ -112,14 +75,6 @@ class MockInstructorApi {
      */
   }
   moveStudent(studentName, fromRoomName, toRoomName) {
-
-    /**
-     *
-
-        aula_config.config["rooms"][from_room]["students"].pop(student, None)
-        student_entry = {student: {}}
-        aula_config.config["rooms"][to_room]["students"].update(student_entry)
-     */
     console.log("MockInstructorApi.moveStudent: fromRoomName", fromRoomName)
     delete aulaConfig.rooms[fromRoomName].students[studentName];
     aulaConfig.rooms[toRoomName].students[studentName] = {};

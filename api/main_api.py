@@ -462,7 +462,7 @@ def create_main_api(publish_message,
 
     blacklist = [
         "192.168",
-        # "127.0.0.1"
+        "127.0.0.1"
     ]
 
     def ip_blacklisted(addr):

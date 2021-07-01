@@ -34,7 +34,7 @@ class UserService:
             firstname=first_name,
             lastname=last_name,
             email=email,
-            rocketchat_i=rocketchat_id
+            rocketchat_id=rocketchat_id
         )
         _user.add()
 

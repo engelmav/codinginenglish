@@ -47,10 +47,6 @@ class AulaActor:
         LOG.debug(f"User channel add result: {add_res}")
 
 
-# TODO: in initialize_user method (or in the configureAula method) we need to make a main
-# room and put the students in it
-
-
 class AulaDataService:
     def __init__(self, models, schema, on_change=None):
         self.models = models
