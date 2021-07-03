@@ -9,7 +9,7 @@ export default {
 };
 
 class FakeAssApi {
-  submitApp(appData){
+  submitApp(appData) {
     alert(appData);
   }
 }
@@ -21,9 +21,7 @@ const props = {
   settings: {
     assets: "https://cie-assets.nyc3.digitaloceanspaces.com",
   },
-}
+  appStore: { userLocation: null },
+};
 
-export const DefaultView = () => (
-
-    <BasicCourseForm {...props} />
-);
+export const DefaultView = () => <BasicCourseForm {...props} />;

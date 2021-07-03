@@ -20,6 +20,8 @@ import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
 import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { AboutUs } from "./AboutUs";
 import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
+import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
+import { Register as _Register } from "./CourseApplications/Register";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -88,7 +90,12 @@ export function main(appStore) {
     );
     appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
     studentSessionMgr.initialize();
-    history.push("/my-dashboard");
+    let nextPage = "/my-dashboard"
+    console.log("auth0 initializeUser() callback sees appStore.flow as", appStore.flow);
+    if (appStore.flow === "firstRegistration"){
+      nextPage = "/apply/curriculum"
+    }
+    history.push(nextPage);
   }
   auth.addOnAuthSuccess(initializeUser);
   auth.addOnLogout(appStore.clearStore);
@@ -149,7 +156,13 @@ export function main(appStore) {
   /** End Configure Aula */
 
   const CallbackWithRouter = withRouter(Callback);
-  const Application = compose(_Application, { appStore, cieApi });
+  // const Application = compose(_Application, { appStore, cieApi });
+  const Register = compose(_Register, { appStore, auth, cieApi });
+  const ApplicationProcess = compose(_ApplicationProcess, {
+    appStore,
+    cieApi,
+    Register,
+  });
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
@@ -159,7 +172,7 @@ export function main(appStore) {
     auth,
     cieApi,
     AboutUs,
-    Application,
+    ApplicationProcess,
     CallbackRoute,
     Classroom,
     CollabEditor,

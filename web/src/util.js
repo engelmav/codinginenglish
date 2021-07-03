@@ -1,6 +1,5 @@
 /* global window, navigator */
 
-import { DateTime, Duration, Interval } from "luxon";
 let userAgentString = navigator.userAgent;
 let isChrome = userAgentString.indexOf("Chrome") > -1;
 let isSafari = userAgentString.indexOf("Safari") > -1;
@@ -34,7 +33,9 @@ const browserDetect = {
  * @param {number} timeWindowHours integer expressing number of hours from a given time.
  * @param {string} startDateTime string of the datetime a class is starting
  */
-const isInSession = (startDateTime, durationMinutes) => {
+const isInSession = async (startDateTime, durationMinutes) => {
+  const luxonModule = await import("luxon");
+  const { DateTime, Duration, Interval } = luxonModule;
   let nowUtc = DateTime.utc();
   const duration = Duration.fromObject({ minutes: durationMinutes });
   const start = DateTime.fromISO(startDateTime);
@@ -43,7 +44,7 @@ const isInSession = (startDateTime, durationMinutes) => {
   return interval.contains(nowUtc);
 };
 
-function hasActiveSession(userSessions) {
+async function hasActiveSession(userSessions) {
   let _hasActiveSession = false;
   userSessions.forEach((userSession) => {
     if (isInSession(userSession.start_time)) {
@@ -89,7 +90,7 @@ class StudentSessionManager {
   }
 
   initialize() {
-    console.log("websocket object:", this.websocket)
+    console.log("websocket object:", this.websocket);
     this.websocket.addEventListener("message", (event) => {
       const { data } = event;
       if (data instanceof Blob) {
@@ -103,7 +104,9 @@ class StudentSessionManager {
   }
 }
 
-export function toLocalTime(dt) {
+export async function toLocalTime(dt) {
+  const luxonModule = await import("luxon");
+  const { DateTime } = luxonModule;
   var dtFromISO = DateTime.fromISO(dt);
   const localDt = dtFromISO.toLocaleString(DateTime.DATETIME_FULL);
   return localDt;

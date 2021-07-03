@@ -31,7 +31,7 @@ class Routes extends Component {
       Home,
       MyDashboard,
       UpcomingSessions,
-      Application
+      ApplicationProcess
     } = this.props;
 
     return (
@@ -61,10 +61,10 @@ class Routes extends Component {
           path="/login"
           render={(props) => {
             auth.login();
-          }}
+          }}exact
         />
         <Route exact path="/editor" component={(props) => <CollabEditor />} />
-        {appStore.applicationOpen && <Route exact path="/apply" component={(props) => <Application />} />}
+        {appStore.applicationOpen && <Route path="/apply" component={(props) => <ApplicationProcess />} />}
       </>
     );
   }

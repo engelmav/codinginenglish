@@ -6,11 +6,13 @@ import * as serviceWorker from "./serviceWorker";
 import axios from "axios";
 
 
-
 (async () => {
   const appStore = makeAppStore();
-  await appStore.rehydrate();
-  console.log("completed hydration:", appStore);
+  const res = await appStore.rehydrate();
+  
+  console.log("completed hydration result:", res, appStore);
+
+
   const App = main(appStore);
   ReactDOM.render(<App />, document.getElementById("main-grid"));
 

@@ -6,19 +6,15 @@ import {
   Button,
   Main,
   Title,
-  ContentSection,
 } from "../UtilComponents";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
 import {
   fontFamily,
-  inputPadding,
-  lgInputFontSize,
-  smInputFontSize,
-  whenSmallScreen,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
+import { Timeline } from "./Timeline";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -62,91 +58,6 @@ const Form = styled(_Form)`
 
 const Error = styled.div`
   color: #ff0033;
-`;
-
-const Timeline = styled.div`
-  .container {
-    margin: auto;
-  }
-
-  li {
-    margin-bottom: 25px;
-  }
-
-  .timeline {
-    counter-reset: test 0;
-    position: relative;
-  }
-
-  .timeline li {
-    list-style: none;
-    float: left;
-    width: 33.3333%;
-    position: relative;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  ul {
-    padding: 0;
-    font-family: ${fontFamily};
-    font-weight: 900;
-  }
-
-  ul:nth-child(1) {
-    ${whenSmallScreen`
-      font-size: .6rem;`}
-    color: black;
-  }
-
-  .timeline li:before {
-    counter-increment: test;
-    content: counter(test);
-    width: 50px;
-    height: 50px;
-    border: 3px solid ${cieOrange};
-    border-radius: 50%;
-    display: block;
-    text-align: center;
-    line-height: 50px;
-    margin: 0 auto 10px auto;
-    background: #fff;
-    color: #000;
-    transition: all ease-in-out 0.3s;
-    ${whenSmallScreen`
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    border-width: 2px;
-    `}
-  }
-
-  .timeline li:after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    background-color: grey;
-    top: 25px;
-    left: -50%;
-    z-index: -999;
-    transition: all ease-in-out 0.3s;
-  }
-
-  .timeline li:first-child:after {
-    content: none;
-  }
-  .timeline li.active-tl {
-    color: black;
-  }
-  .timeline li.active-tl:before {
-    background: ${cieOrange};
-    color: white;
-  }
-
-  .timeline li.active-tl + li:after {
-    background: ${cieOrange};
-  }
 `;
 
 const MainAppl = styled(Main)`
@@ -204,17 +115,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
 
   return (
     <MainAppl p={20}>
+      <Timeline />
       <Title textAlign="center">Webapp Development - Basic</Title>
       <P textAlign="center">
         <i>del 20 septiembre al 20 diciembre</i>
       </P>
-      <Timeline>
-        <ul className="timeline">
-          <li className="active-tl">Solicitud</li>
-          <li>Entrevista</li>
-          <li>Matrícula</li>
-        </ul>
-      </Timeline>
       {appComplete ? (
         <p>
           Gracias por completar la solicitud! Te contactaremos dentro de 2 días
@@ -222,18 +127,6 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
         </p>
       ) : (
         <>
-          <P>
-            El proceso de matriculación de Coding in English consta de tres
-            pasos:
-          </P>
-          <ol>
-            <li>Rellenar la solicitud del curso.</li>
-            <li>
-              Entrevista con un instructor con el fin de averiguar tus objetivos
-              y algunos temas técnicos.
-            </li>
-            <li>Matrícula para el curso</li>
-          </ol>
 
           <Formik
             validationSchema={ApplicationSchema}

@@ -187,7 +187,7 @@
     "jest-localstorage-mock": "^2.4.0",
     "jest-watch-typeahead": "^0.2.1",
     "mjml": "^4.10.1",
-    "react-dev-utils": "^10.0.0",
+    "react-dev-utils": "^10.2.1",
     "react-scripts": "^4.0.3",
     "webpack-bundle-analyzer": "^4.4.2"
   }
