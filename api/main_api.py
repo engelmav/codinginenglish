@@ -23,6 +23,7 @@ from services.rocketchat import RocketChatService
 import requests
 
 LOG = logging.getLogger(__name__)
+FRONTEND_LOG = logging.getLogger("web")
 app = Flask(__name__)
 sockets = Sockets(app)
 
@@ -300,6 +301,20 @@ def create_main_api(publish_message,
         data = _schema.dump(updated_user)
         return make_response(dict(data=data, messages=["Successfully updated user"]), 200)
 
+    def get_rocketchat_user_and_token(auth0_access_token, email=None):
+        auth0_login_resp = rc_service.login_with_auth0(auth0_access_token, config.get("cie.auth0.secretkey"))
+        resp_message = auth0_login_resp.get("message")
+        if resp_message and resp_message == "Email already exists.":
+            if email is None:
+                raise ValueError("Please call get_rocketchat_user_and_token() with email parameter if the user already "
+                                 "exists in Rocketchat")
+            rc_user_id = rc_service.get_user_by_email(email).get("_id")
+            rocketchat_auth_token = rc_service.create_auth_token(rc_user_id)
+            return rc_user_id, rocketchat_auth_token
+        rc_user_id = auth0_login_resp.get("data").get("userId")
+        rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
+        return rc_user_id, rocketchat_auth_token
+
     @app.route('/api/users', methods=['POST'])
     def initialize_user():
         """
@@ -337,9 +352,7 @@ def create_main_api(publish_message,
 
         messages = []
         try:
-            auth0_login_resp = rc_service.login_with_auth0(auth0_access_token, config.get("cie.auth0.secretkey"))
-            rc_user_id = auth0_login_resp.get("data").get("userId")
-            rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
+            rc_user_id, rocketchat_auth_token = get_rocketchat_user_and_token(auth0_access_token, email)
             messages.append("Retrieved RocketChat auth token.")
         except Exception as e:
             messages.append(f"Error creating or logging in user {email} to Rocketchat")
@@ -496,6 +509,16 @@ def create_main_api(publish_message,
             status=status,
             messages=messages
         ))
+
+    @app.post("/api/log")
+    def log_event():
+        req_json = request.get_json()
+        level = req_json.get("data").get("level")
+        log_message = req_json.get("data").get("message")
+        if level == "INFO":
+            FRONTEND_LOG.info(log_message)
+        elif level == "ERROR":
+            FRONTEND_LOG.error(log_message)
 
 
     @app.route("/api/site-map")

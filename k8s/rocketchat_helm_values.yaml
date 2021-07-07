@@ -1,0 +1,3 @@
+extraEnv: |
+    - name: CREATE_TOKENS_FOR_USERS
+      value: "true"

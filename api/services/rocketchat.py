@@ -65,6 +65,10 @@ class RocketChatService:
             '/api/v1/users.list?fields={ "username":1 }&query={ "username": "%s" }' % username)
         return resp
 
+    def get_user_by_email(self, email):
+        user = self._get('/api/v1/users.list?fields={ "username":1 }&query={"emails":{"$elemMatch": {"address" : {"$eq":"%s"}}}}' % email)
+        return user.get("users")[0]
+
     def users(self):
         return self._get("/api/v1/users.list")
 
@@ -92,6 +96,10 @@ class RocketChatService:
         })
         return resp
 
+    def create_auth_token(self, user_id):
+        user_token = self._post("/api/v1/users.createToken", {"userId": user_id})
+        return user_token
+
     def create_or_login_user(self, username, name, email, password):
         user = self.get_user(username)
         if len(user['users']) == 0:
@@ -103,6 +111,7 @@ class RocketChatService:
         resp = self._post('/api/v1/login',
                           {"serviceName": "auth0", "accessToken": auth0_access_token,
                            "secret": "hash", "expiresIn": 200})
+
         return resp
 
     def create_channel(self, channel_name, users=None):

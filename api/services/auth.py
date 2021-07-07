@@ -28,7 +28,7 @@ class AuthService:
 
     def create_auth0_user(self, full_name, user_email):
         user_id = str(uuid.uuid4())
-        users = Users(domain, mgmt_api_token)
+        users = Users(domain, self.mgmt_api_token)
         generated_password = pwd.genword(entropy=56, charset="ascii_62")
         user_res = users.create({
           "email": user_email,
@@ -48,7 +48,7 @@ class AuthService:
         return user_res
 
     def create_auth0_passwd_reset_ticket(self, user_email):
-        tickets = Tickets(domain, mgmt_api_token)
+        tickets = Tickets(domain, self.mgmt_api_token)
         two_days = 172800
         ticket_res = tickets.create_pswd_change({
             "result_url": "https://www.codinginenglish.com/login",

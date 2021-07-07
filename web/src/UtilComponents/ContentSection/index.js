@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { font } from '../sharedStyles';
-import { space } from "styled-system";
+import { space, flex } from "styled-system";
 
 
 const ContentSection = styled.article`

@@ -31,7 +31,7 @@ class Routes extends Component {
       Home,
       MyDashboard,
       UpcomingSessions,
-      ApplicationProcess
+      ApplicationProcess,
     } = this.props;
 
     return (
@@ -54,17 +54,20 @@ class Routes extends Component {
           path="/callback"
           render={(props) => {
             auth.handleAuthenticationFromCallbackRoute(props);
-          return <CallbackRoute {...props} />;
+            return <CallbackRoute {...props} />;
           }}
         />
         <Route
           path="/login"
           render={(props) => {
             auth.login();
-          }}exact
+          }}
+          exact
         />
         <Route exact path="/editor" component={(props) => <CollabEditor />} />
-        {appStore.applicationOpen && <Route path="/apply" component={(props) => <ApplicationProcess />} />}
+        {appStore.applicationOpen && (
+          <Route path="/apply" component={(props) => <ApplicationProcess />} />
+        )}
       </>
     );
   }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { TextInput, Button, Main, Title, Box } from "../UtilComponents";
 import { whenSmallScreen } from "../UtilComponents/sharedStyles";
@@ -14,7 +14,46 @@ const RegisterBtn = styled(Button)`
   min-width: 250px;
 `;
 
+const GoogleBtn = styled.button`
+  img {
+    padding-left: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border-width: 0px;
+  color: white;
+  background: #4285f4;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
+  }
+  p {
+    margin: 0;
+    padding: 0;
+    margin-left: 24px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+`;
+
+const RegisterOpts = styled.div`
+  display: flex;
+  max-width: 400px;
+  margin: 0 auto;
+  flex-direction: column;
+`;
+
 export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
+  const [email, setEmail] = useState("");
   useEffect(() => {
     setMilestone("Regístrate");
   }, []);
@@ -32,16 +71,33 @@ export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
         <li>Entrevista con un instructor</li>
         <li>Matrícula para el curso</li>
       </Ol>
-
-      <RegisterBtn
-        alignSelf="center"
-        onClick={() => {
-          appStore.flow = "firstRegistration";
-          auth.login();
-        }}
-      >
-        Regístrate
-      </RegisterBtn>
+      <RegisterOpts>
+        <GoogleBtn
+          onClick={() => auth.loginWithEmailLink(email)}
+          class="google-btn"
+          id="google-btn"
+          type="button"
+        >
+          <img
+            height="90%"
+            class="google-icon"
+            src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
+          />
+          <p>Regístrate con Google</p>
+        </GoogleBtn>
+        <P m="5px" textAlign="center">- o -</P>
+        <TextInput
+          placeholder={"nombre@xyz.com"}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <RegisterBtn
+          alignSelf="center"
+          onClick={() => auth.loginWithEmailLink(email)}
+        >
+          Regístrate con email
+        </RegisterBtn>
+      </RegisterOpts>
     </SignInContainer>
   );
 };

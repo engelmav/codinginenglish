@@ -38,7 +38,6 @@ class Auth {
   }
 
   login(options = null) {
-    console.log("Auth.js: calling auth0.authorize():");
     if (options) {
       return this.auth0.authorize(options);
     }
@@ -48,19 +47,14 @@ class Auth {
   handleAuthentication() {
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
-        console.log("parsed hash:", authResult)
         if (err) return reject(err);
-        if (!authResult || !authResult.idToken) {
-          return reject(err);
+        if (err || !authResult || !authResult.idToken) {
+          console.log("There was an issue attempting to login.")
         }
-        resolve();
-        console.log("handleAuthentication() setSession");
         this.setSession(authResult);
-        console.log(
-          "Auth module successfully authenticated. Calling callbacks..."
-        );
         this.onAuthSuccess.forEach((callback) => callback(authResult));
-      });
+        resolve();
+      }); 
     });
   }
 
@@ -131,6 +125,33 @@ class Auth {
         );
       }
     });
+  }
+  loginWithGoogle(cb = null){
+    this.auth0.authorize({
+      connection: "google-oauth2",
+    }, (err, res) => {
+      if (cb) cb(err, res);
+    })
+  }
+  loginWithEmailLink(email, cb = null){
+    return new Promise((resolve, reject) => {
+      
+      this.auth0.passwordlessStart({
+        email,
+        send: "link",
+        connection: "email"
+      }, (err, res) => {
+        if (cb) cb(err, res);
+        if (err){
+          console.log("error ocurred in passwordless login:", err);
+        }
+        if (res){
+          console.log("successful passwordlessStart:", res)
+          resolve(res)
+        }
+      })
+    })
+    
   }
 }
 
