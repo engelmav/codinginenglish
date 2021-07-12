@@ -14,7 +14,7 @@ import {
   fontFamily,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
-import { Timeline } from "./Timeline";
+import { FaCheckCircle } from "@react-icons/all-files/fa/FaCheckCircle";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -115,7 +115,6 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
 
   return (
     <MainAppl p={20}>
-      <Timeline />
       <Title textAlign="center">Webapp Development - Basic</Title>
       <P textAlign="center">
         <i>del 20 septiembre al 20 diciembre</i>
@@ -319,8 +318,8 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                       action: `userApplied`,
                     })
                   }
-                >
-                  Submit
+                ><FaCheckCircle />
+                  Envía mi solicitud
                 </Button>
               </Form>
             )}

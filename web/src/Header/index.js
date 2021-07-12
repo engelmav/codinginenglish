@@ -6,6 +6,7 @@ import {
   whenSmallScreen,
   orangeBgColor,
   cieOrange,
+  darkGray,
   font,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
@@ -30,12 +31,12 @@ const headerMarginSm = css`
 const CloseBox = styled(FaRegWindowClose)`
   display: none;
   color: white;
-  background-color: black;
+  background-color: ${darkGray};
   align-self: flex-end;
   cursor: pointer;
   transition: 0.2s;
   :hover {
-    background-color: black;
+    background-color: ${darkGray};
     color: white;
   }
   ${whenSmallScreen`
@@ -65,7 +66,7 @@ const Header = styled.header`
   ${whenSmallScreen`
       ${headerMarginSm}`}
   align-items: center;
-  background-color: black;
+  background-color: #3d3636;
 `;
 
 const Img = styled.img`
@@ -92,7 +93,7 @@ const NavbarList = styled.ul`
     justify-content: flex-start;
     align-items: flex-end;
     ${headerMarginSm}
-    background-color: black;
+    background-color: ${darkGray};
     transition: 0.1s ease-out;
     transform: ${({ navMenu }) =>
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
@@ -239,7 +240,7 @@ const HeaderContainer = observer((props) => {
           <Link to="/">
             <Img
               alt="cie logo"
-              src={`${settings.assets}/cie-logo-horizontal-black.png`}
+              src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
             ></Img>
           </Link>
           <NavbarList navMenu={navMenu} ref={navMenuRef}>

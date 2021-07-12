@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { typography, space } from "styled-system";
+import { typography, space, border, fontSize } from "styled-system";
 import { font, fontColor, debugBorder } from "../sharedStyles";
 
 export const Title = styled.h1`
@@ -9,8 +9,15 @@ export const Title = styled.h1`
   ${typography}
   font-size: max(1.75rem, min(2.5rem, 3vw));
   width: 100%;
-  margin: 0;
   padding: 0;
+`;
+
+export const H2 = styled.h2`
+  font-family: Andale Mono,AndaleMono,monospace;
+  ${space}
+  ${fontSize}
+  ${fontColor}
+  ${typography}
 `;
 
 export const TitleH2 = styled.h2`
@@ -27,17 +34,16 @@ export const TitleH2 = styled.h2`
 `;
 
 export const P = styled.p`
-  // word-break: break-all;
-  // white-space: normal;
   hyphens: auto;
   ${font}
   ${fontColor}
   ${debugBorder}
   ${space}
   ${typography}
+  ${border}
 `;
 
-export const Ol = styled.ol`
+const Ol = styled.ol`
   ${font}
   ${fontColor}
   ${debugBorder}
@@ -46,3 +52,7 @@ export const Ol = styled.ol`
   line-height: 1.5em;
   height: auto;
 `;
+Ol.defaultProps = {
+  p: 3,
+};
+export { Ol };

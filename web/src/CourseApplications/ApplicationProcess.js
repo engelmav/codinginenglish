@@ -13,7 +13,7 @@ const AppContainer = styled(Main)`
   flex-direction: column;
   ${space}
 `;
-export const ApplicationProcess = ({ Register }) => {
+export const ApplicationProcess = ({ Register, NextSteps }) => {
   const [milestone, setMilestone] = React.useState("");
   return (
     <AppContainer className="app-process-main" mt={3} mb={3}>
@@ -24,11 +24,11 @@ export const ApplicationProcess = ({ Register }) => {
             path="/apply"
             component={() => <Register setMilestone={setMilestone} />}
           ></Route>
-          {/* <Route
+          <Route
           exact
-          path="/apply/application"
-          component={() => <BasicCourseForm setMilestone={setMilestone} />}
-        ></Route> */}
+          path="/apply/next-steps"
+          component={() => <NextSteps setMilestone={setMilestone} />}
+        ></Route>
         </Switch>
     </AppContainer>
   );

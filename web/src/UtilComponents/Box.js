@@ -12,6 +12,7 @@ export const Box = styled.div(
   color,
   layout,
   flexbox,
+  flexGrow,
   flexWrap,
   debugBorder
 );

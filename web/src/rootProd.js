@@ -22,6 +22,7 @@ import { AboutUs } from "./AboutUs";
 import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
 import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
 import { Register as _Register } from "./CourseApplications/Register";
+import { NextSteps as _NextSteps } from "./CourseApplications/NextSteps";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -70,7 +71,7 @@ export function main(appStore) {
   const websocketManager = new WebsocketManager(settings);
   const auth = new Auth(appStore);
 
-  async function initializeUser(authResult) {
+  async function handleAuthSuccess(authResult) {
     const initializedUser = await cieApi.initializeUser(authResult);
     appStore.user = initializedUser;
     const userData = initializedUser.data.user;
@@ -84,20 +85,15 @@ export function main(appStore) {
     );
     const studentSessionMgr = new StudentSessionManager(websocket);
     studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
-    console.log(
-      "initializedUser.data.has_session_in_progress:",
-      initializedUser.data.has_session_in_progress
-    );
     appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
     studentSessionMgr.initialize();
-    let nextPage = "/my-dashboard"
-    console.log("auth0 initializeUser() callback sees appStore.flow as", appStore.flow);
-    if (appStore.flow === "firstRegistration"){
-      nextPage = "/apply/curriculum"
+    let nextPage = "/my-dashboard";
+    if (appStore.flow === "newRegistration") {
+      nextPage = "/apply/next-steps";
     }
     history.push(nextPage);
   }
-  auth.addOnAuthSuccess(initializeUser);
+  auth.addOnAuthSuccess(handleAuthSuccess);
   auth.addOnLogout(appStore.clearStore);
 
   const Login = compose(_Login, { auth, appStore });
@@ -158,10 +154,13 @@ export function main(appStore) {
   const CallbackWithRouter = withRouter(Callback);
   // const Application = compose(_Application, { appStore, cieApi });
   const Register = compose(_Register, { appStore, auth, cieApi });
+  const NextSteps = compose(_NextSteps, { appStore, auth, cieApi });
+
   const ApplicationProcess = compose(_ApplicationProcess, {
     appStore,
     cieApi,
     Register,
+    NextSteps,
   });
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });

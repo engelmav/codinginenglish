@@ -3,14 +3,14 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { Box } from "../UtilComponents/Box";
-
+import { darkGray } from "../UtilComponents/sharedStyles";
 
 const StyledFooter = styled.footer`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: black;
+  background: ${darkGray};
   text-align: center;
   color: white;
 `;
