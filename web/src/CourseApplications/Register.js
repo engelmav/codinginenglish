@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import {
+  AlertMessage,
   TextInput,
   Button,
   Main,
@@ -8,11 +9,23 @@ import {
   Title,
   Card,
   CardTitle,
+  CardContent,
 } from "../UtilComponents";
 import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
 import { space } from "styled-system";
 import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope";
+import { Spinner } from "../UtilComponents";
+import * as yup from "yup";
+import history from "../history";
+import ReactGA from "react-ga";
+
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
+
+
+const emailSchema = yup.object({ email: yup.string().email() });
 
 const SignInContainer = styled.div`
   display: flex;
@@ -87,33 +100,69 @@ const RegisterOptsCard = styled(Card)`
   align-self: center;
   justify-content: center;
   width: 600px;
-  
+
   ${whenSmallScreen`
     width: 100%;
   `}
-`;
-const CardContent = styled.div`
-  width: 300px;
-  ${whenSmallScreen`
-    width: 100%;
-  `}
-  align-self: center;
-  display: flex;
-  flex-direction: column;
 `;
 
 export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
+
+  const createRegisteredUser = (userEmail) =>
+    cieApi.createRegisteredUser({ email: userEmail });
+
+  const handleSubmitEmail = async (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (email === "") {
+      setInvalidEmail(true);
+      return;
+    }
+    try {
+      await emailSchema.validate({ email }, { abortEarly: false });
+    } catch {
+      setInvalidEmail(true);
+      ReactGA.event({
+        category: "register",
+        action: "emailRegistration",
+        label: "emailValidationFailed"
+      });
+      return;
+    }
+    appStore.flow = "newRegistration";
+    handleSetEmailSubmitted();
+  };
   const handleSetEmailSubmitted = () => {
-    // Morning Vin,
-    // Here, add a loading spinner to the "Registrate" button.
-    // We can also use it for the "Envia" button!
-    // Then, move on to fixing up the formatting of the application.
-    setTimeout(function() {
-      setEmailSubmitted(true)
-  }, 2000);
-  }
+    createRegisteredUser(email);
+    ReactGA.event({
+      category: "register",
+      action: "emailRegistration",
+      label: "emailCaptured"
+    });
+    // const handleLoginResult = (err, res) => {
+    //   if (err) {
+    //     setInvalidEmail(true);
+    //   }
+    //   if (res) {
+    //     createRegisteredUser(email);
+    //     handleSetEmailSubmitted();
+    //   }
+    // };
+    // send the passwordless link to the user so they have an email reference to 
+    // coding in english and a "way back in".
+    auth.loginWithEmailLink(email);
+    setIsSending(true);
+    setTimeout(function () {
+      setIsSending(false);
+      setEmailSubmitted(true);
+      appStore.email = email;
+      history.push("/apply/next-steps");
+    }, 1500);
+  };
   useEffect(() => {
     setMilestone("Regístrate");
   }, []);
@@ -132,7 +181,20 @@ export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
           <GoogleBtn
             onClick={() => {
               appStore.flow = "newRegistration";
-              auth.loginWithGoogle();
+              const createRegisteredUserFromGoogleLogin = (auth0Result) => {
+                console.log("auth0Result", auth0Result);
+                debugger;
+                createRegisteredUser(email);
+              };
+              ReactGA.event({
+                category: "register",
+                action: "googleRegistration",
+                label: "googleRegistration"
+              });
+              auth.loginWithGoogle(
+                { isRegistration: true },
+                createRegisteredUserFromGoogleLogin
+              );
             }}
             class="google-btn"
             id="google-btn"
@@ -149,35 +211,65 @@ export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
             o
           </Divider>
 
-          {(emailSubmitted)
-          
-          ? <P>Enviado! 
-            Por favor verifica tu correo electrónico para un correo de nosotros. Incluirá un enlace para acceder al currículo y la solicitud.</P> 
-          : <Box display="flex" flexDirection="column">
-          <TextInput
-            mb={2}
-            width="100%"
-            placeholder={"nombre@xyz.com"}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <RegisterBtn
-            onClick={() => {
-              appStore.flow = "newRegistration";
-              auth.loginWithEmailLink(email);
-              handleSetEmailSubmitted();
-            }}
-          >
-            <FaEnvelope size={20} />
-            <P ml="24px"> Regístrate con Email</P>
-          </RegisterBtn>
-          </Box>}
+          {emailSubmitted ? (
+            <P>
+              Enviado! Por favor verifica tu correo electrónico (de{" "}
+              <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
+              para acceder al currículo y la solicitud. (No lo ves?{" "}
+              <Button
+                m={1}
+                onClick={() => {
+                  setEmailSubmitted(false);
+                }}
+              >
+                Intenta otra vez
+              </Button>
+              )
+            </P>
+          ) : (
+            <Box
+              as="form"
+              display="flex"
+              flexDirection="column"
+              onSubmit={handleSubmitEmail}
+            >
+              <TextInput
+                mb={2}
+                width="100%"
+                placeholder={"nombre@xyz.com"}
+                value={email}
+                onChange={(e) => {
+                  setInvalidEmail(false);
+                  setEmail(e.target.value);
+                }}
+              />
+              {invalidEmail && (
+                <AlertMessage
+                  fontSize={1}
+                  mb={2}
+                  p={1}
+                  text="La dirección de correo electrónico no es válido."
+                />
+              )}
+              {!isSending && (
+                <RegisterBtn type="submit">
+                  <FaEnvelope size={20} />
+                  <P ml="24px"> Regístrate con Email</P>
+                </RegisterBtn>
+              )}
+              {isSending && (
+                <Box alignSelf="center">
+                  <Spinner color="black" alignSelf="center" />
+                </Box>
+              )}
+            </Box>
+          )}
         </CardContent>
       </RegisterOptsCard>
-      <P mb="8px">
+      <P p={3}>
         El proceso de matriculación de Coding in English consta de cuatro pasos:
       </P>
-      <Ol mt="8px">
+      <Ol p={0}>
         <li>Registrarse para ver el plan de estudios</li>
         <li>Rellenar la solicitud del curso</li>
         <li>Entrevista con un instructor</li>
