@@ -1,20 +1,23 @@
 import React, { useState } from "react";
-import { Formik, Field, Form as _Form } from "formik";
+import { Formik, Field as _Field, Form as _Form } from "formik";
 import styled from "styled-components";
 import {
+  Box,
+  boxy,
+  ClearableTextInput,
   TextInput,
   Button,
   Main,
   Title,
 } from "../UtilComponents";
-import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
+import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
 import {
   fontFamily,
   cieOrange,
+  darkGray,
 } from "../UtilComponents/sharedStyles";
-import { FaCheckCircle } from "@react-icons/all-files/fa/FaCheckCircle";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -25,14 +28,13 @@ const ApplicationSchema = Yup.object().shape({
     .min(2, "Muy corto!")
     .max(50, "Muy largo!")
     .required("Requerido"),
-  email: Yup.string().email("Invalid email").required("Requerido"),
   programmingLevel: Yup.string().required(
-    "Favor de seleccionar tu nivel de experiencia con la programacion"
+    "Favor de seleccionar tu nivel de experiencia con la programación"
   ),
   englishLevel: Yup.string().required(
-    "Favor de seleccionar tu nivel de experiencia con el ingles"
+    "Favor de seleccionar tu nivel de experiencia con el inglés"
   ),
-  // whenAttend: Yup.array().required("Favor de seleccionar una opcion"),
+  // whenAttend: Yup.array().required("Favor de seleccionar una opción"),
   whenAttend: Yup.bool().oneOf(
     basicCourseForm.find((field) => field.fieldName === "whenAttend").choices,
     "Por favor elige unas horas"
@@ -43,32 +45,37 @@ const ApplicationSchema = Yup.object().shape({
 });
 
 const MultiLabel = styled.label`
+  ${boxy}
   font-family: ${fontFamily};
 `;
+const Field = styled(_Field)`
+  ${boxy}
+`;
+Field.defaultProps = {
+  mr: 2,
+  mb: 1,
+};
 
 const FieldLabel = styled.label`
+  ${boxy}
   font-weight: bolder;
   font-family: ${fontFamily};
 `;
+FieldLabel.defaultProps = {
+  mb: 3,
+};
 
 const Form = styled(_Form)`
   display: flex;
   flex-direction: column;
 `;
 
-const Error = styled.div`
+const Error = styled(P)`
   color: #ff0033;
 `;
 
 const MainAppl = styled(Main)`
   width: min(90%, 700px);
-`;
-
-const ClearableTextField = styled(TextInput)`
-  position: relative;
-  &:not(:valid) ~ .close-icon {
-    display: none;
-  }
 `;
 
 const ClearFieldButton = styled.button`
@@ -89,7 +96,7 @@ const ClearFieldButton = styled.button`
     background-color: ${cieOrange};
     z-index: 1;
     right: 10px;
-    top: -74px;
+    top: -58px;
     bottom: 0;
     margin: auto;
     padding: 2px;
@@ -112,28 +119,32 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
       : "";
   });
   initialValues["location"] = appStore.userLocation || "";
+  initialValues["fullName"] = appStore.lastName
+    ? appStore.firstName + " " + appStore.lastName
+    : appStore.firstName;
 
   return (
-    <MainAppl p={20}>
-      <Title textAlign="center">Webapp Development - Basic</Title>
-      <P textAlign="center">
+    <>
+      <Title textAlign="center">Solicita una plaza</Title>
+      <P mb={4} textAlign="center">
         <i>del 20 septiembre al 20 diciembre</i>
       </P>
       {appComplete ? (
-        <p>
+        <P>
           Gracias por completar la solicitud! Te contactaremos dentro de 2 días
           para hablar de los próximos pasos.
-        </p>
+        </P>
       ) : (
         <>
-
           <Formik
             validationSchema={ApplicationSchema}
             initialValues={initialValues}
             onSubmit={async (values, actions) => {
+              values.email = appStore.email;
               await cieApi.submitApp(values);
               setAppComplete(true);
               actions.setSubmitting(false);
+              appStore.userApplied = true;
             }}
           >
             {({
@@ -149,8 +160,10 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
               <Form onSubmit={handleSubmit}>
                 {basicCourseForm.map((field, idx) => {
                   const { fieldName } = field;
+                  let fieldJsx;
+
                   if (field.fieldType === "shortAnswer") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -171,16 +184,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           }}
                           value={values[field.fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "email") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -198,16 +206,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "multipleChoice") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -224,16 +227,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                             </MultiLabel>
                           );
                         })}
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "checkboxes") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title}>
                           {field.title}
@@ -246,16 +244,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                             </MultiLabel>
                           );
                         })}
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "paragraph") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -273,22 +266,21 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
+                  return (
+                    <Box display="flex" flexDirection="column" mb={3}>
+                      {fieldJsx}
+                      {errors[fieldName] && <Error>{errors[fieldName]}</Error>}
+                    </Box>
+                  );
                 })}
                 <>
                   <FieldLabel htmlFor={"location"}>
                     Ciudad y país. (Lo necesitamos para saber tu zona horaria)
                   </FieldLabel>
-
-                  <TextInput
-                    type="search"
+                  <ClearableTextInput
                     id={"location"}
                     name={"location"}
                     onFocus={() => {
@@ -297,12 +289,15 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                         action: `user focused field location`,
                       });
                     }}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      console.log(e);
+                      handleChange(e);
+                    }}
                     value={values["location"] || appStore.userLocation}
+                    onClear={() => {
+                      setFieldValue("location", " ", false);
+                    }}
                   />
-                  <ClearFieldButton
-                    onClick={() => setFieldValue("location", " ", false)}
-                  ></ClearFieldButton>
 
                   {errors["location"] ? (
                     <Error>{errors["location"]}</Error>
@@ -311,14 +306,16 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                   )}
                 </>
                 <Button
+                  display="flex"
+                  alignItems="center"
                   type="submit"
-                  onClick={() =>
+                  onClick={() => {
                     ReactGA.event({
                       category: "appliedCat",
                       action: `userApplied`,
-                    })
-                  }
-                ><FaCheckCircle />
+                    });
+                  }}
+                >
                   Envía mi solicitud
                 </Button>
               </Form>
@@ -326,6 +323,6 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
           </Formik>
         </>
       )}
-    </MainAppl>
+    </>
   );
 };
