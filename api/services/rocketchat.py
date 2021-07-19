@@ -1,9 +1,7 @@
 from config import config
-from urllib.parse import urljoin
-
 import requests
-
 import logging
+from services.request_session import RequestSession
 
 
 api_url = config['cie.rocketchat.api_url']
@@ -12,14 +10,7 @@ password = config['cie.rocketchat.password']
 LOG = logging.getLogger(__name__)
 
 
-class SessionB(requests.Session):
-    def __init__(self, url_base=None, *args, **kwargs):
-        super(SessionB, self).__init__(*args, **kwargs)
-        self.url_base = url_base
 
-    def request(self, method, url, **kwargs):
-        modified_url = urljoin(self.url_base, url)
-        return super(SessionB, self).request(method, modified_url, **kwargs)
 
 
 class RocketChatService:
@@ -35,7 +26,7 @@ class RocketChatService:
         and add to session for subsequent requests
         :return: None
         """
-        self.session = SessionB(api_url)
+        self.session = RequestSession(api_url)
         try:
             resp = self.session.post(RocketChatService.LOGIN_URI, json={
                 "user": username,
