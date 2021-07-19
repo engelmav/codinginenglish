@@ -31,6 +31,8 @@ import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
 import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 import React from "react";
+import ReactGA from "react-ga";
+
 
 const _Classroom = React.lazy(() => import("./Aula"));
 const _Collab = React.lazy(() => import("./PopupActivity/Collab/Collab"));
@@ -66,10 +68,21 @@ console.log = function () {
   );
 };
 
+
+
 export function main(appStore) {
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
   const auth = new Auth(appStore);
+  const trackingId = "UA-199972795-1";
+
+  ReactGA.initialize(trackingId);
+
+  history.listen((location) => {
+    ReactGA.pageview(location.pathname);
+    window.scrollTo(0, 0);
+  });
+  
 
   async function handleAuthSuccess(authResult) {
     const initializedUser = await cieApi.initializeUser(authResult);
@@ -182,6 +195,6 @@ export function main(appStore) {
 
   const Routes = compose(_Routes, routesProps);
 
-  const App = compose(_App, { appStore, auth, Header, Routes, Footer });
+  const App = compose(_App, { appStore, auth, Header, Routes, Footer, history });
   return App;
 }
