@@ -29,6 +29,8 @@ class AppStore {
   registeredSessions = [];
   sessionInProgress = false;
   rocketchatAuthToken = null;
+  userApplied = false;
+  
 
   constructor() {
     makeAutoObservable(this);
