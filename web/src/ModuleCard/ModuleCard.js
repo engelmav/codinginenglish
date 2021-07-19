@@ -1,10 +1,9 @@
-import { Button, ContentSection, Title } from "../UtilComponents";
+import { ContentSection, Title } from "../UtilComponents";
 import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 // import { toLocalTime } from "../util";
 // import Dialog from "@material-ui/core/Dialog";
-// import useMediaQuery from "@material-ui/core/useMediaQuery";
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Flex, Text, Image } from "rebass";
