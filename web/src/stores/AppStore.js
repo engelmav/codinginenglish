@@ -22,12 +22,15 @@ class AppStore {
   userId = null;
   userRole = null;
   userLocation = null;
+  flow = null;
   firstName = null;
   lastName = null;
   email = null;
   registeredSessions = [];
   sessionInProgress = false;
   rocketchatAuthToken = null;
+  userApplied = false;
+  
 
   constructor() {
     makeAutoObservable(this);
@@ -79,7 +82,7 @@ class AppStore {
   }
 
   async rehydrate() {
-    rehydrate(this);
+    return await rehydrate(this);
   }
 
   get isSynchronized() {
@@ -99,6 +102,7 @@ export const makeAppStore = (appStoreName = "default") => {
       "userId",
       "userRole",
       "firstName",
+      "flow",
       "email",
       "registeredSessions",
       "sessionInProgress",

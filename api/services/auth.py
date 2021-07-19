@@ -1,4 +1,4 @@
-from auth0.v3.authentication import GetToken
+from auth0.v3.authentication import GetToken, Passwordless
 from auth0.v3.management import Users, Tickets
 from passlib import pwd
 
@@ -6,6 +6,8 @@ from config import config, AUTH0_DB_CONN
 
 import logging
 import uuid
+
+from services.request_session import RequestSession
 
 LOG = logging.getLogger(__name__)
 
@@ -21,6 +23,15 @@ class AuthService:
         get_token = GetToken(domain)
         self.token = get_token.client_credentials(client_id, client_secret, API_ENDPOINT)
         self.mgmt_api_token = self.token['access_token']
+        self.session = RequestSession(API_ENDPOINT)
+        headers = {
+            'Bearer': self.mgmt_api_token
+        }
+        self.session.headers.update(headers)
+
+    def _post(self, uri, payload):
+        res = self.session.post(uri, json=payload)
+        return res
 
     def get_auth0_user(self, email):
         user = Users(domain, self.mgmt_api_token).list(q=f"email={email}")
@@ -28,7 +39,7 @@ class AuthService:
 
     def create_auth0_user(self, full_name, user_email):
         user_id = str(uuid.uuid4())
-        users = Users(domain, mgmt_api_token)
+        users = Users(domain, self.mgmt_api_token)
         generated_password = pwd.genword(entropy=56, charset="ascii_62")
         user_res = users.create({
           "email": user_email,
@@ -48,7 +59,7 @@ class AuthService:
         return user_res
 
     def create_auth0_passwd_reset_ticket(self, user_email):
-        tickets = Tickets(domain, mgmt_api_token)
+        tickets = Tickets(domain, self.mgmt_api_token)
         two_days = 172800
         ticket_res = tickets.create_pswd_change({
             "result_url": "https://www.codinginenglish.com/login",
@@ -62,3 +73,20 @@ class AuthService:
         ticket_link = ticket_res.get("ticket")
         better_link = ticket_link.replace("dev-nougy3g5.auth0", "login.codinginenglish")
         return better_link
+
+    def passwordless_login(self, email):
+        # client_id, email, send='link', auth_params=None, client_secret=None
+        # data={
+        #     'client_id': client_id,
+        #     'connection': 'email',
+        #     'email': email,
+        #     'send': send,
+        # }
+        payload = {
+            "email": email,
+            "send": "link",
+            "connection": "email",
+            "client_id": client_id,
+        }
+        res = self._post("/passwordless/start", payload)
+        return res

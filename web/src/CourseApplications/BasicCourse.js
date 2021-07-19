@@ -1,23 +1,22 @@
 import React, { useState } from "react";
-import { Formik, Field, Form as _Form } from "formik";
+import { Formik, Field as _Field, Form as _Form } from "formik";
 import styled from "styled-components";
 import {
+  Box,
+  boxy,
+  ClearableTextInput,
   TextInput,
   Button,
   Main,
   Title,
-  ContentSection,
 } from "../UtilComponents";
-import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
+import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
 import {
   fontFamily,
-  inputPadding,
-  lgInputFontSize,
-  smInputFontSize,
-  whenSmallScreen,
   cieOrange,
+  darkGray,
 } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 
@@ -29,14 +28,13 @@ const ApplicationSchema = Yup.object().shape({
     .min(2, "Muy corto!")
     .max(50, "Muy largo!")
     .required("Requerido"),
-  email: Yup.string().email("Invalid email").required("Requerido"),
   programmingLevel: Yup.string().required(
-    "Favor de seleccionar tu nivel de experiencia con la programacion"
+    "Favor de seleccionar tu nivel de experiencia con la programación"
   ),
   englishLevel: Yup.string().required(
-    "Favor de seleccionar tu nivel de experiencia con el ingles"
+    "Favor de seleccionar tu nivel de experiencia con el inglés"
   ),
-  // whenAttend: Yup.array().required("Favor de seleccionar una opcion"),
+  // whenAttend: Yup.array().required("Favor de seleccionar una opción"),
   whenAttend: Yup.bool().oneOf(
     basicCourseForm.find((field) => field.fieldName === "whenAttend").choices,
     "Por favor elige unas horas"
@@ -47,117 +45,37 @@ const ApplicationSchema = Yup.object().shape({
 });
 
 const MultiLabel = styled.label`
+  ${boxy}
   font-family: ${fontFamily};
 `;
+const Field = styled(_Field)`
+  ${boxy}
+`;
+Field.defaultProps = {
+  mr: 2,
+  mb: 1,
+};
 
 const FieldLabel = styled.label`
+  ${boxy}
   font-weight: bolder;
   font-family: ${fontFamily};
 `;
+FieldLabel.defaultProps = {
+  mb: 3,
+};
 
 const Form = styled(_Form)`
   display: flex;
   flex-direction: column;
 `;
 
-const Error = styled.div`
+const Error = styled(P)`
   color: #ff0033;
-`;
-
-const Timeline = styled.div`
-  .container {
-    margin: auto;
-  }
-
-  li {
-    margin-bottom: 25px;
-  }
-
-  .timeline {
-    counter-reset: test 0;
-    position: relative;
-  }
-
-  .timeline li {
-    list-style: none;
-    float: left;
-    width: 33.3333%;
-    position: relative;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
-  ul {
-    padding: 0;
-    font-family: ${fontFamily};
-    font-weight: 900;
-  }
-
-  ul:nth-child(1) {
-    ${whenSmallScreen`
-      font-size: .6rem;`}
-    color: black;
-  }
-
-  .timeline li:before {
-    counter-increment: test;
-    content: counter(test);
-    width: 50px;
-    height: 50px;
-    border: 3px solid ${cieOrange};
-    border-radius: 50%;
-    display: block;
-    text-align: center;
-    line-height: 50px;
-    margin: 0 auto 10px auto;
-    background: #fff;
-    color: #000;
-    transition: all ease-in-out 0.3s;
-    ${whenSmallScreen`
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    border-width: 2px;
-    `}
-  }
-
-  .timeline li:after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    background-color: grey;
-    top: 25px;
-    left: -50%;
-    z-index: -999;
-    transition: all ease-in-out 0.3s;
-  }
-
-  .timeline li:first-child:after {
-    content: none;
-  }
-  .timeline li.active-tl {
-    color: black;
-  }
-  .timeline li.active-tl:before {
-    background: ${cieOrange};
-    color: white;
-  }
-
-  .timeline li.active-tl + li:after {
-    background: ${cieOrange};
-  }
 `;
 
 const MainAppl = styled(Main)`
   width: min(90%, 700px);
-`;
-
-const ClearableTextField = styled(TextInput)`
-  position: relative;
-  &:not(:valid) ~ .close-icon {
-    display: none;
-  }
 `;
 
 const ClearFieldButton = styled.button`
@@ -178,7 +96,7 @@ const ClearFieldButton = styled.button`
     background-color: ${cieOrange};
     z-index: 1;
     right: 10px;
-    top: -74px;
+    top: -58px;
     bottom: 0;
     margin: auto;
     padding: 2px;
@@ -201,47 +119,32 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
       : "";
   });
   initialValues["location"] = appStore.userLocation || "";
+  initialValues["fullName"] = appStore.lastName
+    ? appStore.firstName + " " + appStore.lastName
+    : appStore.firstName;
 
   return (
-    <MainAppl p={20}>
-      <Title textAlign="center">Webapp Development - Basic</Title>
-      <P textAlign="center">
+    <>
+      <Title textAlign="center">Solicita una plaza</Title>
+      <P mb={4} textAlign="center">
         <i>del 20 septiembre al 20 diciembre</i>
       </P>
-      <Timeline>
-        <ul className="timeline">
-          <li className="active-tl">Solicitud</li>
-          <li>Entrevista</li>
-          <li>Matrícula</li>
-        </ul>
-      </Timeline>
       {appComplete ? (
-        <p>
+        <P>
           Gracias por completar la solicitud! Te contactaremos dentro de 2 días
           para hablar de los próximos pasos.
-        </p>
+        </P>
       ) : (
         <>
-          <P>
-            El proceso de matriculación de Coding in English consta de tres
-            pasos:
-          </P>
-          <ol>
-            <li>Rellenar la solicitud del curso.</li>
-            <li>
-              Entrevista con un instructor con el fin de averiguar tus objetivos
-              y algunos temas técnicos.
-            </li>
-            <li>Matrícula para el curso</li>
-          </ol>
-
           <Formik
             validationSchema={ApplicationSchema}
             initialValues={initialValues}
             onSubmit={async (values, actions) => {
+              values.email = appStore.email;
               await cieApi.submitApp(values);
               setAppComplete(true);
               actions.setSubmitting(false);
+              appStore.userApplied = true;
             }}
           >
             {({
@@ -257,8 +160,10 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
               <Form onSubmit={handleSubmit}>
                 {basicCourseForm.map((field, idx) => {
                   const { fieldName } = field;
+                  let fieldJsx;
+
                   if (field.fieldType === "shortAnswer") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -279,16 +184,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           }}
                           value={values[field.fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "email") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -306,16 +206,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "multipleChoice") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -332,16 +227,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                             </MultiLabel>
                           );
                         })}
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "checkboxes") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title}>
                           {field.title}
@@ -354,16 +244,11 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                             </MultiLabel>
                           );
                         })}
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
                   if (field.fieldType === "paragraph") {
-                    return (
+                    fieldJsx = (
                       <>
                         <FieldLabel htmlFor={field.title} key={idx}>
                           {field.title}
@@ -381,22 +266,21 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                           onChange={handleChange}
                           value={values[fieldName]}
                         />
-                        {errors[fieldName] ? (
-                          <Error>{errors[fieldName]}</Error>
-                        ) : (
-                          <div style={{ color: "white" }}>empty</div>
-                        )}
                       </>
                     );
                   }
+                  return (
+                    <Box display="flex" flexDirection="column" mb={3}>
+                      {fieldJsx}
+                      {errors[fieldName] && <Error>{errors[fieldName]}</Error>}
+                    </Box>
+                  );
                 })}
                 <>
                   <FieldLabel htmlFor={"location"}>
                     Ciudad y país. (Lo necesitamos para saber tu zona horaria)
                   </FieldLabel>
-
-                  <TextInput
-                    type="search"
+                  <ClearableTextInput
                     id={"location"}
                     name={"location"}
                     onFocus={() => {
@@ -405,12 +289,15 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                         action: `user focused field location`,
                       });
                     }}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      console.log(e);
+                      handleChange(e);
+                    }}
                     value={values["location"] || appStore.userLocation}
+                    onClear={() => {
+                      setFieldValue("location", " ", false);
+                    }}
                   />
-                  <ClearFieldButton
-                    onClick={() => setFieldValue("location", " ", false)}
-                  ></ClearFieldButton>
 
                   {errors["location"] ? (
                     <Error>{errors["location"]}</Error>
@@ -419,21 +306,23 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                   )}
                 </>
                 <Button
+                  display="flex"
+                  alignItems="center"
                   type="submit"
-                  onClick={() =>
+                  onClick={() => {
                     ReactGA.event({
                       category: "appliedCat",
                       action: `userApplied`,
-                    })
-                  }
+                    });
+                  }}
                 >
-                  Submit
+                  Envía mi solicitud
                 </Button>
               </Form>
             )}
           </Formik>
         </>
       )}
-    </MainAppl>
+    </>
   );
 };

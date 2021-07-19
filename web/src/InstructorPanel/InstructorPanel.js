@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, Select, TextInput } from "../UtilComponents";
 import animal from "animal-id";
-import { DataGrid } from "@material-ui/data-grid";
+// import { DataGrid } from "@material-ui/data-grid";
 import Dialog from "@material-ui/core/Dialog";
 import { observer } from "mobx-react";
 import { action, computed, makeObservable, observable, toJS } from "mobx";
 import { Box } from "../UtilComponents/Box";
+
+const DataGrid = React.lazy(
+  () => import('@material-ui/data-grid').then(module => ({ default: module.DataGrid }))
+);
 
 var MAIN_ROOM_ID = 1;
 

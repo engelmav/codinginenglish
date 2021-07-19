@@ -10,7 +10,7 @@ class UserService:
     def __init__(self, models):
         self.models = models
 
-    def create_user(self, email, first_name=None, last_name=None, rocketchat_id=None):
+    def create_user(self, email, first_name=None, last_name=None, rocketchat_id=None, status=None):
         m = self.models
         existing_user = m.User.query.filter(
             or_(
@@ -18,7 +18,6 @@ class UserService:
                     m.User.firstname == first_name,
                     m.User.lastname == last_name,
                     m.User.email == email),
-
                 and_(
                     # m.User.fullname == full_name,
                     m.User.email == email
@@ -27,6 +26,7 @@ class UserService:
         ).one_or_none()
 
         if existing_user:
+            # TODO: if existing user with additional data, enrich
             LOG.warning(f"User with email {existing_user.email} exists already, returning")
             return existing_user
 
@@ -34,7 +34,8 @@ class UserService:
             firstname=first_name,
             lastname=last_name,
             email=email,
-            rocketchat_id=rocketchat_id
+            rocketchat_id=rocketchat_id,
+            status=status
         )
         _user.add()
 

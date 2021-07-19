@@ -5,8 +5,16 @@ class CieApi {
     return await (await axios.post("/api/users", userData)).data;
   }
 
+  async createRegisteredUser(userData){
+    return this._post("/api/registered-user", userData)
+  }
+
   async _get(uri) {
     // TODO: handle exceptions
+  }
+
+  async _post(uri, payload) {
+    return (await axios.post(uri, payload)).data;
   }
 
   async getUpcomingRegistrationsByUserId(userId) {
@@ -51,12 +59,26 @@ class CieApi {
   }
 
   async updateUser(userId, userData) {
-    console.log("Attempting to update user with userId", userId, "and data", userData)
+    console.log(
+      "Attempting to update user with userId",
+      userId,
+      "and data",
+      userData
+    );
     return (await axios.patch(`/api/users/${userId}`, userData)).data;
   }
 
-  async submitApp(appData){
+  async submitApp(appData) {
     return (await axios.post(`/api/student-application`, appData)).data;
+  }
+
+  async setUserStatus(userId, status) {
+    return await this.updateUser(userId, { status });
+  }
+
+
+  async log(message, level = "info") {
+    return await this.post("/api/log", { data: { message, level } });
   }
 }
 

@@ -5,7 +5,7 @@ import { font, cieOrange } from "../UtilComponents/sharedStyles";
 import { Link } from "react-router-dom";
 import { Main } from "../UtilComponents";
 import { Button } from "../UtilComponents/Button";
-import { P, Title, TitleH2 } from "../UtilComponents/Typography/Typography"
+import { P, Title, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { Box } from "../UtilComponents/Box";
 import Dialog from "@material-ui/core/Dialog";
 import {
@@ -15,11 +15,10 @@ import {
   space,
 } from "styled-system";
 
-const ContentWrapper = styled.div`
-  ${font}
-  margin: 0 auto;
-  max-width: 980px;
-  min-width: 769px;
+const PageContainer = styled(Main)`
+  display: flex;
+  flex-direction: column;
+  ${space}
 `;
 
 const Flex = styled(Box)(
@@ -119,21 +118,20 @@ const MyDashboard = observer((props) => {
 
   return (
     <>
-      <Main>
+      <PageContainer mt={3} mb={3}>
         <Title textAlign="center">{`${
           appStore.firstName ? appStore.firstName : "Student"
         }'s Dashboard`}</Title>
 
-          {appStore.authData && <TitleH2>Welcome, {appStore.firstName}!</TitleH2>}
-          {appStore.sessionInProgress && (
-            <P>Your class is in session. Go there now!</P>
-          )}
-          {getClasses(registrations)}
-          <P>
-            <Link to="/upcoming-sessions">Find more classes</Link>
-          </P>
-
-      </Main>
+        {appStore.authData && <TitleH2>Welcome, {appStore.firstName}!</TitleH2>}
+        {appStore.sessionInProgress && (
+          <P>Your class is in session. Go there now!</P>
+        )}
+        {getClasses(registrations)}
+        <P>
+          <Link to="/upcoming-sessions">Find more classes</Link>
+        </P>
+      </PageContainer>
       <Dialog
         onClose={handleClose}
         aria-labelledby="user-info-dialog"

@@ -5,11 +5,6 @@ export const basicCourseForm = [
     fieldType: "shortAnswer",
   },
   {
-    fieldName: "email",
-    title: "Email",
-    fieldType: "email",
-  },
-  {
     fieldName: "programmingLevel",
     title: "Nivel de programación",
     fieldType: "multipleChoice",
@@ -19,11 +14,6 @@ export const basicCourseForm = [
       "Escribo programas en mis ratos libres",
       "Escribo programas profesionalmente",
     ],
-  },
-  {
-    fieldName: "whyProgramming",
-    title: "¿Por qué quieres aprender a programar?",
-    fieldType: "paragraph",
   },
   {
     fieldName: "englishLevel",

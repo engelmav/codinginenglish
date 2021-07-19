@@ -1,16 +1,18 @@
-import { Button, ContentSection, Title } from "../UtilComponents";
+import { ContentSection, Title } from "../UtilComponents";
 import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
-import { toLocalTime } from "../util";
-import Dialog from "@material-ui/core/Dialog";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+// import { toLocalTime } from "../util";
+// import Dialog from "@material-ui/core/Dialog";
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Flex, Text, Image } from "rebass";
 import { Link } from "react-router-dom";
 
 import React, { useState } from "react";
+const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
+const useMediaQuery = React.lazy(() => import("@material-ui/core/useMediaQuery"));
+
 
 // TODO: duped in Home/index.js
 const RegisterLink = styled(Link)`
@@ -70,8 +72,8 @@ export const ModuleCard = (props) => {
 
         <P>{moduleDescription}</P>
         <P>del 20 septiembre al 20 diciembre</P>
-        {moduleSessions.map((ms, index) => {
-          const sessionDtLocalTime = toLocalTime(ms._session_datetime);
+        {moduleSessions.map((ms) =>  {
+          // const sessionDtLocalTime = await toLocalTime(ms._session_datetime);
           return (
             // <Button
             //   key={index}

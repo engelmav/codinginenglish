@@ -1,11 +1,8 @@
 import React from "react";
-import PropTypes from "prop-types";
 import fabric from "fabric";
-import Dialog from "@material-ui/core/Dialog";
-import { nanoid } from "nanoid";
-import { CompactPicker } from "react-color";
+
 import { CanvasObjectCreator } from "../services/CanvasObjectCreator";
-import { CanvasContainer, CanvasAndToolbar, Toolbar } from "./styles";
+import { CanvasAndToolbar, Toolbar } from "./styles";
 
 class DesignCanvas extends React.Component {
   state = {

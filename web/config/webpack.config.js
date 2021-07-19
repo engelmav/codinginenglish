@@ -140,7 +140,7 @@ module.exports = function (webpackEnv) {
 
   console.log("Generated entry list:");
   console.log(entryList);
-
+  console.log("isEnvProduction:", isEnvProduction)
   var devtool = isEnvProduction
     ? shouldUseSourceMap
       ? "source-map"
@@ -192,9 +192,7 @@ module.exports = function (webpackEnv) {
     optimization: {
       minimize: isEnvProduction,
       minimizer: [
-        // This is only used in production mode
-
-        // This is only used in production mode
+        new TerserPlugin(),
         new OptimizeCSSAssetsPlugin({
           cssProcessorOptions: {
             parser: safePostCssParser,
@@ -467,13 +465,6 @@ module.exports = function (webpackEnv) {
         filename: "index.html",
         chunks: ["mainApp"],
         excludeChunks: ["zoomApp"],
-      }),
-      new HtmlWebpackPlugin({
-        inject: true,
-        template: "./public/zoomIndex.html",
-        filename: "zoomIndex.html",
-        chunks: ["zoomApp"],
-        excludeChunks: ["mainApp"],
       }),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.

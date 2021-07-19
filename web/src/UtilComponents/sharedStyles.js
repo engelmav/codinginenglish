@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css } from "styled-components";
 
 export const debugBorder = css`
   /* border: 1px dotted blue; */
@@ -8,19 +8,15 @@ const fontColor = css`
   color: #373737;
 `;
 
-
-const lightGray = css`
-  color: #6e6e6e;
-`;
+export const lightGray = "#f6f6f6";
 
 export const darkGray = "#3d3636";
 export const cieOrange = "#ff3e00";
 
-
-export const fontFamily = "'Arial', sans-serif"
+export const fontFamily = "'Arial', sans-serif";
 const font = css`
   font-family: ${fontFamily};
-  ${fontColor}  
+  ${fontColor}
 `;
 
 export const fontMonospace = css`
@@ -42,10 +38,4 @@ export const smInputFontSize = "16px"; // using absolutes because of stripe nons
 export const lgInputFontSize = "16px";
 export const inputPadding = "15px";
 
-export {
-  font,
-  fontColor,
-  lightGray,
-  orangeBgColor
- };
-
+export { font, fontColor, orangeBgColor };

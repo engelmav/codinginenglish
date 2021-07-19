@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Main, ContentSection, Button } from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
@@ -114,7 +114,7 @@ const Home = (props) => {
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="center">
-          <ContentSection justifyContent="center">
+          <ContentSection>
             <p style={{ textAlign: "center" }}>
               Tu clase de inglés se ha convertido en un grupo de ingenieros de
               software.

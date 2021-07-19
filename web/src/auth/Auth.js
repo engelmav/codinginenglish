@@ -1,5 +1,4 @@
 import auth0 from "auth0-js";
-import history from "../history";
 import settings from "../settings";
 
 var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
@@ -38,8 +37,10 @@ class Auth {
     this.onLogout.push(callback);
   }
 
-  login() {
-    console.log("Auth.js: calling auth0.authorize():");
+  login(options = null) {
+    if (options) {
+      return this.auth0.authorize(options);
+    }
     this.auth0.authorize();
   }
 
@@ -47,16 +48,12 @@ class Auth {
     return new Promise((resolve, reject) => {
       this.auth0.parseHash((err, authResult) => {
         if (err) return reject(err);
-        if (!authResult || !authResult.idToken) {
-          return reject(err);
+        if (err || !authResult || !authResult.idToken) {
+          console.log("There was an issue attempting to login.");
         }
-        resolve();
-        console.log("handleAuthentication() setSession")
         this.setSession(authResult);
-        console.log(
-          "Auth module successfully authenticated. Calling callbacks..."
-        );
         this.onAuthSuccess.forEach((callback) => callback(authResult));
+        resolve();
       });
     });
   }
@@ -86,7 +83,7 @@ class Auth {
     return new Promise((resolve, reject) => {
       this.auth0.checkSession({}, (err, authResult) => {
         if (err) return reject(err);
-        console.log("silentAuth() setSession")
+        console.log("silentAuth() setSession");
         this.setSession(authResult);
         resolve();
       });
@@ -107,13 +104,16 @@ class Auth {
 
   isAuthenticated() {
     const currentTime = new Date().getTime();
-    console.log("isAuthenticated() sees loginExpiresAt:",  this.appStore.loginExpiresAt);
+    console.log(
+      "isAuthenticated() sees loginExpiresAt:",
+      this.appStore.loginExpiresAt
+    );
     const isAuth = currentTime < this.appStore.loginExpiresAt;
     return isAuth;
   }
 
   renewSession() {
-    console.log("renewing session")
+    console.log("renewing session");
     this.auth0.checkSession({}, (err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
@@ -124,6 +124,37 @@ class Auth {
           `Could not get new token (${err.error}: ${err.errorDescription})`
         );
       }
+    });
+  }
+  loginWithGoogle(cb = null) {
+    this.auth0.authorize(
+      {
+        connection: "google-oauth2",
+      },
+      (err, res) => {
+        if (cb) cb(err, res);
+      }
+    );
+  }
+  loginWithEmailLink(email, cb = null) {
+    return new Promise((resolve, reject) => {
+      this.auth0.passwordlessStart(
+        {
+          email,
+          send: "link",
+          connection: "email",
+        },
+        (err, res) => {
+          if (cb) cb(err, res);
+          if (err) {
+            console.log("error ocurred in passwordless login:", err);
+          }
+          if (res) {
+            console.log("successful passwordlessStart:", res);
+            resolve(res);
+          }
+        }
+      );
     });
   }
 }

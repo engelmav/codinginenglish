@@ -6,8 +6,8 @@ import BlockQuote from "./UtilComponents/BlockQuote";
 const AboutUs = () => {
   return (
     <Main p={20}>
-      <Title>About Us</Title>
-      <P>
+      <Title pb={3}>About Us</Title>
+      <P pb={4}>
         Coding in English is born of one passionate and principal belief: that
         all people have the right to -- and the possibility of -- achieving a
         better life, and a better livelihood. To this end, the instructors of
@@ -15,15 +15,8 @@ const AboutUs = () => {
         espousing the ideals of kindness, encouragement, and the thrill of
         pedagogy.
       </P>
-      <BlockQuote>
-        It is through hearing the learners, a task unacceptable to authoritarian
-        educators, that democratic teachers increasingly prepare themselves to
-        be heard by learners. But by listening to and so learning to talk with
-        learners, democratic teachers teach the learners to listen to them as
-        well. --Freire{" "}
-      </BlockQuote>
-      <TitleH2>Instructors</TitleH2>
-      <P>
+      <TitleH2 pb={2}>Instructors</TitleH2>
+      <P pb={4}>
         The first instructor at Coding in English,{" "}
         <a href="https://www.linkedin.com/in/vincent-engelmann-76588441/">
           Vincent Engelmann
@@ -34,16 +27,16 @@ const AboutUs = () => {
         English -- to teach immersive English to non-native speakers, in effect
         teaching both English and programming.
       </P>
-      <TitleH2>Design</TitleH2>
-      <P>
+      <TitleH2 pb={2}>Design</TitleH2>
+      <P pb={4}>
         Coding in English consults with{" "}
         <a href="https://www.linkedin.com/in/ericengelmann/">Eric Engelmann</a>{" "}
         in the design and layout of our website. Without him, the site would be
         pretty ugly. Eric is a senior and seasoned product and project manager
         with excellent design sense.
       </P>
-      <TitleH2>Editing & Translation</TitleH2>
-      <P>
+      <TitleH2 pb={2}>Editing & Translation</TitleH2>
+      <P pb={4}>
         We continue to work with{" "}
         <a href="https://www.linkedin.com/in/laura-bohigas-69916394/">
           Laura Bohigas
@@ -51,8 +44,8 @@ const AboutUs = () => {
         for editing and translating into Spanish and Catalan. The site and
         curricula would sound strange without her patient and expert influence.
       </P>
-      <TitleH2>Marketing & Quality Assurance</TitleH2>
-      <P>
+      <TitleH2 pb={2}>Marketing & Quality Assurance</TitleH2>
+      <P pb={4}>
         And last but definitely not least, we continue to work with{" "}
         <a href="https://www.linkedin.com/in/karen-morales-engelmann-2a233146/">
           Karen Morales-Engelmann

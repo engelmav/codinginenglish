@@ -78,6 +78,7 @@ def model_factory(Base):
         email = Column(String(120), unique=True)
         rocketchat_id = Column(Text)
         nickname = Column(Text)
+        status = Column(String(100))
         # TODO: add nickname
         registered_modules = relationship(
             'UserModuleRegistration',

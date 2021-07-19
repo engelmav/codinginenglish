@@ -20,6 +20,9 @@ import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
 import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { AboutUs } from "./AboutUs";
 import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
+import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
+import { Register as _Register } from "./CourseApplications/Register";
+import { NextSteps as _NextSteps } from "./CourseApplications/NextSteps";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -28,6 +31,8 @@ import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
 import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 import React from "react";
+import ReactGA from "react-ga";
+
 
 const _Classroom = React.lazy(() => import("./Aula"));
 const _Collab = React.lazy(() => import("./PopupActivity/Collab/Collab"));
@@ -63,12 +68,23 @@ console.log = function () {
   );
 };
 
+
+
 export function main(appStore) {
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
   const auth = new Auth(appStore);
+  const trackingId = "UA-199972795-1";
 
-  async function initializeUser(authResult) {
+  ReactGA.initialize(trackingId);
+
+  history.listen((location) => {
+    ReactGA.pageview(location.pathname);
+    window.scrollTo(0, 0);
+  });
+  
+
+  async function handleAuthSuccess(authResult) {
     const initializedUser = await cieApi.initializeUser(authResult);
     appStore.user = initializedUser;
     const userData = initializedUser.data.user;
@@ -82,15 +98,15 @@ export function main(appStore) {
     );
     const studentSessionMgr = new StudentSessionManager(websocket);
     studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
-    console.log(
-      "initializedUser.data.has_session_in_progress:",
-      initializedUser.data.has_session_in_progress
-    );
     appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
     studentSessionMgr.initialize();
-    history.push("/my-dashboard");
+    let nextPage = "/my-dashboard";
+    if (appStore.flow === "newRegistration") {
+      nextPage = "/apply/next-steps";
+    }
+    history.push(nextPage);
   }
-  auth.addOnAuthSuccess(initializeUser);
+  auth.addOnAuthSuccess(handleAuthSuccess);
   auth.addOnLogout(appStore.clearStore);
 
   const Login = compose(_Login, { auth, appStore });
@@ -149,7 +165,16 @@ export function main(appStore) {
   /** End Configure Aula */
 
   const CallbackWithRouter = withRouter(Callback);
-  const Application = compose(_Application, { appStore, cieApi });
+  // const Application = compose(_Application, { appStore, cieApi });
+  const Register = compose(_Register, { appStore, auth, cieApi });
+  const NextSteps = compose(_NextSteps, { appStore, auth, cieApi });
+
+  const ApplicationProcess = compose(_ApplicationProcess, {
+    appStore,
+    cieApi,
+    Register,
+    NextSteps,
+  });
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
   const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
@@ -159,7 +184,7 @@ export function main(appStore) {
     auth,
     cieApi,
     AboutUs,
-    Application,
+    ApplicationProcess,
     CallbackRoute,
     Classroom,
     CollabEditor,
@@ -170,6 +195,6 @@ export function main(appStore) {
 
   const Routes = compose(_Routes, routesProps);
 
-  const App = compose(_App, { appStore, auth, Header, Routes, Footer });
+  const App = compose(_App, { appStore, auth, Header, Routes, Footer, history });
   return App;
 }

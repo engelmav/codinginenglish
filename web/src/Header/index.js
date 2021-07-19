@@ -6,7 +6,7 @@ import {
   whenSmallScreen,
   orangeBgColor,
   cieOrange,
-  font,
+  darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
 import { P } from "../UtilComponents/Typography/Typography";
@@ -16,6 +16,11 @@ import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import { CSSTransition } from "react-transition-group";
 import { fadeIn } from "react-animations";
+import history from "../history";
+import ReactGA from "react-ga";
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
 
 const animation = keyframes`${fadeIn}`;
 
@@ -30,12 +35,12 @@ const headerMarginSm = css`
 const CloseBox = styled(FaRegWindowClose)`
   display: none;
   color: white;
-  background-color: black;
+  background-color: ${darkGray};
   align-self: flex-end;
   cursor: pointer;
   transition: 0.2s;
   :hover {
-    background-color: black;
+    background-color: ${darkGray};
     color: white;
   }
   ${whenSmallScreen`
@@ -65,14 +70,14 @@ const Header = styled.header`
   ${whenSmallScreen`
       ${headerMarginSm}`}
   align-items: center;
-  background-color: black;
+  background-color: #3d3636;
 `;
 
 const Img = styled.img`
   width: auto;
   height: 70px;
   ${whenSmallScreen`
-      height: 25px; padding-top: 5px;`}
+      height: 28px; padding-top: 5px;`}
 `;
 
 const NavbarList = styled.ul`
@@ -92,7 +97,7 @@ const NavbarList = styled.ul`
     justify-content: flex-start;
     align-items: flex-end;
     ${headerMarginSm}
-    background-color: black;
+    background-color: ${darkGray};
     transition: 0.1s ease-out;
     transform: ${({ navMenu }) =>
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
@@ -184,6 +189,7 @@ const HeaderContainer = observer((props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [onAppPage, setOnAppPage] = useState(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -193,6 +199,9 @@ const HeaderContainer = observer((props) => {
   };
 
   useEffect(() => {
+    if (history.location.pathname.includes("/apply")) {
+      setOnAppPage(true);
+    }
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
     return () =>
@@ -200,7 +209,7 @@ const HeaderContainer = observer((props) => {
         "mousedown",
         detectBackgroundClickAndCloseNav
       );
-  }, [navMenuRef]);
+  }, [navMenuRef, history.location.pathname]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
   const links = [
@@ -215,7 +224,7 @@ const HeaderContainer = observer((props) => {
         <div></div>
       </Route>
       <Route path="*">
-        {bannerOpen && (
+        {bannerOpen && !onAppPage && (
           <BouncyDiv>
             <Banner>
               <P>
@@ -223,7 +232,16 @@ const HeaderContainer = observer((props) => {
                 <i>WebApp Development - Basic</i>
               </P>
               <Link to="/apply">
-                <ApplyButton onClick={() => setBannerOpen(false)}>
+                <ApplyButton
+                  onClick={() => {
+                    ReactGA.event({
+                      category: "register",
+                      action: "clickedYellowBanner",
+                      label: "solicitaUnaPlaza",
+                    });
+                    setBannerOpen(false);
+                  }}
+                >
                   solicita una plaza
                 </ApplyButton>
               </Link>
@@ -239,7 +257,7 @@ const HeaderContainer = observer((props) => {
           <Link to="/">
             <Img
               alt="cie logo"
-              src={`${settings.assets}/cie-logo-horizontal-black.png`}
+              src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
             ></Img>
           </Link>
           <NavbarList navMenu={navMenu} ref={navMenuRef}>
