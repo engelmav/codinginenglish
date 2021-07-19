@@ -7,7 +7,6 @@ import {
   orangeBgColor,
   cieOrange,
   darkGray,
-  font,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
 import { P } from "../UtilComponents/Typography/Typography";
@@ -17,6 +16,11 @@ import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import { CSSTransition } from "react-transition-group";
 import { fadeIn } from "react-animations";
+import history from "../history";
+import ReactGA from "react-ga";
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
 
 const animation = keyframes`${fadeIn}`;
 
@@ -73,7 +77,7 @@ const Img = styled.img`
   width: auto;
   height: 70px;
   ${whenSmallScreen`
-      height: 25px; padding-top: 5px;`}
+      height: 28px; padding-top: 5px;`}
 `;
 
 const NavbarList = styled.ul`
@@ -185,6 +189,7 @@ const HeaderContainer = observer((props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [onAppPage, setOnAppPage] = useState(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -194,6 +199,9 @@ const HeaderContainer = observer((props) => {
   };
 
   useEffect(() => {
+    if (history.location.pathname.includes("/apply")) {
+      setOnAppPage(true);
+    }
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
     return () =>
@@ -201,7 +209,7 @@ const HeaderContainer = observer((props) => {
         "mousedown",
         detectBackgroundClickAndCloseNav
       );
-  }, [navMenuRef]);
+  }, [navMenuRef, history.location.pathname]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
   const links = [
@@ -216,7 +224,7 @@ const HeaderContainer = observer((props) => {
         <div></div>
       </Route>
       <Route path="*">
-        {bannerOpen && (
+        {bannerOpen && !onAppPage && (
           <BouncyDiv>
             <Banner>
               <P>
@@ -224,7 +232,16 @@ const HeaderContainer = observer((props) => {
                 <i>WebApp Development - Basic</i>
               </P>
               <Link to="/apply">
-                <ApplyButton onClick={() => setBannerOpen(false)}>
+                <ApplyButton
+                  onClick={() => {
+                    ReactGA.event({
+                      category: "register",
+                      action: "clickedYellowBanner",
+                      label: "solicitaUnaPlaza",
+                    });
+                    setBannerOpen(false);
+                  }}
+                >
                   solicita una plaza
                 </ApplyButton>
               </Link>
