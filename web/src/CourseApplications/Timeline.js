@@ -1,15 +1,18 @@
 import React, { useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import {
   fontFamily,
   whenSmallScreen,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
+import { Box } from "../UtilComponents";
 
-const TimelineStyle = styled.div`
+const TimelineStyle = styled(Box)`
+
   width: 500px;
   .container {
     margin: auto;
+
   }
 
   li {
@@ -122,7 +125,7 @@ const milestones = ["Regístrate", "Solicitud", "Entrevista", "Matrícula"];
 export const Timeline = ({ milestone }) => {
   return (
     <Gradient className="gradient-scroll">
-      <TimelineStyle key={milestone} className="timeline-container">
+      <TimelineStyle key={milestone} pt={3} className="timeline-container">
         <ul className="timeline">
           {milestones.map((ms, idx) => {
             return (
