@@ -306,7 +306,7 @@ def create_main_api(publish_message,
         resp_message = auth0_login_resp.get("message")
         if resp_message and resp_message == "Email already exists.":
             if email is None:
-                raise ValueError("Please call get_rocketchat_user_and_token() with email pa/api/usersrameter if the user already "
+                raise ValueError("Please call get_rocketchat_user_and_token() with email parameter if the user already "
                                  "exists in Rocketchat")
             rc_user_id = rc_service.get_user_by_email(email).get("_id")
             rocketchat_auth_token = rc_service.create_auth_token(rc_user_id)
