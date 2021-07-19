@@ -306,7 +306,7 @@ def create_main_api(publish_message,
         resp_message = auth0_login_resp.get("message")
         if resp_message and resp_message == "Email already exists.":
             if email is None:
-                raise ValueError("Please call get_rocketchat_user_and_token() with email parameter if the user already "
+                raise ValueError("Please call get_rocketchat_user_and_token() with email pa/api/usersrameter if the user already "
                                  "exists in Rocketchat")
             rc_user_id = rc_service.get_user_by_email(email).get("_id")
             rocketchat_auth_token = rc_service.create_auth_token(rc_user_id)
@@ -314,6 +314,16 @@ def create_main_api(publish_message,
         rc_user_id = auth0_login_resp.get("data").get("userId")
         rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
         return rc_user_id, rocketchat_auth_token
+
+    @app.post("/api/registered-user")
+    def add_registered_user():
+        """This is a user with only an email address, before they hit the auth0 callback url (initialize_user)"""
+        req = request.get_json()
+        email = req.get("email")
+        # TODO: turn this into a generic /api/partial-user endpoint
+        # status = req.get("status")
+        _user = user_service.create_user(email, status="registered")
+        return make_response(dict(messages=["Created registered user"], status="success"), 200)
 
     @app.route('/api/users', methods=['POST'])
     def initialize_user():
@@ -359,7 +369,10 @@ def create_main_api(publish_message,
             LOG.error(f"Error creating or logging in user {e}", exc_info=True)
             return make_response(dict(messages=messages, status="error"), 500)
 
-        _user = user_service.create_user(email, first_name=given_name, last_name=family_name, rocketchat_id=rc_user_id)
+        _user = user_service.create_user(email, first_name=given_name,
+                                         last_name=family_name,
+                                         rocketchat_id=rc_user_id)
+
         messages.append("Stored Rocketchat auth token in session successfully.")
 
         user_id = _user.id
@@ -466,6 +479,10 @@ def create_main_api(publish_message,
             app=app_json
         )
         student_app.add()
+        email = app_json.get("email")
+        user = models.User.query.filter_by(email=email).one()
+        user.status = "applied"
+        user.add()
         LOG.info(f"application stored successfully")
         return jsonify(dict(
                 data={},
