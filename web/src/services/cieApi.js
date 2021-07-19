@@ -5,6 +5,10 @@ class CieApi {
     return await (await axios.post("/api/users", userData)).data;
   }
 
+  async createRegisteredUser(userData){
+    return this._post("/api/registered-user", userData)
+  }
+
   async _get(uri) {
     // TODO: handle exceptions
   }
@@ -67,6 +71,11 @@ class CieApi {
   async submitApp(appData) {
     return (await axios.post(`/api/student-application`, appData)).data;
   }
+
+  async setUserStatus(userId, status) {
+    return await this.updateUser(userId, { status });
+  }
+
 
   async log(message, level = "info") {
     return await this.post("/api/log", { data: { message, level } });
