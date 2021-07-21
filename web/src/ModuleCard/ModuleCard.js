@@ -5,7 +5,6 @@ import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 // import { toLocalTime } from "../util";
 // import Dialog from "@material-ui/core/Dialog";
 import styled from "styled-components";
-import { observer } from "mobx-react";
 import { Flex, Text, Image } from "rebass";
 import { Link } from "react-router-dom";
 

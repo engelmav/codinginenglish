@@ -26,5 +26,5 @@ export {
   ClearableTextInput,
   Card,
   CardContent,
-  CardTitle
+  CardTitle,
 };

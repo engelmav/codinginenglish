@@ -8,13 +8,13 @@ import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
 import { browserDetect } from "../util";
-import _ from "lodash";
+
 import { readSocketDataAnd } from "../messaging";
 import { Link } from "react-router-dom";
 import { ReadAndDo } from "../messaging";
-import Dialog from "@material-ui/core/Dialog";
+const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
-const VideoCall = React.lazy(() => import("../VideoConference"));
+const VideoCall = React.lazy(() => /* webpackChunkName: "Videoconference" */ import("../VideoConference"));
 
 const ChatSignIn = (props) => {
   const divRef = useRef(null);
@@ -52,6 +52,7 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
           "*"
         );
       }
+      const { default: _} = await import("lodash");
       const handleWebsocketEvent = _.partial(
         readSocketDataAnd,
         sendSlideCommand
@@ -160,6 +161,12 @@ class Aula extends Component {
   }
 
   componentDidMount() {
+    // dependency of PopupActivity
+    const script = document.createElement('script');
+    script.src = "https://unpkg.com/gifler@0.1.0/gifler.min.js";
+    script.async = true;
+    document.body.appendChild(script);
+    
     this.configureActiveSession();
   }
 

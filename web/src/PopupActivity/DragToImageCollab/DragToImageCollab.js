@@ -11,7 +11,7 @@ const S = {
   `,
 };
 
-export const DragToImageCollab = ({
+const DragToImageCollab = ({
   appStore,
   model,
   settings,
@@ -27,3 +27,5 @@ export const DragToImageCollab = ({
   }, []);
   return <S.canvas id="drag-to-image-collab" />;
 };
+
+export default DragToImageCollab;

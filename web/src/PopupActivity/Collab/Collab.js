@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import fabric from "fabric";
 import { Button } from "../../UtilComponents";
-import Dialog from "@material-ui/core/Dialog";
 import { CanvasObjectCreator } from "../../services/CanvasObjectCreator";
 import * as S from "./styles";
 import { CanvasWebsocketHandler } from "./CanvasWebsocketHandler";
@@ -10,6 +9,8 @@ import { computed, observable, makeObservable, toJS } from "mobx";
 import { observer } from "mobx-react";
 import jsonFormat from "json-format";
 import { Box } from "../../UtilComponents/Box";
+
+const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
 const mapToObj = (_map) => {
   const obj = {};

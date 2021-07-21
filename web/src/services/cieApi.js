@@ -76,6 +76,10 @@ class CieApi {
     return await this.updateUser(userId, { status });
   }
 
+  async getUserLocation(){
+    return this._get("/api/applicant-location");
+  }
+
 
   async log(message, level = "info") {
     return await this.post("/api/log", { data: { message, level } });

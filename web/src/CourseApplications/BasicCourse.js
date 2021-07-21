@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Field as _Field, Form as _Form } from "formik";
 import styled from "styled-components";
 import {
@@ -112,6 +112,18 @@ const ClearFieldButton = styled.button`
 
 export const BasicCourseForm = ({ appStore, cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
+
+  useEffect(() => {
+    async function getUserLocation(){
+      const resp = await cieApi.getUserLocation();
+      const locationData = resp.data;
+      const { city, country_name } = locationData;
+      if (!!city && !!country_name)
+        appStore.userLocation = `${city}, ${country_name}`;
+    }
+    getUserLocation();
+  })
+
   const initialValues = {};
   basicCourseForm.forEach((field) => {
     initialValues[field.fieldName] = field.initialValue

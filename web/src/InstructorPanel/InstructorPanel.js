@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, Select, TextInput } from "../UtilComponents";
-import animal from "animal-id";
-// import { DataGrid } from "@material-ui/data-grid";
-import Dialog from "@material-ui/core/Dialog";
 import { observer } from "mobx-react";
 import { action, computed, makeObservable, observable, toJS } from "mobx";
 import { Box } from "../UtilComponents/Box";
 
-const DataGrid = React.lazy(
-  () => import('@material-ui/data-grid').then(module => ({ default: module.DataGrid }))
+const DataGrid = React.lazy(() =>
+  import("@material-ui/data-grid").then((module) => ({
+    default: module.DataGrid,
+  }))
 );
+const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
 var MAIN_ROOM_ID = 1;
 
@@ -134,7 +134,7 @@ class InstructorPanelStore {
 
     const rooms = () => Object.keys(this.aulaConfig.rooms);
     const studentsInRoom = (room) => {
-      const studentIds =  Object.keys(this.aulaConfig.rooms[room].students);
+      const studentIds = Object.keys(this.aulaConfig.rooms[room].students);
       if (studentIds.length === 0) return "empty";
       const studentList = studentIds.map((studentId) => {
         const { firstname, lastname } = this.aulaConfig.rooms[room].students[
@@ -142,14 +142,14 @@ class InstructorPanelStore {
         ];
         return lastname ? `${firstname} ${lastname}` : firstname;
       });
-      return studentList.join(", ")
+      return studentList.join(", ");
     };
 
     const roomRows = [];
 
     rooms().forEach((room, idx) => {
       const studentsStr = studentsInRoom(room);
-      roomRows.push({ id: idx, roomName: room, students: studentsStr })
+      roomRows.push({ id: idx, roomName: room, students: studentsStr });
     });
 
     return roomRows;
@@ -330,8 +330,10 @@ const RoomList = observer(({ appStore, instructorApi }) => {
       <div style={{ width: "100%" }}>
         <SmBtn
           onClick={() => {
-            ipStore.newRoomName = animal.getId();
-            ipStore.roomAddDialogOpen = true;
+            import("animal-id").then((animalId) => {
+              ipStore.newRoomName = animalId.getId();
+              ipStore.roomAddDialogOpen = true;
+            });
           }}
         >
           Add

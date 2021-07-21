@@ -1,6 +1,5 @@
 import Konva from "konva";
 import * as fastgif from "../../../node_modules/fastgif/fastgif.js";
-import _ from "lodash";
 import { readSocketDataAnd } from "../../messaging";
 
 const CHANNEL = "active-session-01-exercise-01";
@@ -24,7 +23,7 @@ function addObjectListeners(websocket, canvasSpec, stage) {
     objectCache[`labelBox-${index}`] = stage.findOne(`#labelBox-${index}`);
   });
 
-  function updateObjectLocations(eventData){
+  function updateObjectLocations(eventData) {
     if (eventData.hasOwnProperty("et") && eventData.et === OBJ_MOVE_EVENT) {
       const { oid, c } = eventData;
       objectCache[oid].to({
@@ -34,7 +33,9 @@ function addObjectListeners(websocket, canvasSpec, stage) {
       });
     }
   }
-  const handleSocketData = _.partial = readSocketDataAnd(updateObjectLocations);
+  const handleSocketData = (_.partial = readSocketDataAnd(
+    updateObjectLocations
+  ));
   websocket.addEventListener("message", handleSocketData);
 }
 
@@ -71,21 +72,21 @@ export async function drawCanvas(canvasSpec, settings, websocket, actorId) {
     }
     renderGif(imageBitmapFrames, gifLayer, stage);
   });
-
-  canvasSpec.labelBuckets.forEach((labelBucket) => {
-    layer.add(LabelBucket(labelBucket.lineBegin, labelBucket.lineEnd));
-  });
-
-  canvasSpec.wordBag.forEach((word, index) => {
+  for (i = 0; i <= canvasSpec.labelBuckets.length; i++) {
+    const labelBucket = canvasSpec.labelBuckets[i];
+    layer.add(await LabelBucket(labelBucket.lineBegin, labelBucket.lineEnd));
+  }
+  for (i = 0; i <= canvasSpec.wordBag.length; i++) {
+    const word = wordBag[i];
     const x = randomIntFromInterval(0, stage.width() - 300);
     const y = randomIntFromInterval(0, stage.height() - 300);
-    layer.add(LabelBox(word, x, y, index, websocket, actorId));
-  });
+    layer.add(await LabelBox(word, x, y, i, websocket, actorId));
+  }
   stage.add(layer);
   addObjectListeners(websocket, canvasSpec, stage);
 }
 
-function LabelBucket(lineStart, lineEnd) {
+async function LabelBucket(lineStart, lineEnd) {
   const group = new Konva.Group({
     width: 130,
     height: 25,
@@ -111,7 +112,7 @@ function LabelBucket(lineStart, lineEnd) {
   return group;
 }
 
-function LabelBox(text, rectX, rectY, index, websocket, actorId) {
+async function LabelBox(text, rectX, rectY, index, websocket, actorId) {
   const objectId = `labelBox-${index}`;
   const rectangleGroup = new Konva.Group({
     x: rectX,
@@ -128,6 +129,7 @@ function LabelBox(text, rectX, rectY, index, websocket, actorId) {
     const { x, y } = pos;
     updateCanvas(actorId, objectId, websocket, x, y);
   }
+  const { default: _ } = await import("lodash");
   const throttledOnDragMove = _.throttle(onDragMove, 100);
 
   rectangleGroup.on("dragmove", throttledOnDragMove);

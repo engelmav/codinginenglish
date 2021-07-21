@@ -13,7 +13,7 @@ const AppContainer = styled(Main)`
   flex-direction: column;
   ${space}
 `;
-export const ApplicationProcess = ({ Register, NextSteps }) => {
+const ApplicationProcess = ({ Register, NextSteps }) => {
   const [milestone, setMilestone] = React.useState("");
   return (
     <AppContainer className="app-process-main" mt={3} mb={3}>
@@ -33,3 +33,5 @@ export const ApplicationProcess = ({ Register, NextSteps }) => {
     </AppContainer>
   );
 };
+
+export default ApplicationProcess;

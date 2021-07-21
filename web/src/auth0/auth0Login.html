@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>coding_in_english: Registrarse / Iniciar sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    body,
+    html {
+      height: 100%;
+      background-color: #f9f9f9;
+    }
+
+    .login-container {
+      position: relative;
+      height: 100%;
+    }
+
+    .login-box {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 15px;
+      background-color: #fff;
+      box-shadow: 0px 5px 5px #ccc;
+      border-radius: 5px;
+      border-top: 1px solid #e9e9e9;
+    }
+
+    .login-header {
+      text-align: center;
+    }
+
+    .login-header img {
+      width: 75px;
+    }
+
+    #error-message {
+      display: none;
+      white-space: break-spaces;
+    }
+    .google-icon {
+      padding-left: 2px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+    .google-btn {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      border-width: 0px;
+      color: white;
+      background: #4285f4;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .google-btn:hover {
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
+    }
+    .google-btn > p {
+      margin: 0;
+      padding: 0;
+      margin-left: 24px;
+      font-family: "Roboto", sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .cie-btn {
+      width: 100%;
+      background-color: #ff3e00;
+      border: solid #ff3e00;
+      border-width: 1px;
+      color: white;
+      padding: 8px;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .cie-btn:hover:enabled {
+      color: rgba(255, 255, 255, 1);
+      box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
+    }
+  </style>
+  <body>
+    <div class="login-container">
+      <div class="col-xs-12 col-sm-4 col-sm-offset-4 login-box">
+        <div class="login-header">
+          <img
+            src="https://cie-assets.nyc3.digitaloceanspaces.com/cie-auth0.png"
+          />
+          <h3>coding_in_english</h3>
+          <h5 id="subtitle">Registrarse / Iniciar sesión</h5>
+        </div>
+        <div id="error-message" class="alert alert-danger"></div>
+        <form onsubmit="return false;" method="post">
+          <div class="form-group">
+            <button class="google-btn" id="google-btn" type="button">
+              <img
+                height="90%"
+                class="google-icon"
+                src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
+              />
+              <p>Regístrate con Google</p>
+            </button>
+            <hr />
+            <label id="email-label" for="name">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="Enter your email"
+            />
+          </div>
+          <div class="form-group">
+            <label id="password-label" for="name">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="Enter your password"
+            />
+          </div>
+          <div class="captcha-container form-group"></div>
+          <button
+            type="submit"
+            id="btn-login"
+            class="btn btn-primary btn-block"
+          >
+            Log In
+          </button>
+          <button type="button" id="btn-signup" class="cie-btn">
+            Regístrate con email
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!--[if IE 8]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.2.5/ie8.js"></script>
+    <![endif]-->
+
+    <!--[if lte IE 9]>
+      <script src="https://cdn.auth0.com/js/polyfills/1.0/base64.min.js"></script>
+      <script src="https://cdn.auth0.com/js/polyfills/1.0/es5-shim.min.js"></script>
+    <![endif]-->
+
+    <script src="https://cdn.auth0.com/js/auth0/9.16/auth0.min.js"></script>
+    <script src="https://cdn.auth0.com/js/polyfills/1.0/object-assign.min.js"></script>
+    <script>
+      var isNewRegistration = false;
+      let params = new URLSearchParams(document.location.search.substring(1));
+      let appState = params.get("app_state"); // passed from CIE in register flow
+      if (appState === "newRegistration") {
+        isNewRegistration = true;
+      }
+    </script>
+    <script>
+      window.addEventListener("load", function () {
+        var config = JSON.parse(
+          decodeURIComponent(escape(window.atob("@@config@@")))
+        );
+
+        var leeway = config.internalOptions.leeway;
+        if (leeway) {
+          var convertedLeeway = parseInt(leeway);
+
+          if (!isNaN(convertedLeeway)) {
+            config.internalOptions.leeway = convertedLeeway;
+          }
+        }
+        var params = Object.assign(
+          {
+            overrides: {
+              __tenant: config.auth0Tenant,
+              __token_issuer: config.authorizationServer.issuer,
+            },
+            domain: config.auth0Domain,
+            clientID: config.clientID,
+            redirectUri: config.callbackURL,
+            responseType: "code",
+          },
+          config.internalOptions
+        );
+
+        var webAuth = new auth0.WebAuth(params);
+        var databaseConnection = "Username-Password-Authentication";
+        var captcha = webAuth.renderCaptcha(
+          document.querySelector(".captcha-container")
+        );
+
+        function login(e) {
+          e.preventDefault();
+          var button = this;
+          var username = document.getElementById("email").value;
+          var password = document.getElementById("password").value;
+          button.disabled = true;
+          webAuth.login(
+            {
+              realm: databaseConnection,
+              username: username,
+              password: password,
+              captcha: captcha.getValue(),
+            },
+            function (err) {
+              if (err) displayError(err);
+              button.disabled = false;
+            }
+          );
+        }
+
+        function signup() {
+          var button = this;
+          var email = document.getElementById("email").value;
+          if (isNewRegistration) {
+            var passwordlessWebAuth = new auth0.WebAuth({
+              clientID: config.clientID,
+              domain: config.auth0Domain,
+              redirectUri: config.callbackURL,
+              responseType: "token id_token",
+            });
+            var res = passwordlessWebAuth.passwordlessStart(
+              {
+                connection: "email",
+                send: "link",
+                email: email,
+              },
+              function (err, res) {
+                if (err) displayError(err);
+                button.disabled = false;
+                if (res){
+                  console.log("success res", res)
+                }
+              }
+            );
+            console.log("result of passwordlessWebAuth", res)
+            return;
+          }
+          var password = document.getElementById("password").value;
+
+          button.disabled = true;
+          webAuth.redirect.signupAndLogin(
+            {
+              connection: databaseConnection,
+              email: email,
+              password: password,
+              captcha: captcha.getValue(),
+            },
+            function (err) {
+              if (err) displayError(err);
+              button.disabled = false;
+            }
+          );
+        }
+
+        function loginWithGoogle() {
+          webAuth.authorize(
+            {
+              connection: "google-oauth2",
+            },
+            function (err) {
+              if (err) displayError(err);
+            }
+          );
+        }
+
+        function displayError(err) {
+          captcha.reload();
+          var errorMessage = document.getElementById("error-message");
+          errorMessage.innerHTML = err.policy || err.description;
+          errorMessage.style.display = "block";
+        }
+        if (isNewRegistration) {
+          document.getElementById("password").style.display = "none";
+          document.getElementById("password-label").style.display = "none";
+          document.getElementById("btn-login").style.display = "none";
+          document.title = "coding_in_english - Registración";
+          document.getElementById("subtitle").innerHTML = "Registración";
+        }
+        document.getElementById("btn-login").addEventListener("click", login);
+        document
+          .getElementById("google-btn")
+          .addEventListener("click", loginWithGoogle);
+        document.getElementById("btn-signup").addEventListener("click", signup);
+      });
+    </script>
+  </body>
+</html>

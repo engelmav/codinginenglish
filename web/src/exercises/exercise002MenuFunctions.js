@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Fade from 'react-reveal';
+
 
 export default class Exercise002MenuFunctions extends Component {
   constructor(props) {
@@ -31,7 +31,7 @@ export default class Exercise002MenuFunctions extends Component {
         <button onClick={this.getContent}>Set Link</button>
         {
           this.state.replBackend &&
-          <Fade><div>{this.state.content}</div></Fade>
+          <div>{this.state.content}</div>
         }
       </div>
     );

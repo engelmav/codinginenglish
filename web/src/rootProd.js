@@ -1,14 +1,14 @@
 import { App as _App } from "./App";
-import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
-import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
-import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
+// import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
+// import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
+// import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
 // import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
 // import { Aula as _Classroom } from "./Aula";
 import { Auth } from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
 import { InstructorApi } from "./services/InstructorApi";
-import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
+// import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Header as _Header } from "./Header";
@@ -16,13 +16,13 @@ import { Footer as _Footer } from "./Footer/Footer";
 import { Login as _Login } from "./Login/Login";
 import history from "./history";
 import { Home as _Home } from "./Home";
-import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
-import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
-import { AboutUs } from "./AboutUs";
-import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
-import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
-import { Register as _Register } from "./CourseApplications/Register";
-import { NextSteps as _NextSteps } from "./CourseApplications/NextSteps";
+// import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
+// import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
+// import { AboutUs } from "./AboutUs";
+// import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
+// import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
+// import { Register as _Register } from "./CourseApplications/Register";
+// import { NextSteps as _NextSteps } from "./CourseApplications/NextSteps";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
@@ -33,9 +33,67 @@ import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/Instructo
 import React from "react";
 import ReactGA from "react-ga";
 
+const _Collab = React.lazy(() => {
+  console.log("importing _Collab");
+  return import(
+    /* webpackChunkName: "Collab" */ "./PopupActivity/Collab/Collab"
+  );
+});
 
-const _Classroom = React.lazy(() => import("./Aula"));
-const _Collab = React.lazy(() => import("./PopupActivity/Collab/Collab"));
+const _DragToImageCollab = React.lazy(() => {
+  console.log("Lazy loading DragToImageCollab");
+  return import(
+    /* DragToImageCollab: "DragToImageCollab" */ "./PopupActivity/DragToImageCollab/DragToImageCollab"
+  );
+});
+
+const _Classroom = React.lazy(() =>
+  import(/* webpackChunkName: "Aula" */ "./Aula")
+);
+
+const _MyDashboard = React.lazy(() => {
+  console.log("Lazy loading MyDashboard");
+
+  import("./MyDashboard/MyDashboard");
+});
+const _CheckoutForm = React.lazy(() =>
+  import(/* webpackChunkName: "CheckoutForm" */ "./CheckoutForm/CheckoutForm")
+);
+
+const AboutUs = React.lazy(() => {
+  console.log("Lazy loading AboutUs");
+  return import(/* webpackChunkName: "AboutUs" */ "./AboutUs");
+});
+
+const _ApplicationProcess = React.lazy(() => {
+  console.log("Lazy loading _ApplicationProcess");
+  return import("./CourseApplications/ApplicationProcess");
+});
+
+const _Register = React.lazy(() => {
+  console.log("Lazy loading Register");
+  import("./CourseApplications/Register");
+});
+const _NextSteps = React.lazy(() => {
+  console.log("Lazy loading Register");
+  import("./CourseApplications/_NextSteps");
+});
+
+const _ModuleCard = React.lazy(() => {
+  console.log("Lazy loading ModuleCard");
+  import("./ModuleCard/ModuleCard");
+});
+
+const _PopupActivity = React.lazy(() =>
+  import(
+    /* webpackChunkName: "PopupActivity" */ "./PopupActivity/PopupActivity"
+  )
+);
+const _MultipleChoice = React.lazy(() =>
+  import(
+    /* webpackChunkName: "MultipleChoice" */ "./PopupActivity/MultipleChoice/MultipleChoice"
+  )
+);
 
 var log = console.log;
 
@@ -68,9 +126,8 @@ console.log = function () {
   );
 };
 
-
-
-export function main(appStore) {
+export async function main() {
+  const appStore = await import("./stores/AppStore");
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
   const auth = new Auth(appStore);
@@ -82,7 +139,6 @@ export function main(appStore) {
     ReactGA.pageview(location.pathname);
     window.scrollTo(0, 0);
   });
-  
 
   async function handleAuthSuccess(authResult) {
     const initializedUser = await cieApi.initializeUser(authResult);
@@ -112,6 +168,7 @@ export function main(appStore) {
   const Login = compose(_Login, { auth, appStore });
   const Header = compose(_Header, { appStore, auth, settings, Login });
   const Footer = compose(_Footer, { appStore, auth, Login });
+  const Home = compose(_Home, { auth, cieApi, settings });
 
   const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
   const ModuleCard = compose(_ModuleCard, {
@@ -165,7 +222,6 @@ export function main(appStore) {
   /** End Configure Aula */
 
   const CallbackWithRouter = withRouter(Callback);
-  // const Application = compose(_Application, { appStore, cieApi });
   const Register = compose(_Register, { appStore, auth, cieApi });
   const NextSteps = compose(_NextSteps, { appStore, auth, cieApi });
 
@@ -176,7 +232,6 @@ export function main(appStore) {
     NextSteps,
   });
   const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
-  const Home = compose(_Home, { auth, cieApi, settings });
   const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
   const CollabEditor = compose(_Collab, { appStore, editorMode: true });
   const routesProps = {
@@ -195,6 +250,13 @@ export function main(appStore) {
 
   const Routes = compose(_Routes, routesProps);
 
-  const App = compose(_App, { appStore, auth, Header, Routes, Footer, history });
+  const App = compose(_App, {
+    appStore,
+    auth,
+    Header,
+    Routes,
+    Footer,
+    history,
+  });
   return App;
 }

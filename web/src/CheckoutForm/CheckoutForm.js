@@ -3,14 +3,13 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {
   smMediaQuery,
   smInputFontSize,
   lgInputFontSize,
   fontFamily,
   inputPadding,
-  debugBorder
+  debugBorder,
 } from "../UtilComponents/sharedStyles";
 
 import {
@@ -20,7 +19,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
 import { cieApi } from "../services/cieApi";
 import { AlertMessage, Button, Spinner } from "../UtilComponents";
 import {
@@ -36,6 +34,17 @@ import {
   inputFormBorder,
   inputFormBorderRadius,
 } from "../UtilComponents/TextInput";
+const useMediaQuery = React.lazy(() => import("@material-ui/core/useMediaQuery"));
+
+
+let stripePromise;
+const getStripe = (settings) => {
+  if (!stripePromise) {
+    const { stripePK } = settings;
+    stripePromise = loadStripe(stripePK);
+  }
+  return stripePromise;
+};
 
 let paymentCurrency = observable.box("EUR");
 const setPaymentCurrency = (e) => (paymentCurrency = e.target.value);
@@ -258,10 +267,10 @@ function CheckoutFormConsumer(props) {
             value={computedEmail || ""} // need this empty string for React to "control" this input field
             onChange={(e) => setEmail(e.target.value)}
           />
-                    <EmailNote>
-                For receipt and account creation on your terms. We will NOT spam
-                you.
-              </EmailNote>
+          <EmailNote>
+            For receipt and account creation on your terms. We will NOT spam
+            you.
+          </EmailNote>
           <CardElementContainer>
             <CardElement
               options={{
@@ -290,11 +299,9 @@ function CheckoutFormConsumer(props) {
   );
 }
 
-function CheckoutForm(props) {
-  const { stripePK } = props.settings;
-  const stripePromise = loadStripe(stripePK);
+const CheckoutForm = observer((props) => {
   return (
-    <Elements stripe={stripePromise}>
+    <Elements stripe={getStripe(props.settings)}>
       <CheckoutFormConsumer
         appStore={props.appStore}
         onCloseClick={props.onCloseClick}
@@ -302,8 +309,6 @@ function CheckoutForm(props) {
       />
     </Elements>
   );
-}
+});
 
-const CheckoutFormObserver = observer(CheckoutForm);
-
-export { CheckoutFormObserver as CheckoutForm };
+export default CheckoutForm;

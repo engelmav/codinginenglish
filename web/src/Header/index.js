@@ -14,19 +14,19 @@ import { navbarCommonStyle, LI } from "../Navbar";
 import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
-import { CSSTransition } from "react-transition-group";
-import { fadeIn } from "react-animations";
+// import { CSSTransition } from "react-transition-group";
+// import { fadeIn } from "react-animations";
 import history from "../history";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
-const animation = keyframes`${fadeIn}`;
+// const animation = keyframes`${fadeIn}`;
 
-const BouncyDiv = styled.div`
-  animation: 4s ${animation};
-`;
+// const BouncyDiv = styled.div`
+//   animation: 4s ${animation};
+// `;
 
 const headerMarginSm = css`
   padding: 1rem;
@@ -225,37 +225,36 @@ const HeaderContainer = observer((props) => {
       </Route>
       <Route path="*">
         {bannerOpen && !onAppPage && (
-          <BouncyDiv>
-            <Banner>
-              <P>
-                Se ha abierto la matrícula del curso{" "}
-                <i>WebApp Development - Basic</i>
-              </P>
-              <Link to="/apply">
-                <ApplyButton
-                  onClick={() => {
-                    ReactGA.event({
-                      category: "register",
-                      action: "clickedYellowBanner",
-                      label: "solicitaUnaPlaza",
-                    });
-                    setBannerOpen(false);
-                  }}
-                >
-                  solicita una plaza
-                </ApplyButton>
-              </Link>
-              <CloseBanner
-                size="25"
-                alignSelf="flex-end"
-                onClick={() => setBannerOpen(false)}
-              />
-            </Banner>
-          </BouncyDiv>
+          <Banner>
+            <P>
+              Se ha abierto la matrícula del curso{" "}
+              <i>WebApp Development - Basic</i>
+            </P>
+            <Link to="/apply">
+              <ApplyButton
+                onClick={() => {
+                  ReactGA.event({
+                    category: "register",
+                    action: "clickedYellowBanner",
+                    label: "solicitaUnaPlaza",
+                  });
+                  setBannerOpen(false);
+                }}
+              >
+                solicita una plaza
+              </ApplyButton>
+            </Link>
+            <CloseBanner
+              size="25"
+              alignSelf="flex-end"
+              onClick={() => setBannerOpen(false)}
+            />
+          </Banner>
         )}
         <Header>
           <Link to="/">
             <Img
+              loading="lazy"
               alt="cie logo"
               src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
             ></Img>
@@ -274,16 +273,9 @@ const HeaderContainer = observer((props) => {
                 <LI>
                   <Link to="/my-dashboard">my_dashboard</Link>
                 </LI>
-
-                <CSSTransition
-                  in={appStore.sessionInProgress}
-                  timeout={200}
-                  classNames="my-node"
-                >
-                  <LI>
-                    <Link to="/class">in_session!</Link>
-                  </LI>
-                </CSSTransition>
+                <LI>
+                  <Link to="/class">in_session!</Link>
+                </LI>
               </>
             )}
             <li>

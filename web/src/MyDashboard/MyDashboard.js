@@ -7,13 +7,14 @@ import { Main } from "../UtilComponents";
 import { Button } from "../UtilComponents/Button";
 import { P, Title, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { Box } from "../UtilComponents/Box";
-import Dialog from "@material-ui/core/Dialog";
 import {
   flexDirection,
   alignItems,
   justifyContent,
   space,
 } from "styled-system";
+
+const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
 const PageContainer = styled(Main)`
   display: flex;

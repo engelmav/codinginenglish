@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { Main, ContentSection, Button } from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
@@ -10,17 +10,9 @@ import {
   debugBorder,
   cieOrange,
 } from "../UtilComponents/sharedStyles";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
-import Dialog from "@material-ui/core/Dialog";
-import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
-import { fadeIn } from "react-animations";
 
-const animation = keyframes`${fadeIn}`;
-
-const BouncyDiv = styled.div`
-  animation: 3s ${animation};
-`;
 
 const SectionImage = styled.img`
   width: 225px;
@@ -108,9 +100,7 @@ const Home = (props) => {
     <MainLanding p={1}>
       <Box display="flex" flexDirection="column" alignItems="center" mb={20}>
         <Box mt={3}>
-        <BouncyDiv>
           <TaglineTitle>Únete a la economía global</TaglineTitle>
-          </BouncyDiv>
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="center">
@@ -124,6 +114,7 @@ const Home = (props) => {
       </Box>
       <Box mt={0} alignSelf="center">
         <SectionImage
+          loading="lazy"
           alt="Speak English, Build Apps"
           src={`${settings.assets}/home/chat-icon-green-red.png`}
         />
@@ -161,6 +152,7 @@ const Home = (props) => {
       </ContentSectionLanding>
       <Box mt={40} alignSelf="center">
         <SectionImage
+          loading="lazy"
           alt="Learn Vocabulary and Grammar in Real Context"
           src={`${settings.assets}/home/dictionary.png`}
         />
@@ -176,6 +168,7 @@ const Home = (props) => {
       </ContentSectionLanding>
       <Box mt={40} alignSelf="center">
         <SectionImage
+          loading="lazy"
           alt="Learn in a Live Teaching Environment"
           src={`${settings.assets}/home/meeting.png`}
         />
@@ -189,46 +182,22 @@ const Home = (props) => {
           línea. Puedes realizar actividades en grupo, hacer preguntas a tu
           instructor, reír y compartir tus dudas y tus logros.
         </p>
-        <LPButton
-          alignSelf="center"
-          onClick={() => setIsOpenLiveTeaching(true)}
-        >
-          Saber más
-        </LPButton>
-        <Dialog
-          open={isOpenLiveTeaching}
-          onBackdropClick={() => setIsOpenLiveTeaching(false)}
-        >
-          <ContentSectionLanding p={10}>
-            <CloseBox
-              size="30"
-              alignSelf="flex-end"
-              onClick={() => setIsOpenLiveTeaching(false)}
-            />
-            <Title>Enseñanza en vivo</Title>
-            <P>
-              Los estudiantes trabajan con los instructores como grupo y también
-              de forma individual. El aula virtual está equipada con vídeo y
-              chat integrados y con ejercicios interactivos de inglés y de
-              programación. Los ejercicios de programación se realizan en una
-              máquina virtual de Ubuntu completamente equipada y en la misma
-              aula virtual.{" "}
-            </P>
-            <P>
-              Recibe ayuda de tu instructor al momento si te quedas estancado o
-              no entiendes alguna de las clases. Despídete de los aburridos
-              foros de debate (aunque también tendremos de esos). ¡Si te
-              pierdes, dilo! Deja que un instructor paciente y experto te ayude.
-              ¡No estás solo en esto!
-            </P>
-            <LPButton
-              alignSelf="center"
-              onClick={() => setIsOpenLiveTeaching(false)}
-            >
-              Hecho!
-            </LPButton>
-          </ContentSectionLanding>
-        </Dialog>
+
+        <Title>Enseñanza en vivo</Title>
+        <P>
+          Los estudiantes trabajan con los instructores como grupo y también de
+          forma individual. El aula virtual está equipada con vídeo y chat
+          integrados y con ejercicios interactivos de inglés y de programación.
+          Los ejercicios de programación se realizan en una máquina virtual de
+          Ubuntu completamente equipada y en la misma aula virtual.{" "}
+        </P>
+        <P>
+          Recibe ayuda de tu instructor al momento si te quedas estancado o no
+          entiendes alguna de las clases. Despídete de los aburridos foros de
+          debate (aunque también tendremos de esos). ¡Si te pierdes, dilo! Deja
+          que un instructor paciente y experto te ayude. ¡No estás solo en esto!
+        </P>
+
         <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
           <p>
             «Como estudiante extranjero, aprender sobre cualquier materia… era

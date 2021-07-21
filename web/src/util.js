@@ -34,7 +34,7 @@ const browserDetect = {
  * @param {string} startDateTime string of the datetime a class is starting
  */
 const isInSession = async (startDateTime, durationMinutes) => {
-  const luxonModule = await import("luxon");
+  const luxonModule = await import(/* webpackChunkName: "luxon" */ "luxon");
   const { DateTime, Duration, Interval } = luxonModule;
   let nowUtc = DateTime.utc();
   const duration = Duration.fromObject({ minutes: durationMinutes });
@@ -105,7 +105,7 @@ class StudentSessionManager {
 }
 
 export async function toLocalTime(dt) {
-  const luxonModule = await import("luxon");
+  const luxonModule = await import(/* webpackChunkName: "luxon" */ "luxon");
   const { DateTime } = luxonModule;
   var dtFromISO = DateTime.fromISO(dt);
   const localDt = dtFromISO.toLocaleString(DateTime.DATETIME_FULL);
