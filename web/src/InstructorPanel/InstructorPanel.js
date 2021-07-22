@@ -189,7 +189,7 @@ const Border = styled.div`
   overflow-y: scroll;
 `;
 
-export const InstructorPanel = observer(({ appStore, instructorApi }) => {
+const InstructorPanel = observer(({ appStore, instructorApi }) => {
   useEffect(() => {
     async function init() {
       const aulaConfig = await instructorApi.getAulaConfig(
@@ -430,3 +430,5 @@ const NewRoomDialog = observer(({ appStore, instructorApi }) => {
     </Box>
   );
 });
+
+export default InstructorPanel;

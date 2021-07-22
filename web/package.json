@@ -18,7 +18,6 @@
     "case-sensitive-paths-webpack-plugin": "2.2.0",
     "css-loader": "6.2.0",
     "eslint": "5.12.0",
-    "eslint-config-react-app": "^3.0.8",
     "eslint-plugin-flowtype": "2.50.1",
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jsx-a11y": "6.1.2",
@@ -36,6 +35,7 @@
     "json-string-formatter": "^1.0.1",
     "jwt-decode": "^3.1.2",
     "konva": "^7.2.5",
+    "laxy": "^1.0.0",
     "location": "0.0.1",
     "lodash": "^4.17.21",
     "luxon": "^1.17.2",
@@ -54,7 +54,6 @@
     "react": "^17.0.2",
     "react-alert-template-basic": "^1.0.0",
     "react-animations": "^1.0.0",
-    "react-app-polyfill": "^0.2.2",
     "react-beautiful-dnd": "^13.0.0",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.2",
@@ -82,14 +81,11 @@
     "yup": "^0.32.9"
   },
   "scripts": {
-    "start": "webpack serve --config config/webpack.config.js --open",
-    "build": "webpack --config config/webpack.config.js --env production --env NODE_ENV=production",
+    "start": "webpack serve --env DEV_SERVER=1 --progress --config config/webpack.config.js --open",
+    "build": "./node_modules/.bin/webpack --progress --config config/webpack.config.js --env production --env NODE_ENV=production",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": [
     ">0.2%",
@@ -104,7 +100,6 @@
     ],
     "resolver": "jest-pnp-resolver",
     "setupFiles": [
-      "react-app-polyfill/jsdom",
       "jest-localstorage-mock"
     ],
     "testMatch": [

@@ -33,7 +33,11 @@ class Routes extends Component {
       UpcomingSessions,
       ApplicationProcess,
     } = this.props;
-
+    console.log(
+      "this what we have for ApplicationProcess:",
+      ApplicationProcess
+    );
+    console.log("this what we have for Home:", Home);
     return (
       <>
         <Route exact path="/" component={(props) => <Home />} />
@@ -65,9 +69,14 @@ class Routes extends Component {
           exact
         />
         <Route exact path="/editor" component={(props) => <CollabEditor />} />
-        {appStore.applicationOpen && (
-          <Route path="/apply" component={(props) => <ApplicationProcess />} />
-        )}
+
+        <Route
+          path="/apply"
+          component={(props) => {
+            console.log("hit /apply route");
+            return <ApplicationProcess />;
+          }}
+        />
       </>
     );
   }

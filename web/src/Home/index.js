@@ -13,7 +13,6 @@ import {
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-
 const SectionImage = styled.img`
   width: 225px;
   padding-bottom: 20px;
@@ -119,7 +118,7 @@ const Home = (props) => {
           src={`${settings.assets}/home/chat-icon-green-red.png`}
         />
       </Box>
-      <SectionTitle>Habla inglés, crea aplicaciones</SectionTitle>
+      <SectionTitle mb={2}>Habla inglés, crea aplicaciones</SectionTitle>
       <ContentSectionLanding>
         <p>
           Prácticas de conversación en cada clase, especialmente sobre
@@ -157,7 +156,7 @@ const Home = (props) => {
           src={`${settings.assets}/home/dictionary.png`}
         />
       </Box>
-      <SectionTitle>
+      <SectionTitle mb={2}>
         Aprende vocabulario y gramática en un contexto real
       </SectionTitle>
       <ContentSectionLanding>
@@ -173,7 +172,9 @@ const Home = (props) => {
           src={`${settings.assets}/home/meeting.png`}
         />
       </Box>
-      <SectionTitle>Estudia en un entorno de aprendizaje en vivo</SectionTitle>
+      <SectionTitle mt={4} mb={2}>
+        Estudia en un entorno de aprendizaje en vivo
+      </SectionTitle>
       <ContentSectionLanding>
         <p>
           Como muchas clases han pasado a ser en línea, muchos estudiantes se
@@ -182,39 +183,36 @@ const Home = (props) => {
           línea. Puedes realizar actividades en grupo, hacer preguntas a tu
           instructor, reír y compartir tus dudas y tus logros.
         </p>
-
-        <Title>Enseñanza en vivo</Title>
-        <P>
+        <p>
           Los estudiantes trabajan con los instructores como grupo y también de
           forma individual. El aula virtual está equipada con vídeo y chat
           integrados y con ejercicios interactivos de inglés y de programación.
           Los ejercicios de programación se realizan en una máquina virtual de
-          Ubuntu completamente equipada y en la misma aula virtual.{" "}
-        </P>
-        <P>
+          Ubuntu completamente equipada y en la misma aula virtual.
+        </p>
+        <p>
           Recibe ayuda de tu instructor al momento si te quedas estancado o no
           entiendes alguna de las clases. Despídete de los aburridos foros de
           debate (aunque también tendremos de esos). ¡Si te pierdes, dilo! Deja
           que un instructor paciente y experto te ayude. ¡No estás solo en esto!
-        </P>
-
-        <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-          <p>
-            «Como estudiante extranjero, aprender sobre cualquier materia… era
-            muy duro. Para aprender, primero necesitaba comprender una
-            herramienta básica: el inglés».
-          </p>
-          <footer>
-            —Takeishi Kimoto,{" "}
-            <cite>
-              <a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-                ¿De verdad es tan importante saber inglés para aprender
-                programación?
-              </a>
-            </cite>
-          </footer>
-        </BlockQuote>
+        </p>
       </ContentSectionLanding>
+      <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
+        <p>
+          «Como estudiante extranjero, aprender sobre cualquier materia… era muy
+          duro. Para aprender, primero necesitaba comprender una herramienta
+          básica: el inglés».
+        </p>
+        <footer>
+          —Takeishi Kimoto,{" "}
+          <cite>
+            <a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
+              ¿De verdad es tan importante saber inglés para aprender
+              programación?
+            </a>
+          </cite>
+        </footer>
+      </BlockQuote>
     </MainLanding>
   );
 };

@@ -1,13 +1,14 @@
-FROM node:10 as npm-build-stage
+FROM node:12 as npm-build-stage
+
 
 
 WORKDIR /app
 COPY package*.json /app/
-RUN npm install
-RUN npm ci --only=production
+
+RUN yarn install --production
 COPY ./ /app
 
-RUN npm install react-dev-utils
+RUN yarn add -D webpack-cli
 RUN npm run build --production
 
 

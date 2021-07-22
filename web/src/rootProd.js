@@ -4,7 +4,8 @@ import { App as _App } from "./App";
 // import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
 // import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
 // import { Aula as _Classroom } from "./Aula";
-import { Auth } from "./auth/Auth";
+import { makeAppStore } from "./stores/AppStore";
+import Auth from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
 import { InstructorApi } from "./services/InstructorApi";
@@ -13,7 +14,6 @@ import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Header as _Header } from "./Header";
 import { Footer as _Footer } from "./Footer/Footer";
-import { Login as _Login } from "./Login/Login";
 import history from "./history";
 import { Home as _Home } from "./Home";
 // import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
@@ -29,7 +29,7 @@ import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
-import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
+// import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 import React from "react";
 import ReactGA from "react-ga";
 
@@ -49,6 +49,11 @@ const _DragToImageCollab = React.lazy(() => {
 
 const _Classroom = React.lazy(() =>
   import(/* webpackChunkName: "Aula" */ "./Aula")
+);
+
+// import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
+const _InstructorPanel = React.lazy(() =>
+  import("./InstructorPanel/InstructorPanel")
 );
 
 const _MyDashboard = React.lazy(() => {
@@ -72,16 +77,16 @@ const _ApplicationProcess = React.lazy(() => {
 
 const _Register = React.lazy(() => {
   console.log("Lazy loading Register");
-  import("./CourseApplications/Register");
+  return import("./CourseApplications/Register");
 });
 const _NextSteps = React.lazy(() => {
-  console.log("Lazy loading Register");
-  import("./CourseApplications/_NextSteps");
+  console.log("Lazy loading NextSteps");
+  return import("./CourseApplications/NextSteps");
 });
 
 const _ModuleCard = React.lazy(() => {
   console.log("Lazy loading ModuleCard");
-  import("./ModuleCard/ModuleCard");
+  return import("./ModuleCard/ModuleCard");
 });
 
 const _PopupActivity = React.lazy(() =>
@@ -94,6 +99,9 @@ const _MultipleChoice = React.lazy(() =>
     /* webpackChunkName: "MultipleChoice" */ "./PopupActivity/MultipleChoice/MultipleChoice"
   )
 );
+
+// import { Login as _Login } from "./Login/Login";
+const _Login = React.lazy(() => import("./Login/Login"));
 
 var log = console.log;
 
@@ -127,12 +135,11 @@ console.log = function () {
 };
 
 export async function main() {
-  const appStore = await import("./stores/AppStore");
+  const appStore = makeAppStore();
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
   const auth = new Auth(appStore);
   const trackingId = "UA-199972795-1";
-
   ReactGA.initialize(trackingId);
 
   history.listen((location) => {
@@ -165,10 +172,10 @@ export async function main() {
   auth.addOnAuthSuccess(handleAuthSuccess);
   auth.addOnLogout(appStore.clearStore);
 
+  const Home = compose(_Home, { auth, cieApi, settings });
   const Login = compose(_Login, { auth, appStore });
   const Header = compose(_Header, { appStore, auth, settings, Login });
   const Footer = compose(_Footer, { appStore, auth, Login });
-  const Home = compose(_Home, { auth, cieApi, settings });
 
   const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
   const ModuleCard = compose(_ModuleCard, {

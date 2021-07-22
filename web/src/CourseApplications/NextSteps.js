@@ -30,8 +30,9 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-export const NextSteps = ({ appStore, cieApi, setMilestone }) => {
+const NextSteps = ({ appStore, cieApi, setMilestone }) => {
   useEffect(() => setMilestone("Solicitud"));
+  console.log("NextSteps!@!!!")
   return (
     <Container
       display="flex"
@@ -107,3 +108,5 @@ export const NextSteps = ({ appStore, cieApi, setMilestone }) => {
     </Container>
   );
 };
+
+export default NextSteps;

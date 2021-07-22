@@ -1,6 +1,6 @@
-import auth0 from "auth0-js";
 import settings from "../settings";
-
+import auth0 from "auth0-js";
+// const { default: auth0 } = await import("auth0-js");
 var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 
 class Auth {
@@ -159,4 +159,4 @@ class Auth {
   }
 }
 
-export { Auth };
+export default Auth;

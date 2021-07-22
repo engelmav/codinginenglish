@@ -106,7 +106,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
+const Register = ({ appStore, auth, cieApi, setMilestone }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -166,6 +166,7 @@ export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
   useEffect(() => {
     setMilestone("Regístrate");
   }, []);
+  console.log("Register~!!!!")
   return (
     <SignInContainer className="signin-container">
       <Title textAlign="center">Regístrate</Title>
@@ -279,3 +280,5 @@ export const Register = ({ appStore, auth, cieApi, setMilestone }) => {
     </SignInContainer>
   );
 };
+
+export default Register;

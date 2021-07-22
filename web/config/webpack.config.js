@@ -8,6 +8,33 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
+
+
+  const plugins = [
+    new webpack.DefinePlugin({
+      __VERSION__: JSON.stringify("1.0.0." + Date.now()),
+      __ENVIRONMENT__: JSON.stringify(environment),
+      __DEV_SERVER__: JSON.stringify(process.env.DEV_SERVER),
+    }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "../public", "index.html"),
+      favicon: path.resolve(__dirname, "../public", "favicon.ico"),
+    }),
+    new CompressionWebpackPlugin({
+      compressionOptions: {
+        numiterations: 15,
+      },
+      algorithm(input, compressionOptions, callback) {
+        return zopfli.gzip(input, compressionOptions, callback);
+      },
+    }),
+  ];
+
+  if (environment !== "production"){
+    plugins.push(new BundleAnalyzerPlugin())
+  }
+
+
   return {
     mode: environment,
     entry: {
@@ -31,7 +58,7 @@ module.exports = function (env) {
     },
     devServer: {
       historyApiFallback: true,
-      contentBase: path.resolve(__dirname, "../dist"),
+      contentBase: path.resolve(__dirname, "../build"),
       open: true,
       compress: true,
       hot: true,
@@ -62,30 +89,12 @@ module.exports = function (env) {
       },
     },
     output: {
+      path: path.resolve(__dirname, "../build"),
       filename: (pathData) => {
         return "static/js/[name].[contenthash:8].js";
       },
       chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
     },
-    plugins: [
-      new webpack.DefinePlugin({
-        __VERSION__: JSON.stringify("1.0.0." + Date.now()),
-        __ENVIRONMENT__: JSON.stringify(environment),
-        __DEV_SERVER__: JSON.stringify(process.env.DEV_SERVER),
-      }),
-      new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, "../public", "index.html"),
-        favicon: path.resolve(__dirname, "../public", "favicon.ico"),
-      }),
-      new BundleAnalyzerPlugin(),
-      new CompressionWebpackPlugin({
-        compressionOptions: {
-          numiterations: 15,
-        },
-        algorithm(input, compressionOptions, callback) {
-          return zopfli.gzip(input, compressionOptions, callback);
-        },
-      }),
-    ],
+    plugins: plugins
   };
 };

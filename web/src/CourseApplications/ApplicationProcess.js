@@ -14,6 +14,7 @@ const AppContainer = styled(Main)`
   ${space}
 `;
 const ApplicationProcess = ({ Register, NextSteps }) => {
+  console.log("ApplicationProcess!!!!")
   const [milestone, setMilestone] = React.useState("");
   return (
     <AppContainer className="app-process-main" mt={3} mb={3}>
