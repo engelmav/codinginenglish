@@ -52,8 +52,8 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
           "*"
         );
       }
-      const { default: _} = await import("lodash");
-      const handleWebsocketEvent = _.partial(
+      const { partial } = await import("lodash");
+      const handleWebsocketEvent = partial(
         readSocketDataAnd,
         sendSlideCommand
       );

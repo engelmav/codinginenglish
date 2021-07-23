@@ -94,7 +94,7 @@ const TechStackImg = styled.img`
 
 const Home = (props) => {
   const { settings } = props;
-  const [isOpenLiveTeaching, setIsOpenLiveTeaching] = useState(false);
+  console.log("Mounting Home")
   return (
     <MainLanding p={1}>
       <Box display="flex" flexDirection="column" alignItems="center" mb={20}>

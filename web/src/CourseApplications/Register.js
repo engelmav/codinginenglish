@@ -166,7 +166,6 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
   useEffect(() => {
     setMilestone("Regístrate");
   }, []);
-  console.log("Register~!!!!")
   return (
     <SignInContainer className="signin-container">
       <Title textAlign="center">Regístrate</Title>

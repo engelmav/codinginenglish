@@ -5,14 +5,14 @@ import { App as _App } from "./App";
 // import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
 // import { Aula as _Classroom } from "./Aula";
 import { makeAppStore } from "./stores/AppStore";
-import Auth from "./auth/Auth";
+import makeAuth from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
 import { InstructorApi } from "./services/InstructorApi";
 // import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
-import { Header as _Header } from "./Header";
+// import { Header as _Header } from "./Header";
 import { Footer as _Footer } from "./Footer/Footer";
 import history from "./history";
 import { Home as _Home } from "./Home";
@@ -32,6 +32,59 @@ import { WebsocketManager } from "./messaging";
 // import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 import React from "react";
 import ReactGA from "react-ga";
+
+
+let appStoreSingleton;
+let authSingleton;
+
+async function makeAppStoreSingleton(){
+  if (appStoreSingleton) return appStoreSingleton;
+  appStoreSingleton = await makeAppStore();
+  return appStoreSingleton;
+}
+
+async function makeAuthSingleton() {
+  if (authSingleton) return authSingleton;
+  authSingleton = await makeAuth();
+  return authSingleton;
+}
+
+const _Login = React.lazy(() => {
+  const Login = import("./Login/Login");
+  return Login;
+});  
+
+async function makeLazyLogin() {
+  const appStore = await makeAppStoreSingleton()
+  const Auth = await makeAuthSingleton();
+  const auth = new Auth(appStore);
+  const Login = compose(_Login, { auth, appStore });
+  return Login
+}
+
+export async function makeLazyHeader(){
+  const _Header = React.lazy(() => {
+    console.log("Lazy loading _Header");
+    const Header = import("./Header");
+    return Header;
+  }); 
+
+  const Login = await makeLazyLogin();
+  const appStore = makeAppStoreSingleton();
+  const Header = compose(_Header, { appStore, settings,
+     Login 
+    });
+  return Header;
+}
+
+export async function makeLazyFooter(){
+  const Login = makeLazyLogin();
+  const Footer = compose(_Footer, { Login })
+  return Footer;
+}
+
+export const Home = compose(_Home, { settings });
+
 
 const _Collab = React.lazy(() => {
   console.log("importing _Collab");
@@ -67,7 +120,7 @@ const _CheckoutForm = React.lazy(() =>
 
 const AboutUs = React.lazy(() => {
   console.log("Lazy loading AboutUs");
-  return import(/* webpackChunkName: "AboutUs" */ "./AboutUs");
+  return import("./AboutUs");
 });
 
 const _ApplicationProcess = React.lazy(() => {
@@ -100,8 +153,6 @@ const _MultipleChoice = React.lazy(() =>
   )
 );
 
-// import { Login as _Login } from "./Login/Login";
-const _Login = React.lazy(() => import("./Login/Login"));
 
 var log = console.log;
 
@@ -134,11 +185,13 @@ console.log = function () {
   );
 };
 
-export async function main() {
-  const appStore = makeAppStore();
+export async function makeApp() {
+  const appStore = makeAppStoreSingleton();
+  const Auth = await makeAuthSingleton(appStore);
+  const auth = new Auth(appStore);
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
-  const auth = new Auth(appStore);
+  
   const trackingId = "UA-199972795-1";
   ReactGA.initialize(trackingId);
 
@@ -172,10 +225,7 @@ export async function main() {
   auth.addOnAuthSuccess(handleAuthSuccess);
   auth.addOnLogout(appStore.clearStore);
 
-  const Home = compose(_Home, { auth, cieApi, settings });
-  const Login = compose(_Login, { auth, appStore });
-  const Header = compose(_Header, { appStore, auth, settings, Login });
-  const Footer = compose(_Footer, { appStore, auth, Login });
+  // const Footer = compose(_Footer, { appStore, auth, Login });
 
   const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
   const ModuleCard = compose(_ModuleCard, {
@@ -250,7 +300,6 @@ export async function main() {
     CallbackRoute,
     Classroom,
     CollabEditor,
-    Home,
     MyDashboard,
     UpcomingSessions,
   };
@@ -260,9 +309,7 @@ export async function main() {
   const App = compose(_App, {
     appStore,
     auth,
-    Header,
     Routes,
-    Footer,
     history,
   });
   return App;

@@ -32,7 +32,6 @@ const DownloadAndApplyBox = styled.div`
 
 const NextSteps = ({ appStore, cieApi, setMilestone }) => {
   useEffect(() => setMilestone("Solicitud"));
-  console.log("NextSteps!@!!!")
   return (
     <Container
       display="flex"

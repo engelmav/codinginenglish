@@ -14,19 +14,12 @@ import { navbarCommonStyle, LI } from "../Navbar";
 import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
-// import { CSSTransition } from "react-transition-group";
-// import { fadeIn } from "react-animations";
+
 import history from "../history";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
-
-// const animation = keyframes`${fadeIn}`;
-
-// const BouncyDiv = styled.div`
-//   animation: 4s ${animation};
-// `;
 
 const headerMarginSm = css`
   padding: 1rem;
@@ -185,7 +178,10 @@ export const CloseBanner = styled(FaRegWindowClose)`
 `;
 
 const HeaderContainer = observer((props) => {
-  const { auth, appStore, settings, Login } = props;
+  console.log("Attempting to load HeaderContainer")
+  const { appStore, settings, 
+    Login 
+  } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
@@ -289,4 +285,4 @@ const HeaderContainer = observer((props) => {
   );
 });
 
-export { HeaderContainer as Header };
+export default HeaderContainer;

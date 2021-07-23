@@ -28,19 +28,12 @@ class Routes extends Component {
       CallbackRoute,
       Classroom,
       CollabEditor,
-      Home,
       MyDashboard,
       UpcomingSessions,
       ApplicationProcess,
     } = this.props;
-    console.log(
-      "this what we have for ApplicationProcess:",
-      ApplicationProcess
-    );
-    console.log("this what we have for Home:", Home);
     return (
       <>
-        <Route exact path="/" component={(props) => <Home />} />
         <Route exact path="/about-us" component={(props) => <AboutUs />} />
         <Route
           exact

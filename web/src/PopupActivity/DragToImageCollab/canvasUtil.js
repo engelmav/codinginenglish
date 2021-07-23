@@ -129,8 +129,8 @@ async function LabelBox(text, rectX, rectY, index, websocket, actorId) {
     const { x, y } = pos;
     updateCanvas(actorId, objectId, websocket, x, y);
   }
-  const { default: _ } = await import("lodash");
-  const throttledOnDragMove = _.throttle(onDragMove, 100);
+  const { throttle } = await import("lodash");
+  const throttledOnDragMove = throttle(onDragMove, 100);
 
   rectangleGroup.on("dragmove", throttledOnDragMove);
   const box = new Konva.Rect({

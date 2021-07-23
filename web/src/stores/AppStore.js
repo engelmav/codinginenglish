@@ -1,4 +1,3 @@
-import { action, configure, makeAutoObservable } from "mobx";
 import {
   clearPersist,
   isSynchronized,
@@ -8,90 +7,93 @@ import {
   StorageAdapter,
 } from "mobx-persist-store";
 
-configure({
-  enforceActions: "never",
-});
+export const makeAppStore = async (appStoreName = "default") => {
+  // the shit you have to do for laziness. hot damn.
+  console.log("importing mobx")
+  const { action, configure, makeAutoObservable } = await import("mobx");
+  console.log("finished importing mobx")
+  configure({
+    enforceActions: "never",
+  });
 
-class AppStore {
-  activeSessionId = null;
-  activeSessionSlug = null;
-  applicationOpen = true;
-  isAuthenticated = false;
-  loginExpiresAt = null;
-  authData = null;
-  userId = null;
-  userRole = null;
-  userLocation = null;
-  flow = null;
-  firstName = null;
-  lastName = null;
-  email = null;
-  registeredSessions = [];
-  sessionInProgress = false;
-  rocketchatAuthToken = null;
-  userApplied = false;
-  
+  class AppStore {
+    activeSessionId = null;
+    activeSessionSlug = null;
+    applicationOpen = true;
+    isAuthenticated = false;
+    loginExpiresAt = null;
+    authData = null;
+    userId = null;
+    userRole = null;
+    userLocation = null;
+    flow = null;
+    firstName = null;
+    lastName = null;
+    email = null;
+    registeredSessions = [];
+    sessionInProgress = false;
+    rocketchatAuthToken = null;
+    userApplied = false;
 
-  constructor() {
-    makeAutoObservable(this);
-    this.setSessionInProgress = this.setSessionInProgress.bind(this);
-    this.clearStore = this.clearStore.bind(this);
+    constructor() {
+      makeAutoObservable(this);
+      this.setSessionInProgress = this.setSessionInProgress.bind(this);
+      this.clearStore = this.clearStore.bind(this);
+    }
+
+    @action toggleIsAuthenticated() {
+      this.isAuthenticated = !this.isAuthenticated;
+    }
+
+    @action setLoginExpiry(expiresAt) {
+      this.loginExpiresAt = expiresAt;
+    }
+
+    @action async configureUser(authData, storedUser, rcAuthToken) {
+      this.authData = authData;
+      const { email, given_name } = authData.idTokenPayload;
+      this.email = email;
+
+      // TODO: perform official reconciliation of two user sources
+      const { firstname, lastname, id, role } = storedUser;
+      this.firstName = firstname;
+      this.lastName = lastname;
+      this.userId = id;
+      console.log("stored user object:", storedUser);
+      this.userRole = role;
+
+      this.rocketchatAuthToken = rcAuthToken;
+    }
+
+    @action setFirstname(firstname) {
+      this.firstName = firstname;
+    }
+
+    @action setUserRole(role) {
+      this.userRole = role;
+    }
+
+    setSessionInProgress(isInProgress) {
+      this.sessionInProgress = isInProgress;
+    }
+    clearStore() {
+      clearPersist(this);
+    }
+
+    stopPersist() {
+      stopPersist(this);
+    }
+
+    async rehydrate() {
+      return await rehydrate(this);
+    }
+
+    get isSynchronized() {
+      console.log("running isSynchronized()");
+      return isSynchronized(this);
+    }
   }
 
-  @action toggleIsAuthenticated() {
-    this.isAuthenticated = !this.isAuthenticated;
-  }
-
-  @action setLoginExpiry(expiresAt){
-    this.loginExpiresAt = expiresAt;
-  }
-
-  @action async configureUser(authData, storedUser, rcAuthToken) {
-    this.authData = authData;
-    const { email, given_name } = authData.idTokenPayload;
-    this.email = email;
-
-    // TODO: perform official reconciliation of two user sources
-    const { firstname, lastname, id, role } = storedUser;
-    this.firstName = firstname;
-    this.lastName = lastname;
-    this.userId = id;
-    console.log("stored user object:", storedUser)
-    this.userRole = role;
-
-    this.rocketchatAuthToken = rcAuthToken;
-  }
-
-  @action setFirstname(firstname) {
-    this.firstName = firstname;
-  }
-
-  @action setUserRole(role){
-    this.userRole = role;
-  }
-
-  setSessionInProgress(isInProgress) {
-    this.sessionInProgress = isInProgress;
-  }
-  clearStore() {
-    clearPersist(this);
-  }
-
-  stopPersist() {
-    stopPersist(this);
-  }
-
-  async rehydrate() {
-    return await rehydrate(this);
-  }
-
-  get isSynchronized() {
-    console.log("running isSynchronized()")
-    return isSynchronized(this);
-  }
-}
-
-export const makeAppStore = (appStoreName = "default") => {
   return persistence({
     name: `AppStore.${appStoreName}`,
     properties: [

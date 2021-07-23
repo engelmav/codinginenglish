@@ -1,6 +1,6 @@
 import fabric from "fabric";
 import { ReadAndDo } from "../../messaging";
-import _ from "lodash";
+import { throttle } from "lodash";
 import {
   OBJ_CREATE_EVENT,
   OBJ_MOVE_EVENT,
@@ -68,7 +68,7 @@ export class CanvasWebsocketHandler {
       this.broadcastChange({ et: OBJ_MOD_EVENT, objectId: objId, mod: data });
     };
 
-    const handleCustomChange = _.throttle(onCustomChange, 200);
+    const handleCustomChange = throttle(onCustomChange, 200);
 
     this.canvasObjectCreator.canvas.on(
       "object:fillColorChange",
@@ -87,14 +87,14 @@ export class CanvasWebsocketHandler {
       const et = OBJ_MOVE_EVENT;
       this.broadcastChange({ et, objectId, top, left });
     };
-    const handleObjectMove = _.throttle(onObjectMove, 200);
+    const handleObjectMove = throttle(onObjectMove, 200);
     const handleMod = (e) => {
       const objectId = e.transform.target.id;
       const modAction = e.transform.target;
       const et = OBJ_MOD_EVENT;
       this.broadcastChange({ et, objectId, mod: modAction });
     };
-    const handleModThrottled = _.throttle(handleMod, 200);
+    const handleModThrottled = throttle(handleMod, 200);
     canvasObj.on({
       moving: handleObjectMove,
       scaling: handleModThrottled,
@@ -165,13 +165,14 @@ export class CanvasWebsocketHandler {
       console.log("received create event for object", objToAdd);
       fabric.fabric.util.enlivenObjects([objToAdd], (o) => {
         const obj = o[0];
-        const origRenderOnAddRemove = this.canvasObjectCreator.canvas
-          .renderOnAddRemove;
+        const origRenderOnAddRemove =
+          this.canvasObjectCreator.canvas.renderOnAddRemove;
         this.canvasObjectCreator.canvas.renderOnAddRemove = false;
         obj.set({ remoteAdd: true }); // prevents infinite loop between local and remote canvases; see broadcastCanvasChanges()
         this.canvasObjectCreator.addCanvasObject(obj);
         this.bindObjectChanges(obj);
-        this.canvasObjectCreator.canvas.renderOnAddRemove = origRenderOnAddRemove;
+        this.canvasObjectCreator.canvas.renderOnAddRemove =
+          origRenderOnAddRemove;
       });
     }
     if (eventType === OBJ_MOD_EVENT) {

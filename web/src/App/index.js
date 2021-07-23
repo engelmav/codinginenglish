@@ -1,12 +1,13 @@
 import React, { Component, Suspense } from "react";
 import "./styles.css";
-import { Router } from "react-router-dom";
+
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Flex } from "rebass";
 import { Box } from "../UtilComponents/Box";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { Spinner } from "../UtilComponents";
+
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -31,28 +32,25 @@ class App extends Component {
   componentDidMount() {
     const el = document.getElementById("loader-container");
     el.remove();
-    const loaderStyle = document.getElementById("loader-style")
+    const loaderStyle = document.getElementById("loader-style");
     loaderStyle.remove();
   }
   render() {
-    const { Header, Routes, Footer, history } = this.props;
+    const { Header, Routes, Footer } = this.props;
     return (
       <ThemeProvider theme={theme}>
         <Suspense fallback={<Spinner color="black" alignSelf="center" />}>
-          <Router history={history}>
-            <GlobalStyle />
-            <Flex
-              justifyContent="space-between"
-              flexDirection="column"
-              height="100%"
-            >
-              <Header />
-              <RoutesBox>
-                <Routes />
-              </RoutesBox>
-              <Footer />
-            </Flex>
-          </Router>
+          <GlobalStyle />
+          <Flex
+            justifyContent="space-between"
+            flexDirection="column"
+            height="100%"
+          >
+
+            <RoutesBox>
+              <Routes />
+            </RoutesBox>
+          </Flex>
         </Suspense>
       </ThemeProvider>
     );
