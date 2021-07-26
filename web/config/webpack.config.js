@@ -1,16 +1,17 @@
 const path = require("path");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const zopfli = require("@gfx/zopfli");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+const ASSET_PATH = process.env.ASSET_PATH || "/";
+
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
 
-
-  const plugins = [
+  let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
@@ -20,20 +21,21 @@ module.exports = function (env) {
       template: path.resolve(__dirname, "../public", "index.html"),
       favicon: path.resolve(__dirname, "../public", "favicon.ico"),
     }),
-    new CompressionWebpackPlugin({
-      compressionOptions: {
-        numiterations: 15,
-      },
-      algorithm(input, compressionOptions, callback) {
-        return zopfli.gzip(input, compressionOptions, callback);
-      },
-    }),
   ];
 
-  if (environment !== "production"){
-    plugins.push(new BundleAnalyzerPlugin())
+  if (environment !== "production") {
+    plugins.concat([
+      new BundleAnalyzerPlugin(),
+      new CompressionWebpackPlugin({
+        compressionOptions: {
+          numiterations: 15,
+        },
+        algorithm(input, compressionOptions, callback) {
+          return zopfli.gzip(input, compressionOptions, callback);
+        },
+      }),
+    ]);
   }
-
 
   return {
     mode: environment,
@@ -63,6 +65,8 @@ module.exports = function (env) {
       compress: true,
       hot: true,
       port: 8080,
+      proxy: { "/api": "http://localhost:5000" },
+      // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
     },
     optimization: {
       minimizer: [() => ({ terserOptions: { mangle: false } })],
@@ -91,10 +95,11 @@ module.exports = function (env) {
     output: {
       path: path.resolve(__dirname, "../build"),
       filename: (pathData) => {
-        return "static/js/[name].[contenthash:8].js";
+        return "[name].[contenthash:8].js";
       },
-      chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
+      chunkFilename: "[name].[contenthash:8].chunk.js",
+      // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
     },
-    plugins: plugins
+    plugins: plugins,
   };
 };

@@ -14,7 +14,7 @@ const settings = {
 
   },
   development: {
-    auth0Host:     (__DEV_SERVER__ === "1") ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback',
+    auth0Host:     `${window.location.origin}/callback`,
     guacUrl:       (__DEV_SERVER__ === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl: "https://chat.codinginenglish.com/channel/",
     slidesUrl:     "https://slides.com/vincentengelmann",

@@ -3,9 +3,10 @@ FROM node:12 as npm-build-stage
 
 
 WORKDIR /app
-COPY package*.json /app/
+COPY yarn.lock /app/
+COPY package.json /app/
 
-RUN yarn install --production
+
 COPY ./ /app
 
 RUN yarn add -D webpack-cli

@@ -1,3 +1,4 @@
+import { action, configure, makeAutoObservable }  from "mobx";
 import {
   clearPersist,
   isSynchronized,
@@ -7,11 +8,7 @@ import {
   StorageAdapter,
 } from "mobx-persist-store";
 
-export const makeAppStore = async (appStoreName = "default") => {
-  // the shit you have to do for laziness. hot damn.
-  console.log("importing mobx")
-  const { action, configure, makeAutoObservable } = await import("mobx");
-  console.log("finished importing mobx")
+export const makeAppStore = (appStoreName = "default") => {
   configure({
     enforceActions: "never",
   });

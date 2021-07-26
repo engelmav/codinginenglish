@@ -1,87 +1,45 @@
+import addTimestampsToLog from "./log";
 import { App as _App } from "./App";
-// import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
-// import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
-// import { DragToImageCollab as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
-// import { Collab as _Collab } from "./PopupActivity/Collab/Collab"
-// import { Aula as _Classroom } from "./Aula";
 import { makeAppStore } from "./stores/AppStore";
-import makeAuth from "./auth/Auth";
+import Auth from "./auth/Auth";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
 import { InstructorApi } from "./services/InstructorApi";
-// import { CheckoutForm as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { compose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
-// import { Header as _Header } from "./Header";
 import { Footer as _Footer } from "./Footer/Footer";
 import history from "./history";
+import _Header from "./Header"
 import { Home as _Home } from "./Home";
-// import { ModuleCard as _ModuleCard } from "./ModuleCard/ModuleCard";
-// import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
-// import { AboutUs } from "./AboutUs";
-// import { BasicCourseForm as _Application } from "./CourseApplications/BasicCourse";
-// import { ApplicationProcess as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
-// import { Register as _Register } from "./CourseApplications/Register";
-// import { NextSteps as _NextSteps } from "./CourseApplications/NextSteps";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
 import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
-// import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
 import React from "react";
 import ReactGA from "react-ga";
 
 
-let appStoreSingleton;
-let authSingleton;
+addTimestampsToLog();
 
-async function makeAppStoreSingleton(){
-  if (appStoreSingleton) return appStoreSingleton;
-  appStoreSingleton = await makeAppStore();
-  return appStoreSingleton;
-}
 
-async function makeAuthSingleton() {
-  if (authSingleton) return authSingleton;
-  authSingleton = await makeAuth();
-  return authSingleton;
-}
+var appStore = makeAppStore();
+var auth = new Auth(appStore)
+
+const baseProps = {auth, appStore, settings}
 
 const _Login = React.lazy(() => {
   const Login = import("./Login/Login");
   return Login;
-});  
+});
 
-async function makeLazyLogin() {
-  const appStore = await makeAppStoreSingleton()
-  const Auth = await makeAuthSingleton();
-  const auth = new Auth(appStore);
-  const Login = compose(_Login, { auth, appStore });
-  return Login
-}
+const Login = compose(_Login, {...baseProps});
 
-export async function makeLazyHeader(){
-  const _Header = React.lazy(() => {
-    console.log("Lazy loading _Header");
-    const Header = import("./Header");
-    return Header;
-  }); 
 
-  const Login = await makeLazyLogin();
-  const appStore = makeAppStoreSingleton();
-  const Header = compose(_Header, { appStore, settings,
-     Login 
-    });
-  return Header;
-}
+export const Header = compose(_Header, {...baseProps, Login})
+export const Footer = compose(_Footer, { Login })
 
-export async function makeLazyFooter(){
-  const Login = makeLazyLogin();
-  const Footer = compose(_Footer, { Login })
-  return Footer;
-}
 
 export const Home = compose(_Home, { settings });
 
@@ -110,8 +68,6 @@ const _InstructorPanel = React.lazy(() =>
 );
 
 const _MyDashboard = React.lazy(() => {
-  console.log("Lazy loading MyDashboard");
-
   import("./MyDashboard/MyDashboard");
 });
 const _CheckoutForm = React.lazy(() =>
@@ -119,21 +75,17 @@ const _CheckoutForm = React.lazy(() =>
 );
 
 const AboutUs = React.lazy(() => {
-  console.log("Lazy loading AboutUs");
   return import("./AboutUs");
 });
 
 const _ApplicationProcess = React.lazy(() => {
-  console.log("Lazy loading _ApplicationProcess");
   return import("./CourseApplications/ApplicationProcess");
 });
 
 const _Register = React.lazy(() => {
-  console.log("Lazy loading Register");
   return import("./CourseApplications/Register");
 });
 const _NextSteps = React.lazy(() => {
-  console.log("Lazy loading NextSteps");
   return import("./CourseApplications/NextSteps");
 });
 
@@ -143,52 +95,15 @@ const _ModuleCard = React.lazy(() => {
 });
 
 const _PopupActivity = React.lazy(() =>
-  import(
-    /* webpackChunkName: "PopupActivity" */ "./PopupActivity/PopupActivity"
-  )
+  import("./PopupActivity/PopupActivity")
 );
 const _MultipleChoice = React.lazy(() =>
-  import(
-    /* webpackChunkName: "MultipleChoice" */ "./PopupActivity/MultipleChoice/MultipleChoice"
-  )
+  import("./PopupActivity/MultipleChoice/MultipleChoice")
 );
 
-
-var log = console.log;
-
-console.log = function () {
-  var first_parameter = arguments[0];
-  var other_parameters = Array.prototype.slice.call(arguments, 1);
-
-  function formatConsoleDate(date) {
-    var hour = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
-    var milliseconds = date.getMilliseconds();
-
-    return (
-      "[" +
-      (hour < 10 ? "0" + hour : hour) +
-      ":" +
-      (minutes < 10 ? "0" + minutes : minutes) +
-      ":" +
-      (seconds < 10 ? "0" + seconds : seconds) +
-      "." +
-      ("00" + milliseconds).slice(-3) +
-      "] "
-    );
-  }
-
-  log.apply(
-    console,
-    [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters)
-  );
-};
-
-export async function makeApp() {
-  const appStore = makeAppStoreSingleton();
-  const Auth = await makeAuthSingleton(appStore);
-  const auth = new Auth(appStore);
+export function makeApp() {
+  const appStore = makeAppStore();
+  const auth = new Auth(appStore)
   const cieApi = new CieApi();
   const websocketManager = new WebsocketManager(settings);
   
@@ -222,6 +137,7 @@ export async function makeApp() {
     }
     history.push(nextPage);
   }
+
   auth.addOnAuthSuccess(handleAuthSuccess);
   auth.addOnLogout(appStore.clearStore);
 

@@ -8,7 +8,6 @@ import { Box } from "../UtilComponents/Box";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { Spinner } from "../UtilComponents";
 
-
 const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
@@ -30,10 +29,10 @@ const RoutesBox = styled(Box)`
 @observer
 class App extends Component {
   componentDidMount() {
-    const el = document.getElementById("loader-container");
-    el.remove();
-    const loaderStyle = document.getElementById("loader-style");
-    loaderStyle.remove();
+    ["loader-container", "loader-style"].map((elemId) => {
+      const el = document.getElementById(elemId);
+      if (el) el.remove();
+    });
   }
   render() {
     const { Header, Routes, Footer } = this.props;
@@ -46,7 +45,6 @@ class App extends Component {
             flexDirection="column"
             height="100%"
           >
-
             <RoutesBox>
               <Routes />
             </RoutesBox>

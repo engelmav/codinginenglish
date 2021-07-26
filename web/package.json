@@ -83,9 +83,18 @@
   "scripts": {
     "start": "webpack serve --env DEV_SERVER=1 --progress --config config/webpack.config.js --open",
     "build": "./node_modules/.bin/webpack --progress --config config/webpack.config.js --env production --env NODE_ENV=production",
+ 
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
+  },
+  "reactSnap": {
+    "puppeteerArgs": [
+      "--disable-setuid-sandbox", "--no-sandbox"
+    ],
+    "concurrency": 1,
+    "inlineCss": false,
+    "puppeteerExecutablePath": "/usr/bin/chromium-browser"
   },
   "browserslist": [
     ">0.2%",
@@ -156,6 +165,7 @@
     "eslint-formatter-pretty": "^4.1.0",
     "html-webpack-plugin": "^5.3.2",
     "mjml": "^4.10.1",
+    "react-snap": "^1.23.0",
     "webpack": "^5.45.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2",
