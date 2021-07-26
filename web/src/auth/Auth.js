@@ -9,7 +9,7 @@ class Auth {
   auth0 = new auth0.WebAuth({
     domain: "login.codinginenglish.com",
     clientID: CLIENT_ID,
-    redirectUri: `${window.location.origin}/callback`,
+    redirectUri: settings.auth0Host,
     responseType: "token id_token",
     scope: "openid email profile",
   });
