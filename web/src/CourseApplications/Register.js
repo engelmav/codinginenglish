@@ -174,42 +174,11 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
         solicitar una plaza.
       </P>
       <RegisterOptsCard p={4} mt={3} mb={3}>
-        <CardTitle fontSize={1} mb={3} textAlign="center">
+        <CardTitle fontSize={2} mb={4} textAlign="center">
           registración
         </CardTitle>
         <CardContent>
-          <GoogleBtn
-            onClick={() => {
-              appStore.flow = "newRegistration";
-              const createRegisteredUserFromGoogleLogin = (auth0Result) => {
-                console.log("auth0Result", auth0Result);
-                debugger;
-                createRegisteredUser(email);
-              };
-              ReactGA.event({
-                category: "register",
-                action: "googleRegistration",
-                label: "googleRegistration"
-              });
-              auth.loginWithGoogle(
-                { isRegistration: true },
-                createRegisteredUserFromGoogleLogin
-              );
-            }}
-            class="google-btn"
-            id="google-btn"
-            type="button"
-          >
-            <img
-              height="90%"
-              class="google-icon"
-              src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
-            />
-            <p>Regístrate con Google</p>
-          </GoogleBtn>
-          <Divider mt={3} mb={3}>
-            o
-          </Divider>
+         
 
           {emailSubmitted ? (
             <P>

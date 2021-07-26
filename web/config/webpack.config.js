@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const zopfli = require("@gfx/zopfli");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -9,8 +9,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
 
-
-  const plugins = [
+  let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
@@ -20,20 +19,23 @@ module.exports = function (env) {
       template: path.resolve(__dirname, "../public", "index.html"),
       favicon: path.resolve(__dirname, "../public", "favicon.ico"),
     }),
-    new CompressionWebpackPlugin({
-      compressionOptions: {
-        numiterations: 15,
-      },
-      algorithm(input, compressionOptions, callback) {
-        return zopfli.gzip(input, compressionOptions, callback);
-      },
-    }),
   ];
 
-  if (environment !== "production"){
-    plugins.push(new BundleAnalyzerPlugin())
+  if (environment !== "production") {
+    plugins.concat([new BundleAnalyzerPlugin()]);
   }
-
+  if (environment === "production") {
+    plugins.concat([
+      new CompressionWebpackPlugin({
+        compressionOptions: {
+          numiterations: 15,
+        },
+        algorithm(input, compressionOptions, callback) {
+          return zopfli.gzip(input, compressionOptions, callback);
+        },
+      }),
+    ]);
+  }
 
   return {
     mode: environment,
@@ -95,6 +97,6 @@ module.exports = function (env) {
       },
       chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
     },
-    plugins: plugins
+    plugins: plugins,
   };
 };
