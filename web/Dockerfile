@@ -3,11 +3,13 @@ FROM node:12 as npm-build-stage
 
 
 WORKDIR /app
-COPY yarn.lock /app/
 COPY package.json /app/
+COPY src /app/src
+COPY config /app/config
+COPY public /app/public
 
-
-COPY ./ /app
+COPY babel.config.js /app/
+COPY yarn.lock /app/
 
 RUN yarn add -D webpack-cli
 RUN npm run build --production

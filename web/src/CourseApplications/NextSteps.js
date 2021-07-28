@@ -30,8 +30,8 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-const NextSteps = ({ appStore, cieApi, setMilestone }) => {
-  useEffect(() => setMilestone("Solicitud"));
+const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
+  useEffect(() => {setMilestone("Solicitud"); console.log("loaded NextSteps")}, []);
   return (
     <Container
       display="flex"
@@ -96,7 +96,7 @@ const NextSteps = ({ appStore, cieApi, setMilestone }) => {
             <FaDownload /> Descarga el currículo
           </Button>
         </DownloadAndApplyBox>
-        <BasicCourseForm cieApi={cieApi} appStore={appStore} />
+        <BasicCourseForm cieApi={cieApi} appStoreLazy={appStoreLazy} />
       </Card>
       <P>
         ¿Quieres hablar en persona? No dudes en{" "}

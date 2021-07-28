@@ -9,12 +9,11 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
+import { AutoScaleImage } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
-import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
-
 import history from "../history";
 import ReactGA from "react-ga";
 
@@ -96,30 +95,6 @@ const NavbarList = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
-const LinkButton = styled(Link)`
-  overflow: auto;
-  font-size: 13.3333px;
-  text-transform: lowercase;
-  background-color: ${cieOrange};
-  border-radius: 2px;
-  font-weight: 100;
-  font-family: "Arial", "sans-serif";
-  background-color: ${cieOrange};
-  text-decoration: none;
-  padding: 8px;
-  color: white;
-  a {
-    font-family: "Arial", "sans-serif";
-    color: white;
-    background-color: ${cieOrange};
-    ${orangeBgColor}
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    padding: 10px;
-    justify-items: space-between;
-  }
-`;
 
 const Banner = styled.div`
   margin: 0;
@@ -177,11 +152,9 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
-const HeaderContainer = observer((props) => {
-  console.log("Attempting to load HeaderContainer")
-  const { appStore, settings, 
-    Login 
-  } = props;
+const HeaderContainer = (props) => {
+  console.log("Attempting to load HeaderContainer");
+  const { appStoreLazy, settings, Login } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
@@ -248,13 +221,22 @@ const HeaderContainer = observer((props) => {
           </Banner>
         )}
         <Header>
+          <div>
           <Link to="/">
-            <Img
+            <AutoScaleImage
+                    mt={4}
+                    mb={3}
+                    alignSelf="center"
+                    width="225"
+                    height="179.797"
+                    maxWidth="50%"
+                    loading="lazy"
               loading="lazy"
               alt="cie logo"
               src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
-            ></Img>
+             />
           </Link>
+          </div>
           <NavbarList navMenu={navMenu} ref={navMenuRef}>
             <LI>
               <CloseBox size="20" onClick={() => setNavMenu(false)} />
@@ -264,7 +246,7 @@ const HeaderContainer = observer((props) => {
                 <Link to={link.location}>{link.text}</Link>
               </LI>
             ))}
-            {appStore.authData && (
+            {/* {appStore.authData && ( this would make us load appStore right away..rethink
               <>
                 <LI>
                   <Link to="/my-dashboard">my_dashboard</Link>
@@ -273,7 +255,7 @@ const HeaderContainer = observer((props) => {
                   <Link to="/class">in_session!</Link>
                 </LI>
               </>
-            )}
+            )} */}
             <li>
               <Login />
             </li>
@@ -283,6 +265,6 @@ const HeaderContainer = observer((props) => {
       </Route>
     </Switch>
   );
-});
+};
 
 export default HeaderContainer;

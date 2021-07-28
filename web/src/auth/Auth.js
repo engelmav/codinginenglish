@@ -1,20 +1,22 @@
 import settings from "../settings";
 import auth0 from "auth0-js";
+
+
 var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 
 class Auth {
   accessToken;
   idToken;
 
-  auth0 = new auth0.WebAuth({
-    domain: "login.codinginenglish.com",
-    clientID: CLIENT_ID,
-    redirectUri: settings.auth0Host,
-    responseType: "token id_token",
-    scope: "openid email profile",
-  });
-
-  constructor(appStore) {
+  constructor() {
+    this.auth0 = new auth0.WebAuth({
+      domain: "login.codinginenglish.com",
+      clientID: CLIENT_ID,
+      redirectUri: settings.auth0Redirect,
+      responseType: "token id_token",
+      scope: "openid email profile",
+    });
+    console.log("using auth0Redirect", settings.auth0Redirect)
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.handleAuthentication = this.handleAuthentication.bind(this);
@@ -22,7 +24,6 @@ class Auth {
       this.handleAuthenticationFromCallbackRoute.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
     this.renewSession = this.renewSession.bind(this);
-    this.appStore = appStore;
     this.onAuthSuccess = [];
     this.onLogout = [];
   }

@@ -1,2 +1,4 @@
-echo Running devserver on port 8080
-sudo docker run --add-host cie-api:127.0.0.1 -p 8080:80 cie-web
+IP=`hostname -I  | awk '{ print $1}'`
+echo Running devserver on port 8080, mapping cie-api to $IP
+
+sudo docker run --add-host cie-api:$IP -p 8080:80 cie-web

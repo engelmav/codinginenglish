@@ -15,6 +15,7 @@ module.exports = function (api) {
     ],
     plugins: [
       "lodash",
+      "babel-plugin-styled-components",
       "@babel/plugin-transform-runtime",
       [
         "@babel/plugin-proposal-decorators",

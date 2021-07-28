@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense } from "react";
-import { Main, ContentSection, Button } from "../UtilComponents";
+import { AutoScaleImage, Main, ContentSection, Button } from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
@@ -13,19 +13,6 @@ import {
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-const SectionImage = styled.img`
-  width: 225px;
-  padding-bottom: 20px;
-  ${whenSmallScreen`
-    width: 70px;
-    height: auto;`}
-`;
-
-const LPButton = styled(Button)`
-  padding: 10px;
-  color: white;
-  ${fontMonospace}
-`;
 
 const MainLanding = styled(Main)`
   width: min(90%, 700px);
@@ -86,19 +73,12 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
-const TechStackImg = styled.img`
-  width: 100%;
-  height: auto;
-  padding-bottom: 20px;
-`;
-
 const Home = (props) => {
   const { settings } = props;
-  console.log("Mounting Home")
   return (
     <MainLanding p={1}>
       <Box display="flex" flexDirection="column" alignItems="center" mb={20}>
-        <Box mt={3}>
+        <Box mt={4}>
           <TaglineTitle>Únete a la economía global</TaglineTitle>
         </Box>
 
@@ -111,13 +91,18 @@ const Home = (props) => {
           </ContentSection>
         </Box>
       </Box>
-      <Box mt={0} alignSelf="center">
-        <SectionImage
-          loading="lazy"
-          alt="Speak English, Build Apps"
-          src={`${settings.assets}/home/chat-icon-green-red.png`}
-        />
-      </Box>
+
+      <AutoScaleImage
+        mt={4}
+        mb={3}
+        alignSelf="center"
+        width="225"
+        height="179.797"
+        maxWidth="35%"
+        loading="lazy"
+        alt="Speak English, Build Apps"
+        src={`${settings.assets}/home/chat-icon-green-red.png`}
+      />
       <SectionTitle mb={2}>Habla inglés, crea aplicaciones</SectionTitle>
       <ContentSectionLanding>
         <p>
@@ -131,12 +116,17 @@ const Home = (props) => {
         </p>
         <I>Y crear software real en el proceso.</I>
       </ContentSectionLanding>
-      <Box mt={40} alignSelf="center">
-        <TechStackImg
-          alt={"Software Stack"}
-          src={`${props.settings.assets}/home/3-tech.png`}
-        />
-      </Box>
+
+      <AutoScaleImage
+        mt={5}
+        mb={3}
+        alignSelf="center"
+        maxWidth="100%"
+        width="692"
+        height="221.438"
+        alt={"Software Stack"}
+        src={`${props.settings.edgeAssets}/home/3-tech.jpg`}
+      />
       <SectionTitle>Crea tu cartera de proyectos</SectionTitle>
       <ContentSectionLanding>
         <p>Crea tu cartera de proyectos sobre la marcha.</p>
@@ -149,13 +139,18 @@ const Home = (props) => {
         </p>
         <RegisterLink to="/apply">Solicita una plaza aquí</RegisterLink>
       </ContentSectionLanding>
-      <Box mt={40} alignSelf="center">
-        <SectionImage
-          loading="lazy"
-          alt="Learn Vocabulary and Grammar in Real Context"
-          src={`${settings.assets}/home/dictionary.png`}
-        />
-      </Box>
+
+      <AutoScaleImage
+        alignSelf="center"
+        maxWidth="35%"
+        mt={5}
+        mb={3}
+        width="225"
+        height="225"
+        loading="lazy"
+        alt="Learn Vocabulary and Grammar in Real Context"
+        src={`${settings.assets}/home/dictionary.png`}
+      />
       <SectionTitle mb={2}>
         Aprende vocabulario y gramática en un contexto real
       </SectionTitle>
@@ -165,13 +160,19 @@ const Home = (props) => {
           y vocabulario integradas en las clases técnicas.
         </p>
       </ContentSectionLanding>
-      <Box mt={40} alignSelf="center">
-        <SectionImage
-          loading="lazy"
-          alt="Learn in a Live Teaching Environment"
-          src={`${settings.assets}/home/meeting.png`}
-        />
-      </Box>
+
+      <AutoScaleImage
+        mt={5}
+        mb={3}
+        alignSelf="center"
+        loading="lazy"
+        maxWidth="35%"
+        width="225px"
+        height="211.062px"
+        alt="Learn in a Live Teaching Environment"
+        src={`${settings.assets}/home/meeting.png`}
+      />
+
       <SectionTitle mt={4} mb={2}>
         Estudia en un entorno de aprendizaje en vivo
       </SectionTitle>

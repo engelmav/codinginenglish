@@ -1,3 +1,4 @@
+import { AutoScaleImage } from "./AutoScaleImage";
 import { Box, boxy } from "./Box";
 import { Button } from "./Button";
 import { Title } from "./Typography/Typography";
@@ -13,6 +14,7 @@ import { Select } from "./Select/Select";
 
 export {
   AlertMessage,
+  AutoScaleImage,
   Box,
   boxy,
   Button,

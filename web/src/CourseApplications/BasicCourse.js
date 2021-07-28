@@ -7,17 +7,12 @@ import {
   ClearableTextInput,
   TextInput,
   Button,
-  Main,
   Title,
 } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
-import {
-  fontFamily,
-  cieOrange,
-  darkGray,
-} from "../UtilComponents/sharedStyles";
+import { fontFamily, cieOrange } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -74,56 +69,7 @@ const Error = styled(P)`
   color: #ff0033;
 `;
 
-const MainAppl = styled(Main)`
-  width: min(90%, 700px);
-`;
-
-const ClearFieldButton = styled.button`
-  border: 1px solid transparent;
-  background-color: transparent;
-  display: inline-block;
-  vertical-align: middle;
-  outline: 0;
-  cursor: pointer;
-  position: relative;
-  padding: 10px;
-  &:after {
-    content: "X";
-    display: block;
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    background-color: ${cieOrange};
-    z-index: 1;
-    right: 10px;
-    top: -58px;
-    bottom: 0;
-    margin: auto;
-    padding: 2px;
-    border-radius: 50%;
-    text-align: center;
-    color: white;
-    font-weight: normal;
-    font-size: 12px;
-    box-shadow: 0 0 2px #e50f0f;
-    cursor: pointer;
-  }
-`;
-
-export const BasicCourseForm = ({ appStore, cieApi }) => {
-  const [appComplete, setAppComplete] = useState(false);
-
-  useEffect(() => {
-    async function getUserLocation(){
-      const resp = await cieApi.getUserLocation();
-      const locationData = resp.data;
-      const { city, country_name } = locationData;
-      if (!!city && !!country_name)
-        appStore.userLocation = `${city}, ${country_name}`;
-    }
-    getUserLocation();
-  })
-
+const setupFormik = (appStore) => {
   const initialValues = {};
   basicCourseForm.forEach((field) => {
     initialValues[field.fieldName] = field.initialValue
@@ -134,6 +80,32 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
   initialValues["fullName"] = appStore.lastName
     ? appStore.firstName + " " + appStore.lastName
     : appStore.firstName;
+  return { initialValues, basicCourseForm };
+};
+
+export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
+  const [appComplete, setAppComplete] = useState(false);
+  const [appStore, setAppStore] = useState(null)
+  const [formikData, setFormikData] = useState(false);
+
+  useEffect(() => {
+    async function init() {
+      const _appStore = await appStoreLazy.create();
+      setAppStore(_appStore);
+      try {
+        const resp = await cieApi.getUserLocation();
+        const locationData = resp.data;
+        const { city, country_name } = locationData;
+        if (!!city && !!country_name)
+        appStore.userLocation = `${city}, ${country_name}`;
+      } catch {
+        console.log("Unable to get location.")
+      }
+      const _formikData = setupFormik(_appStore);
+      setFormikData(_formikData);
+    }
+    init();
+  }, []);
 
   return (
     <>
@@ -148,191 +120,195 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
         </P>
       ) : (
         <>
-          <Formik
-            validationSchema={ApplicationSchema}
-            initialValues={initialValues}
-            onSubmit={async (values, actions) => {
-              values.email = appStore.email;
-              await cieApi.submitApp(values);
-              setAppComplete(true);
-              actions.setSubmitting(false);
-              appStore.userApplied = true;
-            }}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleSubmit,
-              handleChange,
-              handleBlur,
-              isSubmitting,
-              setFieldValue,
-            }) => (
-              <Form onSubmit={handleSubmit}>
-                {basicCourseForm.map((field, idx) => {
-                  const { fieldName } = field;
-                  let fieldJsx;
+          {formikData && (
+            <Formik
+              validationSchema={ApplicationSchema}
+              initialValues={formikData.initialValues}
+              onSubmit={async (values, actions) => {
+                values.email = appStore.email;
+                await cieApi.submitApp(values);
+                setAppComplete(true);
+                actions.setSubmitting(false);
+                appStore.userApplied = true;
+              }}
+            >
+              {({
+                values,
+                errors,
+                touched,
+                handleSubmit,
+                handleChange,
+                handleBlur,
+                isSubmitting,
+                setFieldValue,
+              }) => (
+                <Form onSubmit={handleSubmit}>
+                  {formikData.basicCourseForm.map((field, idx) => {
+                    const { fieldName } = field;
+                    let fieldJsx;
 
-                  if (field.fieldType === "shortAnswer") {
-                    fieldJsx = (
-                      <>
-                        <FieldLabel htmlFor={field.title} key={idx}>
-                          {field.title}
-                        </FieldLabel>
-                        <TextInput
-                          autocomplete="false"
-                          type="text"
-                          id={fieldName}
-                          name={fieldName}
-                          onFocus={() => {
-                            ReactGA.event({
-                              category: "applyFieldFocus",
-                              action: `user focused field ${field.title}`,
-                            });
-                          }}
-                          onChange={(e) => {
-                            handleChange(e);
-                          }}
-                          value={values[field.fieldName]}
-                        />
-                      </>
+                    if (field.fieldType === "shortAnswer") {
+                      fieldJsx = (
+                        <>
+                          <FieldLabel htmlFor={field.title} key={idx}>
+                            {field.title}
+                          </FieldLabel>
+                          <TextInput
+                            autocomplete="false"
+                            type="text"
+                            id={fieldName}
+                            name={fieldName}
+                            onFocus={() => {
+                              ReactGA.event({
+                                category: "applyFieldFocus",
+                                action: `user focused field ${field.title}`,
+                              });
+                            }}
+                            onChange={(e) => {
+                              handleChange(e);
+                            }}
+                            value={values[field.fieldName]}
+                          />
+                        </>
+                      );
+                    }
+                    if (field.fieldType === "email") {
+                      fieldJsx = (
+                        <>
+                          <FieldLabel htmlFor={field.title} key={idx}>
+                            {field.title}
+                          </FieldLabel>
+                          <TextInput
+                            type="email"
+                            id={fieldName}
+                            name={fieldName}
+                            onFocus={() => {
+                              ReactGA.event({
+                                category: "applyFieldFocus",
+                                action: `user focused field ${field.title}`,
+                              });
+                            }}
+                            onChange={handleChange}
+                            value={values[fieldName]}
+                          />
+                        </>
+                      );
+                    }
+                    if (field.fieldType === "multipleChoice") {
+                      fieldJsx = (
+                        <>
+                          <FieldLabel htmlFor={field.title} key={idx}>
+                            {field.title}
+                          </FieldLabel>
+                          {field.choices.map((choice, idx) => {
+                            return (
+                              <MultiLabel key={idx}>
+                                <Field
+                                  type="radio"
+                                  name={fieldName}
+                                  value={choice}
+                                />
+                                {choice}
+                              </MultiLabel>
+                            );
+                          })}
+                        </>
+                      );
+                    }
+                    if (field.fieldType === "checkboxes") {
+                      fieldJsx = (
+                        <>
+                          <FieldLabel htmlFor={field.title}>
+                            {field.title}
+                          </FieldLabel>
+                          {field.choices.map((choice, idx) => {
+                            return (
+                              <MultiLabel key={idx}>
+                                <Field type="checkbox" name={choice} />
+                                {choice}
+                              </MultiLabel>
+                            );
+                          })}
+                        </>
+                      );
+                    }
+                    if (field.fieldType === "paragraph") {
+                      fieldJsx = (
+                        <>
+                          <FieldLabel htmlFor={field.title} key={idx}>
+                            {field.title}
+                          </FieldLabel>
+                          <TextInput
+                            as="textarea"
+                            name={fieldName}
+                            value={values[field.fieldName]}
+                            onFocus={() => {
+                              ReactGA.event({
+                                category: "applyFieldFocus",
+                                action: `user focused field ${field.title}`,
+                              });
+                            }}
+                            onChange={handleChange}
+                            value={values[fieldName]}
+                          />
+                        </>
+                      );
+                    }
+                    return (
+                      <Box display="flex" flexDirection="column" mb={3}>
+                        {fieldJsx}
+                        {errors[fieldName] && (
+                          <Error>{errors[fieldName]}</Error>
+                        )}
+                      </Box>
                     );
-                  }
-                  if (field.fieldType === "email") {
-                    fieldJsx = (
-                      <>
-                        <FieldLabel htmlFor={field.title} key={idx}>
-                          {field.title}
-                        </FieldLabel>
-                        <TextInput
-                          type="email"
-                          id={fieldName}
-                          name={fieldName}
-                          onFocus={() => {
-                            ReactGA.event({
-                              category: "applyFieldFocus",
-                              action: `user focused field ${field.title}`,
-                            });
-                          }}
-                          onChange={handleChange}
-                          value={values[fieldName]}
-                        />
-                      </>
-                    );
-                  }
-                  if (field.fieldType === "multipleChoice") {
-                    fieldJsx = (
-                      <>
-                        <FieldLabel htmlFor={field.title} key={idx}>
-                          {field.title}
-                        </FieldLabel>
-                        {field.choices.map((choice, idx) => {
-                          return (
-                            <MultiLabel key={idx}>
-                              <Field
-                                type="radio"
-                                name={fieldName}
-                                value={choice}
-                              />
-                              {choice}
-                            </MultiLabel>
-                          );
-                        })}
-                      </>
-                    );
-                  }
-                  if (field.fieldType === "checkboxes") {
-                    fieldJsx = (
-                      <>
-                        <FieldLabel htmlFor={field.title}>
-                          {field.title}
-                        </FieldLabel>
-                        {field.choices.map((choice, idx) => {
-                          return (
-                            <MultiLabel key={idx}>
-                              <Field type="checkbox" name={choice} />
-                              {choice}
-                            </MultiLabel>
-                          );
-                        })}
-                      </>
-                    );
-                  }
-                  if (field.fieldType === "paragraph") {
-                    fieldJsx = (
-                      <>
-                        <FieldLabel htmlFor={field.title} key={idx}>
-                          {field.title}
-                        </FieldLabel>
-                        <TextInput
-                          as="textarea"
-                          name={fieldName}
-                          value={values[field.fieldName]}
-                          onFocus={() => {
-                            ReactGA.event({
-                              category: "applyFieldFocus",
-                              action: `user focused field ${field.title}`,
-                            });
-                          }}
-                          onChange={handleChange}
-                          value={values[fieldName]}
-                        />
-                      </>
-                    );
-                  }
-                  return (
-                    <Box display="flex" flexDirection="column" mb={3}>
-                      {fieldJsx}
-                      {errors[fieldName] && <Error>{errors[fieldName]}</Error>}
-                    </Box>
-                  );
-                })}
-                <>
-                  <FieldLabel htmlFor={"location"}>
-                    Ciudad y país. (Lo necesitamos para saber tu zona horaria)
-                  </FieldLabel>
-                  <ClearableTextInput
-                    id={"location"}
-                    name={"location"}
-                    onFocus={() => {
+                  })}
+                  <>
+                    <FieldLabel htmlFor={"location"}>
+                      Ciudad y país. (Lo necesitamos para saber tu zona horaria)
+                    </FieldLabel>
+                    <ClearableTextInput
+                      id={"location"}
+                      name={"location"}
+                      onFocus={() => {
+                        ReactGA.event({
+                          category: "applyFieldFocus",
+                          action: `user focused field location`,
+                        });
+                      }}
+                      onChange={(e) => {
+                        console.log(e);
+                        handleChange(e);
+                      }}
+                      value={values["location"] || appStore.userLocation}
+                      onClear={() => {
+                        setFieldValue("location", " ", false);
+                      }}
+                    />
+
+                    {errors["location"] ? (
+                      <Error>{errors["location"]}</Error>
+                    ) : (
+                      <div style={{ color: "white" }}>empty</div>
+                    )}
+                  </>
+                  <Button
+                    display="flex"
+                    alignItems="center"
+                    type="submit"
+                    onClick={() => {
                       ReactGA.event({
-                        category: "applyFieldFocus",
-                        action: `user focused field location`,
+                        category: "appliedCat",
+                        action: `userApplied`,
                       });
                     }}
-                    onChange={(e) => {
-                      console.log(e);
-                      handleChange(e);
-                    }}
-                    value={values["location"] || appStore.userLocation}
-                    onClear={() => {
-                      setFieldValue("location", " ", false);
-                    }}
-                  />
-
-                  {errors["location"] ? (
-                    <Error>{errors["location"]}</Error>
-                  ) : (
-                    <div style={{ color: "white" }}>empty</div>
-                  )}
-                </>
-                <Button
-                  display="flex"
-                  alignItems="center"
-                  type="submit"
-                  onClick={() => {
-                    ReactGA.event({
-                      category: "appliedCat",
-                      action: `userApplied`,
-                    });
-                  }}
-                >
-                  Envía mi solicitud
-                </Button>
-              </Form>
-            )}
-          </Formik>
+                  >
+                    Envía mi solicitud
+                  </Button>
+                </Form>
+              )}
+            </Formik>
+          )}
         </>
       )}
     </>

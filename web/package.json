@@ -39,10 +39,10 @@
     "location": "0.0.1",
     "lodash": "^4.17.21",
     "luxon": "^1.17.2",
-    "mobx": "^6.1.8",
+    "mobx": "^6.3.2",
     "mobx-persist": "^0.4.1",
     "mobx-persist-store": "^0.5.30",
-    "mobx-react": "^7.1.0",
+    "mobx-react": "^7.2.0",
     "nanoid": "^3.1.23",
     "navigator": "^1.0.1",
     "npm": "^7.20.0",
@@ -72,6 +72,7 @@
     "reconnecting-websocket": "^4.4.0",
     "regenerator-runtime": "^0.13.7",
     "resolve": "1.10.0",
+    "serve-gzipped": "^1.0.0",
     "style-loader": "0.23.1",
     "styled-components": "^5.3.0",
     "styled-system": "^5.1.5",
@@ -83,14 +84,19 @@
   "scripts": {
     "start": "webpack serve --env DEV_SERVER=1 --progress --config config/webpack.config.js --open",
     "build": "./node_modules/.bin/webpack --progress --config config/webpack.config.js --env production --env NODE_ENV=production",
- 
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
   },
   "reactSnap": {
+    "source": "build",
+    "skipThirdPartyRequests": true,
     "puppeteerArgs": [
-      "--disable-setuid-sandbox", "--no-sandbox"
+      "--disable-setuid-sandbox",
+      "--no-sandbox"
+    ],
+    "include": [
+      "/"
     ],
     "concurrency": 1,
     "inlineCss": false,
@@ -158,6 +164,7 @@
     "@gfx/zopfli": "^1.0.15",
     "babel-loader": "^8.2.2",
     "babel-plugin-lodash": "^3.3.4",
+    "babel-plugin-styled-components": "^1.13.2",
     "caniuse-lite": "^1.0.30001235",
     "compression-webpack-plugin": "^8.0.1",
     "core-js": "^3.15.2",

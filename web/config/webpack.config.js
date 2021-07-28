@@ -10,12 +10,12 @@ const ASSET_PATH = process.env.ASSET_PATH || "/";
 
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
-
+  console.log("*** Webpack running with environment", environment);
   let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
-      __DEV_SERVER__: JSON.stringify(process.env.DEV_SERVER),
+      __DEV_SERVER__: JSON.stringify(env.DEV_SERVER),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "../public", "index.html"),
@@ -24,25 +24,40 @@ module.exports = function (env) {
   ];
 
   if (environment !== "production") {
-    plugins.concat([
-      new BundleAnalyzerPlugin(),
-      new CompressionWebpackPlugin({
-        compressionOptions: {
-          numiterations: 15,
-        },
-        algorithm(input, compressionOptions, callback) {
-          return zopfli.gzip(input, compressionOptions, callback);
-        },
-      }),
-    ]);
+    plugins.push(new BundleAnalyzerPlugin());
   }
 
-  return {
+  if (environment === "production") {
+    compressionOpts = {
+      compressionOptions: {
+        numiterations: 15,
+      },
+      algorithm(input, compressionOptions, callback) {
+        return zopfli.gzip(input, compressionOptions, callback);
+      },
+    };
+    const compressionPlugin = new CompressionWebpackPlugin();
+    console.log("*** Adding compressionPlugin");
+    plugins.push(compressionPlugin);
+  }
+
+  const config = {
     mode: environment,
     entry: {
       mainEntry: "./src/index.js",
     },
-    resolve: { fallback: { crypto: false } },
+    resolve: {
+      fallback: { crypto: false },
+      alias: {
+        // Support React Native Web
+
+        // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
+
+        "react-dom$": "react-dom/profiling",
+
+        "scheduler/tracing": "scheduler/tracing-profiling",
+      },
+    },
     module: {
       rules: [
         {
@@ -68,8 +83,8 @@ module.exports = function (env) {
       proxy: { "/api": "http://localhost:5000" },
       // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
     },
+
     optimization: {
-      minimizer: [() => ({ terserOptions: { mangle: false } })],
       runtimeChunk: "single",
       splitChunks: {
         chunks: "all",
@@ -99,7 +114,21 @@ module.exports = function (env) {
       },
       chunkFilename: "[name].[contenthash:8].chunk.js",
       // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
+      publicPath: "/"
     },
     plugins: plugins,
   };
+  if (environment !== "production") {
+    config["devtool"] = "eval-source-map";
+  } else {
+    console.log("*** Adding minification")
+    config.optimization["minimizer"] = [
+      () => ({
+        terserOptions: {
+          mangle: true,
+        },
+      }),
+    ];
+  }
+  return config;
 };

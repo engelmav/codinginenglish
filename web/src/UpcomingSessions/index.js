@@ -46,4 +46,4 @@ class UpcomingSessions extends Component {
   }
 }
 
-export { UpcomingSessions };
+export default UpcomingSessions 

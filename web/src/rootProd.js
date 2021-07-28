@@ -1,54 +1,47 @@
 import addTimestampsToLog from "./log";
 import { App as _App } from "./App";
-import { makeAppStore } from "./stores/AppStore";
-import Auth from "./auth/Auth";
+import { appStoreLazy } from "./stores/AppStoreLazy";
+import { AuthLazy } from "./auth/AuthLazy";
 import Callback from "./auth/Auth0Callback";
 import { CieApi } from "./services/cieApi";
 import { InstructorApi } from "./services/InstructorApi";
-import { compose } from "./compose";
+import { compose, observableCompose } from "./compose";
 import { createWithAuth } from "./auth/RequiresAuth";
 import { Footer as _Footer } from "./Footer/Footer";
 import history from "./history";
-import _Header from "./Header"
+import _Header from "./Header";
 import { Home as _Home } from "./Home";
 import { Routes as _Routes } from "./Routes";
 import settings from "./settings";
 import { StudentSessionManager } from "./util";
-import { UpcomingSessions as _UpcomingSessions } from "./UpcomingSessions";
 import { withRouter } from "react-router-dom";
 import { WebsocketManager } from "./messaging";
 import React from "react";
 import ReactGA from "react-ga";
-
+import reactor from "./reactor";
 
 addTimestampsToLog();
 
+const authLazy = new AuthLazy(appStoreLazy);
+const baseProps = { authLazy, appStoreLazy, settings };
+const cieApi = new CieApi();
+const websocketManager = new WebsocketManager(settings);
 
-var appStore = makeAppStore();
-var auth = new Auth(appStore)
-
-const baseProps = {auth, appStore, settings}
 
 const _Login = React.lazy(() => {
   const Login = import("./Login/Login");
   return Login;
 });
 
-const Login = compose(_Login, {...baseProps});
+const Login = compose(_Login, { ...baseProps });
 
-
-export const Header = compose(_Header, {...baseProps, Login})
-export const Footer = compose(_Footer, { Login })
-
-
+export const Header = compose(_Header, { ...baseProps, Login });
+export const Footer = compose(_Footer, { Login });
 export const Home = compose(_Home, { settings });
-
 
 const _Collab = React.lazy(() => {
   console.log("importing _Collab");
-  return import(
-    /* webpackChunkName: "Collab" */ "./PopupActivity/Collab/Collab"
-  );
+  return import("./PopupActivity/Collab/Collab");
 });
 
 const _DragToImageCollab = React.lazy(() => {
@@ -100,13 +93,11 @@ const _PopupActivity = React.lazy(() =>
 const _MultipleChoice = React.lazy(() =>
   import("./PopupActivity/MultipleChoice/MultipleChoice")
 );
+const _UpcomingSessions = React.lazy(() =>
+  import("./UpcomingSessions")
+);
 
-export function makeApp() {
-  const appStore = makeAppStore();
-  const auth = new Auth(appStore)
-  const cieApi = new CieApi();
-  const websocketManager = new WebsocketManager(settings);
-  
+export async function makeApp() {
   const trackingId = "UA-199972795-1";
   ReactGA.initialize(trackingId);
 
@@ -116,6 +107,7 @@ export function makeApp() {
   });
 
   async function handleAuthSuccess(authResult) {
+    const appStore = await appStoreLazy.create();
     const initializedUser = await cieApi.initializeUser(authResult);
     appStore.user = initializedUser;
     const userData = initializedUser.data.user;
@@ -137,53 +129,49 @@ export function makeApp() {
     }
     history.push(nextPage);
   }
-
-  auth.addOnAuthSuccess(handleAuthSuccess);
-  auth.addOnLogout(appStore.clearStore);
-
+  reactor.registerEvent("auth_success");
+  reactor.addEventListener("auth_success", handleAuthSuccess);
   // const Footer = compose(_Footer, { appStore, auth, Login });
 
-  const CheckoutForm = compose(_CheckoutForm, { appStore, settings });
+  const CheckoutForm = compose(_CheckoutForm, { appStoreLazy, settings });
   const ModuleCard = compose(_ModuleCard, {
     cieApi,
-    appStore,
+    appStoreLazy,
     settings,
     CheckoutForm,
   });
   const UpcomingSessions = compose(_UpcomingSessions, {
     cieApi,
-    auth,
-    appStore,
+    authLazy,
+    appStoreLazy,
     ModuleCard,
   });
 
   /** Configure Aula */
   const instructorApi = new InstructorApi();
   const InstructorPanel = compose(_InstructorPanel, {
-    appStore,
+    appStoreLazy,
     instructorApi,
   });
-  const Collab = compose(_Collab, { cieApi, appStore });
+  const Collab = compose(_Collab, { cieApi, appStoreLazy });
   const MultipleChoice = compose(_MultipleChoice, { cieApi });
   const DragToImageCollab = compose(_DragToImageCollab, {
-    appStore,
+    appStoreLazy,
     cieApi,
     settings,
   });
 
   const PopupActivity = compose(_PopupActivity, {
-    appStore,
+    appStoreLazy,
     Collab,
     MultipleChoice,
     DragToImageCollab,
     websocketManager,
   });
-  const withAuth = createWithAuth(auth);
+  const withAuth = createWithAuth(authLazy);
 
-  const { authData } = appStore;
   const _ClassroomInjected = compose(_Classroom, {
-    appStore,
-    authData,
+    appStoreLazy,
     cieApi,
     settings,
     InstructorPanel,
@@ -195,21 +183,25 @@ export function makeApp() {
   /** End Configure Aula */
 
   const CallbackWithRouter = withRouter(Callback);
-  const Register = compose(_Register, { appStore, auth, cieApi });
-  const NextSteps = compose(_NextSteps, { appStore, auth, cieApi });
+  const Register = compose(_Register, { appStoreLazy, authLazy, cieApi });
+  const NextSteps = compose(_NextSteps, { appStoreLazy, authLazy, cieApi });
 
   const ApplicationProcess = compose(_ApplicationProcess, {
-    appStore,
+    appStoreLazy,
     cieApi,
     Register,
     NextSteps,
   });
-  const CallbackRoute = compose(CallbackWithRouter, { appStore, auth, cieApi });
-  const MyDashboard = compose(_MyDashboard, { auth, appStore, cieApi });
-  const CollabEditor = compose(_Collab, { appStore, editorMode: true });
+  const CallbackRoute = compose(CallbackWithRouter, {
+    appStoreLazy,
+    authLazy,
+    cieApi,
+  });
+  const MyDashboard = compose(_MyDashboard, { authLazy, appStoreLazy, cieApi });
+  const CollabEditor = compose(_Collab, { appStoreLazy, editorMode: true });
   const routesProps = {
-    appStore,
-    auth,
+    appStoreLazy,
+    authLazy,
     cieApi,
     AboutUs,
     ApplicationProcess,
@@ -223,8 +215,8 @@ export function makeApp() {
   const Routes = compose(_Routes, routesProps);
 
   const App = compose(_App, {
-    appStore,
-    auth,
+    appStoreLazy,
+    authLazy,
     Routes,
     history,
   });

@@ -10,7 +10,6 @@ import { Spinner } from "./UtilComponents";
  * initialize, and prioritize everything _outside_ of this component.
  */
 
-console.log("index.js");
 
 function makeLazyComponent(asyncGetter) {
   const Component = () => {
@@ -33,19 +32,16 @@ function makeLazyComponent(asyncGetter) {
   return <Component />;
 }
 
-const App = makeApp();
 
 const AppContainer = () => {
   console.log("App component");
   return (
     <Router history={history}>
       <Suspense fallback={<Spinner />}>
-      {/* <HeaderLazy /> */}
-      {/* {makeLazyComponent(makeLazyHeader)} */}
-      <Header />
-      <Route exact path="/" component={(props) => <Home />} />
-      <App />
-      <Footer />
+        <Header />
+        <Route exact path="/" component={(props) => <Home />} />
+        {makeLazyComponent(makeApp)}
+        <Footer />
       </Suspense>
     </Router>
   );
