@@ -95,6 +95,30 @@ const NavbarList = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
+const LinkButton = styled(Link)`
+  overflow: auto;
+  font-size: 13.3333px;
+  text-transform: lowercase;
+  background-color: ${cieOrange};
+  border-radius: 2px;
+  font-weight: 100;
+  font-family: "Arial", "sans-serif";
+  background-color: ${cieOrange};
+  text-decoration: none;
+  padding: 8px;
+  color: white;
+  a {
+    font-family: "Arial", "sans-serif";
+    color: white;
+    background-color: ${cieOrange};
+    ${orangeBgColor}
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    justify-items: space-between;
+  }
+`;
 
 const Banner = styled.div`
   margin: 0;
@@ -221,22 +245,13 @@ const HeaderContainer = (props) => {
           </Banner>
         )}
         <Header>
-          <div>
           <Link to="/">
-            <AutoScaleImage
-                    mt={4}
-                    mb={3}
-                    alignSelf="center"
-                    width="225"
-                    height="179.797"
-                    maxWidth="50%"
-                    loading="lazy"
+            <Img
               loading="lazy"
               alt="cie logo"
               src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
-             />
+            ></Img>
           </Link>
-          </div>
           <NavbarList navMenu={navMenu} ref={navMenuRef}>
             <LI>
               <CloseBox size="20" onClick={() => setNavMenu(false)} />

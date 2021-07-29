@@ -12,7 +12,7 @@ COPY babel.config.js /app/
 COPY yarn.lock /app/
 
 RUN yarn add -D webpack-cli
-RUN npm run build --production
+RUN npm run build --production -- --env keycdn
 
 
 FROM nginx:1.17.5

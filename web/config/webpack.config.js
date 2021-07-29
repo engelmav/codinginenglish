@@ -3,14 +3,19 @@ const webpack = require("webpack");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
-const zopfli = require("@gfx/zopfli");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const ASSET_PATH = process.env.ASSET_PATH || "/";
+var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
+var outputPath = path.resolve(__dirname, "../build");
 
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
-  console.log("*** Webpack running with environment", environment);
+  const publicPath = console.log(
+    "*** Webpack running with environment",
+    environment
+  );
   let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
@@ -40,6 +45,10 @@ module.exports = function (env) {
     console.log("*** Adding compressionPlugin");
     plugins.push(compressionPlugin);
   }
+  if (env.spaces) {
+    const UploadToSpacesPlugin = require("../buildUtil");
+    plugins.push(new UploadToSpacesPlugin({ outputPath, s3Folder: "js" }));
+  }
 
   const config = {
     mode: environment,
@@ -48,15 +57,10 @@ module.exports = function (env) {
     },
     resolve: {
       fallback: { crypto: false },
-      alias: {
-        // Support React Native Web
-
-        // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-
-        "react-dom$": "react-dom/profiling",
-
-        "scheduler/tracing": "scheduler/tracing-profiling",
-      },
+      // alias: {
+      //   "react-dom$": "react-dom/profiling",
+      //   "scheduler/tracing": "scheduler/tracing-profiling",
+      // },
     },
     module: {
       rules: [
@@ -81,7 +85,6 @@ module.exports = function (env) {
       hot: true,
       port: 8080,
       proxy: { "/api": "http://localhost:5000" },
-      // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
     },
 
     optimization: {
@@ -108,27 +111,37 @@ module.exports = function (env) {
       },
     },
     output: {
-      path: path.resolve(__dirname, "../build"),
+      path: outputPath,
       filename: (pathData) => {
         return "[name].[contenthash:8].js";
       },
       chunkFilename: "[name].[contenthash:8].chunk.js",
-      // publicPath: "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/",
-      publicPath: "/"
+      publicPath: "/",
     },
     plugins: plugins,
   };
   if (environment !== "production") {
     config["devtool"] = "eval-source-map";
   } else {
-    console.log("*** Adding minification")
-    config.optimization["minimizer"] = [
-      () => ({
-        terserOptions: {
-          mangle: true,
-        },
-      }),
+    console.log("*** Adding minification");
+    config.optimization.minimize = true;
+    config.optimization.minimizer = [
+      // () => ({
+      //   terserOptions: {
+      //     mangle: true,
+      //   },
+      // }),
+      new TerserPlugin(),
     ];
   }
+  if (env.spaces) {
+    config.output.publicPath = doSpacesUrl;
+  } else {
+    config.output.publicPath = "/";
+  }
+  if (env.keycdn) {
+    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/"
+  }
+  console.log("*** publicPath set to", config.output.publicPath);
   return config;
 };
