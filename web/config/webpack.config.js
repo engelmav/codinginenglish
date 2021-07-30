@@ -5,6 +5,7 @@ const BundleAnalyzerPlugin =
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const zopfli = require("@gfx/zopfli");
 
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
@@ -12,10 +13,7 @@ var outputPath = path.resolve(__dirname, "../build");
 
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
-  const publicPath = console.log(
-    "*** Webpack running with environment",
-    environment
-  );
+  console.log("*** Webpack running with environment", environment);
   let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
@@ -46,8 +44,8 @@ module.exports = function (env) {
     plugins.push(compressionPlugin);
   }
   if (env.spaces) {
-    const UploadToSpacesPlugin = require("../buildUtil");
-    plugins.push(new UploadToSpacesPlugin({ outputPath, s3Folder: "js" }));
+    const UploadToCdnPlugin = require("../buildUtil");
+    plugins.push(new UploadToCdnPlugin({ outputPath, s3Folder: "js" }));
   }
 
   const config = {
@@ -57,10 +55,6 @@ module.exports = function (env) {
     },
     resolve: {
       fallback: { crypto: false },
-      // alias: {
-      //   "react-dom$": "react-dom/profiling",
-      //   "scheduler/tracing": "scheduler/tracing-profiling",
-      // },
     },
     module: {
       rules: [
@@ -125,14 +119,7 @@ module.exports = function (env) {
   } else {
     console.log("*** Adding minification");
     config.optimization.minimize = true;
-    config.optimization.minimizer = [
-      // () => ({
-      //   terserOptions: {
-      //     mangle: true,
-      //   },
-      // }),
-      new TerserPlugin(),
-    ];
+    config.optimization.minimizer = [new TerserPlugin()];
   }
   if (env.spaces) {
     config.output.publicPath = doSpacesUrl;
@@ -140,7 +127,7 @@ module.exports = function (env) {
     config.output.publicPath = "/";
   }
   if (env.keycdn) {
-    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/"
+    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/";
   }
   console.log("*** publicPath set to", config.output.publicPath);
   return config;

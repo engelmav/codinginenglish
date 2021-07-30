@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, Route, Switch } from "react-router-dom";
-import styled, { css, keyframes } from "styled-components";
+import styled, { css } from "styled-components";
 import {
   debugBorder,
   whenSmallScreen,
@@ -9,10 +9,8 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
-import { AutoScaleImage } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
-import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import history from "../history";
 import ReactGA from "react-ga";
@@ -38,9 +36,15 @@ const CloseBox = styled(FaRegWindowClose)`
   ${whenSmallScreen`
       display: block;`}
 `;
-const Hamburger = styled(GiHamburgerMenu)`
+const Hamburger = styled.svg`
+  height: 20px;
+  width: 20px;
   display: none;
-  color: white;
+  rect {
+      fill: white;
+      stroke: ${darkGray};
+      stroke-width: 10px;
+    }  
   cursor: pointer;
   ${whenSmallScreen`
       display: block;`}
@@ -62,7 +66,7 @@ const Header = styled.header`
   ${whenSmallScreen`
       ${headerMarginSm}`}
   align-items: center;
-  background-color: #3d3636;
+  background-color: ${darkGray};
 `;
 
 const Img = styled.img`
@@ -93,31 +97,6 @@ const NavbarList = styled.ul`
     transition: 0.1s ease-out;
     transform: ${({ navMenu }) =>
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
-`;
-
-const LinkButton = styled(Link)`
-  overflow: auto;
-  font-size: 13.3333px;
-  text-transform: lowercase;
-  background-color: ${cieOrange};
-  border-radius: 2px;
-  font-weight: 100;
-  font-family: "Arial", "sans-serif";
-  background-color: ${cieOrange};
-  text-decoration: none;
-  padding: 8px;
-  color: white;
-  a {
-    font-family: "Arial", "sans-serif";
-    color: white;
-    background-color: ${cieOrange};
-    ${orangeBgColor}
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    padding: 10px;
-    justify-items: space-between;
-  }
 `;
 
 const Banner = styled.div`
@@ -275,7 +254,15 @@ const HeaderContainer = (props) => {
               <Login />
             </li>
           </NavbarList>
-          <Hamburger size="20" onClick={() => setNavMenu(true)} />
+
+          <Hamburger
+            viewBox="0 0 100 80"
+            onClick={() => setNavMenu(true)}
+          >
+            <rect width="100" height="20"></rect>
+            <rect y="30" width="100" height="20"></rect>
+            <rect y="60" width="100" height="20"></rect>
+          </Hamburger>
         </Header>
       </Route>
     </Switch>

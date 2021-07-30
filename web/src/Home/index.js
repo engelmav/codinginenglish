@@ -1,5 +1,5 @@
-import React, { useState, lazy, Suspense } from "react";
-import { AutoScaleImage, Main, ContentSection, Button } from "../UtilComponents";
+import React, { useEffect, useState } from "react";
+import { AutoScaleImage, Main, ContentSection } from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
@@ -12,7 +12,7 @@ import {
 } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-
+import settings from "../settings";
 
 const MainLanding = styled(Main)`
   width: min(90%, 700px);
@@ -73,13 +73,49 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
+const langToStrapiLocale = (lang) => {
+  let normalLang;
+  const lcLang = lang.toLowerCase();
+  if (lcLang.includes("-")) {
+    normalLang = lcLang.split("-")[0];
+  } else {
+    normalLang = lcLang;
+  }
+  if (normalLang === "ca") {
+    return "ca-es";
+  } else if (normalLang === "en") {
+    return normalLang;
+  } else if (normalLang === "es") return normalLang;
+};
+
 const Home = (props) => {
+  const [locale, setLocale] = useState(null);
+  const [content, setContent] = useState({
+    joinGlobal: { title: "", blurbContent: "" },
+  });
+  console.log("initial content value:", content)
+  useEffect(() => {
+    async function init() {
+      const lang = navigator.language;
+      const _locale = langToStrapiLocale(lang);
+      setLocale(_locale);
+      const resp = await fetch(
+        `${settings.cmsUrl}/langing-page-blurbs?blurbname=joinGlobal&_locale=ca-es`
+      );
+      const respJson = await resp.json();
+      console.log(JSON.stringify(respJson));
+      const { title, blurbContent } = respJson[0];
+      console.log("got title", title, "and blurbContent", blurbContent)
+      setContent({ joinGlobal: { title, blurbContent } });
+    }
+    init();
+  }, []);
   const { settings } = props;
   return (
     <MainLanding p={1}>
       <Box display="flex" flexDirection="column" alignItems="center" mb={20}>
         <Box mt={4}>
-          <TaglineTitle>Únete a la economía global</TaglineTitle>
+          <TaglineTitle>{content.joinGlobal.title}</TaglineTitle>
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="center">

@@ -5,6 +5,7 @@ console.log("__DEV_SERVER__ set to", __DEV_SERVER__);
 const settings = {
   production: {
     auth0Redirect:     "https://www.codinginenglish.com/callback",
+    cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",
     slidesUrl:         "https://slides.com/vincentengelmann",
@@ -17,6 +18,7 @@ const settings = {
   },
   development: {
     auth0Redirect:     (__DEV_SERVER__ === "1") ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback',
+    cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           (__DEV_SERVER__ === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",
     slidesUrl:         "https://slides.com/vincentengelmann",
