@@ -20,10 +20,8 @@ import * as yup from "yup";
 import history from "../history";
 import ReactGA from "react-ga";
 
-
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
-
 
 const emailSchema = yup.object({ email: yup.string().email() });
 
@@ -106,11 +104,23 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStore, auth, cieApi, setMilestone }) => {
+const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
+  const [appStore, setAppStore] = useState(null);
+  const [auth, setAuth] = useState(null);
+
+  useEffect(() => {
+    async function init() {
+      const _appStore = await appStoreLazy.create();
+      const _auth = await authLazy.create();
+      setAppStore(_appStore);
+      setAuth(_auth);
+    }
+    init();
+  }, []);
 
   const createRegisteredUser = (userEmail) =>
     cieApi.createRegisteredUser({ email: userEmail });
@@ -129,7 +139,7 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
       ReactGA.event({
         category: "register",
         action: "emailRegistration",
-        label: "emailValidationFailed"
+        label: "emailValidationFailed",
       });
       return;
     }
@@ -141,7 +151,7 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
     ReactGA.event({
       category: "register",
       action: "emailRegistration",
-      label: "emailCaptured"
+      label: "emailCaptured",
     });
     // const handleLoginResult = (err, res) => {
     //   if (err) {
@@ -152,7 +162,7 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
     //     handleSetEmailSubmitted();
     //   }
     // };
-    // send the passwordless link to the user so they have an email reference to 
+    // send the passwordless link to the user so they have an email reference to
     // coding in english and a "way back in".
     auth.loginWithEmailLink(email);
     setIsSending(true);
@@ -166,7 +176,6 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
   useEffect(() => {
     setMilestone("Regístrate");
   }, []);
-  console.log("Register~!!!!")
   return (
     <SignInContainer className="signin-container">
       <Title textAlign="center">Regístrate</Title>
@@ -190,7 +199,7 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
               ReactGA.event({
                 category: "register",
                 action: "googleRegistration",
-                label: "googleRegistration"
+                label: "googleRegistration",
               });
               auth.loginWithGoogle(
                 { isRegistration: true },
@@ -235,6 +244,7 @@ const Register = ({ appStore, auth, cieApi, setMilestone }) => {
               onSubmit={handleSubmitEmail}
             >
               <TextInput
+                autoComplete="email"
                 mb={2}
                 width="100%"
                 placeholder={"nombre@xyz.com"}

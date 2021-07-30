@@ -1,46 +1,67 @@
 const path = require("path");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
-const zopfli = require("@gfx/zopfli");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+
+const ASSET_PATH = process.env.ASSET_PATH || "/";
+var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
+var outputPath = path.resolve(__dirname, "../build");
 
 module.exports = function (env) {
   const environment = env.production ? "production" : "development";
-
-
-  const plugins = [
+  const publicPath = console.log(
+    "*** Webpack running with environment",
+    environment
+  );
+  let plugins = [
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
-      __DEV_SERVER__: JSON.stringify(process.env.DEV_SERVER),
+      __DEV_SERVER__: JSON.stringify(env.DEV_SERVER),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "../public", "index.html"),
       favicon: path.resolve(__dirname, "../public", "favicon.ico"),
     }),
-    new CompressionWebpackPlugin({
+  ];
+
+  if (environment !== "production") {
+    plugins.push(new BundleAnalyzerPlugin());
+  }
+
+  if (environment === "production") {
+    compressionOpts = {
       compressionOptions: {
         numiterations: 15,
       },
       algorithm(input, compressionOptions, callback) {
         return zopfli.gzip(input, compressionOptions, callback);
       },
-    }),
-  ];
-
-  if (environment !== "production"){
-    plugins.push(new BundleAnalyzerPlugin())
+    };
+    const compressionPlugin = new CompressionWebpackPlugin();
+    console.log("*** Adding compressionPlugin");
+    plugins.push(compressionPlugin);
+  }
+  if (env.spaces) {
+    const UploadToSpacesPlugin = require("../buildUtil");
+    plugins.push(new UploadToSpacesPlugin({ outputPath, s3Folder: "js" }));
   }
 
-
-  return {
+  const config = {
     mode: environment,
     entry: {
       mainEntry: "./src/index.js",
     },
-    resolve: { fallback: { crypto: false } },
+    resolve: {
+      fallback: { crypto: false },
+      // alias: {
+      //   "react-dom$": "react-dom/profiling",
+      //   "scheduler/tracing": "scheduler/tracing-profiling",
+      // },
+    },
     module: {
       rules: [
         {
@@ -63,9 +84,10 @@ module.exports = function (env) {
       compress: true,
       hot: true,
       port: 8080,
+      proxy: { "/api": "http://localhost:5000" },
     },
+
     optimization: {
-      minimizer: [() => ({ terserOptions: { mangle: false } })],
       runtimeChunk: "single",
       splitChunks: {
         chunks: "all",
@@ -89,12 +111,37 @@ module.exports = function (env) {
       },
     },
     output: {
-      path: path.resolve(__dirname, "../build"),
+      path: outputPath,
       filename: (pathData) => {
-        return "static/js/[name].[contenthash:8].js";
+        return "[name].[contenthash:8].js";
       },
-      chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
+      chunkFilename: "[name].[contenthash:8].chunk.js",
+      publicPath: "/",
     },
-    plugins: plugins
+    plugins: plugins,
   };
+  if (environment !== "production") {
+    config["devtool"] = "eval-source-map";
+  } else {
+    console.log("*** Adding minification");
+    config.optimization.minimize = true;
+    config.optimization.minimizer = [
+      // () => ({
+      //   terserOptions: {
+      //     mangle: true,
+      //   },
+      // }),
+      new TerserPlugin(),
+    ];
+  }
+  if (env.spaces) {
+    config.output.publicPath = doSpacesUrl;
+  } else {
+    config.output.publicPath = "/";
+  }
+  if (env.keycdn) {
+    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/"
+  }
+  console.log("*** publicPath set to", config.output.publicPath);
+  return config;
 };

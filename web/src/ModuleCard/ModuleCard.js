@@ -7,11 +7,8 @@ import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 import styled from "styled-components";
 import { Flex, Text, Image } from "rebass";
 import { Link } from "react-router-dom";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
-const useMediaQuery = React.lazy(() => import("@material-ui/core/useMediaQuery"));
-
 
 // TODO: duped in Home/index.js
 const RegisterLink = styled(Link)`
@@ -43,11 +40,19 @@ const DialogContent = styled(Flex)`
   height: 100%;
 `;
 
-export const ModuleCard = (props) => {
+const ModuleCard = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [fullScreen, setFullScreen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  //
-  const fullScreen = useMediaQuery("(max-width: 40em)");
+  useEffect(() => {
+    async function init(){
+      const { useMediaQuery } = await import("@material-ui/core");
+      const isFullscreen = useMediaQuery("(max-width: 40em)");
+      setFullScreen(isFullscreen);
+    }
+    init();
+  })
+  
   const { appStore, CheckoutForm, settings } = props;
   const {
     name: moduleName,
@@ -71,7 +76,7 @@ export const ModuleCard = (props) => {
 
         <P>{moduleDescription}</P>
         <P>del 20 septiembre al 20 diciembre</P>
-        {moduleSessions.map((ms) =>  {
+        {moduleSessions.map((ms) => {
           // const sessionDtLocalTime = await toLocalTime(ms._session_datetime);
           return (
             // <Button
@@ -124,3 +129,5 @@ export const ModuleCard = (props) => {
     </>
   );
 };
+
+export default ModuleCard;

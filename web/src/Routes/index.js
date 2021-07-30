@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Route } from "react-router-dom";
-import { observer } from "mobx-react";
 import { Technique } from "../Technique/Technique";
 
-@observer
 class Routes extends Component {
   constructor(props) {
     super(props);
@@ -22,25 +20,18 @@ class Routes extends Component {
 
   render() {
     const {
-      auth,
+      authLazy,
       appStore,
       AboutUs,
       CallbackRoute,
       Classroom,
       CollabEditor,
-      Home,
       MyDashboard,
       UpcomingSessions,
       ApplicationProcess,
     } = this.props;
-    console.log(
-      "this what we have for ApplicationProcess:",
-      ApplicationProcess
-    );
-    console.log("this what we have for Home:", Home);
     return (
       <>
-        <Route exact path="/" component={(props) => <Home />} />
         <Route exact path="/about-us" component={(props) => <AboutUs />} />
         <Route
           exact
@@ -57,8 +48,7 @@ class Routes extends Component {
         <Route
           path="/callback"
           render={(props) => {
-            auth.handleAuthenticationFromCallbackRoute(props);
-            return <CallbackRoute {...props} />;
+            return <CallbackRoute {...props} authLazy={authLazy} />;
           }}
         />
         <Route

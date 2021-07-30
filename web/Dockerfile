@@ -3,13 +3,16 @@ FROM node:12 as npm-build-stage
 
 
 WORKDIR /app
-COPY package*.json /app/
+COPY package.json /app/
+COPY src /app/src
+COPY config /app/config
+COPY public /app/public
 
-RUN yarn install --production
-COPY ./ /app
+COPY babel.config.js /app/
+COPY yarn.lock /app/
 
 RUN yarn add -D webpack-cli
-RUN npm run build --production
+RUN npm run build --production -- --env keycdn
 
 
 FROM nginx:1.17.5

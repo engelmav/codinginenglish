@@ -9,24 +9,16 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
+import { AutoScaleImage } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
-import { observer } from "mobx-react";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
-// import { CSSTransition } from "react-transition-group";
-// import { fadeIn } from "react-animations";
 import history from "../history";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
-
-// const animation = keyframes`${fadeIn}`;
-
-// const BouncyDiv = styled.div`
-//   animation: 4s ${animation};
-// `;
 
 const headerMarginSm = css`
   padding: 1rem;
@@ -184,8 +176,9 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
-const HeaderContainer = observer((props) => {
-  const { auth, appStore, settings, Login } = props;
+const HeaderContainer = (props) => {
+  console.log("Attempting to load HeaderContainer");
+  const { appStoreLazy, settings, Login } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
@@ -268,7 +261,7 @@ const HeaderContainer = observer((props) => {
                 <Link to={link.location}>{link.text}</Link>
               </LI>
             ))}
-            {appStore.authData && (
+            {/* {appStore.authData && ( this would make us load appStore right away..rethink
               <>
                 <LI>
                   <Link to="/my-dashboard">my_dashboard</Link>
@@ -277,7 +270,7 @@ const HeaderContainer = observer((props) => {
                   <Link to="/class">in_session!</Link>
                 </LI>
               </>
-            )}
+            )} */}
             <li>
               <Login />
             </li>
@@ -287,6 +280,6 @@ const HeaderContainer = observer((props) => {
       </Route>
     </Switch>
   );
-});
+};
 
-export { HeaderContainer as Header };
+export default HeaderContainer;
