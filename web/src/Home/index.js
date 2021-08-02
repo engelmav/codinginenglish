@@ -103,7 +103,8 @@ const Home = (props) => {
         mt={5}
         mb={3}
         alt={"Software Stack"}
-        srcSet={`${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
+        srcSet={
+          `${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
         sizes="(min-width: 600px) 692px, 320px"
         src={`${props.settings.assets}/home/3-tech-692w.webp`}
       />
