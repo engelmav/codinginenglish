@@ -1,11 +1,4 @@
 /* global __ENVIRONMENT__, __DEV_SERVER__ */
-import getConfig from 'next/config'
-
-const {publicRuntimeConfig} = getConfig()
-const {DEV_SERVER, ENVIRONMENT} = publicRuntimeConfig
-
-console.log("DEV_SERVER set to", DEV_SERVER);
-console.log("ENVIRONMENT set to", ENVIRONMENT)
 
 const settings = {
   production: {
@@ -35,4 +28,4 @@ const settings = {
   }
 }
 
-export default settings[ENVIRONMENT];
+export default settings[process.env.ENVIRONMENT];

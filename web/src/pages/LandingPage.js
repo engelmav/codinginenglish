@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { AutoScaleImage, Main, ContentSection } from "../UtilComponents";
+import React from "react";
+import {
+  AutoScaleImage,
+  Main,
+  ContentSection,
+  RegisterLink,
+} from "../UtilComponents";
 import { Title, P } from "../UtilComponents/Typography/Typography";
-import { whenSmallScreen, fontMonospace } from "../UtilComponents/sharedStyles";
+import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import { Box } from "../UtilComponents/Box";
 import {
-  orangeBgColor,
   darkGray,
   debugBorder,
-  cieOrange,
 } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import settings from "../settings";
 
 const MainLanding = styled(Main)`
   width: min(90%, 700px);
@@ -36,29 +37,9 @@ const I = styled.p`
   font-style: italic;
 `;
 
-const RegisterLink = styled(Link)`
-  ${orangeBgColor}
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  padding: 10px;
-  color: white;
-  border-radius: 2px;
-  ${fontMonospace}
-  a {
-    color: ${cieOrange};
-  }
-  &:hover:enabled {
-    color: rgba(255, 255, 255, 1);
-    box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
-  }
-  align-self: center;
-`;
-
 const TaglineTitle = styled.h1`
   font-family: Andale Mono, AndaleMono, monospace;
   color: ${darkGray};
-  /* font-size: max(1rem, min(2.5rem, 2.5vw)); */
   ${whenSmallScreen`
     font-size: 1.25rem;`}
   font-weight: bolder;
@@ -73,49 +54,13 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
-const langToStrapiLocale = (lang) => {
-  let normalLang;
-  const lcLang = lang.toLowerCase();
-  if (lcLang.includes("-")) {
-    normalLang = lcLang.split("-")[0];
-  } else {
-    normalLang = lcLang;
-  }
-  if (normalLang === "ca") {
-    return "ca-es";
-  } else if (normalLang === "en") {
-    return normalLang;
-  } else if (normalLang === "es") return normalLang;
-};
-
 const LandingPage = (props) => {
-  const [locale, setLocale] = useState(null);
-  const [content, setContent] = useState({
-    joinGlobal: { title: "", blurbContent: "" },
-  });
-  console.log("initial content value:", content)
-  useEffect(() => {
-    async function init() {
-      const lang = navigator.language;
-      const _locale = langToStrapiLocale(lang);
-      setLocale(_locale);
-      const resp = await fetch(
-        `${settings.cmsUrl}/langing-page-blurbs?blurbname=joinGlobal&_locale=ca-es`
-      );
-      const respJson = await resp.json();
-      console.log(JSON.stringify(respJson));
-      const { title, blurbContent } = respJson[0];
-      console.log("got title", title, "and blurbContent", blurbContent)
-      setContent({ joinGlobal: { title, blurbContent } });
-    }
-    init();
-  }, []);
   const { settings } = props;
   return (
     <MainLanding p={1}>
       <Box display="flex" flexDirection="column" alignItems="center" mb={20}>
         <Box mt={4}>
-          <TaglineTitle>{content.joinGlobal.title}</TaglineTitle>
+          <TaglineTitle>Únete a la economía global</TaglineTitle>
         </Box>
 
         <Box display="flex" flexDirection="column" alignItems="center">
@@ -129,7 +74,7 @@ const LandingPage = (props) => {
       </Box>
 
       <AutoScaleImage
-        mt={4}
+        mt={3}
         mb={3}
         alignSelf="center"
         width="225"
@@ -137,7 +82,9 @@ const LandingPage = (props) => {
         maxWidth="35%"
         loading="lazy"
         alt="Speak English, Build Apps"
-        src={`${settings.assets}/home/chat-icon-green-red.png`}
+        srcSet={`${props.settings.edgeAssets}/home/chat-icon-green-red-small.png 320w, ${props.settings.edgeAssets}/home/chat-icon-green-red.png 1920w`}
+        sizes="(min-width: 600px) 692px, 320px"
+        src={`${props.settings.edgeAssets}/home/3-tech-692w.webp`}
       />
       <SectionTitle mb={2}>Habla inglés, crea aplicaciones</SectionTitle>
       <ContentSectionLanding>
@@ -152,16 +99,14 @@ const LandingPage = (props) => {
         </p>
         <I>Y crear software real en el proceso.</I>
       </ContentSectionLanding>
-
       <AutoScaleImage
         mt={5}
         mb={3}
-        alignSelf="center"
-        maxWidth="100%"
-        width="692"
-        height="221.438"
         alt={"Software Stack"}
-        src={`${props.settings.edgeAssets}/home/3-tech.jpg`}
+        srcSet={
+          `${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
+        sizes="(min-width: 600px) 692px, 320px"
+        src={`${props.settings.assets}/home/3-tech-692w.webp`}
       />
       <SectionTitle>Crea tu cartera de proyectos</SectionTitle>
       <ContentSectionLanding>
@@ -173,7 +118,9 @@ const LandingPage = (props) => {
           código profesional en un repositorio de GitHub y una aplicación web
           implementada.
         </p>
-        <RegisterLink to="/apply">Solicita una plaza aquí</RegisterLink>
+        <RegisterLink mt={3} alignSelf="center" href="/apply">
+          Solicita una plaza aquí
+        </RegisterLink>
       </ContentSectionLanding>
 
       <AutoScaleImage
@@ -185,6 +132,8 @@ const LandingPage = (props) => {
         height="225"
         loading="lazy"
         alt="Learn Vocabulary and Grammar in Real Context"
+        srcSet={`${props.settings.assets}/home/dictionary-sm.png 320w, ${props.settings.assets}/home/dictionary.png 1920w`}
+        sizes="(min-width: 600px) 692px, 320px"
         src={`${settings.assets}/home/dictionary.png`}
       />
       <SectionTitle mb={2}>
@@ -198,7 +147,7 @@ const LandingPage = (props) => {
       </ContentSectionLanding>
 
       <AutoScaleImage
-        mt={5}
+        mt={4}
         mb={3}
         alignSelf="center"
         loading="lazy"
@@ -206,7 +155,9 @@ const LandingPage = (props) => {
         width="225px"
         height="211.062px"
         alt="Learn in a Live Teaching Environment"
+        srcSet={`${props.settings.assets}/home/meeting-sm.png 320w, ${props.settings.assets}/home/meeting.png 1920w`}
         src={`${settings.assets}/home/meeting.png`}
+        sizes="(min-width: 600px) 692px, 320px"
       />
 
       <SectionTitle mt={4} mb={2}>
