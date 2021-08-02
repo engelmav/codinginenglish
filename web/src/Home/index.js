@@ -93,7 +93,7 @@ const Home = (props) => {
   const [content, setContent] = useState({
     joinGlobal: { title: "", blurbContent: "" },
   });
-  console.log("initial content value:", content)
+  console.log("initial content value:", content);
   useEffect(() => {
     async function init() {
       const lang = navigator.language;
@@ -105,7 +105,7 @@ const Home = (props) => {
       const respJson = await resp.json();
       console.log(JSON.stringify(respJson));
       const { title, blurbContent } = respJson[0];
-      console.log("got title", title, "and blurbContent", blurbContent)
+      console.log("got title", title, "and blurbContent", blurbContent);
       setContent({ joinGlobal: { title, blurbContent } });
     }
     init();
@@ -152,16 +152,14 @@ const Home = (props) => {
         </p>
         <I>Y crear software real en el proceso.</I>
       </ContentSectionLanding>
-
       <AutoScaleImage
         mt={5}
         mb={3}
-        alignSelf="center"
-        maxWidth="100%"
-        width="692"
-        height="221.438"
         alt={"Software Stack"}
-        src={`${props.settings.edgeAssets}/home/3-tech.jpg`}
+        srcSet={
+          `${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
+        sizes="(min-width: 600px) 692px, 320px"
+        src={`${props.settings.assets}/home/3-tech-692w.webp`}
       />
       <SectionTitle>Crea tu cartera de proyectos</SectionTitle>
       <ContentSectionLanding>
