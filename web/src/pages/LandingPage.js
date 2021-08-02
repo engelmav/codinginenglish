@@ -88,7 +88,7 @@ const langToStrapiLocale = (lang) => {
   } else if (normalLang === "es") return normalLang;
 };
 
-const Home = (props) => {
+const LandingPage = (props) => {
   const [locale, setLocale] = useState(null);
   const [content, setContent] = useState({
     joinGlobal: { title: "", blurbContent: "" },
@@ -254,4 +254,4 @@ const Home = (props) => {
   );
 };
 
-export { Home };
+export { LandingPage };

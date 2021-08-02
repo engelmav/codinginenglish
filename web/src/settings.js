@@ -1,6 +1,11 @@
 /* global __ENVIRONMENT__, __DEV_SERVER__ */
+import getConfig from 'next/config'
 
-console.log("__DEV_SERVER__ set to", __DEV_SERVER__);
+const {publicRuntimeConfig} = getConfig()
+const {DEV_SERVER, ENVIRONMENT} = publicRuntimeConfig
+
+console.log("DEV_SERVER set to", DEV_SERVER);
+console.log("ENVIRONMENT set to", ENVIRONMENT)
 
 const settings = {
   production: {
@@ -17,12 +22,12 @@ const settings = {
 
   },
   development: {
-    auth0Redirect:     (__DEV_SERVER__ === "1") ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback',
+    auth0Redirect:     (DEV_SERVER === "1") ? 'http://localhost:8080/callback': 'http://192.168.1.43/callback',
     cmsUrl:            "https://content.codinginenglish.com",
-    guacUrl:           (__DEV_SERVER__ === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
+    guacUrl:           (DEV_SERVER === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",
     slidesUrl:         "https://slides.com/vincentengelmann",
-    auth0LogoutUrl:    (__DEV_SERVER__ === "1") ? 'http://localhost:8080/': 'http://192.168.1.43/',
+    auth0LogoutUrl:    (DEV_SERVER === "1") ? 'http://localhost:8080/': 'http://192.168.1.43/',
     assets:            "https://cie-assets.nyc3.digitaloceanspaces.com",
     edgeAssets:        "https://cie-assets.nyc3.cdn.digitaloceanspaces.com",
     stripePK:          "pk_test_cwKTnilflzQHY5WlR2x2tgwa00KGJyLRrP",
@@ -30,4 +35,4 @@ const settings = {
   }
 }
 
-export default settings[__ENVIRONMENT__];
+export default settings[ENVIRONMENT];
