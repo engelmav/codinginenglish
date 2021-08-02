@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 var fs = require("fs");
 var ftp = require("basic-ftp");
 
-class UploadToSpacesPlugin {
+class UploadToCdnPlugin {
   constructor(options) {
     this.options = options;
   }
@@ -60,4 +60,4 @@ async function ftpUpload(file) {
   });
 }
 
-module.exports = UploadToSpacesPlugin;
+module.exports = UploadToCdnPlugin;

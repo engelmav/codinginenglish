@@ -1,6 +1,8 @@
 import styled, { css } from "styled-components";
 import { space, flexbox } from "styled-system";
-import { font, cieOrange } from "../sharedStyles";
+import { font, fontMonospace, cieOrange } from "../sharedStyles";
+import { Link } from "react-router-dom";
+import { boxy } from "../Box"
 
 const commonStyles = css`
   ${font}
@@ -50,6 +52,25 @@ export const LinkButton = styled.a`
 
   &:hover {
     ${hoverStyles}
+  }
+`;
+
+
+export const RegisterLink = styled(Link)`
+  ${boxy}
+  text-decoration: none;
+  text-align: center;
+  padding: 10px;
+  color: white;
+  border-radius: 2px;
+  background: ${cieOrange};
+  ${fontMonospace}
+  a {
+    color: ${cieOrange};
+  }
+  &:hover:enabled {
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
   }
 `;
 
