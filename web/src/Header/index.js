@@ -228,7 +228,12 @@ const HeaderContainer = (props) => {
             <Img
               loading="lazy"
               alt="cie logo"
-              src={`${settings.assets}/CIE%20Logo%20Horizontal%20transparent.png`}
+              srcSet={
+                `${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+              sizes="(min-width: 600px) 692px, 282px"
+              src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+
+
             ></Img>
           </Link>
           <NavbarList navMenu={navMenu} ref={navMenuRef}>

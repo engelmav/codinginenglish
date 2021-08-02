@@ -1,6 +1,6 @@
 import { AutoScaleImage } from "./AutoScaleImage";
 import { Box, boxy } from "./Box";
-import { Button } from "./Button";
+import { Button, RegisterLink } from "./Button";
 import { Title } from "./Typography/Typography";
 import { Window } from "./Window";
 import { Spinner } from "./Spinner";
@@ -18,6 +18,7 @@ export {
   Box,
   boxy,
   Button,
+  RegisterLink,
   Spinner,
   Title,
   Window,
