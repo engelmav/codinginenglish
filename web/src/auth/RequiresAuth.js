@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import history from '../history';
+import React, { Component } from "react";
+import Router from "next/router";
 
 // make a function that takes an auth instance
 // and returns a RequiresAuth HOC
@@ -8,19 +8,20 @@ const createWithAuth = (authLazy) => {
   return function (ProtectedRoute) {
     return class AuthHOC extends Component {
       async componentWillMount() {
-        const auth = await authLazy()
+        const auth = await authLazy();
         if (!(await auth.isAuthenticated())) {
           console.log("Not authenticated!");
-          history.push('/');
+          console.log(
+            "***** WARNING: attempting to use next/router's Router.push to push to /"
+          );
+          Router.push("/");
         }
       }
       render() {
-        return (
-          <ProtectedRoute {...this.props} />
-        );
+        return <ProtectedRoute {...this.props} />;
       }
-    }
-  }
-}
+    };
+  };
+};
 
 export { createWithAuth };

@@ -1,7 +1,12 @@
 import React from "react";
 import settings from "../settings";
-import { LandingPage } from "./LandingPage";
-export default function Index() {
-  return <LandingPage settings={settings}/>;
-  // return <div>custom key: {process.env.ENVIRONMENT}</div>
-}
+import { LandingPage } from "../rootProd";
+import Layout from "../components/Layout";
+
+const Index = () => (
+  <Layout>
+    <LandingPage settings={settings} />
+  </Layout>
+);
+
+export default Index;

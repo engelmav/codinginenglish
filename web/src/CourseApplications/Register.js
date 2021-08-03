@@ -17,7 +17,7 @@ import { space } from "styled-system";
 import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
-import history from "../history";
+import Router from "next/router";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -170,7 +170,7 @@ const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
       setIsSending(false);
       setEmailSubmitted(true);
       appStore.email = email;
-      history.push("/apply/next-steps");
+      Router.push("/apply/next-steps");
     }, 1500);
   };
   useEffect(() => {

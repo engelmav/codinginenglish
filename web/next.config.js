@@ -1,6 +1,6 @@
 module.exports = {
   env: {
-    ENVIRONMENT: process.env.ENVIRONMENT
+    ENVIRONMENT: process.env.NODE_ENV,
   },
   webpack: (config, options) => {
     config.plugins = config.plugins || [];
@@ -10,7 +10,7 @@ module.exports = {
       DEV_SERVER: true,
     });
     config.plugins.push(definePlugin);
-    console.log(" ********************** running webpack function")
+    console.log("********************** running webpack function");
     return config;
-  }
+  },
 };

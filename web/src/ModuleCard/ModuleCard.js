@@ -3,12 +3,12 @@ import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
 // import { toLocalTime } from "../util";
-// import Dialog from "@material-ui/core/Dialog";
+import Dialog from "@material-ui/core/Dialog";
+import { useMediaQuery } from "@material-ui/core";
 import styled from "styled-components";
 import { Flex, Text, Image } from "rebass";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
 // TODO: duped in Home/index.js
 const RegisterLink = styled(Link)`
@@ -44,16 +44,9 @@ const ModuleCard = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  useEffect(() => {
-    async function init(){
-      const { useMediaQuery } = await import("@material-ui/core");
-      const isFullscreen = useMediaQuery("(max-width: 40em)");
-      setFullScreen(isFullscreen);
-    }
-    init();
-  })
-  
-  const { appStore, CheckoutForm, settings } = props;
+  const isFullscreen = useMediaQuery("(max-width: 40em)");
+  setFullScreen(isFullscreen);
+  const { CheckoutForm, settings } = props;
   const {
     name: moduleName,
     description: moduleDescription,
@@ -76,22 +69,11 @@ const ModuleCard = (props) => {
 
         <P>{moduleDescription}</P>
         <P>del 20 septiembre al 20 diciembre</P>
-        {moduleSessions.map((ms) => {
-          // const sessionDtLocalTime = await toLocalTime(ms._session_datetime);
+        {moduleSessions.map((ms, idx) => {
           return (
-            // <Button
-            //   key={index}
-            //   m={1}
-            //   alignSelf="center"
-            //   maxWidth="500px"
-            //   onClick={() => {
-            //     setDialogOpen(true);
-            //     setSelectedSession(sessionDtLocalTime);
-            //   }}
-            // >
-            //   {`Apply for ${sessionDtLocalTime}`}
-            // </Button>
-            <RegisterLink to="/apply">{`Solicita el curso`}</RegisterLink>
+            <RegisterLink key={idx} href="/apply">
+              Solicita el curso
+            </RegisterLink>
           );
         })}
       </CardBox>

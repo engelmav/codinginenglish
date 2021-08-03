@@ -90,7 +90,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "dev-next": "next dev --env ENVIRONMENT=development",
+    "dev-next-proxy": "NODE_ENV=development node devtools/server.js",
+    "dev-next": "NODE_ENV=development next dev",
     "build-next": "next build",
     "start-next": "next start"
   },
@@ -177,6 +178,7 @@
     "enzyme": "^3.9.0",
     "eslint-formatter-pretty": "^4.1.0",
     "html-webpack-plugin": "^5.3.2",
+    "http-proxy-middleware": "^2.0.1",
     "mjml": "^4.10.1",
     "webpack": "^5.45.1",
     "webpack-bundle-analyzer": "^4.4.2",

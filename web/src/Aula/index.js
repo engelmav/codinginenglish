@@ -1,5 +1,4 @@
-import React, { Component, Suspense, useEffect, useRef } from "react";
-import "./styles.css";
+import React, { Component, useEffect, useRef } from "react";
 import Iframe from "react-iframe";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -7,7 +6,6 @@ import * as S from "./styles";
 import { Window, Button } from "../UtilComponents";
 import { Rnd } from "react-rnd";
 import { observer } from "mobx-react";
-import { browserDetect } from "../util";
 
 import { readSocketDataAnd } from "../messaging";
 import { Link } from "react-router-dom";
@@ -92,6 +90,7 @@ class Aula extends Component {
       prezzieLink: null,
       exerciseContent: null,
       onTop: null,
+      browserDetect,
 
       roomChangeNotification: null,
     };
@@ -160,7 +159,9 @@ class Aula extends Component {
     this.setState({ aulaWebsocket });
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const { browserDetect } = await import("../util");
+    this.setState({browserDetect})
     // dependency of PopupActivity
     const script = document.createElement('script');
     script.src = "https://unpkg.com/gifler@0.1.0/gifler.min.js";
@@ -247,6 +248,7 @@ class Aula extends Component {
       prezzieLink,
       videoChannel,
       onTop,
+      browserDetect,
       isWindowDragging,
 
       roomChangeNotification,
@@ -414,13 +416,11 @@ class Aula extends Component {
           >
             <Window title="Video" onClose={toggleVideo} />
             {isWindowDragging && <S.CoverWindowOnDrag />}
-            <Suspense fallback={<div>Loading...</div>}>
               <VideoCall
                 key={videoChannel}
                 participantName={appStore.firstName}
                 videoChannel={videoChannel}
               />
-            </Suspense>
           </Rnd>
         )}
 
