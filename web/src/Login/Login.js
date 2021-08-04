@@ -5,7 +5,7 @@ const Wrapper = styled.div`
   cursor: pointer;
 `;
 const Login = (props) => {
-  const { authLazy, appStoreLazy } = props;
+  const { authLazy, appStore } = props;
   const login = async () => {
     const auth = await authLazy.create();
     auth.login(this.props.onLogin);
@@ -20,7 +20,6 @@ const Login = (props) => {
     <Wrapper>
       <svg
         onClick={async () => {
-          const appStore = await appStoreLazy.create();
           appStore.authData === null ? login() : logout();
         }}
         xmlns="http://www.w3.org/2000/svg"

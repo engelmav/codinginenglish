@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { navbarCommonStyle, LI } from "../Navbar";
-import { Box } from "../UtilComponents/Box";
 import { darkGray } from "../UtilComponents/sharedStyles";
 
 const StyledFooter = styled.footer`
@@ -38,7 +37,7 @@ export const Footer = (props) => {
       <NavbarFooter>
         {links.map((link, idx) => (
           <LI key={idx}>
-            <Link to={link.location}>{link.text}</Link>
+            <Link href={link.location}>{link.text}</Link>
           </LI>
         ))}
       </NavbarFooter>

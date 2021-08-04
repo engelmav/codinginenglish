@@ -1,10 +1,9 @@
 import React from "react";
 // import Header from "../Header";
-import { Header } from "../rootProd";
+import { Header, Footer } from "../rootProd";
 import Head from "next/head";
 import styled from "styled-components";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -16,14 +15,14 @@ const GlobalStyle = createGlobalStyle`
 
 const Layout = (props) => (
   <>
-  <GlobalStyle />
+    <GlobalStyle />
     <Head>
       <title>coding_in_english</title>
     </Head>
     <Header />
     {props.children}
-    <div>Fake footer</div>
-    </>
+    <Footer />
+  </>
 );
 
 export default Layout;

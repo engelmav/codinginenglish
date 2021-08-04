@@ -158,7 +158,7 @@ export const CloseBanner = styled(FaRegWindowClose)`
 
 
 const HeaderContainer = (props) => {
-  const { appStoreLazy, Login, } = props;
+  const { appStore, Login, } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);

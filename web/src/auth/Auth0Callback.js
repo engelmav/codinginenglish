@@ -12,8 +12,9 @@ const Callback = ({ authLazy }) => {
   useEffect(() => {
     async function init() {
       const auth = await authLazy.create();
+      console.log("here is the Router object exported from next/router", Router)
       console.log("****** WARNING: attempting to use Router.location or auth.checkRoute(), Router.location:", Router.location, "Router.pathname:", Router.pathname)
-      auth.checkRoute(Router.location);
+      auth.checkRoute(Router.router.asPath);
       const url = new URL(document.location.href.replace(/#/g, "?"));
       const authError = url.searchParams.get("error_description");
       if (authError) {

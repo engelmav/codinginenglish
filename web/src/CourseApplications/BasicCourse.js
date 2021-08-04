@@ -12,7 +12,7 @@ import {
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
-import { fontFamily, cieOrange } from "../UtilComponents/sharedStyles";
+import { fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -83,15 +83,12 @@ const setupFormik = (appStore) => {
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
+export const BasicCourseForm = ({ appStore, cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
-  const [appStore, setAppStore] = useState(null)
   const [formikData, setFormikData] = useState(false);
 
   useEffect(() => {
     async function init() {
-      const _appStore = await appStoreLazy.create();
-      setAppStore(_appStore);
       try {
         const resp = await cieApi.getUserLocation();
         const locationData = resp.data;
@@ -101,7 +98,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
       } catch {
         console.log("Unable to get location.")
       }
-      const _formikData = setupFormik(_appStore);
+      const _formikData = setupFormik(appStore);
       setFormikData(_formikData);
     }
     init();

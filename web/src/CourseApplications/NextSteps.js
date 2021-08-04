@@ -14,7 +14,6 @@ import { BasicCourseForm } from "./BasicCourse";
 
 import ReactGA from "react-ga";
 
-
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
@@ -30,8 +29,10 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
-  useEffect(() => {setMilestone("Solicitud"); console.log("loaded NextSteps")}, []);
+const NextSteps = ({ appStore, cieApi }) => {
+  useEffect(() => {
+    appStore.milestone = "Solicitud";
+  }, []);
   return (
     <Container
       display="flex"
@@ -62,8 +63,8 @@ const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
             Solicitud
           </Title>
           <P mt={3} width={[1 / 2, 1]}>
-          ¡Bienvenidos! Averíguate más sobre nuestro curso WebApp Development -
-            Basic y solicita una plaza.
+            ¡Bienvenidos! Averíguate más sobre nuestro curso WebApp Development
+            - Basic y solicita una plaza.
           </P>
         </Box>
       </Box>
@@ -80,23 +81,22 @@ const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
         >
           <P mr={3}>Descarga el currículo de WebApp Development - Basic</P>
           <Button
-            onClick={() =>
-              {
-                ReactGA.event({
-                  category: "application",
-                  action: "downloadCurriculum",
-                  label: "basicCurriculum"
-                });
-                saveAs(
+            onClick={() => {
+              ReactGA.event({
+                category: "application",
+                action: "downloadCurriculum",
+                label: "basicCurriculum",
+              });
+              saveAs(
                 "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/WebApp%20Development%20-%20Basic%20(ES).pdf",
                 "WebAppDevelopment_Basic_CIE_2021_Sep_20.pdf"
-              )}
-            }
+              );
+            }}
           >
             <FaDownload /> Descarga el currículo
           </Button>
         </DownloadAndApplyBox>
-        <BasicCourseForm cieApi={cieApi} appStoreLazy={appStoreLazy} />
+        <BasicCourseForm cieApi={cieApi} appStore={appStore} />
       </Card>
       <P>
         ¿Quieres hablar en persona? No dudes en{" "}

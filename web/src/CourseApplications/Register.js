@@ -41,13 +41,13 @@ const RegisterBtn = styled(Button)`
   }
 `;
 
+const GImage = styled.img`
+  padding-left: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  width: 2.8em;
+`;
 const GoogleBtn = styled.button`
-  img {
-    padding-left: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    width: 2.8em;
-  }
   width: 100%;
   padding: 0;
   margin: 0;
@@ -104,19 +104,16 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
+const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
-  const [appStore, setAppStore] = useState(null);
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
     async function init() {
-      const _appStore = await appStoreLazy.create();
       const _auth = await authLazy.create();
-      setAppStore(_appStore);
       setAuth(_auth);
     }
     init();
@@ -174,7 +171,7 @@ const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
     }, 1500);
   };
   useEffect(() => {
-    setMilestone("Regístrate");
+    appStore.milestone = "Regístrate";
   }, []);
   return (
     <SignInContainer className="signin-container">
@@ -206,13 +203,11 @@ const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
                 createRegisteredUserFromGoogleLogin
               );
             }}
-            class="google-btn"
-            id="google-btn"
             type="button"
           >
-            <img
+            <GImage
               height="90%"
-              class="google-icon"
+              className="google-icon"
               src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
             />
             <p>Regístrate con Google</p>

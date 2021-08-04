@@ -45,7 +45,8 @@ const ModuleCard = (props) => {
   const [fullScreen, setFullScreen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
   const isFullscreen = useMediaQuery("(max-width: 40em)");
-  setFullScreen(isFullscreen);
+  useEffect(() => setFullScreen(isFullscreen), []);
+
   const { CheckoutForm, settings } = props;
   const {
     name: moduleName,

@@ -122,14 +122,14 @@ const Gradient = styled.div`
 
 const milestones = ["Regístrate", "Solicitud", "Entrevista", "Matrícula"];
 
-export const Timeline = ({ milestone }) => {
+export const Timeline = ({ appStore }) => {
   return (
     <Gradient className="gradient-scroll">
-      <TimelineStyle key={milestone} pt={3} className="timeline-container">
+      <TimelineStyle key={appStore.milestone} pt={3} className="timeline-container">
         <ul className="timeline">
           {milestones.map((ms, idx) => {
             return (
-              <Milestone key={idx} isActive={ms === milestone}>
+              <Milestone key={idx} isActive={ms === appStore.milestone}>
                 {ms}
               </Milestone>
             );

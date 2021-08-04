@@ -1,7 +1,6 @@
 import React from "react";
-import { UpcomingSessions } from "../rootProd";
+import { UpcomingSessions, cieApi } from "../rootProd";
 import Layout from "../components/Layout";
-import { cieApi } from "../services/cieApi";
 
 const UpcomingSessionsPage = ({cieModules}) => {
   return (
@@ -15,6 +14,7 @@ const UpcomingSessionsPage = ({cieModules}) => {
 export async function getServerSideProps() {
   let cieModules = [];
   try {
+    console.log("************ cieApi:", cieApi)
     console.log("UpcomingSessions.init()");
     const result = await cieApi.getUpcomingModulesAndSessions();
     cieModules = result.data;
