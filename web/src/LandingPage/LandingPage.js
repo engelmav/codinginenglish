@@ -114,7 +114,7 @@ const LandingPage = (props) => {
           código profesional en un repositorio de GitHub y una aplicación web
           implementada.
         </p>
-        <RegisterLink mt={3} alignSelf="center" href="/apply">
+        <RegisterLink mt={3} p={2} alignSelf="center" href="/apply">
           Solicita una plaza aquí
         </RegisterLink>
       </ContentSectionLanding>

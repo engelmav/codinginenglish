@@ -84,9 +84,8 @@
     "yup": "^0.32.9"
   },
   "scripts": {
-    "start": "webpack serve --host 0.0.0.0 --env DEV_SERVER=1 --progress --config config/webpack.config.js --open",
-    "build": "./node_modules/.bin/webpack --progress --config config/webpack.config.js --env production --env NODE_ENV=production",
-    "postbuild": "react-snap",
+    "start": "next start",
+    "build":  "next build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'",

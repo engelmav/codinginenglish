@@ -19,7 +19,7 @@
   "dependencies": {
     "i": "^0.3.6",
     "json-to-pretty-yaml": "^1.2.2",
-    "kubernetes-models": "^0.7.3",
+    "kubernetes-models": "^1.7.1",
     "npm": "^6.14.6",
     "yargs": "^15.3.1"
   },

@@ -31,18 +31,18 @@ import { default as _Login } from "./Login/Login";
 //   const Login = import("./Login/Login");
 //   return Login;
 // });
-import { InstructorPanel as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
-import { default as _Collab } from "./PopupActivity/Collab/Collab";
+import { default as _InstructorPanel } from "./InstructorPanel/InstructorPanel";
+import { Collab as _Collab } from "./PopupActivity/Collab/Collab";
 import { default as _DragToImageCollab } from "./PopupActivity/DragToImageCollab/DragToImageCollab";
-import { default as _Classroom } from "./Aula";
-import { default as _MyDashboard } from "./MyDashboard/MyDashboard";
+import { Aula as _Classroom } from "./Aula";
+import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { default as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { default as AboutUs } from "./AboutUs";
 import { default as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
 import { default as _Register } from "./CourseApplications/Register";
 import { default as _NextSteps } from "./CourseApplications/NextSteps";
-import { default as _PopupActivity } from "./PopupActivity/PopupActivity";
-import { default as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
+import { PopupActivity as _PopupActivity } from "./PopupActivity/PopupActivity";
+import { MultipleChoice as _MultipleChoice } from "./PopupActivity/MultipleChoice/MultipleChoice";
 
 addTimestampsToLog();
 

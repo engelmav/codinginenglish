@@ -23,6 +23,7 @@ spec:
     - chat.codinginenglish.com
     - ws.codinginenglish.com
     - content.codinginenglish.com
+    - dev-site.codinginenglish.com
     secretName: cie-tls
   rules:
   - host: www.codinginenglish.com
@@ -71,5 +72,11 @@ spec:
         backend:
           serviceName: strapi-service
           servicePort: 80
-
+  - host: dev-site.codinginenglish.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: cie-web-next-service
+          servicePort: 80
 
