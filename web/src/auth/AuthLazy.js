@@ -1,13 +1,14 @@
 import reactor from "../reactor";
 import settings from "../settings";
+import appStoreLazy from "../stores/AppStoreLazy";
 
 var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 
 class AuthLazy {
   authSingleton;
-  appStore;
-  constructor(appStore) {
-    this.appStore = appStore;
+  appStoreLazy;
+  constructor(appStoreLazy) {
+    this.appStoreLazy = appStoreLazy;
   }
   create = async () => {
     if (this.authSingleton) return this.authSingleton;
@@ -74,7 +75,8 @@ class AuthLazy {
       async setSession(authResult) {
         this.idToken = authResult.idToken;
         this.profile = authResult.idTokenPayload;
-        this.appStore.setLoginExpiry(authResult.idTokenPayload.exp * 1000);
+        const appStore = await appStoreLazy.load();
+        appStore.setLoginExpiry(authResult.idTokenPayload.exp * 1000);
       }
 
       signOut() {
@@ -161,7 +163,7 @@ class AuthLazy {
       }
     }
     this.authSingleton = new Auth(auth0);
-    this.authSingleton.appStore = this.appStore;
+    this.authSingleton.appStore = this.appStoreLazy;
     return this.authSingleton;
   };
 }

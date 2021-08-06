@@ -104,7 +104,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
+const Register = ({ appStoreLazy, authLazy, cieApi }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -123,6 +123,7 @@ const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
     cieApi.createRegisteredUser({ email: userEmail });
 
   const handleSubmitEmail = async (event) => {
+
     event.stopPropagation();
     event.preventDefault();
     if (email === "") {
@@ -140,10 +141,10 @@ const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
       });
       return;
     }
-    appStore.flow = "newRegistration";
+    (await appStoreLazy.load()).flow = "newRegistration";
     handleSetEmailSubmitted();
   };
-  const handleSetEmailSubmitted = () => {
+  const handleSetEmailSubmitted = async () => {
     createRegisteredUser(email);
     ReactGA.event({
       category: "register",
@@ -163,15 +164,18 @@ const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
     // coding in english and a "way back in".
     auth.loginWithEmailLink(email);
     setIsSending(true);
-    setTimeout(function () {
+    (await appStoreLazy.load()).email = email;
+    setTimeout(async function () {
       setIsSending(false);
       setEmailSubmitted(true);
-      appStore.email = email;
       Router.push("/apply/next-steps");
     }, 1500);
   };
   useEffect(() => {
-    appStore.milestone = "Regístrate";
+    async function init(){
+      (await appStoreLazy.load()).milestone = "Regístrate";
+    }
+    init();
   }, []);
   return (
     <SignInContainer className="signin-container">
@@ -186,7 +190,8 @@ const Register = ({ appStore, authLazy, cieApi, setMilestone }) => {
         </CardTitle>
         <CardContent>
           <GoogleBtn
-            onClick={() => {
+            onClick={async () => {
+              const appStore = await appStoreLazy.load();
               appStore.flow = "newRegistration";
               const createRegisteredUserFromGoogleLogin = (auth0Result) => {
                 console.log("auth0Result", auth0Result);

@@ -46,6 +46,7 @@
     "nanoid": "^3.1.23",
     "navigator": "^1.0.1",
     "next": "^11.0.1",
+    "next-http-proxy-middleware": "^1.0.10",
     "npm": "^7.20.0",
     "pnp-webpack-plugin": "1.2.1",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -85,7 +86,7 @@
   },
   "scripts": {
     "start": "next start",
-    "build":  "next build",
+    "build": "next build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'",

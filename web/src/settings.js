@@ -1,9 +1,9 @@
 /* global __ENVIRONMENT__, __DEV_SERVER__ */
-
+console.log("SERVER_MODE is set to", SERVER_MODE)
 const settings = {
   production: {
     auth0Redirect:     "https://www.codinginenglish.com/callback",
-    cieApiUrl:         "http://cie-api",
+    cieApiUrl:         (SERVER_MODE) ? "http://cie-api": "/",
     cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",
@@ -17,7 +17,7 @@ const settings = {
   },
   development: {
     auth0Redirect:     'http://localhost:3000/callback',
-    cieApiUrl:         "http://localhost:5000",
+    cieApiUrl:         (SERVER_MODE) ? "http://localhost:5000": "/",
     cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           (DEV_SERVER === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",

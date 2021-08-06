@@ -1,9 +1,8 @@
 import React from "react";
-// import Header from "../Header";
 import { Header, Footer } from "../rootProd";
 import Head from "next/head";
-import styled from "styled-components";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+
+import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   * {

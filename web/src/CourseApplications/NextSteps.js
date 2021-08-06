@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, boxy } from "../UtilComponents/Box";
 import { Card, CardTitle, Button } from "../UtilComponents";
 import { P, Title, H2 } from "../UtilComponents/Typography/Typography";
@@ -29,9 +29,14 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-const NextSteps = ({ appStore, cieApi }) => {
+const NextSteps = ({ appStoreLazy, cieApi }) => {
+  const [appStore, setAppStore] = useState(null)
   useEffect(() => {
-    appStore.milestone = "Solicitud";
+    async function init() {
+      setAppStore(await appStoreLazy.load());
+      appStore.milestone = "Solicitud"
+    }
+    init();
   }, []);
   return (
     <Container

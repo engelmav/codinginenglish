@@ -1,5 +1,3 @@
-import {  Route, Switch } from "react-router-dom";
-import { Timeline } from "./Timeline";
 import React from "react";
 import {  Main } from "../UtilComponents";
 import styled from "styled-components";
@@ -10,10 +8,10 @@ const AppContainer = styled(Main)`
   flex-direction: column;
   ${space}
 `;
-const ApplicationProcess = ({ children, appStore }) => {
+const ApplicationProcess = ({ children, Timeline }) => {
   return (
     <AppContainer className="app-process-main" mt={3} mb={3}>
-      <Timeline appStore={appStore} />
+      <Timeline />
      {children}
     </AppContainer>
   );
