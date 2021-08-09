@@ -56,7 +56,6 @@ class AppStore {
     this.firstName = firstname;
     this.lastName = lastname;
     this.userId = id;
-    console.log("stored user object:", storedUser);
     this.userRole = role;
 
     this.rocketchatAuthToken = rcAuthToken;
@@ -114,8 +113,6 @@ export const makeAppStore = (appStoreName = "default") => {
         return data ? JSON.parse(data) : undefined;
       },
       write: async (name, content) => {
-        console.log(name, content);
-
         window.localStorage.setItem(name, JSON.stringify(content));
       },
     }),

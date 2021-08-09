@@ -122,22 +122,15 @@ const Gradient = styled.div`
 
 const milestones = ["Regístrate", "Solicitud", "Entrevista", "Matrícula"];
 
-export const Timeline = ({ appStoreLazy }) => {
-  const [appStore, setAppStore] = useState(null)
-  useEffect(() => {
-    async function init() {
-      setAppStore(await appStoreLazy.load());
-    }
-    init();
-  })
-  
+export const Timeline = ({ milestone }) => {
   return (
     <Gradient className="gradient-scroll">
-      <TimelineStyle key={appStore?.milestone} pt={3} className="timeline-container">
+      <TimelineStyle pt={3} className="timeline-container">
         <ul className="timeline">
           {milestones.map((ms, idx) => {
+            const isActive = ms === milestone;
             return (
-              <Milestone key={idx} isActive={ms === appStore?.milestone}>
+              <Milestone key={idx} isActive={isActive}>
                 {ms}
               </Milestone>
             );

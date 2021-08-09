@@ -1,10 +1,9 @@
 import axios from "axios";
 
 class CieApi {
-  constructor(settings) {
-    this.settings = settings;
+  constructor() {
     const axiosConfig = {
-      baseURL: settings.cieApiUrl,
+      baseURL: "/",
     }
     this.axios = axios.create(axiosConfig)
   }
@@ -27,10 +26,6 @@ class CieApi {
   }
 
   async getUpcomingRegistrationsByUserId(userId) {
-    console.log(
-      "getUserRegistrations() checking registrations for userId",
-      userId
-    );
     const res = await this.axios(
       {
         url: `/api/users/${userId}/module-sessions`,
@@ -40,16 +35,13 @@ class CieApi {
         params: { futureOnly: true },
       }
     );
-    console.log("cieApi.getUserRegistrations():", res);
     return res.data.data;
   }
 
   async getUpcomingModulesAndSessions() {
     let modulesAndSessions = [];
-    console.log("***************************** attempting to get modules and sessions")
     try {
       const res = await this.axios.get("/api/cie-modules");
-      console.log(res)
       modulesAndSessions = res.data;
     } catch (ex) {
       console.log("Failed to get upcoming classes.");
@@ -86,7 +78,8 @@ class CieApi {
   }
 
   async submitApp(appData) {
-    return (await this.axios.post(`/api/student-application`, appData)).data;
+    const res = (await this.axios.post(`/api/student-application`, appData)).data;
+    return res;
   }
 
   async setUserStatus(userId, status) {
@@ -102,6 +95,6 @@ class CieApi {
   }
 }
 
-const cieApi = new CieApi("/api");
+const cieApi = new CieApi();
 
 export { cieApi, CieApi };

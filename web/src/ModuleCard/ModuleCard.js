@@ -1,4 +1,4 @@
-import { ContentSection, Title } from "../UtilComponents";
+import { ContentSection, Title, RegisterLink } from "../UtilComponents";
 import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
 import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
 import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
@@ -9,20 +9,8 @@ import styled from "styled-components";
 import { Flex, Text, Image } from "rebass";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import settings from "../settings";
 
-// TODO: duped in Home/index.js
-const RegisterLink = styled(Link)`
-  background: ${cieOrange};
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  padding: 10px;
-  color: white;
-  ${fontMonospace}
-  a {
-    color: ${cieOrange};
-  }
-`;
 
 const CardBox = styled(Flex)`
   justify-content: center;
@@ -47,7 +35,7 @@ const ModuleCard = (props) => {
   const isFullscreen = useMediaQuery("(max-width: 40em)");
   useEffect(() => setFullScreen(isFullscreen), []);
 
-  const { CheckoutForm, settings } = props;
+  const { CheckoutForm } = props;
   const {
     name: moduleName,
     description: moduleDescription,
@@ -72,8 +60,8 @@ const ModuleCard = (props) => {
         <P>del 20 septiembre al 20 diciembre</P>
         {moduleSessions.map((ms, idx) => {
           return (
-            <RegisterLink key={idx} href="/apply">
-              Solicita el curso
+            <RegisterLink mt={3} p={2}  key={idx} href="/apply">
+              Solicita una plaza
             </RegisterLink>
           );
         })}

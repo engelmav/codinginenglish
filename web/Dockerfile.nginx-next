@@ -1,0 +1,3 @@
+FROM nginx:1.17.5
+
+COPY nginx-next.conf /etc/nginx/nginx.conf

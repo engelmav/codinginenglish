@@ -1,8 +1,9 @@
 /* global __ENVIRONMENT__, __DEV_SERVER__ */
-console.log("SERVER_MODE is set to", SERVER_MODE)
+
+
 const settings = {
   production: {
-    auth0Redirect:     "https://www.codinginenglish.com/callback",
+    auth0Redirect:     "https://dev-site.codinginenglish.com/callback",
     cieApiUrl:         (SERVER_MODE) ? "http://cie-api": "/",
     cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           "https://remote.codinginenglish.com/guacamole",
@@ -13,11 +14,10 @@ const settings = {
     edgeAssets:        "https://cie-assets.nyc3.cdn.digitaloceanspaces.com",
     stripePK:          "pk_live_ciL7BF5syCv4uC1KPjHEq2Sa00raFPFo6w",
     websocketAddress:  "wss://ws.codinginenglish.com:443/ws/stream"
-
   },
   development: {
     auth0Redirect:     'http://localhost:3000/callback',
-    cieApiUrl:         (SERVER_MODE) ? "http://localhost:5000": "/",
+    cieApiUrl:         (SERVER_MODE) ? "http://0.0.0.0:5000": "/",
     cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           (DEV_SERVER === "1") ? 'http://192.168.1.45:8080/guacamole': "https://remote.codinginenglish.com/guacamole",
     rocketchatUrl:     "https://chat.codinginenglish.com/channel/",
@@ -30,4 +30,4 @@ const settings = {
   }
 }
 
-export default settings[process.env.ENVIRONMENT];
+export default settings[process.env.NODE_ENV];

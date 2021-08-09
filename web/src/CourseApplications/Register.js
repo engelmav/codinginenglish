@@ -104,7 +104,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStoreLazy, authLazy, cieApi }) => {
+const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -115,6 +115,8 @@ const Register = ({ appStoreLazy, authLazy, cieApi }) => {
     async function init() {
       const _auth = await authLazy.create();
       setAuth(_auth);
+      const _appStore = await appStoreLazy.load();
+      _appStore.setMilestone("Regístrate");
     }
     init();
   }, []);
@@ -123,7 +125,6 @@ const Register = ({ appStoreLazy, authLazy, cieApi }) => {
     cieApi.createRegisteredUser({ email: userEmail });
 
   const handleSubmitEmail = async (event) => {
-
     event.stopPropagation();
     event.preventDefault();
     if (email === "") {
@@ -171,123 +172,120 @@ const Register = ({ appStoreLazy, authLazy, cieApi }) => {
       Router.push("/apply/next-steps");
     }, 1500);
   };
-  useEffect(() => {
-    async function init(){
-      (await appStoreLazy.load()).milestone = "Regístrate";
-    }
-    init();
-  }, []);
   return (
-    <SignInContainer className="signin-container">
-      <Title textAlign="center">Regístrate</Title>
-      <P p={3}>
-        Regístrate aquí para ver el currículo de WebApp Development - Basic y
-        solicitar una plaza.
-      </P>
-      <RegisterOptsCard p={4} mt={3} mb={3}>
-        <CardTitle fontSize={1} mb={3} textAlign="center">
-          registración
-        </CardTitle>
-        <CardContent>
-          <GoogleBtn
-            onClick={async () => {
-              const appStore = await appStoreLazy.load();
-              appStore.flow = "newRegistration";
-              const createRegisteredUserFromGoogleLogin = (auth0Result) => {
-                console.log("auth0Result", auth0Result);
-                debugger;
-                createRegisteredUser(email);
-              };
-              ReactGA.event({
-                category: "register",
-                action: "googleRegistration",
-                label: "googleRegistration",
-              });
-              auth.loginWithGoogle(
-                { isRegistration: true },
-                createRegisteredUserFromGoogleLogin
-              );
-            }}
-            type="button"
-          >
-            <GImage
-              height="90%"
-              className="google-icon"
-              src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
-            />
-            <p>Regístrate con Google</p>
-          </GoogleBtn>
-          <Divider mt={3} mb={3}>
-            o
-          </Divider>
-
-          {emailSubmitted ? (
-            <P>
-              Enviado! Por favor verifica tu correo electrónico (de{" "}
-              <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
-              para acceder al currículo y la solicitud. (No lo ves?{" "}
-              <Button
-                m={1}
-                onClick={() => {
-                  setEmailSubmitted(false);
-                }}
-              >
-                Intenta otra vez
-              </Button>
-              )
-            </P>
-          ) : (
-            <Box
-              as="form"
-              display="flex"
-              flexDirection="column"
-              onSubmit={handleSubmitEmail}
+    <>
+      <Timeline milestone="Regístrate" />
+      <SignInContainer className="signin-container">
+        <Title textAlign="center">Regístrate</Title>
+        <P p={3}>
+          Regístrate aquí para ver el currículo de WebApp Development - Basic y
+          solicitar una plaza.
+        </P>
+        <RegisterOptsCard p={4} mt={3} mb={3}>
+          <CardTitle fontSize={1} mb={3} textAlign="center">
+            registración
+          </CardTitle>
+          <CardContent>
+            <GoogleBtn
+              onClick={async () => {
+                const appStore = await appStoreLazy.load();
+                appStore.flow = "newRegistration";
+                const createRegisteredUserFromGoogleLogin = (auth0Result) => {
+                  debugger;
+                  createRegisteredUser(email);
+                };
+                ReactGA.event({
+                  category: "register",
+                  action: "googleRegistration",
+                  label: "googleRegistration",
+                });
+                auth.loginWithGoogle(
+                  { isRegistration: true },
+                  createRegisteredUserFromGoogleLogin
+                );
+              }}
+              type="button"
             >
-              <TextInput
-                autoComplete="email"
-                mb={2}
-                width="100%"
-                placeholder={"nombre@xyz.com"}
-                value={email}
-                onChange={(e) => {
-                  setInvalidEmail(false);
-                  setEmail(e.target.value);
-                }}
+              <GImage
+                height="90%"
+                className="google-icon"
+                src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
               />
-              {invalidEmail && (
-                <AlertMessage
-                  fontSize={1}
+              <p>Regístrate con Google</p>
+            </GoogleBtn>
+            <Divider mt={3} mb={3}>
+              o
+            </Divider>
+
+            {emailSubmitted ? (
+              <P>
+                Enviado! Por favor verifica tu correo electrónico (de{" "}
+                <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
+                para acceder al currículo y la solicitud. (No lo ves?{" "}
+                <Button
+                  m={1}
+                  onClick={() => {
+                    setEmailSubmitted(false);
+                  }}
+                >
+                  Intenta otra vez
+                </Button>
+                )
+              </P>
+            ) : (
+              <Box
+                as="form"
+                display="flex"
+                flexDirection="column"
+                onSubmit={handleSubmitEmail}
+              >
+                <TextInput
+                  autoComplete="email"
                   mb={2}
-                  p={1}
-                  text="La dirección de correo electrónico no es válido."
+                  width="100%"
+                  placeholder={"nombre@xyz.com"}
+                  value={email}
+                  onChange={(e) => {
+                    setInvalidEmail(false);
+                    setEmail(e.target.value);
+                  }}
                 />
-              )}
-              {!isSending && (
-                <RegisterBtn type="submit">
-                  <FaEnvelope size={20} />
-                  <P ml="24px"> Regístrate con Email</P>
-                </RegisterBtn>
-              )}
-              {isSending && (
-                <Box alignSelf="center">
-                  <Spinner color="black" alignSelf="center" />
-                </Box>
-              )}
-            </Box>
-          )}
-        </CardContent>
-      </RegisterOptsCard>
-      <P p={3}>
-        El proceso de matriculación de Coding in English consta de cuatro pasos:
-      </P>
-      <Ol p={0}>
-        <li>Registrarse para ver el plan de estudios</li>
-        <li>Rellenar la solicitud del curso</li>
-        <li>Entrevista con un instructor</li>
-        <li>Matrícula para el curso</li>
-      </Ol>
-      {/*  */}
-    </SignInContainer>
+                {invalidEmail && (
+                  <AlertMessage
+                    fontSize={1}
+                    mb={2}
+                    p={1}
+                    text="La dirección de correo electrónico no es válido."
+                  />
+                )}
+                {!isSending && (
+                  <RegisterBtn type="submit">
+                    <FaEnvelope size={20} />
+                    <P ml="24px"> Regístrate con Email</P>
+                  </RegisterBtn>
+                )}
+                {isSending && (
+                  <Box alignSelf="center">
+                    <Spinner color="black" alignSelf="center" />
+                  </Box>
+                )}
+              </Box>
+            )}
+          </CardContent>
+        </RegisterOptsCard>
+        <P p={3}>
+          El proceso de matriculación de Coding in English consta de cuatro
+          pasos:
+        </P>
+        <Ol p={0}>
+          <li>Registrarse para ver el plan de estudios</li>
+          <li>Rellenar la solicitud del curso</li>
+          <li>Entrevista con un instructor</li>
+          <li>Matrícula para el curso</li>
+        </Ol>
+        {/*  */}
+      </SignInContainer>
+    </>
   );
 };
 

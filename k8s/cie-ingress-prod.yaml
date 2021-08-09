@@ -30,13 +30,13 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: cie-web
+          serviceName: cie-web-nginx-next-service
           servicePort: 80
   - host: codinginenglish.com
     http:
       paths:
       - backend:
-          serviceName: cie-web
+          serviceName: cie-web-nginx-next-service
           servicePort: 80
   - host: remote.codinginenglish.com
     http:
@@ -77,6 +77,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: cie-web-next-service
+          serviceName: cie-web-nginx-next-service
           servicePort: 80
 

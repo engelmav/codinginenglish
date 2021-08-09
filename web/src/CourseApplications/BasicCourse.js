@@ -83,22 +83,25 @@ const setupFormik = (appStore) => {
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ appStore, cieApi }) => {
+export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
+  const [appStore, setAppStore] = useState(null);
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
 
   useEffect(() => {
     async function init() {
+      const _appStore = await appStoreLazy.load();
+      setAppStore(_appStore);
       try {
         const resp = await cieApi.getUserLocation();
         const locationData = resp.data;
         const { city, country_name } = locationData;
         if (!!city && !!country_name)
-        appStore.userLocation = `${city}, ${country_name}`;
+          _appStore.userLocation = `${city}, ${country_name}`;
       } catch {
-        console.log("Unable to get location.")
+        console.log("Unable to get location.");
       }
-      const _formikData = setupFormik(appStore);
+      const _formikData = setupFormik(_appStore);
       setFormikData(_formikData);
     }
     init();
@@ -146,7 +149,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
 
                     if (field.fieldType === "shortAnswer") {
                       fieldJsx = (
-                        <>
+                        <div key={idx}>
                           <FieldLabel htmlFor={field.title} key={idx}>
                             {field.title}
                           </FieldLabel>
@@ -164,9 +167,9 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                             onChange={(e) => {
                               handleChange(e);
                             }}
-                            value={values[field.fieldName]}
+                            value={values[field.fieldName] || ""}
                           />
-                        </>
+                        </div>
                       );
                     }
                     if (field.fieldType === "email") {
@@ -186,7 +189,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                               });
                             }}
                             onChange={handleChange}
-                            value={values[fieldName]}
+                            value={values[fieldName] || ""}
                           />
                         </>
                       );
@@ -246,7 +249,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                               });
                             }}
                             onChange={handleChange}
-                            value={values[fieldName]}
+                            value={values[fieldName] || ""}
                           />
                         </>
                       );
@@ -277,7 +280,7 @@ export const BasicCourseForm = ({ appStore, cieApi }) => {
                         console.log(e);
                         handleChange(e);
                       }}
-                      value={values["location"] || appStore.userLocation}
+                      value={values["location"] || appStore.userLocation || ""}
                       onClear={() => {
                         setFieldValue("location", " ", false);
                       }}

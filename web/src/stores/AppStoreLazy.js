@@ -4,7 +4,6 @@ class AppStoreLazy {
   }
   load = async (appStoreName = "default") => {
     if (this.appStoreSingleton) return this.appStoreSingleton;
-    console.log("lazy importing mobx");
     console.trace();
     const { action, configure, makeAutoObservable } = await import("mobx");
     const {
@@ -31,6 +30,7 @@ class AppStoreLazy {
       userRole = null;
       userLocation = null;
       flow = null;
+      milestone = null;
       firstName = null;
       lastName = null;
       email = null;
@@ -80,6 +80,10 @@ class AppStoreLazy {
       setSessionInProgress(isInProgress) {
         this.sessionInProgress = isInProgress;
       }
+      setMilestone(milestone) {
+        console.log("setting milestone to", milestone)
+        this.milestone = milestone;
+      }
       clearStore() {
         clearPersist(this);
       }
@@ -110,6 +114,7 @@ class AppStoreLazy {
             "userRole",
             "firstName",
             "flow",
+            "milestone",
             "email",
             "registeredSessions",
             "sessionInProgress",

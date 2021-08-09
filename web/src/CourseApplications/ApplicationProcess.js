@@ -8,10 +8,9 @@ const AppContainer = styled(Main)`
   flex-direction: column;
   ${space}
 `;
-const ApplicationProcess = ({ children, Timeline }) => {
+const ApplicationProcess = ({ children }) => {
   return (
-    <AppContainer className="app-process-main" mt={3} mb={3}>
-      <Timeline />
+    <AppContainer mt={3} mb={3}>
      {children}
     </AppContainer>
   );

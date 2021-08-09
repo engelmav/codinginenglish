@@ -1,5 +1,4 @@
 module.exports = function (api) {
-  console.log("******************* executing in babel.config.js")
   api.cache(true);
   return {
     presets: [

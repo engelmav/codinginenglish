@@ -66,7 +66,6 @@ class AuthLazy {
       }
 
       checkRoute = (path) => {
-        console.log("****** WARNING: auth.checkRoute() got location:", location)
         if (/access_token|id_token|error/.test(path)) {
           this.handleAuthentication();
         }

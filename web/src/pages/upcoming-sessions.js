@@ -1,8 +1,10 @@
 import React from "react";
-import { UpcomingSessions, cieApi } from "../rootProd";
+import { cieApi } from "../services/cieApi";
+import UpcomingSessions from "../UpcomingSessions";
 import Layout from "../components/Layout";
+import settings from "../settings";
 
-const UpcomingSessionsPage = ({cieModules}) => {
+const UpcomingSessionsPage = ({ cieModules }) => {
   return (
     <Layout>
       <UpcomingSessions cieModules={cieModules} />
@@ -14,16 +16,15 @@ const UpcomingSessionsPage = ({cieModules}) => {
 export async function getServerSideProps() {
   let cieModules = [];
   try {
-    console.log("************ cieApi:", cieApi)
-    console.log("UpcomingSessions.init()");
-    const result = await cieApi.getUpcomingModulesAndSessions();
-    cieModules = result.data;
-    console.log(
-      "**************************** result of result.data:",
-      cieModules
-    );
-    if ((cieModules === null) | (cieModules === undefined)) {
-      throw new Error("cieModules is null or undefined");
+    const result = await fetch(`${settings.cieApiUrl}/api/cie-modules`);
+    const data = await result.json();
+    console.log(data)
+    if (data === null || data === undefined) {
+      console.log(
+        "*** WARNING: null or undefined result of getUpcomingModulesAndSessions() in getServerSideProps()"
+      );
+    } else {
+      cieModules = data.data;
     }
   } catch (ex) {
     console.log("Failed to retrieve scheduledSessions.");

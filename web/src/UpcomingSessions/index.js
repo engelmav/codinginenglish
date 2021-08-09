@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Main, Title } from "../UtilComponents";
 import { observer } from "mobx-react";
-import { cieApi } from "../services/cieApi"
+import ModuleCard from "../ModuleCard/ModuleCard"
 
 const UpcomingSessions = observer((props) => {
-  const { cieModules, ModuleCard } = props;
+  const { cieModules } = props;
   return (
     <Main p={20}>
-      <Title alignSelf="center" mb={3}>
+      <Title textAlign="center" mb={3}>
         Upcoming Sessions
       </Title>
       {cieModules.map((moduleData, i) => (

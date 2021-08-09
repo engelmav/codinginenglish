@@ -11,9 +11,6 @@ const createWithAuth = (authLazy) => {
         const auth = await authLazy();
         if (!(await auth.isAuthenticated())) {
           console.log("Not authenticated!");
-          console.log(
-            "***** WARNING: attempting to use next/router's Router.push to push to /"
-          );
           Router.push("/");
         }
       }

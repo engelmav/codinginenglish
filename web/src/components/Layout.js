@@ -1,5 +1,6 @@
 import React from "react";
-import { Header, Footer } from "../rootProd";
+import Header from "../Header";
+import { Footer } from "../Footer/Footer";
 import Head from "next/head";
 
 import { createGlobalStyle } from "styled-components";

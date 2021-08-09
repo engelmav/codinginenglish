@@ -29,16 +29,19 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-const NextSteps = ({ appStoreLazy, cieApi }) => {
-  const [appStore, setAppStore] = useState(null)
+const NextSteps = ({ Timeline, appStoreLazy, cieApi }) => {
+  const [appStore, setAppStore] = useState(null);
   useEffect(() => {
     async function init() {
-      setAppStore(await appStoreLazy.load());
-      appStore.milestone = "Solicitud"
+      const _appStore = await appStoreLazy.load();
+      _appStore.setMilestone("Solicitud");
+      setAppStore(_appStore);
     }
     init();
   }, []);
   return (
+    <>
+    <Timeline milestone="Solicitud" />
     <Container
       display="flex"
       flexDirection="column"
@@ -101,7 +104,7 @@ const NextSteps = ({ appStoreLazy, cieApi }) => {
             <FaDownload /> Descarga el currículo
           </Button>
         </DownloadAndApplyBox>
-        <BasicCourseForm cieApi={cieApi} appStore={appStore} />
+        <BasicCourseForm cieApi={cieApi} appStoreLazy={appStoreLazy} />
       </Card>
       <P>
         ¿Quieres hablar en persona? No dudes en{" "}
@@ -110,6 +113,7 @@ const NextSteps = ({ appStoreLazy, cieApi }) => {
         </a>
       </P>
     </Container>
+    </>
   );
 };
 

@@ -1,11 +1,12 @@
 import React from "react";
 import styled from "styled-components";
+import appStoreLazy from "../stores/AppStoreLazy"
 
 const Wrapper = styled.div`
   cursor: pointer;
 `;
 const Login = (props) => {
-  const { authLazy, appStoreLazy } = props;
+  const { authLazy } = props;
   const login = async () => {
     const auth = await authLazy.create();
     auth.login(this.props.onLogin);

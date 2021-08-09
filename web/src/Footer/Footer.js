@@ -25,7 +25,6 @@ const NavbarFooter = styled.ul`
 `;
 
 export const Footer = (props) => {
-  const { Login } = props;
   const links = [
     { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions" },
     { text: "CONÓCENOS", location: "/about-us" },

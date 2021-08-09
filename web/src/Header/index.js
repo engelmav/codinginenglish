@@ -4,8 +4,6 @@ import styled, { css } from "styled-components";
 import {
   debugBorder,
   whenSmallScreen,
-  orangeBgColor,
-  cieOrange,
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
@@ -14,6 +12,7 @@ import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import ReactGA from "react-ga";
 import settings from "../settings";
+import Login from "../Login/Login";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -37,6 +36,7 @@ const CloseBox = styled(FaRegWindowClose)`
       display: block;`}
 `;
 const Hamburger = styled.svg`
+
   height: 20px;
   width: 20px;
   display: none;
@@ -156,9 +156,7 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
-
 const HeaderContainer = (props) => {
-  const { appStore, Login, } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
@@ -209,10 +207,7 @@ const HeaderContainer = (props) => {
               solicita una plaza
             </ApplyButton>
           </Link>
-          <CloseBanner
-            size="25"
-            onClick={() => setBannerOpen(false)}
-          />
+          <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
         </Banner>
       )}
       <Header>
@@ -234,13 +229,13 @@ const HeaderContainer = (props) => {
               <Link href={link.location}>{link.text}</Link>
             </LI>
           ))}
-          <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
+          <Login />
+        </NavbarList>
+        <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
             <rect width="100" height="20"></rect>
             <rect y="30" width="100" height="20"></rect>
             <rect y="60" width="100" height="20"></rect>
           </Hamburger>
-          <Login />
-        </NavbarList>
       </Header>
     </>
   );

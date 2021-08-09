@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { render, hydrate } from "react-dom";
+import { render } from "react-dom";
 import history from "./history";
 import { Router, Route } from "react-router-dom";
 import { makeApp, Home, Header, Footer } from "./rootProd";
@@ -25,7 +25,6 @@ function makeLazyComponent(asyncGetter) {
 }
 
 const AppContainer = () => {
-  console.log("App component");
   return (
     <Router history={history}>
       <Header />
@@ -37,11 +36,5 @@ const AppContainer = () => {
 };
 
 const rootElement = document.getElementById("main-grid");
-if (rootElement.hasChildNodes()) {
-  console.log("hydrating");
-  hydrate(<AppContainer />, rootElement);
-} else {
-  console.log("rendering");
+render(<AppContainer />, rootElement);
 
-  render(<AppContainer />, rootElement);
-}

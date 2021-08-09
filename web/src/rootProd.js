@@ -38,7 +38,7 @@ import { Aula as _Classroom } from "./Aula";
 import { MyDashboard as _MyDashboard } from "./MyDashboard/MyDashboard";
 import { default as _CheckoutForm } from "./CheckoutForm/CheckoutForm";
 import { default as AboutUs } from "./AboutUs";
-import { Timeline as _Timeline } from "./CourseApplications/Timeline";
+import { Timeline } from "./CourseApplications/Timeline";
 import { default as _ApplicationProcess } from "./CourseApplications/ApplicationProcess";
 import { default as _Register } from "./CourseApplications/Register";
 import { default as _NextSteps } from "./CourseApplications/NextSteps";
@@ -100,7 +100,7 @@ async function handleAuthSuccess(authResult) {
   const studentSessionMgr = new StudentSessionManager(websocket);
   studentSessionMgr.addOnSessionStart(appStore.setSessionInProgress);
   appStore.setSessionInProgress(initializedUser.data.has_session_in_progress);
-  studentSessionMgr.initialize();
+  // studentSessionMgr.initialize();
   let nextPage = "/my-dashboard";
   if (appStore.flow === "newRegistration") {
     nextPage = "/apply/next-steps";
@@ -160,17 +160,16 @@ const _ClassroomInjected = compose(_Classroom, {
 const Classroom = withAuth(_ClassroomInjected);
 /** End Configure Aula */
 
-export const Register = compose(_Register, { appStoreLazy, authLazy, cieApi });
+export const Register = compose(_Register, { Timeline, appStoreLazy, authLazy, cieApi });
 export const NextSteps = compose(_NextSteps, {
+  Timeline,
   appStoreLazy,
   authLazy,
   cieApi,
 });
-const Timeline = compose(_Timeline, { appStoreLazy });
 export const ApplicationProcess = compose(_ApplicationProcess, {
   appStoreLazy,
   cieApi,
-  Timeline,
   Register,
   NextSteps,
 });
