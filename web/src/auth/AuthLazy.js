@@ -1,5 +1,6 @@
 import reactor from "../reactor";
 import settings from "../settings";
+import appStoreLazy from "../stores/AppStoreLazy";
 
 var CLIENT_ID = "pyJiq82f4s6ik5dr9oNnyryW5127T965";
 
@@ -11,8 +12,6 @@ class AuthLazy {
   }
   create = async () => {
     if (this.authSingleton) return this.authSingleton;
-    console.log("lazy importing auth0-js");
-    console.trace();
     const { default: auth0 } = await import("auth0-js");
     class Auth {
       accessToken;
@@ -26,7 +25,7 @@ class AuthLazy {
           responseType: "token id_token",
           scope: "openid email profile",
         });
-        this.appStoreLazy = null; // add me after instantiation
+        this.appStore = null; // add me after instantiation
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
         this.handleAuthentication = this.handleAuthentication.bind(this);
@@ -66,16 +65,16 @@ class AuthLazy {
         });
       }
 
-      checkRoute = (location) => {
-        if (/access_token|id_token|error/.test(location.hash)) {
+      checkRoute = (path) => {
+        if (/access_token|id_token|error/.test(path)) {
           this.handleAuthentication();
         }
       };
 
       async setSession(authResult) {
-        const appStore = await this.appStoreLazy.create();
         this.idToken = authResult.idToken;
         this.profile = authResult.idTokenPayload;
+        const appStore = await appStoreLazy.load();
         appStore.setLoginExpiry(authResult.idTokenPayload.exp * 1000);
       }
 
@@ -103,9 +102,7 @@ class AuthLazy {
         // Remove tokens and expiry time.
         this.accessToken = null;
         this.idToken = null;
-        const appStore = await this.appStoreLazy.create();
-
-        appStore.setLoginExpiry(0);
+        this.appStore.setLoginExpiry(0);
 
         this.auth0.logout({
           returnTo: window.location.origin,
@@ -114,8 +111,7 @@ class AuthLazy {
 
       async isAuthenticated() {
         const currentTime = new Date().getTime();
-        const appStore = await this.appStoreLazy.create();
-        const isAuth = currentTime < appStore.loginExpiresAt;
+        const isAuth = currentTime < this.appStore.loginExpiresAt;
         return isAuth;
       }
 
@@ -166,7 +162,7 @@ class AuthLazy {
       }
     }
     this.authSingleton = new Auth(auth0);
-    this.authSingleton.appStoreLazy = this.appStoreLazy;
+    this.authSingleton.appStore = this.appStoreLazy;
     return this.authSingleton;
   };
 }

@@ -9,10 +9,7 @@ import { Title, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import { Box } from "../UtilComponents/Box";
-import {
-  darkGray,
-  debugBorder,
-} from "../UtilComponents/sharedStyles";
+import { darkGray, debugBorder } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
 
 const MainLanding = styled(Main)`
@@ -54,7 +51,7 @@ const SectionTitle = styled(Title)`
   ${debugBorder}
 `;
 
-const Home = (props) => {
+const LandingPage = (props) => {
   const { settings } = props;
   return (
     <MainLanding p={1}>
@@ -103,8 +100,7 @@ const Home = (props) => {
         mt={5}
         mb={3}
         alt={"Software Stack"}
-        srcSet={
-          `${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
+        srcSet={`${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
         sizes="(min-width: 600px) 692px, 320px"
         src={`${props.settings.assets}/home/3-tech-692w.webp`}
       />
@@ -118,7 +114,7 @@ const Home = (props) => {
           código profesional en un repositorio de GitHub y una aplicación web
           implementada.
         </p>
-        <RegisterLink mt={3} alignSelf="center" to="/apply">
+        <RegisterLink mt={3} p={2} alignSelf="center" href="/apply">
           Solicita una plaza aquí
         </RegisterLink>
       </ContentSectionLanding>
@@ -205,4 +201,4 @@ const Home = (props) => {
   );
 };
 
-export { Home };
+export default LandingPage;

@@ -1,19 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, Route, Switch } from "react-router-dom";
+import Link from "next/link";
 import styled, { css } from "styled-components";
 import {
   debugBorder,
   whenSmallScreen,
-  orangeBgColor,
-  cieOrange,
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
-import history from "../history";
 import ReactGA from "react-ga";
+import settings from "../settings";
+import Login from "../Login/Login";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -37,14 +36,15 @@ const CloseBox = styled(FaRegWindowClose)`
       display: block;`}
 `;
 const Hamburger = styled.svg`
+
   height: 20px;
   width: 20px;
   display: none;
   rect {
-      fill: white;
-      stroke: ${darkGray};
-      stroke-width: 10px;
-    }  
+    fill: white;
+    stroke: ${darkGray};
+    stroke-width: 10px;
+  }
   cursor: pointer;
   ${whenSmallScreen`
       display: block;`}
@@ -72,6 +72,7 @@ const Header = styled.header`
 const Img = styled.img`
   width: auto;
   height: 70px;
+  cursor: pointer;
   ${whenSmallScreen`
       height: 28px; padding-top: 5px;`}
 `;
@@ -156,12 +157,9 @@ export const CloseBanner = styled(FaRegWindowClose)`
 `;
 
 const HeaderContainer = (props) => {
-  console.log("Attempting to load HeaderContainer");
-  const { appStoreLazy, settings, Login } = props;
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
-  const [onAppPage, setOnAppPage] = useState(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -171,9 +169,6 @@ const HeaderContainer = (props) => {
   };
 
   useEffect(() => {
-    if (history.location.pathname.includes("/apply")) {
-      setOnAppPage(true);
-    }
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
     return () =>
@@ -181,7 +176,7 @@ const HeaderContainer = (props) => {
         "mousedown",
         detectBackgroundClickAndCloseNav
       );
-  }, [navMenuRef, history.location.pathname]);
+  }, [navMenuRef]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
   const links = [
@@ -191,87 +186,81 @@ const HeaderContainer = (props) => {
   ];
 
   return (
-    <Switch>
-      <Route path="/class">
-        <div></div>
-      </Route>
-      <Route path="*">
-        {bannerOpen && !onAppPage && (
-          <Banner>
-            <P>
-              Se ha abierto la matrícula del curso{" "}
-              <i>WebApp Development - Basic</i>
-            </P>
-            <Link to="/apply">
-              <ApplyButton
-                onClick={() => {
-                  ReactGA.event({
-                    category: "register",
-                    action: "clickedYellowBanner",
-                    label: "solicitaUnaPlaza",
-                  });
-                  setBannerOpen(false);
-                }}
-              >
-                solicita una plaza
-              </ApplyButton>
-            </Link>
-            <CloseBanner
-              size="25"
-              alignSelf="flex-end"
-              onClick={() => setBannerOpen(false)}
-            />
-          </Banner>
-        )}
-        <Header>
-          <Link to="/">
-            <Img
-              loading="lazy"
-              alt="cie logo"
-              srcSet={
-                `${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
-              sizes="(min-width: 600px) 692px, 282px"
-              src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
-
-
-            ></Img>
+    <>
+      {bannerOpen && (
+        <Banner>
+          <P>
+            Se ha abierto la matrícula del curso{" "}
+            <i>WebApp Development - Basic</i>
+          </P>
+          <Link href="/apply">
+            <ApplyButton
+              onClick={() => {
+                ReactGA.event({
+                  category: "register",
+                  action: "clickedYellowBanner",
+                  label: "solicitaUnaPlaza",
+                });
+                setBannerOpen(false);
+              }}
+            >
+              solicita una plaza
+            </ApplyButton>
           </Link>
-          <NavbarList navMenu={navMenu} ref={navMenuRef}>
-            <LI>
-              <CloseBox size="20" onClick={() => setNavMenu(false)} />
+          <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
+        </Banner>
+      )}
+      <Header>
+        <Link href="/">
+          <Img
+            loading="lazy"
+            alt="cie logo"
+            srcSet={`${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+            sizes="(min-width: 600px) 692px, 282px"
+            src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+          ></Img>
+        </Link>
+        <NavbarList navMenu={navMenu} ref={navMenuRef}>
+          <LI>
+            <CloseBox size="20" onClick={() => setNavMenu(false)} />
+          </LI>
+          {links.map((link, idx) => (
+            <LI onClick={link.onClick} key={idx}>
+              <Link href={link.location}>{link.text}</Link>
             </LI>
-            {links.map((link, idx) => (
-              <LI onClick={link.onClick} key={idx}>
-                <Link to={link.location}>{link.text}</Link>
-              </LI>
-            ))}
-            {/* {appStore.authData && ( this would make us load appStore right away..rethink
-              <>
-                <LI>
-                  <Link to="/my-dashboard">my_dashboard</Link>
-                </LI>
-                <LI>
-                  <Link to="/class">in_session!</Link>
-                </LI>
-              </>
-            )} */}
-            <li>
-              <Login />
-            </li>
-          </NavbarList>
-
-          <Hamburger
-            viewBox="0 0 100 80"
-            onClick={() => setNavMenu(true)}
-          >
+          ))}
+          <Login />
+        </NavbarList>
+        <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
             <rect width="100" height="20"></rect>
             <rect y="30" width="100" height="20"></rect>
             <rect y="60" width="100" height="20"></rect>
           </Hamburger>
-        </Header>
-      </Route>
-    </Switch>
+      </Header>
+    </>
   );
 };
 
 export default HeaderContainer;
+
+/**
+ 
+
+          {/* {appStore.authData && ( this would make us load appStore right away..rethink
+              <>
+                <LI>
+                  <Link href="/my-dashboard">my_dashboard</Link>
+                </LI>
+                <LI>
+                  <Link href="/class">in_session!</Link>
+                </LI>
+              </>
+            )} 
+            <li>
+
+        
+
+
+      </Header>
+
+ */

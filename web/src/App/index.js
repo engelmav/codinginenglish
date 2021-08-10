@@ -1,5 +1,4 @@
-import React, { Component, Suspense } from "react";
-import "./styles.css";
+import React, { Component } from "react";
 
 import styled from "styled-components";
 import { Flex } from "rebass";
@@ -36,14 +35,11 @@ class App extends Component {
     const { Header, Routes, Footer } = this.props;
     return (
       <ThemeProvider theme={theme}>
-        <Suspense fallback={<Spinner color="black" alignSelf="center" />}>
-          <GlobalStyle />
+        <GlobalStyle />
 
-            <RoutesBox>
-              <Routes />
-            </RoutesBox>
-
-        </Suspense>
+        <RoutesBox>
+          <Routes />
+        </RoutesBox>
       </ThemeProvider>
     );
   }

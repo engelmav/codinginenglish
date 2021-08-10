@@ -6,6 +6,7 @@ from typing import List
 import gevent
 from flask import Flask, jsonify, request
 from flask_sockets import Sockets
+from flask_cors import CORS
 from sqlalchemy import func
 
 from aula.aula import AulaDataService
@@ -25,6 +26,8 @@ import requests
 LOG = logging.getLogger(__name__)
 FRONTEND_LOG = logging.getLogger("web")
 app = Flask(__name__)
+CORS(app)
+
 sockets = Sockets(app)
 
 

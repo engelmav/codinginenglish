@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, boxy } from "../UtilComponents/Box";
 import { Card, CardTitle, Button } from "../UtilComponents";
 import { P, Title, H2 } from "../UtilComponents/Typography/Typography";
@@ -13,7 +13,6 @@ import { FaDownload } from "@react-icons/all-files/fa/FaDownload";
 import { BasicCourseForm } from "./BasicCourse";
 
 import ReactGA from "react-ga";
-
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -30,9 +29,19 @@ const DownloadAndApplyBox = styled.div`
   ${boxy}
 `;
 
-const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
-  useEffect(() => {setMilestone("Solicitud"); console.log("loaded NextSteps")}, []);
+const NextSteps = ({ Timeline, appStoreLazy, cieApi }) => {
+  const [appStore, setAppStore] = useState(null);
+  useEffect(() => {
+    async function init() {
+      const _appStore = await appStoreLazy.load();
+      _appStore.setMilestone("Solicitud");
+      setAppStore(_appStore);
+    }
+    init();
+  }, []);
   return (
+    <>
+    <Timeline milestone="Solicitud" />
     <Container
       display="flex"
       flexDirection="column"
@@ -62,8 +71,8 @@ const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
             Solicitud
           </Title>
           <P mt={3} width={[1 / 2, 1]}>
-          ¡Bienvenidos! Averíguate más sobre nuestro curso WebApp Development -
-            Basic y solicita una plaza.
+            ¡Bienvenidos! Averíguate más sobre nuestro curso WebApp Development
+            - Basic y solicita una plaza.
           </P>
         </Box>
       </Box>
@@ -80,18 +89,17 @@ const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
         >
           <P mr={3}>Descarga el currículo de WebApp Development - Basic</P>
           <Button
-            onClick={() =>
-              {
-                ReactGA.event({
-                  category: "application",
-                  action: "downloadCurriculum",
-                  label: "basicCurriculum"
-                });
-                saveAs(
+            onClick={() => {
+              ReactGA.event({
+                category: "application",
+                action: "downloadCurriculum",
+                label: "basicCurriculum",
+              });
+              saveAs(
                 "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/WebApp%20Development%20-%20Basic%20(ES).pdf",
                 "WebAppDevelopment_Basic_CIE_2021_Sep_20.pdf"
-              )}
-            }
+              );
+            }}
           >
             <FaDownload /> Descarga el currículo
           </Button>
@@ -105,6 +113,7 @@ const NextSteps = ({ appStoreLazy, cieApi, setMilestone }) => {
         </a>
       </P>
     </Container>
+    </>
   );
 };
 

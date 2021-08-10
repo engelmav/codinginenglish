@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { typography, space, border, fontSize } from "styled-system";
+import { boxy } from "../Box";
 import { font, fontColor, debugBorder } from "../sharedStyles";
 
 export const Title = styled.h1`
@@ -23,6 +24,7 @@ export const H2 = styled.h2`
 `;
 
 export const TitleH2 = styled.h2`
+  ${boxy}
   font-family: Andale Mono,AndaleMono,monospace;
   ${space}
   ${fontColor}

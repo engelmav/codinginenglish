@@ -1,9 +1,8 @@
 const {
   Service, ServicePort, PodTemplateSpec, Container
 } = require('kubernetes-models/v1');
-const {
-  Deployment, DeploymentSpec
-} = require('kubernetes-models/extensions/v1beta1');
+const  {Deployment}  = "kubernetes-models/api/apps/v1/Deployment";
+
 
 const argv = require('yargs')
   .usage('$0 [options]')
@@ -66,6 +65,7 @@ function createLoadBalancer(
 
 function createDeployment(params) {
   const { componentName, imageName, envVars, ports, secrets } = params;
+  console.log(Deployment)
   let deployment = new Deployment({
     metadata: {
       name: componentName

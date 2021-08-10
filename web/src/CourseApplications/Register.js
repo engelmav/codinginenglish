@@ -17,7 +17,7 @@ import { space } from "styled-system";
 import { FaEnvelope } from "@react-icons/all-files/fa/FaEnvelope";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
-import history from "../history";
+import Router from "next/router";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -41,13 +41,13 @@ const RegisterBtn = styled(Button)`
   }
 `;
 
+const GImage = styled.img`
+  padding-left: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  width: 2.8em;
+`;
 const GoogleBtn = styled.button`
-  img {
-    padding-left: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    width: 2.8em;
-  }
   width: 100%;
   padding: 0;
   margin: 0;
@@ -104,20 +104,19 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
+const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
-  const [appStore, setAppStore] = useState(null);
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
     async function init() {
-      const _appStore = await appStoreLazy.create();
       const _auth = await authLazy.create();
-      setAppStore(_appStore);
       setAuth(_auth);
+      const _appStore = await appStoreLazy.load();
+      _appStore.setMilestone("Regístrate");
     }
     init();
   }, []);
@@ -143,10 +142,10 @@ const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
       });
       return;
     }
-    appStore.flow = "newRegistration";
+    (await appStoreLazy.load()).flow = "newRegistration";
     handleSetEmailSubmitted();
   };
-  const handleSetEmailSubmitted = () => {
+  const handleSetEmailSubmitted = async () => {
     createRegisteredUser(email);
     ReactGA.event({
       category: "register",
@@ -166,128 +165,127 @@ const Register = ({ appStoreLazy, authLazy, cieApi, setMilestone }) => {
     // coding in english and a "way back in".
     auth.loginWithEmailLink(email);
     setIsSending(true);
-    setTimeout(function () {
+    (await appStoreLazy.load()).email = email;
+    setTimeout(async function () {
       setIsSending(false);
       setEmailSubmitted(true);
-      appStore.email = email;
-      history.push("/apply/next-steps");
+      Router.push("/apply/next-steps");
     }, 1500);
   };
-  useEffect(() => {
-    setMilestone("Regístrate");
-  }, []);
   return (
-    <SignInContainer className="signin-container">
-      <Title textAlign="center">Regístrate</Title>
-      <P p={3}>
-        Regístrate aquí para ver el currículo de WebApp Development - Basic y
-        solicitar una plaza.
-      </P>
-      <RegisterOptsCard p={4} mt={3} mb={3}>
-        <CardTitle fontSize={1} mb={3} textAlign="center">
-          registración
-        </CardTitle>
-        <CardContent>
-          <GoogleBtn
-            onClick={() => {
-              appStore.flow = "newRegistration";
-              const createRegisteredUserFromGoogleLogin = (auth0Result) => {
-                console.log("auth0Result", auth0Result);
-                debugger;
-                createRegisteredUser(email);
-              };
-              ReactGA.event({
-                category: "register",
-                action: "googleRegistration",
-                label: "googleRegistration",
-              });
-              auth.loginWithGoogle(
-                { isRegistration: true },
-                createRegisteredUserFromGoogleLogin
-              );
-            }}
-            class="google-btn"
-            id="google-btn"
-            type="button"
-          >
-            <img
-              height="90%"
-              class="google-icon"
-              src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
-            />
-            <p>Regístrate con Google</p>
-          </GoogleBtn>
-          <Divider mt={3} mb={3}>
-            o
-          </Divider>
-
-          {emailSubmitted ? (
-            <P>
-              Enviado! Por favor verifica tu correo electrónico (de{" "}
-              <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
-              para acceder al currículo y la solicitud. (No lo ves?{" "}
-              <Button
-                m={1}
-                onClick={() => {
-                  setEmailSubmitted(false);
-                }}
-              >
-                Intenta otra vez
-              </Button>
-              )
-            </P>
-          ) : (
-            <Box
-              as="form"
-              display="flex"
-              flexDirection="column"
-              onSubmit={handleSubmitEmail}
+    <>
+      <Timeline milestone="Regístrate" />
+      <SignInContainer className="signin-container">
+        <Title textAlign="center">Regístrate</Title>
+        <P p={3}>
+          Regístrate aquí para ver el currículo de WebApp Development - Basic y
+          solicitar una plaza.
+        </P>
+        <RegisterOptsCard p={4} mt={3} mb={3}>
+          <CardTitle fontSize={1} mb={3} textAlign="center">
+            registración
+          </CardTitle>
+          <CardContent>
+            <GoogleBtn
+              onClick={async () => {
+                const appStore = await appStoreLazy.load();
+                appStore.flow = "newRegistration";
+                const createRegisteredUserFromGoogleLogin = (auth0Result) => {
+                  debugger;
+                  createRegisteredUser(email);
+                };
+                ReactGA.event({
+                  category: "register",
+                  action: "googleRegistration",
+                  label: "googleRegistration",
+                });
+                auth.loginWithGoogle(
+                  { isRegistration: true },
+                  createRegisteredUserFromGoogleLogin
+                );
+              }}
+              type="button"
             >
-              <TextInput
-                autoComplete="email"
-                mb={2}
-                width="100%"
-                placeholder={"nombre@xyz.com"}
-                value={email}
-                onChange={(e) => {
-                  setInvalidEmail(false);
-                  setEmail(e.target.value);
-                }}
+              <GImage
+                height="90%"
+                className="google-icon"
+                src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
               />
-              {invalidEmail && (
-                <AlertMessage
-                  fontSize={1}
+              <p>Regístrate con Google</p>
+            </GoogleBtn>
+            <Divider mt={3} mb={3}>
+              o
+            </Divider>
+
+            {emailSubmitted ? (
+              <P>
+                Enviado! Por favor verifica tu correo electrónico (de{" "}
+                <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
+                para acceder al currículo y la solicitud. (No lo ves?{" "}
+                <Button
+                  m={1}
+                  onClick={() => {
+                    setEmailSubmitted(false);
+                  }}
+                >
+                  Intenta otra vez
+                </Button>
+                )
+              </P>
+            ) : (
+              <Box
+                as="form"
+                display="flex"
+                flexDirection="column"
+                onSubmit={handleSubmitEmail}
+              >
+                <TextInput
+                  autoComplete="email"
                   mb={2}
-                  p={1}
-                  text="La dirección de correo electrónico no es válido."
+                  width="100%"
+                  placeholder={"nombre@xyz.com"}
+                  value={email}
+                  onChange={(e) => {
+                    setInvalidEmail(false);
+                    setEmail(e.target.value);
+                  }}
                 />
-              )}
-              {!isSending && (
-                <RegisterBtn type="submit">
-                  <FaEnvelope size={20} />
-                  <P ml="24px"> Regístrate con Email</P>
-                </RegisterBtn>
-              )}
-              {isSending && (
-                <Box alignSelf="center">
-                  <Spinner color="black" alignSelf="center" />
-                </Box>
-              )}
-            </Box>
-          )}
-        </CardContent>
-      </RegisterOptsCard>
-      <P p={3}>
-        El proceso de matriculación de Coding in English consta de cuatro pasos:
-      </P>
-      <Ol p={0}>
-        <li>Registrarse para ver el plan de estudios</li>
-        <li>Rellenar la solicitud del curso</li>
-        <li>Entrevista con un instructor</li>
-        <li>Matrícula para el curso</li>
-      </Ol>
-      {/*  */}
-    </SignInContainer>
+                {invalidEmail && (
+                  <AlertMessage
+                    fontSize={1}
+                    mb={2}
+                    p={1}
+                    text="La dirección de correo electrónico no es válido."
+                  />
+                )}
+                {!isSending && (
+                  <RegisterBtn type="submit">
+                    <FaEnvelope size={20} />
+                    <P ml="24px"> Regístrate con Email</P>
+                  </RegisterBtn>
+                )}
+                {isSending && (
+                  <Box alignSelf="center">
+                    <Spinner color="black" alignSelf="center" />
+                  </Box>
+                )}
+              </Box>
+            )}
+          </CardContent>
+        </RegisterOptsCard>
+        <P p={3}>
+          El proceso de matriculación de Coding in English consta de cuatro
+          pasos:
+        </P>
+        <Ol p={0}>
+          <li>Registrarse para ver el plan de estudios</li>
+          <li>Rellenar la solicitud del curso</li>
+          <li>Entrevista con un instructor</li>
+          <li>Matrícula para el curso</li>
+        </Ol>
+        {/*  */}
+      </SignInContainer>
+    </>
   );
 };
 

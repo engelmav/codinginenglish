@@ -1,8 +1,9 @@
 import styled, { css } from "styled-components";
 import { space, flexbox } from "styled-system";
 import { font, fontMonospace, cieOrange } from "../sharedStyles";
-import { Link } from "react-router-dom";
-import { boxy } from "../Box"
+import { boxy } from "../Box";
+import Link from "next/link";
+import React from "react";
 
 const commonStyles = css`
   ${font}
@@ -55,23 +56,58 @@ export const LinkButton = styled.a`
   }
 `;
 
+// const RegisterLinkStyle = styled.div`
+// export const RegisterLink = styled(Link)`
+//   ${boxy}
+//   text-align: center;
+//   padding: 10px;
+//   color: white;
+//   border-radius: 2px;
+//   background-color: ${cieOrange};
+//   ${fontMonospace}
 
-export const RegisterLink = styled(Link)`
+//   color: white;
+//   text-decoration: none;
+
+//   &:hover:enabled {
+//     color: rgba(255, 255, 255, 1);
+//     box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
+//   }
+// `;
+
+const StyledLink = styled.a`
   ${boxy}
-  text-decoration: none;
   text-align: center;
-  padding: 10px;
   color: white;
   border-radius: 2px;
-  background: ${cieOrange};
+  background-color: ${cieOrange};
   ${fontMonospace}
-  a {
-    color: ${cieOrange};
-  }
+
+  color: white;
+  text-decoration: none;
+
   &:hover:enabled {
     color: rgba(255, 255, 255, 1);
     box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
   }
 `;
+
+export const RegisterLink = (props) => {
+  const { children, href, ...otherProps } = props;
+  return (
+    <Link href={href} passHref>
+      <StyledLink {...otherProps}>{children}</StyledLink>
+    </Link>
+  );
+};
+// export const RegisterLink = ({ children, href }) => {
+//   return (
+//     <RegisterLinkStyle >
+//       <Link href={href}>{children}</Link>
+//     </RegisterLinkStyle>
+//   );
+// };
+
+export const NextRegisterLink = styled(Link);
 
 export { Button };

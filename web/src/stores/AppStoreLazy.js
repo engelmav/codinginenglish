@@ -1,12 +1,11 @@
 class AppStoreLazy {
-  constructor(){
+  constructor() {
     this.appStoreSingleton = null;
   }
-  create = async (appStoreName = "default") => {
+  load = async (appStoreName = "default") => {
     if (this.appStoreSingleton) return this.appStoreSingleton;
-    console.log("lazy importing mobx")
     console.trace();
-    const { action, configure, makeAutoObservable } = await import(/* webpackChunkName: "mobx" */ "mobx");
+    const { action, configure, makeAutoObservable } = await import("mobx");
     const {
       clearPersist,
       isSynchronized,
@@ -31,6 +30,7 @@ class AppStoreLazy {
       userRole = null;
       userLocation = null;
       flow = null;
+      milestone = null;
       firstName = null;
       lastName = null;
       email = null;
@@ -80,6 +80,10 @@ class AppStoreLazy {
       setSessionInProgress(isInProgress) {
         this.sessionInProgress = isInProgress;
       }
+      setMilestone(milestone) {
+        console.log("setting milestone to", milestone)
+        this.milestone = milestone;
+      }
       clearStore() {
         clearPersist(this);
       }
@@ -97,41 +101,43 @@ class AppStoreLazy {
         return isSynchronized(this);
       }
     }
-    this.appStoreSingleton = persistence({
-      name: `AppStore.${appStoreName}`,
-      properties: [
-        "activeSessionId",
-        "isAuthenticated",
-        "loginExpiresAt",
-        "authData",
-        "userId",
-        "userRole",
-        "firstName",
-        "flow",
-        "email",
-        "registeredSessions",
-        "sessionInProgress",
-        "rocketchatAuthToken",
-      ],
-      adapter: new StorageAdapter({
-        read: async (name) => {
-          const data = window.localStorage.getItem(name);
-          return data ? JSON.parse(data) : undefined;
-        },
-        write: async (name, content) => {
-          console.log(name, content);
-
-          window.localStorage.setItem(name, JSON.stringify(content));
-        },
-      }),
-      reactionOptions: {
-        // optional
-        delay: 200,
-      },
-    })(new AppStore());
+    this.appStoreSingleton = SERVER_MODE
+      ? new AppStore()
+      : persistence({
+          name: `AppStore.${appStoreName}`,
+          properties: [
+            "activeSessionId",
+            "isAuthenticated",
+            "loginExpiresAt",
+            "authData",
+            "userId",
+            "userRole",
+            "firstName",
+            "flow",
+            "milestone",
+            "email",
+            "registeredSessions",
+            "sessionInProgress",
+            "rocketchatAuthToken",
+          ],
+          adapter: new StorageAdapter({
+            read: async (name) => {
+              const data = window.localStorage.getItem(name);
+              return data ? JSON.parse(data) : undefined;
+            },
+            write: async (name, content) => {
+              console.log(name, content);
+              window.localStorage.setItem(name, JSON.stringify(content));
+            },
+          }),
+          reactionOptions: {
+            // optional
+            delay: 200,
+          },
+        })(new AppStore());
     return this.appStoreSingleton;
   };
 }
 
 const appStoreLazy = new AppStoreLazy();
-export { appStoreLazy };
+export default appStoreLazy;

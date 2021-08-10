@@ -53,10 +53,17 @@ const ButtonDiv = styled.div`
 `;
 export const ClearableTextInput = (props) => {
   useEffect(() => {}, [props.value]);
-  const { id, name, onChange, onClear, value } = props;
+  const { id, name, onChange, value } = props;
+  const { onClear, ...remainingProps } = props; // don't pass onClear to text field
   return (
     <ButtonDiv>
-      <TextInput id={id} name={name} value={value || ""} {...props} onChange={onChange} />
+      <TextInput
+        id={id}
+        name={name}
+        value={value || ""}
+        {...remainingProps}
+        onChange={onChange}
+      />
       <div onClick={onClear}>
         <FaTimesCircle />
       </div>

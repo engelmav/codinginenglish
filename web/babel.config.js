@@ -1,8 +1,8 @@
 module.exports = function (api) {
-  console.log("******************* executing in babel.config.js")
   api.cache(true);
   return {
     presets: [
+      "next/babel",
       "@babel/preset-react",
       [
         "@babel/preset-env",
@@ -15,7 +15,7 @@ module.exports = function (api) {
     ],
     plugins: [
       "lodash",
-      "babel-plugin-styled-components",
+      ["babel-plugin-styled-components", { "ssr": true }],
       "@babel/plugin-transform-runtime",
       [
         "@babel/plugin-proposal-decorators",

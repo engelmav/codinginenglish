@@ -12,7 +12,7 @@ import {
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
-import { fontFamily, cieOrange } from "../UtilComponents/sharedStyles";
+import { fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 
 const trackingId = "UA-199972795-1";
@@ -84,22 +84,22 @@ const setupFormik = (appStore) => {
 };
 
 export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
+  const [appStore, setAppStore] = useState(null);
   const [appComplete, setAppComplete] = useState(false);
-  const [appStore, setAppStore] = useState(null)
   const [formikData, setFormikData] = useState(false);
 
   useEffect(() => {
     async function init() {
-      const _appStore = await appStoreLazy.create();
+      const _appStore = await appStoreLazy.load();
       setAppStore(_appStore);
       try {
         const resp = await cieApi.getUserLocation();
         const locationData = resp.data;
         const { city, country_name } = locationData;
         if (!!city && !!country_name)
-        appStore.userLocation = `${city}, ${country_name}`;
+          _appStore.userLocation = `${city}, ${country_name}`;
       } catch {
-        console.log("Unable to get location.")
+        console.log("Unable to get location.");
       }
       const _formikData = setupFormik(_appStore);
       setFormikData(_formikData);
@@ -149,7 +149,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
 
                     if (field.fieldType === "shortAnswer") {
                       fieldJsx = (
-                        <>
+                        <div key={idx}>
                           <FieldLabel htmlFor={field.title} key={idx}>
                             {field.title}
                           </FieldLabel>
@@ -167,9 +167,9 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             onChange={(e) => {
                               handleChange(e);
                             }}
-                            value={values[field.fieldName]}
+                            value={values[field.fieldName] || ""}
                           />
-                        </>
+                        </div>
                       );
                     }
                     if (field.fieldType === "email") {
@@ -189,7 +189,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                               });
                             }}
                             onChange={handleChange}
-                            value={values[fieldName]}
+                            value={values[fieldName] || ""}
                           />
                         </>
                       );
@@ -249,7 +249,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                               });
                             }}
                             onChange={handleChange}
-                            value={values[fieldName]}
+                            value={values[fieldName] || ""}
                           />
                         </>
                       );
@@ -280,7 +280,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                         console.log(e);
                         handleChange(e);
                       }}
-                      value={values["location"] || appStore.userLocation}
+                      value={values["location"] || appStore.userLocation || ""}
                       onClear={() => {
                         setFieldValue("location", " ", false);
                       }}

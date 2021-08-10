@@ -55,7 +55,6 @@ export function readSocketDataAnd(doSomething, event) {
       let eventData;
       try {
         eventData = JSON.parse(reader.result);
-        console.log(eventData);
         doSomething(eventData);
       } catch (ex) {
         console.error("Failed to parse websocket event data.", ex.stack);
@@ -79,7 +78,6 @@ class ReadAndDo {
         let eventData;
         try {
           eventData = JSON.parse(reader.result);
-          console.log(eventData);
         } catch (ex) {
           console.error("Failed to parse websocket event data.", ex.stack);
           console.log("Original websocket event received was:", event.data);

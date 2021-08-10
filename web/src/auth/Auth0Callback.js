@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { ContentSection, Main } from "../UtilComponents";
 import styled from "styled-components";
-import history from "../history";
+import Router from "next/router";
 
 const CallbackContent = styled(ContentSection)`
   align-items: center;
 `;
 
-const Callback = ({authLazy}) => {
+const Callback = ({ authLazy }) => {
   const [error, setError] = useState(null);
   useEffect(() => {
     async function init() {
       const auth = await authLazy.create();
-      auth.checkRoute(history.location);
+      auth.checkRoute(Router.router.asPath);
       const url = new URL(document.location.href.replace(/#/g, "?"));
       const authError = url.searchParams.get("error_description");
       if (authError) {
