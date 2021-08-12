@@ -13,6 +13,10 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/nickname: "cie-ingress"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($host = 'codinginenglish.com' ) {
+        rewrite ^ https://www.codinginenglish.com$request_uri permanent;
+      }
 spec:
   tls:
   - hosts:

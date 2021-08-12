@@ -1,9 +1,6 @@
-/* global __ENVIRONMENT__, __DEV_SERVER__ */
-
-
 const settings = {
   production: {
-    auth0Redirect:     "https://dev-site.codinginenglish.com/callback",
+    auth0Redirect:     "https://www.codinginenglish.com/callback",
     cieApiUrl:         (SERVER_MODE) ? "http://cie-api": "/",
     cmsUrl:            "https://content.codinginenglish.com",
     guacUrl:           "https://remote.codinginenglish.com/guacamole",
