@@ -44,7 +44,7 @@
     "mobx-react": "^7.2.0",
     "nanoid": "^3.1.23",
     "navigator": "^1.0.1",
-    "next": "^11.0.1",
+    "next": "^11.1.0",
     "next-http-proxy-middleware": "^1.0.10",
     "npm": "^7.20.0",
     "pnp-webpack-plugin": "1.2.1",
