@@ -15,6 +15,16 @@ Title.defaultProps = {
 
 }
 
+export const TitleH1 = styled.h1`
+  font-family: Andale Mono,AndaleMono,monospace;
+  ${space}
+  ${fontColor}
+  ${typography}
+`;
+TitleH1.defaultProps = {
+
+}
+
 export const H2 = styled.h2`
   font-family: Andale Mono,AndaleMono,monospace;
   ${space}
