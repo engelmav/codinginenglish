@@ -13,6 +13,7 @@ import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import ReactGA from "react-ga";
 import settings from "../settings";
 import Login from "../Login/Login";
+import Router from "next/router";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -160,6 +161,7 @@ const HeaderContainer = (props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [inApplyRoute, setInApplyRoute] = useState(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -169,6 +171,9 @@ const HeaderContainer = (props) => {
   };
 
   useEffect(() => {
+    if (Router.pathname.includes("/apply")){
+      setInApplyRoute(true);
+    }
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
     // Unbind listener on cleanup.
     return () =>
@@ -187,7 +192,7 @@ const HeaderContainer = (props) => {
 
   return (
     <>
-      {bannerOpen && (
+      {bannerOpen && !inApplyRoute && (
         <Banner>
           <P>
             Se ha abierto la matrícula del curso{" "}
@@ -204,7 +209,7 @@ const HeaderContainer = (props) => {
                 setBannerOpen(false);
               }}
             >
-              solicita una plaza
+              ¡regístrate ahora!
             </ApplyButton>
           </Link>
           <CloseBanner size="25" onClick={() => setBannerOpen(false)} />

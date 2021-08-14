@@ -30,14 +30,14 @@ const TimelineStyle = styled(Box)`
     width: 25%;
     position: relative;
     text-align: center;
-    text-transform: uppercase;
+
+    font-family: "Roboto Mono";
   }
 
   ul {
     padding: 0;
-    /* font-family: ${fontFamily}; */
-    font-family: "Roboto";
-    font-weight: 700;
+    font-family: "Roboto Mono";
+    font-weight: 550;
   }
 
   ul:nth-child(1) {

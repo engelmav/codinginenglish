@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { whenSmallScreen, darkGray, lightGray } from "../sharedStyles";
 import { Box, boxy } from "../Box";
-import { P } from "../Typography/Typography";
+import { typography } from 'styled-system'
 
 export const Card = styled.div`
   ${boxy}
@@ -10,11 +10,17 @@ export const Card = styled.div`
   background-color: ${lightGray};
 `;
 
-export const CardTitle = styled(P)`
+export const CardTitle = styled.h1`
+  ${boxy}
   text-transform: uppercase;
   font-weight: 800;
   color: ${darkGray};
+  ${typography}
 `;
+
+CardTitle.defaultProps = {
+  fontFamily: "Roboto Mono"
+}
 
 export const CardContent = styled.div`
   ${boxy}

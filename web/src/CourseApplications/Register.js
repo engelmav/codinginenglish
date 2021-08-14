@@ -6,6 +6,7 @@ import {
   Button,
   Main,
   Box,
+  boxy,
   Title,
   Card,
   CardTitle,
@@ -48,9 +49,8 @@ const GImage = styled.img`
   width: 2.8em;
 `;
 const GoogleBtn = styled.button`
+  ${boxy}
   width: 100%;
-  padding: 0;
-  margin: 0;
   border-width: 0px;
   color: white;
   background: #4285f4;
@@ -92,6 +92,7 @@ const Divider = styled(P)`
 `;
 
 const RegisterOptsCard = styled(Card)`
+  ${boxy}
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -176,17 +177,13 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
     <>
       <Timeline milestone="Regístrate" />
       <SignInContainer className="signin-container">
-        <Title textAlign="center">Regístrate</Title>
-        <P p={3}>
-          Regístrate aquí para ver el currículo de WebApp Development - Basic y
-          solicitar una plaza.
-        </P>
-        <RegisterOptsCard p={4} mt={3} mb={3}>
+        <RegisterOptsCard p={3} mt={2} mb={2}>
           <CardTitle fontSize={1} mb={3} textAlign="center">
-            registración
+            WebApp Development - Basic
           </CardTitle>
           <CardContent>
             <GoogleBtn
+              p={[1, null, 0]}
               onClick={async () => {
                 const appStore = await appStoreLazy.load();
                 appStore.flow = "newRegistration";
@@ -213,7 +210,7 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
               />
               <p>Regístrate con Google</p>
             </GoogleBtn>
-            <Divider mt={3} mb={3}>
+            <Divider mt={2} mb={2}>
               o
             </Divider>
 
