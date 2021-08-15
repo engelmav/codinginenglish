@@ -16,7 +16,8 @@ const BlockQuote = styled.blockquote`
     background: #f9f9f9;
     border-left: 10px solid #ccc;
     margin: 1.5em 10px;
-    padding: 0.5em 10px;
+    margin-top:0px;
+    padding: 30px;
     margin-bottom: 0;
     font-size: clamp(1rem, 1.25vw, 1.25rem);
   }
