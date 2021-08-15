@@ -21,7 +21,7 @@ export const TitleH1 = styled.h1`
 
   font-family: Andale Mono,AndaleMono,monospace;
   font-size: 50px;
-  margin: 32px 0 30px 0;
+  margin: 35px 0;
 `;
 
 export const H2 = styled.h2`
@@ -54,6 +54,7 @@ export const P = styled.p`
   ${typography}
   ${border}
 
+  line-height: 1.5em;
   hyphens: auto;
 `;
 

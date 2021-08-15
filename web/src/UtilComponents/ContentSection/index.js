@@ -9,6 +9,15 @@ const ContentSection = styled.article`
   ${font}
   ${space}
   ${typography}
+  font-family: Andale Mono, AndaleMono, monospace;
+  margin: 35px 0 0 0;
+
+  h2 {
+    padding-bottom:15px;
+  }
+  p{
+    padding-bottom:10px;
+  }
 `;
 
 
