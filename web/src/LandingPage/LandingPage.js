@@ -54,9 +54,13 @@ const MainLanding = styled(Main)`
     }
     p.sub-heading {
       font-size:20px;
+      padding-bottom:0px;
     }
     img {
       width: 35%;
+    }
+    article{
+      margin-bottom:30px;
     }
   }
 
