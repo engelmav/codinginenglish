@@ -27,7 +27,7 @@ const AboutUs = () => {
         </P>
       </ContentSection>
 
-      <ContentSection mt={40}>
+      <ContentSection mt={4}>
         <TitleH2>Instructors</TitleH2>
         <P>
           The first instructor at Coding in English,{" "}

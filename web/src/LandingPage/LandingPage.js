@@ -64,29 +64,23 @@ const MainLanding = styled(Main)`
   }
 `;
 
-
 const LandingPage = (props) => {
   const { settings } = props;
   return (
     <MainLanding p={1}>
-      <ContentSection
-        display="flex"
-        flexDirection="column"
-        textAlign="center"
-
-      >
+      <ContentSection display="flex" flexDirection="column" textAlign="center">
         <TitleH1>Únete a la economía global</TitleH1>
         <P className="sub-heading">
           Tu clase de inglés se ha convertido en un grupo de ingenieros de
           software.
         </P>
       </ContentSection>
-      {/* small: 3 keeps the next H1 "above the fold" */}
-      <ContentSection mt={{default: 5, small: 3}}>
+      {/*the smallest, 1, keeps the next h1 "above the fold" */}
+      <ContentSection mt={[1, 5, 5, 5]}>
         <AutoScaleImage
           mt={3}
           mb={3}
-          width={{small: 100}}
+          width={{ small: 100 }}
           alignSelf="center"
           loading="lazy"
           alt="Speak English, Build Apps"
@@ -106,7 +100,7 @@ const LandingPage = (props) => {
         </P>
       </ContentSection>
 
-      <ContentSection  mt={5}>
+      <ContentSection mt={5}>
         <AutoScaleImage
           className="wide-image"
           mt={3}
@@ -130,7 +124,7 @@ const LandingPage = (props) => {
         </RegisterLink>
       </ContentSection>
 
-      <ContentSection  mt={5}>
+      <ContentSection mt={5}>
         <AutoScaleImage
           alignSelf="center"
           mt={4}
@@ -148,7 +142,7 @@ const LandingPage = (props) => {
         </P>
       </ContentSection>
 
-      <ContentSection  mt={5}>
+      <ContentSection mt={5}>
         <AutoScaleImage
           mt={4}
           mb={3}
