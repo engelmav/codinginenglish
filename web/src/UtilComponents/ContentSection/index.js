@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { font } from '../sharedStyles';
-import { space, flex } from "styled-system";
+import { typography, space, flex } from "styled-system";
 
 
 const ContentSection = styled.article`
@@ -8,6 +8,7 @@ const ContentSection = styled.article`
   flex-direction: column;
   ${font}
   ${space}
+  ${typography}
 `;
 
 
