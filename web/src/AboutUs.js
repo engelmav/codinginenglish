@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  AutoScaleImage,
   Main,
   ContentSection
 } from "./UtilComponents";
@@ -9,8 +8,9 @@ import {
   TitleH2,
   P
 } from "./UtilComponents/Typography/Typography";
-//import { Main } from "./UtilComponents/Main";
 import BlockQuote from "./UtilComponents/BlockQuote";
+
+const topMargin = 4;
 
 const AboutUs = () => {
   return (
@@ -27,7 +27,7 @@ const AboutUs = () => {
         </P>
       </ContentSection>
 
-      <ContentSection>
+      <ContentSection mt={40}>
         <TitleH2>Instructors</TitleH2>
         <P>
           The first instructor at Coding in English,{" "}
@@ -42,7 +42,7 @@ const AboutUs = () => {
         </P>
       </ContentSection>
 
-      <ContentSection>
+      <ContentSection mt={topMargin}>
         <TitleH2>Design</TitleH2>
         <P>
           Coding in English consults with{" "}
@@ -53,7 +53,7 @@ const AboutUs = () => {
         </P>
       </ContentSection>
 
-      <ContentSection>
+      <ContentSection mt={topMargin}>
         <TitleH2>Editing & Translation</TitleH2>
         <P>
           We continue to work with{" "}
@@ -65,7 +65,7 @@ const AboutUs = () => {
         </P>
       </ContentSection>
 
-      <ContentSection>
+      <ContentSection mt={topMargin}>
         <TitleH2>Marketing & Quality Assurance</TitleH2>
         <P>
           And last but definitely not least, we continue to work with{" "}

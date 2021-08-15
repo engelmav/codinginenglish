@@ -73,6 +73,7 @@ const GoogleBtn = styled.button`
 
 const Divider = styled(P)`
   ${space}
+  font-family: "Roboto Mono";
   display: flex;
   align-items: center;
   &:before {
@@ -261,7 +262,7 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
                 {!isSending && (
                   <RegisterBtn type="submit">
                     <FaEnvelope size={20} />
-                    <P ml="24px"> Regístrate con Email</P>
+                    <P mb={0} ml="24px"> Regístrate con Email</P>
                   </RegisterBtn>
                 )}
                 {isSending && (
