@@ -5,27 +5,21 @@ import {
   ContentSection,
   RegisterLink,
 } from "../UtilComponents";
-import {
-  Title,
-  TitleH1,
-  H2,
-  P
-} from "../UtilComponents/Typography/Typography";
+import { TitleH1, H2, P } from "../UtilComponents/Typography/Typography";
 import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
-import { Box } from "../UtilComponents/Box";
 import { darkGray, debugBorder } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
 
 const MainLanding = styled(Main)`
   ${debugBorder}
-
   width: min(90%, 850px);
-  margin-bottom:50px;
+  margin-bottom: 50px;
   display: flex;
   flex-direction: column;
 
-  p, blockquote {
+  p,
+  blockquote {
     margin-left: auto;
     margin-right: auto;
     max-width: 700px;
@@ -42,25 +36,22 @@ const MainLanding = styled(Main)`
   }
 
   p.sub-heading {
-    font-size:25px;
+    font-size: 25px;
   }
 
   @media (max-width: 700px) {
-    h1{
-      font-size:35px;
+    h1 {
+      font-size: 35px;
     }
     h2 {
-      font-size:30px;
+      font-size: 30px;
     }
     p.sub-heading {
-      font-size:20px;
-      padding-bottom:0px;
+      font-size: 20px;
+      padding-bottom: 0px;
     }
     img {
       width: 35%;
-    }
-    article{
-      margin-bottom:30px;
     }
   }
 
@@ -73,52 +64,23 @@ const MainLanding = styled(Main)`
   }
 `;
 
-const ContentSectionLanding = styled(ContentSection)`
-  //line-height: 1.5em;
-  margin-bottom: 75px;
-  p {
-    padding-bottom:10px;
-  }
-`;
-
-const I = styled.p`
-  font-style: italic;
-`;
-
-const TaglineTitle = styled.h1`
-  ${whenSmallScreen`
-    font-size: 1.25rem;`}
-  font-family: Andale Mono, AndaleMono, monospace;
-  color: ${darkGray};
-  font-weight: bolder;
-  text-align: center;
-  padding: 0;
-  margin: 0;
-`;
-
-const SectionTitle = styled(Title)`
-  ${debugBorder}
-  text-align: center;
-  color: ${darkGray};
-`;
-
 const LandingPage = (props) => {
   const { settings } = props;
   return (
     <MainLanding p={1}>
-      <ContentSectionLanding display="flex" flexDirection="column" textAlign='center'>
-        <TitleH1>
-          Únete a la economía global
-        </TitleH1>
+      <ContentSection display="flex" flexDirection="column" textAlign="center">
+        <TitleH1>Únete a la economía global</TitleH1>
         <P className="sub-heading">
-          Tu clase de inglés se ha convertido en un grupo de ingenieros de software.
+          Tu clase de inglés se ha convertido en un grupo de ingenieros de
+          software.
         </P>
-      </ContentSectionLanding>
-
-      <ContentSectionLanding>
+      </ContentSection>
+      {/*the smallest, 1, keeps the next h1 "above the fold" */}
+      <ContentSection mt={[1, 5, 5, 5]}>
         <AutoScaleImage
           mt={3}
           mb={3}
+          width={{ small: 100 }}
           alignSelf="center"
           loading="lazy"
           alt="Speak English, Build Apps"
@@ -126,21 +88,19 @@ const LandingPage = (props) => {
           //sizes="(min-width: 600px) 692px, 320px"
           src={`${props.settings.edgeAssets}/home/3-tech-692w.webp`}
         />
-        <H2>
-          Habla inglés, crea aplicaciones
-        </H2>
+        <H2>Habla inglés, crea aplicaciones</H2>
         <P>
           Prácticas de conversación en cada clase, especialmente sobre
-          ingeniería de software. Los temas comprenden trabajar con gerentes de producto, compañeros,
-          clientes, realizar revisiones de código, hacer preguntas en foros,
-          leer documentación y mucho más.
+          ingeniería de software. Los temas comprenden trabajar con gerentes de
+          producto, compañeros, clientes, realizar revisiones de código, hacer
+          preguntas en foros, leer documentación y mucho más.
         </P>
-        <p style={{ fontStyle: "italic" }}>
+        <P style={{ fontStyle: "italic" }}>
           Y crear software real en el proceso.
-        </p>
-      </ContentSectionLanding>
+        </P>
+      </ContentSection>
 
-      <ContentSectionLanding>
+      <ContentSection mt={5}>
         <AutoScaleImage
           className="wide-image"
           mt={3}
@@ -149,14 +109,9 @@ const LandingPage = (props) => {
           alt={"Software Stack"}
           srcSet={`${props.settings.assets}/home/3-tech-320w.webp 320w, ${props.settings.assets}/home/3-tech-692w.webp 1920w`}
           src={`${props.settings.assets}/home/3-tech-692w.webp`}
-          // sizes="(min-width: 600px) 692px, 320px"
         />
-        <H2>
-          Crea tu cartera de proyectos
-        </H2>
-        <P>
-          Crea tu cartera de proyectos sobre la marcha.
-        </P>
+        <H2>Crea tu cartera de proyectos</H2>
+        <P textAlign="center">Crea tu cartera de proyectos sobre la marcha.</P>
         <P>
           Todo el trabajo realizado en clase es tuyo y puedes exponerlo en tu
           cartera de proyectos de la aplicación web. Presume ante empleadores
@@ -165,11 +120,11 @@ const LandingPage = (props) => {
           implementada.
         </P>
         <RegisterLink mt={3} py={2} px={4} alignSelf="center" href="/apply">
-          Solicita una plaza aquí
+          Regístrate aquí
         </RegisterLink>
-      </ContentSectionLanding>
+      </ContentSection>
 
-      <ContentSectionLanding>
+      <ContentSection mt={5}>
         <AutoScaleImage
           alignSelf="center"
           mt={4}
@@ -180,16 +135,14 @@ const LandingPage = (props) => {
           //sizes="(min-width: 600px) 692px, 320px"
           src={`${settings.assets}/home/dictionary.png`}
         />
-        <H2>
-          Aprende vocabulario y gramática en un contexto real
-        </H2>
+        <H2>Aprende vocabulario y gramática en un contexto real</H2>
         <P>
           Todos nuestros cursos están complementados con prácticas de gramática
           y vocabulario integradas en las clases técnicas.
         </P>
-      </ContentSectionLanding>
+      </ContentSection>
 
-      <ContentSectionLanding>
+      <ContentSection mt={5}>
         <AutoScaleImage
           mt={4}
           mb={3}
@@ -200,9 +153,7 @@ const LandingPage = (props) => {
           src={`${settings.assets}/home/meeting.png`}
           //sizes="(min-width: 600px) 692px, 320px"
         />
-        <H2>
-          Estudia en un entorno de aprendizaje en vivo
-        </H2>
+        <H2>Estudia en un entorno de aprendizaje en vivo</H2>
         <P>
           Como muchas clases han pasado a ser en línea, muchos estudiantes se
           han visto obligados a aprender en soledad. Nosotros traemos la
@@ -223,7 +174,7 @@ const LandingPage = (props) => {
           debate (aunque también tendremos de esos). ¡Si te pierdes, dilo! Deja
           que un instructor paciente y experto te ayude. ¡No estás solo en esto!
         </P>
-      </ContentSectionLanding>
+      </ContentSection>
 
       <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
         <P>
