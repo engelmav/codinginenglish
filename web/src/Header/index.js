@@ -7,6 +7,7 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
+import { boxy } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
@@ -37,7 +38,6 @@ const CloseBox = styled(FaRegWindowClose)`
       display: block;`}
 `;
 const Hamburger = styled.svg`
-
   height: 20px;
   width: 20px;
   display: none;
@@ -102,14 +102,12 @@ const NavbarList = styled.ul`
 `;
 
 const Banner = styled.div`
+  ${boxy}
   margin: 0;
   background: yellow;
   display: flex;
-  padding: 1px;
   justify-content: center;
   align-items: center;
-  padding-left: 6px;
-  padding-right: 6px;
   ${whenSmallScreen`
       font-size: 12px;
       padding-left: 3px;
@@ -171,7 +169,7 @@ const HeaderContainer = (props) => {
   };
 
   useEffect(() => {
-    if (Router.pathname.includes("/apply")){
+    if (Router.pathname.includes("/apply")) {
       setInApplyRoute(true);
     }
     document.addEventListener("mousedown", detectBackgroundClickAndCloseNav);
@@ -190,13 +188,29 @@ const HeaderContainer = (props) => {
     { text: "TÉCNICA", location: "/technique", ...hideNav },
   ];
 
+  function treatAsUTC(date) {
+    var result = new Date(date);
+    result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+    return result;
+  }
+
+  function daysBetween(startDate, endDate) {
+    var millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return Math.floor(
+      (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
+    );
+  }
+
   return (
     <>
       {bannerOpen && !inApplyRoute && (
-        <Banner>
-          <P>
-            Se ha abierto la matrícula del curso{" "}
-            <i>WebApp Development - Basic</i>
+        <Banner p={[1, 2, 2, 2]}>
+          <P mb={0}>
+            El curso <i>WebApp Development - Basic</i>
+            {` empieza en ${daysBetween(
+              new Date(),
+              new Date("9/20/2021 12:00 AM")
+            )} días.`}
           </P>
           <Link href="/apply">
             <ApplyButton
@@ -209,7 +223,7 @@ const HeaderContainer = (props) => {
                 setBannerOpen(false);
               }}
             >
-              ¡regístrate ahora!
+              ¡Inscríbete ahora!
             </ApplyButton>
           </Link>
           <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
@@ -237,10 +251,10 @@ const HeaderContainer = (props) => {
           <Login />
         </NavbarList>
         <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
-            <rect width="100" height="20"></rect>
-            <rect y="30" width="100" height="20"></rect>
-            <rect y="60" width="100" height="20"></rect>
-          </Hamburger>
+          <rect width="100" height="20"></rect>
+          <rect y="30" width="100" height="20"></rect>
+          <rect y="60" width="100" height="20"></rect>
+        </Hamburger>
       </Header>
     </>
   );

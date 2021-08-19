@@ -118,7 +118,7 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
       const _auth = await authLazy.create();
       setAuth(_auth);
       const _appStore = await appStoreLazy.load();
-      _appStore.setMilestone("Regístrate");
+      _appStore.setMilestone("Inscripción");
     }
     init();
   }, []);
@@ -176,12 +176,13 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
   };
   return (
     <>
-      <Timeline milestone="Regístrate" />
+      <Timeline milestone="Inscripción" />
       <SignInContainer className="signin-container">
         <RegisterOptsCard p={3} mt={2} mb={2}>
           <CardTitle fontSize={1} mb={3} textAlign="center">
             WebApp Development - Basic
           </CardTitle>
+          <P mb={3} textAlign="center">Inscríbete para ver el currículo y solicitar una plaza en el curso.</P>
           <CardContent>
             <GoogleBtn
               p={[1, null, 0]}
@@ -209,7 +210,7 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
                 className="google-icon"
                 src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
               />
-              <p>Regístrate con Google</p>
+              <p>Inscríbete con Google</p>
             </GoogleBtn>
             <Divider mt={2} mb={2}>
               o
@@ -259,7 +260,7 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
                 {!isSending && (
                   <RegisterBtn type="submit">
                     <FaEnvelope size={20} />
-                    <P mb={0} ml="24px"> Regístrate con Email</P>
+                    <P mb={0} ml="24px"> Inscríbete con Email</P>
                   </RegisterBtn>
                 )}
                 {isSending && (

@@ -8,6 +8,7 @@ const fontColor = css`
   color: #373737;
 `;
 
+export const ctaBlue = "#0095FF";
 export const lightGray = "#f6f6f6";
 
 export const darkGray = "#3d3636";
@@ -20,7 +21,7 @@ const font = css`
 `;
 
 export const fontMonospace = css`
-  font-family: Andale Mono, AndaleMono, monospace;
+  font-family: Roboto Mono, monospace;
 `;
 
 const orangeBgColor = css`

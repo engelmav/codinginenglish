@@ -120,7 +120,7 @@ const Gradient = styled.div`
   `}
 `;
 
-const milestones = ["Regístrate", "Solicitud", "Entrevista", "Matrícula"];
+const milestones = ["Inscripción", "Solicitud", "Entrevista", "Matrícula"];
 
 export const Timeline = ({ milestone }) => {
   return (

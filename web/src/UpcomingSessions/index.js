@@ -16,7 +16,7 @@ const UpcomingSessions = observer((props) => {
   const { cieModules } = props;
   return (
     <Main p={20}>
-      <ContentSection>
+      <ContentSection display="flex" flexDirection="column" textAlign="center">
         <TitleH1 textAlign="center">Upcoming Sessions</TitleH1>
       </ContentSection>
 
