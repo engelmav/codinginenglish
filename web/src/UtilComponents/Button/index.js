@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { space, flexbox } from "styled-system";
-import { font, fontMonospace, cieOrange } from "../sharedStyles";
+import { font, fontMonospace, cieOrange, ctaBlue } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
 import React from "react";
@@ -56,35 +56,18 @@ export const LinkButton = styled.a`
   }
 `;
 
-// const RegisterLinkStyle = styled.div`
-// export const RegisterLink = styled(Link)`
-//   ${boxy}
-//   text-align: center;
-//   padding: 10px;
-//   color: white;
-//   border-radius: 2px;
-//   background-color: ${cieOrange};
-//   ${fontMonospace}
 
-//   color: white;
-//   text-decoration: none;
-
-//   &:hover:enabled {
-//     color: rgba(255, 255, 255, 1);
-//     box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
-//   }
-// `;
 
 const StyledLink = styled.a`
   ${boxy}
   text-align: center;
   color: white;
-  border-radius: 2px;
-  background-color: ${cieOrange};
+  font-weight: 600;
+  border-radius: 4px;
+  background-color: ${ctaBlue};
   ${fontMonospace}
-
-  color: white;
   text-decoration: none;
+  box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 
   &:hover:enabled {
     color: rgba(255, 255, 255, 1);

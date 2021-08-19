@@ -6,7 +6,6 @@ import {
   RegisterLink,
 } from "../UtilComponents";
 import { TitleH1, H2, P } from "../UtilComponents/Typography/Typography";
-import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import { darkGray, debugBorder } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
@@ -40,12 +39,6 @@ const MainLanding = styled(Main)`
   }
 
   @media (max-width: 700px) {
-    h1 {
-      font-size: 35px;
-    }
-    h2 {
-      font-size: 30px;
-    }
     p.sub-heading {
       font-size: 20px;
       padding-bottom: 0px;
@@ -64,12 +57,25 @@ const MainLanding = styled(Main)`
   }
 `;
 
+const RegisterCtaButton = (
+  <RegisterLink
+    width={["100%", "250px", "250px", "250px"]}
+    mt={2}
+    py={3}
+    px={4}
+    alignSelf="center"
+    href="/apply"
+  >
+    ¡inscríbete ahora!
+  </RegisterLink>
+);
+
 const LandingPage = (props) => {
   const { settings } = props;
   return (
     <MainLanding p={1}>
       <ContentSection display="flex" flexDirection="column" textAlign="center">
-        <TitleH1>Únete a la economía global</TitleH1>
+        <TitleH1 my={[3, 5, 5, 5]}>Bienvenidos a la economía global</TitleH1>
         <P className="sub-heading">
           Tu clase de inglés se ha convertido en un grupo de ingenieros de
           software.
@@ -88,18 +94,19 @@ const LandingPage = (props) => {
           //sizes="(min-width: 600px) 692px, 320px"
           src={`${props.settings.edgeAssets}/home/3-tech-692w.webp`}
         />
-        <H2>Habla inglés, crea aplicaciones</H2>
+        <H2>Crea aplicaciones, habla inglés</H2>
         <P>
           Prácticas de conversación en cada clase, especialmente sobre
           ingeniería de software. Los temas comprenden trabajar con gerentes de
           producto, compañeros, clientes, realizar revisiones de código, hacer
           preguntas en foros, leer documentación y mucho más.
         </P>
-        <P style={{ fontStyle: "italic" }}>
+        <P fontStyle="italic" textAlign="center">
           Y crear software real en el proceso.
         </P>
+        <P mt={2}>Para ver el currículo y solicitar una plaza,</P>
+        {RegisterCtaButton}
       </ContentSection>
-
       <ContentSection mt={5}>
         <AutoScaleImage
           className="wide-image"
@@ -119,11 +126,7 @@ const LandingPage = (props) => {
           código profesional en un repositorio de GitHub y una aplicación web
           implementada.
         </P>
-        <RegisterLink mt={3} py={2} px={4} alignSelf="center" href="/apply">
-          Regístrate aquí
-        </RegisterLink>
       </ContentSection>
-
       <ContentSection mt={5}>
         <AutoScaleImage
           alignSelf="center"
@@ -140,6 +143,8 @@ const LandingPage = (props) => {
           Todos nuestros cursos están complementados con prácticas de gramática
           y vocabulario integradas en las clases técnicas.
         </P>
+        <P mt={2}>Con el conocimiento y práctica del inglés y programación, no hay límites en lo que puedes lograr.</P>
+        {RegisterCtaButton}
       </ContentSection>
 
       <ContentSection mt={5}>

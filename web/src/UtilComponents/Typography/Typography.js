@@ -4,7 +4,7 @@ import { boxy } from "../Box";
 import { font, fontColor, debugBorder, darkGray } from "../sharedStyles";
 
 export const Title = styled.h1`
-  font-family: Andale Mono, AndaleMono, monospace;
+  font-family: Noto Sans;
   ${space}
   ${fontColor}
   ${typography}
@@ -14,27 +14,28 @@ export const Title = styled.h1`
 //Title.defaultProps = {}
 
 export const TitleH1 = styled.h1`
+  ${fontSize}
   ${space}
   ${fontColor}
-  ${typography}
-  font-family: Andale Mono,AndaleMono,monospace;
-  font-size: 50px;
-  margin: 35px 0;
+  font-family: Noto Sans;
 `;
+
+TitleH1.defaultProps = {
+  fontSize: ["35px", "40px", "60px", "65px"],
+};
 
 export const H2 = styled.h2`
   ${space}
   ${fontSize}
   ${fontColor}
   ${typography}
-
-  font-family: Andale Mono,AndaleMono,monospace;
-  font-size: 36px;
-  margin: 15px 0;
+  font-family: Noto Sans;
   text-align: center;
 `;
 H2.defaultProps = {
-  pb: 2,
+  mt: 3,
+  mb: 2,
+  fontSize: ["30px", "35px", "40px", "50px"],
 };
 
 export const TitleH2 = styled.h2`
