@@ -5,7 +5,6 @@ import React from "react";
 const AutoScaleImageStyle = styled.img`
   ${flexbox}
   ${space}
-  width: 100%; /* scale with content width */
   height: auto; /* compute a height that preserves the aspect ratio */
 `;
 
