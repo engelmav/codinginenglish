@@ -15,12 +15,6 @@ export async function getStaticProps({ locale }) {
   const localeContentUrl = `https://content.codinginenglish.com/landing-page?_locale=${locale}`;
   const res = await fetch(localeContentUrl);
   const content = await res.json();
-  if (content.length === 0) {
-    return {
-      notFound: true,
-    };
-  }
-
   return {
     props: {
       content,

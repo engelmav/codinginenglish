@@ -52,6 +52,7 @@ const Hamburger = styled.svg`
 `;
 
 const Header = styled.header`
+  ${boxy}
   box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px;
   position: sticky;
   z-index: 1;
@@ -62,7 +63,6 @@ const Header = styled.header`
   display: flex;
   height: 200x;
   flex-wrap: wrap;
-  justify-content: space-between;
   padding: 1rem;
   ${whenSmallScreen`
       ${headerMarginSm}`}
@@ -75,15 +75,20 @@ const Img = styled.img`
   height: 70px;
   cursor: pointer;
   ${whenSmallScreen`
-      height: 24px; 
+      height: 35px; 
       width: 200px;
       padding-top: 5px;
       `}
 `;
 
+const Img2 = styled.img`
+  ${boxy}
+  cursor: pointer;
+`;
+
 const LanguageSelectorStyle = styled.div`
   ${boxy}
-  position: absolute;
+  position: fixed;
   z-index: 20;
   background-color: ${darkGray};
   opacity: 0.97;
@@ -91,6 +96,8 @@ const LanguageSelectorStyle = styled.div`
   top: 0;
   margin: 0 auto;
   color: white;
+  overflow-x: hidden;
+
 `;
 
 const LangUl = styled.ul``;
@@ -101,13 +108,14 @@ const locales = {
   español: "es",
 };
 
-const LanguageSelector = ({ closeLanguageSelector }) => {
+const LangSelectModal = ({ closeLanguageSelector }) => {
   return (
     <LanguageSelectorStyle
       display="flex"
       alignItems="center"
       justifyContent="center"
-      width="100vw"
+
+      width="100%"
       height={["100vh", "100vh", "400px", "400px"]}
     >
       <LangUl>
@@ -200,6 +208,19 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
+function treatAsUTC(date) {
+  var result = new Date(date);
+  result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+  return result;
+}
+
+function daysBetween(startDate, endDate) {
+  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return Math.floor(
+    (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
+  );
+}
+
 const HeaderContainer = (props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
@@ -236,19 +257,6 @@ const HeaderContainer = (props) => {
     { text: "TÉCNICA", location: "/technique", ...hideNav },
   ];
 
-  function treatAsUTC(date) {
-    var result = new Date(date);
-    result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
-    return result;
-  }
-
-  function daysBetween(startDate, endDate) {
-    var millisecondsPerDay = 24 * 60 * 60 * 1000;
-    return Math.floor(
-      (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
-    );
-  }
-
   return (
     <>
       {bannerOpen && !inApplyRoute && (
@@ -277,7 +285,12 @@ const HeaderContainer = (props) => {
           <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
         </Banner>
       )}
-      <Header>
+      {languageSelectorOpen && (
+        <LangSelectModal closeLanguageSelector={closeLanguageSelector} />
+      )}
+      <Header
+        justifyContent={["space-between", "center", "center", "space-between"]}
+      >
         <Link href="/">
           <Img
             loading="lazy"
@@ -287,33 +300,33 @@ const HeaderContainer = (props) => {
             src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
           ></Img>
         </Link>
-        {languageSelectorOpen && (
-          <LanguageSelector closeLanguageSelector={closeLanguageSelector} />
-        )}
-        <img
-          loading="lazy"
-          alt="lang"
-          width="25px"
-          height="25px"
-          src={`${settings.edgeAssets}/icon128px-exported-black.jpg`}
-          onClick={showLanguageSelector}
-        ></img>
-        <NavbarUl navMenu={navMenu} ref={navMenuRef}>
-          <LI>
-            <CloseBox size="20" onClick={() => setNavMenu(false)} />
-          </LI>
-          {links.map((link, idx) => (
-            <LI onClick={link.onClick} key={idx}>
-              <Link href={link.location}>{link.text}</Link>
+        <Box display="flex" alignItems="center">
+          <Img2
+            {...{ mr: [3, 3, 0] }}
+            loading="lazy"
+            alt="lang"
+            width="22px"
+            height="22px"
+            src={`${settings.edgeAssets}/icon128px-exported-black.jpg`}
+            onClick={showLanguageSelector}
+          />
+          <NavbarUl navMenu={navMenu} ref={navMenuRef}>
+            <LI>
+              <CloseBox size="20" onClick={() => setNavMenu(false)} />
             </LI>
-          ))}
-          <Login />
-        </NavbarUl>
-        <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
-          <rect width="100" height="20"></rect>
-          <rect y="30" width="100" height="20"></rect>
-          <rect y="60" width="100" height="20"></rect>
-        </Hamburger>
+            {links.map((link, idx) => (
+              <LI onClick={link.onClick} key={idx}>
+                <Link href={link.location}>{link.text}</Link>
+              </LI>
+            ))}
+            <Login />
+          </NavbarUl>
+          <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
+            <rect width="100" height="20"></rect>
+            <rect y="30" width="100" height="20"></rect>
+            <rect y="60" width="100" height="20"></rect>
+          </Hamburger>
+        </Box>
       </Header>
     </>
   );

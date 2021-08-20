@@ -3,21 +3,13 @@ import { typography, space, border, fontSize } from "styled-system";
 import { boxy } from "../Box";
 import { font, fontColor, debugBorder, darkGray } from "../sharedStyles";
 
-export const Title = styled.h1`
-  font-family: Noto Sans;
-  ${space}
-  ${fontColor}
-  ${typography}
-  font-size: max(1.75rem, min(2.5rem, 3vw));
-  width: 100%;
-`;
-//Title.defaultProps = {}
 
 export const TitleH1 = styled.h1`
   ${fontSize}
   ${space}
   ${fontColor}
-  font-family: Noto Sans;
+  font-family: Roboto Mono;
+  font-weight: 700;
 `;
 
 TitleH1.defaultProps = {
@@ -29,7 +21,7 @@ export const H2 = styled.h2`
   ${fontSize}
   ${fontColor}
   ${typography}
-  font-family: Noto Sans;
+  font-family: Roboto Mono;
   text-align: center;
 `;
 H2.defaultProps = {

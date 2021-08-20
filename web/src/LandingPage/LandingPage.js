@@ -46,16 +46,13 @@ const MainLanding = styled(Main)`
     }
   }
 
-  & .cie-title {
-    font-family: monospace;
-    font-size: max(1rem, min(2.5rem, 3vw));
-  }
+
   & .section {
     flex-basis: 100%;
   }
 `;
 
-const RegisterCtaButton = (props) => (
+const RegisterCtaButton = ({buttonText, gaLabel}) => (
   <RegisterLink
     width={["100%", "250px", "250px", "250px"]}
     mt={2}
@@ -68,11 +65,11 @@ const RegisterCtaButton = (props) => (
       ReactGA.event({
         category: "registration",
         action: "clickedRegister",
-        label: props.where,
+        label: gaLabel,
       });
     }}
   >
-    ¡inscríbete ahora!
+    {buttonText}
   </RegisterLink>
 );
 
@@ -80,14 +77,20 @@ const Section = ({
   sectionTitle,
   sectionContent,
   imageData,
-  callToActionButton,
+  buttonData,
   settings,
 }) => {
+  // temporary hack till we normalize the 3-tech image.
+  let maxWidth = "230px"
+  if (imageData.alt === "Software Stack"){
+    maxWidth = "500px"
+  }
   return (
     <ContentSection mt={[1, 5, 5, 5]}>
       <AutoScaleImage
         mt={3}
         mb={3}
+        maxWidth={maxWidth}
         alignSelf="center"
         loading="lazy"
         alt={imageData.alt}
@@ -96,7 +99,7 @@ const Section = ({
       />
       <H2>{sectionTitle}</H2>
       <ReactMarkdown components={{ p: P }}>{sectionContent}</ReactMarkdown>
-      <RegisterCtaButton where="after crea aplicaciones" />
+      {buttonData && <RegisterCtaButton {...buttonData} />}
     </ContentSection>
   );
 };
