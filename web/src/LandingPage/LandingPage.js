@@ -9,6 +9,13 @@ import { TitleH1, H2, P } from "../UtilComponents/Typography/Typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import { darkGray, debugBorder } from "../UtilComponents/sharedStyles";
 import styled from "styled-components";
+import ReactGA from "react-ga";
+import ReactMarkdown from 'react-markdown';
+import Image from "next/image"
+
+
+const trackingId = "UA-199972795-1";
+ReactGA.initialize(trackingId);
 
 const MainLanding = styled(Main)`
   ${debugBorder}
@@ -57,30 +64,59 @@ const MainLanding = styled(Main)`
   }
 `;
 
-const RegisterCtaButton = (
+const RegisterCtaButton = (props) => (
   <RegisterLink
     width={["100%", "250px", "250px", "250px"]}
     mt={2}
     py={3}
     px={4}
+    mb={3}
     alignSelf="center"
     href="/apply"
+    onClick={() => {
+      ReactGA.event({
+        category: "registration",
+        action: "clickedRegister",
+        label: props.where,
+      });
+    }}
   >
     ¡inscríbete ahora!
   </RegisterLink>
 );
 
+const Section = ({
+  sectionTitle,
+  sectionContent,
+  imageUrl,
+  callToActionButton,
+  settings
+}) => {
+  return (
+    <ContentSection mt={[1, 5, 5, 5]}>
+      <Image
+        alt="image"
+        src={`${settings.edgeAssets}/${imageUrl}`}
+        layout="responsive"
+      />
+      <H2>{sectionTitle}</H2>
+      <ReactMarkdown
+  components={{"p": P}}>{sectionContent}</ReactMarkdown>
+      <RegisterCtaButton where="after crea aplicaciones" />
+    </ContentSection>
+  );
+};
+
 const LandingPage = (props) => {
-  const { settings } = props;
+  const { settings, content } = props;
+  console.log(content);
   return (
     <MainLanding p={1}>
       <ContentSection display="flex" flexDirection="column" textAlign="center">
-        <TitleH1 my={[3, 5, 5, 5]}>Bienvenidos a la economía global</TitleH1>
-        <P className="sub-heading">
-          Tu clase de inglés se ha convertido en un grupo de ingenieros de
-          software.
-        </P>
+        <TitleH1 my={[3, 5, 5, 5]}>{content.title}</TitleH1>
+        <P className="sub-heading">{content.subtitle}</P>
       </ContentSection>
+      {content.Section.map(section => <Section {...section} settings={settings} />)}
       {/*the smallest, 1, keeps the next h1 "above the fold" */}
       <ContentSection mt={[1, 5, 5, 5]}>
         <AutoScaleImage
@@ -96,18 +132,22 @@ const LandingPage = (props) => {
         />
         <H2>Crea aplicaciones, habla inglés</H2>
         <P>
-          Prácticas de conversación en cada clase, especialmente sobre
-          ingeniería de software. Los temas comprenden trabajar con gerentes de
-          producto, compañeros, clientes, realizar revisiones de código, hacer
-          preguntas en foros, leer documentación y mucho más.
+          Aumenta tus oportunidades y tus ingresos. En la economía global, las
+          dos competencias más cotizadas son la programación y el inglés.
+          Consigue las dos aquí en Coding in English.
+        </P>
+        <P>
+          Practica conversación en inglés en cada clase, especialmente sobre
+          ingeniería de software, con gerentes de producto, compañeros,
+          clientes. Realiza revisiones de código, hacer preguntas en foros, leer
+          documentación y mucho más.
         </P>
         <P fontStyle="italic" textAlign="center">
-          Y crear software real en el proceso.
+          Salta al <i>mainstream</i> global.
         </P>
-        <P mt={2}>Para ver el currículo y solicitar una plaza,</P>
-        {RegisterCtaButton}
+        <RegisterCtaButton where="after crea aplicaciones" />
       </ContentSection>
-      <ContentSection mt={5}>
+      <ContentSection mt={[3, 5, 5, 5]}>
         <AutoScaleImage
           className="wide-image"
           mt={3}
@@ -127,7 +167,7 @@ const LandingPage = (props) => {
           implementada.
         </P>
       </ContentSection>
-      <ContentSection mt={5}>
+      <ContentSection mt={[3, 5, 5, 5]}>
         <AutoScaleImage
           alignSelf="center"
           mt={4}
@@ -143,11 +183,9 @@ const LandingPage = (props) => {
           Todos nuestros cursos están complementados con prácticas de gramática
           y vocabulario integradas en las clases técnicas.
         </P>
-        <P mt={2}>Con el conocimiento y práctica del inglés y programación, no hay límites en lo que puedes lograr.</P>
-        {RegisterCtaButton}
       </ContentSection>
 
-      <ContentSection mt={5}>
+      <ContentSection mt={[3, 5, 5, 5]} mb={3}>
         <AutoScaleImage
           mt={4}
           mb={3}
@@ -156,7 +194,6 @@ const LandingPage = (props) => {
           alt="Learn in a Live Teaching Environment"
           srcSet={`${props.settings.assets}/home/meeting-sm.png 320w, ${props.settings.assets}/home/meeting.png 1920w`}
           src={`${settings.assets}/home/meeting.png`}
-          //sizes="(min-width: 600px) 692px, 320px"
         />
         <H2>Estudia en un entorno de aprendizaje en vivo</H2>
         <P>
@@ -179,6 +216,7 @@ const LandingPage = (props) => {
           debate (aunque también tendremos de esos). ¡Si te pierdes, dilo! Deja
           que un instructor paciente y experto te ayude. ¡No estás solo en esto!
         </P>
+        <RegisterCtaButton where="after estudia en vivo" />
       </ContentSection>
 
       <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">

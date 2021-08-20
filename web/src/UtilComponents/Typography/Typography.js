@@ -54,6 +54,7 @@ export const P = styled.p`
   ${space}
   ${typography}
   ${border}
+  ${boxy}
 
   line-height: 1.5em;
   hyphens: auto;

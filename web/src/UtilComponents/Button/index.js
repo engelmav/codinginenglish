@@ -23,6 +23,7 @@ const hoverStyles = css`
 const Button = styled.button.attrs((props) => {
   return { ...props };
 })`
+  ${boxy}
   ${space}
   ${commonStyles}
   border: solid #ff3e00;

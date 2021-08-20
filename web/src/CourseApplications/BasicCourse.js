@@ -57,7 +57,7 @@ const FieldLabel = styled.label`
   font-family: ${fontFamily};
 `;
 FieldLabel.defaultProps = {
-  mb: 3,
+  mb: 1,
 };
 
 const Form = styled(_Form)`
@@ -109,10 +109,6 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
 
   return (
     <>
-      <Title textAlign="center">Solicita una plaza</Title>
-      <P mb={4} textAlign="center">
-        <i>del 20 septiembre al 20 diciembre</i>
-      </P>
       {appComplete ? (
         <P>
           Gracias por completar la solicitud! Te contactaremos dentro de 2 días
@@ -149,11 +145,12 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
 
                     if (field.fieldType === "shortAnswer") {
                       fieldJsx = (
-                        <div key={idx}>
+                        <Box display="flex" flexDirection="column" key={idx}>
                           <FieldLabel htmlFor={field.title} key={idx}>
                             {field.title}
                           </FieldLabel>
                           <TextInput
+                            mb={2}
                             autocomplete="false"
                             type="text"
                             id={fieldName}
@@ -169,7 +166,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             }}
                             value={values[field.fieldName] || ""}
                           />
-                        </div>
+                        </Box>
                       );
                     }
                     if (field.fieldType === "email") {
@@ -179,6 +176,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             {field.title}
                           </FieldLabel>
                           <TextInput
+                            mb={2}
                             type="email"
                             id={fieldName}
                             name={fieldName}
@@ -200,18 +198,20 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                           <FieldLabel htmlFor={field.title} key={idx}>
                             {field.title}
                           </FieldLabel>
-                          {field.choices.map((choice, idx) => {
-                            return (
-                              <MultiLabel key={idx}>
-                                <Field
-                                  type="radio"
-                                  name={fieldName}
-                                  value={choice}
-                                />
-                                {choice}
-                              </MultiLabel>
-                            );
-                          })}
+                          <Box display="flex" flexDirection="column" mb={2}>
+                            {field.choices.map((choice, idx) => {
+                              return (
+                                <MultiLabel key={idx}>
+                                  <Field
+                                    type="radio"
+                                    name={fieldName}
+                                    value={choice}
+                                  />
+                                  {choice}
+                                </MultiLabel>
+                              );
+                            })}
+                          </Box>
                         </>
                       );
                     }
@@ -292,19 +292,23 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                       <div style={{ color: "white" }}>empty</div>
                     )}
                   </>
-                  <Button
-                    display="flex"
-                    alignItems="center"
-                    type="submit"
-                    onClick={() => {
-                      ReactGA.event({
-                        category: "appliedCat",
-                        action: `userApplied`,
-                      });
-                    }}
-                  >
-                    Envía mi solicitud
-                  </Button>
+                  <Box width="100%" display="flex" flexDirection="column">
+                    <Button
+                      width={["100%", "45%", "45%", "45%"]}
+                      display="flex"
+                      alignSelf="center"
+                      justifyContent="center"
+                      type="submit"
+                      onClick={() => {
+                        ReactGA.event({
+                          category: "appliedCat",
+                          action: `userApplied`,
+                        });
+                      }}
+                    >
+                      Envía mi solicitud
+                    </Button>
+                  </Box>
                 </Form>
               )}
             </Formik>

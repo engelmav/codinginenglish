@@ -6,6 +6,14 @@ class CieDocument extends Document {
     return (
       <Html>
         <Head>
+          <link
+            href="https://fonts.googleapis.com/css?family=Roboto+Mono&display"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=Noto+Sans&display"
+            rel="stylesheet"
+          />
           <script
             async
             src="https://www.googletagmanager.com/gtag/js?id=UA-199972795-1"

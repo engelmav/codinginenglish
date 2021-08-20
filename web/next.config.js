@@ -2,6 +2,13 @@ const isProd = process.env.NODE_ENV === "production";
 module.exports = (phase, { defaultConfig }) => {
   const customConfig = {
     // assetPrefix: isProd ? "https://devsite-19e8e.kxcdn.com" : "",
+    i18n: {
+      locales: ["en", "es", "ca-ES"],
+      defaultLocale: "en",
+    },
+    images: {
+      domains: ["ie-assets.nyc3.digitaloceanspaces.com"],
+    },
     env: {
       ENVIRONMENT: process.env.NODE_ENV,
     },

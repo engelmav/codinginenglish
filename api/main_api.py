@@ -318,7 +318,7 @@ def create_main_api(publish_message,
         rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
         return rc_user_id, rocketchat_auth_token
 
-    @app.post("/api/registered-user")
+    @app.route("/api/registered-user", methods=["POST"])
     def add_registered_user():
         """This is a user with only an email address, before they hit the auth0 callback url (initialize_user)"""
         req = request.get_json()
@@ -530,7 +530,7 @@ def create_main_api(publish_message,
             messages=messages
         ))
 
-    @app.post("/api/log")
+    @app.route("/api/log", methods=["POST"])
     def log_event():
         req_json = request.get_json()
         level = req_json.get("data").get("level")

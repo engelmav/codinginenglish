@@ -7,7 +7,7 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
-import { boxy } from "../UtilComponents";
+import { boxy, Box } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
@@ -75,10 +75,55 @@ const Img = styled.img`
   height: 70px;
   cursor: pointer;
   ${whenSmallScreen`
-      height: 28px; padding-top: 5px;`}
+      height: 24px; 
+      width: 200px;
+      padding-top: 5px;
+      `}
 `;
 
-const NavbarList = styled.ul`
+const LanguageSelectorStyle = styled.div`
+  ${boxy}
+  position: absolute;
+  z-index: 20;
+  background-color: ${darkGray};
+  opacity: 0.97;
+  left: 0;
+  top: 0;
+  margin: 0 auto;
+  color: white;
+`;
+
+const LangUl = styled.ul``;
+
+const locales = {
+  english: "en",
+  català: "ca-es",
+  español: "es",
+};
+
+const LanguageSelector = ({ closeLanguageSelector }) => {
+  return (
+    <LanguageSelectorStyle
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      width="100vw"
+      height={["100vh", "100vh", "400px", "400px"]}
+    >
+      <LangUl>
+        {Object.keys(locales).map((localeKey) => (
+          <LI mb={2} fontSize={20} onClick={closeLanguageSelector}>
+            <Link href={Router.pathname} locale={locales[localeKey]}>
+              {localeKey}
+            </Link>
+          </LI>
+        ))}
+      </LangUl>
+    </LanguageSelectorStyle>
+  );
+};
+
+const NavbarUl = styled.ul`
   ${navbarCommonStyle}
   ${whenSmallScreen`
     li {
@@ -160,6 +205,9 @@ const HeaderContainer = (props) => {
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
   const [inApplyRoute, setInApplyRoute] = useState(false);
+  const [languageSelectorOpen, setLanguageSelectorOpen] = useState(false);
+  const showLanguageSelector = () => setLanguageSelectorOpen(true);
+  const closeLanguageSelector = () => setLanguageSelectorOpen(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -239,7 +287,18 @@ const HeaderContainer = (props) => {
             src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
           ></Img>
         </Link>
-        <NavbarList navMenu={navMenu} ref={navMenuRef}>
+        {languageSelectorOpen && (
+          <LanguageSelector closeLanguageSelector={closeLanguageSelector} />
+        )}
+        <img
+          loading="lazy"
+          alt="lang"
+          width="25px"
+          height="25px"
+          src={`${settings.edgeAssets}/icon128px-exported-black.jpg`}
+          onClick={showLanguageSelector}
+        ></img>
+        <NavbarUl navMenu={navMenu} ref={navMenuRef}>
           <LI>
             <CloseBox size="20" onClick={() => setNavMenu(false)} />
           </LI>
@@ -249,7 +308,7 @@ const HeaderContainer = (props) => {
             </LI>
           ))}
           <Login />
-        </NavbarList>
+        </NavbarUl>
         <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
           <rect width="100" height="20"></rect>
           <rect y="30" width="100" height="20"></rect>

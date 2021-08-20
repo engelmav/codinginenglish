@@ -18,14 +18,7 @@ const Layout = (props) => (
     <GlobalStyle />
     <Head>
       <title>coding_in_english</title>
-      <link
-        href="https://fonts.googleapis.com/css?family=Roboto+Mono&display"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css?family=Noto+Sans&display"
-        rel="stylesheet"
-      />
+
     </Head>
     <Header />
     {props.children}

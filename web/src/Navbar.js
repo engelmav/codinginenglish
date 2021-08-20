@@ -3,6 +3,9 @@ import {
   debugBorder,
 } from "./UtilComponents/sharedStyles";
 import styled from "styled-components";
+import { boxy } from "./UtilComponents";
+import { typography } from "styled-system"
+
 
 export const navbarCommonStyle = css`
   ${debugBorder}
@@ -27,7 +30,10 @@ export const navbarCommonStyle = css`
 `;
 
 export const LI = styled.li`
+  ${boxy}
+  list-style-type: none;
   a {
+    ${typography}
     color: white;
     font-weight: 900;
     text-align: center;

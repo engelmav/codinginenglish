@@ -37,7 +37,7 @@ const Callback = ({ authLazy }) => {
             </p>
           </>
         ) : (
-          <p>Logging you in / Iniciando la sesión ...</p>
+          <p>Inscribiéndote en Coding in English ...</p>
         )}
       </CallbackContent>
     </Main>
