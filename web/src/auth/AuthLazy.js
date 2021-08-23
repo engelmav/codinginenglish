@@ -54,11 +54,12 @@ class AuthLazy {
       handleAuthentication() {
         return new Promise((resolve, reject) => {
           this.auth0.parseHash((err, authResult) => {
-            if (err) return reject(err);
             if (err || !authResult || !authResult.idToken) {
               console.log("There was an issue attempting to login.");
             }
             this.setSession(authResult);
+            console.log("dispatching auth_success see trace for callers")
+            console.trace();
             reactor.dispatchEvent("auth_success", authResult);
             resolve();
           });
@@ -67,6 +68,7 @@ class AuthLazy {
 
       checkRoute = (path) => {
         if (/access_token|id_token|error/.test(path)) {
+          console.log("checkRoute executing")
           this.handleAuthentication();
         }
       };
@@ -89,7 +91,10 @@ class AuthLazy {
       async silentAuth() {
         return new Promise((resolve, reject) => {
           this.auth0.checkSession({}, (err, authResult) => {
-            if (err) return reject(err);
+            if (err) {
+              console.log("silentAuth failed");
+              return console.trace();
+            }
             console.log("silentAuth() setSession");
             this.setSession(authResult);
             resolve();
@@ -167,4 +172,5 @@ class AuthLazy {
   };
 }
 
-export { AuthLazy };
+const authLazy = new AuthLazy();
+export { authLazy };

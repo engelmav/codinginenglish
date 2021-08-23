@@ -15,46 +15,9 @@ import ReactMarkdown from "react-markdown";
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
-const MainLanding = styled(Main)`
-  ${debugBorder}
-  width: min(90%, 850px);
-  margin-bottom: 50px;
-  display: flex;
-  flex-direction: column;
-
-  p,
-  blockquote {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 700px;
-  }
-
-  img.wide-image {
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  p.sub-heading {
-    font-size: 25px;
-  }
-
-  @media (max-width: 700px) {
-    p.sub-heading {
-      font-size: 20px;
-      padding-bottom: 0px;
-    }
-  }
-
-
-  & .section {
-    flex-basis: 100%;
-  }
-`;
-
-const RegisterCtaButton = ({buttonText, gaLabel}) => (
+const RegisterCtaButton = ({ buttonText, gaLabel }) => (
   <RegisterLink
-    width={["100%", "250px", "250px", "250px"]}
+    width={["45%", "250px", "250px", "250px"]}
     mt={2}
     py={3}
     px={4}
@@ -81,16 +44,21 @@ const Section = ({
   settings,
 }) => {
   // temporary hack till we normalize the 3-tech image.
-  let maxWidth = "230px"
-  if (imageData.alt === "Software Stack"){
-    maxWidth = "500px"
+  let maxWidth = "230px";
+  let minWidth = null;
+  let className = "img"
+  if (imageData.alt === "Software Stack") {
+    maxWidth = "500px";
+    minWidth = "280px"
   }
   return (
-    <ContentSection mt={[1, 5, 5, 5]}>
+    <ContentSection mt={[1, 5, 5, 5]} mb={4}>
       <AutoScaleImage
         mt={3}
         mb={3}
         maxWidth={maxWidth}
+        minWidth={minWidth}
+        className={className}
         alignSelf="center"
         loading="lazy"
         alt={imageData.alt}
@@ -104,17 +72,20 @@ const Section = ({
   );
 };
 
+
+
 const LandingPage = (props) => {
-  const { settings, content } = props;
-  console.log(content);
+  const { settings, landingPageContent } = props;
+  const content = landingPageContent;
   return (
-    <MainLanding p={1}>
+    <>
+    
       <ContentSection display="flex" flexDirection="column" textAlign="center">
         <TitleH1 my={[3, 5, 5, 5]}>{content.title}</TitleH1>
-        <P className="sub-heading">{content.subtitle}</P>
+        <P fontSize={[3, 3, 3, 4, 5]}>{content.subtitle}</P>
       </ContentSection>
-      {content.Section.map((section) => (
-        <Section {...section} settings={settings} />
+      {content.Section.map((section, idx) => (
+        <Section key={idx} {...section} settings={settings} />
       ))}
       <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
         <P>
@@ -132,7 +103,7 @@ const LandingPage = (props) => {
           </cite>
         </footer>
       </BlockQuote>
-    </MainLanding>
+    </>
   );
 };
 

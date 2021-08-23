@@ -95,7 +95,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "dev": "NODE_ENV=development next dev",
+    "dev": "NODE_ENV=development next dev --hostname 0.0.0.0",
     "lint": "next lint"
   },
   "reactSnap": {

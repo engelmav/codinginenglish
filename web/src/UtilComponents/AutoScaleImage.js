@@ -9,12 +9,12 @@ const AutoScaleImageStyle = styled.img`
 `;
 
 export const AutoScaleImage = (props) => {
-  const { width, height, maxWidth, mt, mb, sizes } = props;
+  const { width, height, maxWidth, minWidth, mt, mb, sizes } = props;
   return (
     <AutoScaleImageStyle
       mt={mt}
       mb={mb}
-      style={{ maxWidth: maxWidth }}
+      style={{ maxWidth, minWidth }}
       width={width}
       height={height}
       sizes={sizes}

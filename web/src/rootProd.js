@@ -107,8 +107,6 @@ async function handleAuthSuccess(authResult) {
   }
   Router.push(nextPage);
 }
-reactor.registerEvent("auth_success");
-reactor.addEventListener("auth_success", handleAuthSuccess);
 // const Footer = compose(_Footer, { appStore, auth, Login });
 
 const CheckoutForm = compose(_CheckoutForm, { appStoreLazy, settings });

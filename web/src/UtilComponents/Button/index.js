@@ -13,6 +13,7 @@ const commonStyles = css`
   border-radius: 2px;
   color: white;
   cursor: pointer;
+
 `;
 
 const hoverStyles = css`
@@ -26,6 +27,7 @@ const Button = styled.button.attrs((props) => {
   ${boxy}
   ${space}
   ${commonStyles}
+  font-family: Roboto;
   border: solid #ff3e00;
   border-width: 1px;
   &:disabled,
@@ -64,7 +66,6 @@ const StyledLink = styled.a`
   text-align: center;
   color: white;
   ${typography}
-  font-weight: 700;
   border-radius: 4px;
   background-color: ${ctaBlue};
   text-decoration: none;

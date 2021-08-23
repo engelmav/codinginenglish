@@ -1,7 +1,7 @@
 import { AutoScaleImage } from "./AutoScaleImage";
 import { Box, boxy } from "./Box";
 import { Button, RegisterLink } from "./Button";
-import { Title } from "./Typography/Typography";
+import { TitleH2 } from "./Typography/Typography";
 import { Window } from "./Window";
 import { Spinner } from "./Spinner";
 import { ClearableTextInput, TextInput } from "./TextInput";
@@ -20,7 +20,7 @@ export {
   Button,
   RegisterLink,
   Spinner,
-  Title,
+  TitleH2 as Title,
   Window,
   TextInput,
   ContentSection,

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
+import { space, width } from "styled-system";
 import {
   debugBorder,
   whenSmallScreen,
@@ -71,14 +72,12 @@ const Header = styled.header`
 `;
 
 const Img = styled.img`
-  width: auto;
-  height: 70px;
-  cursor: pointer;
+  ${space}
+  ${width}
+  min-width: 180px;
   ${whenSmallScreen`
-      height: 35px; 
-      width: 200px;
-      padding-top: 5px;
-      `}
+      max-width: 180px;`}
+  cursor: pointer;
 `;
 
 const Img2 = styled.img`
@@ -97,7 +96,6 @@ const LanguageSelectorStyle = styled.div`
   margin: 0 auto;
   color: white;
   overflow-x: hidden;
-
 `;
 
 const LangUl = styled.ul``;
@@ -114,7 +112,6 @@ const LangSelectModal = ({ closeLanguageSelector }) => {
       display="flex"
       alignItems="center"
       justifyContent="center"
-
       width="100%"
       height={["100vh", "100vh", "400px", "400px"]}
     >
@@ -156,7 +153,7 @@ const NavbarUl = styled.ul`
 
 const Banner = styled.div`
   ${boxy}
-  margin: 0;
+  width: 100%;
   background: yellow;
   display: flex;
   justify-content: center;
@@ -251,11 +248,17 @@ const HeaderContainer = (props) => {
   }, [navMenuRef]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
-  const links = [
+  const _links = [
     { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions", ...hideNav },
     { text: "CONÓCENOS", location: "/about-us", ...hideNav },
     { text: "TÉCNICA", location: "/technique", ...hideNav },
   ];
+
+  let { links } = props.headerContent;
+  links = links.map((link) => {
+    link.onClick = () => setNavMenu(false);
+    return link;
+  });
 
   return (
     <>
@@ -289,15 +292,14 @@ const HeaderContainer = (props) => {
         <LangSelectModal closeLanguageSelector={closeLanguageSelector} />
       )}
       <Header
-        justifyContent={["space-between", "center", "center", "space-between"]}
+        justifyContent={["space-between"]}
       >
         <Link href="/">
           <Img
             loading="lazy"
             alt="cie logo"
             srcSet={`${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
-            sizes="(min-width: 600px) 692px, 282px"
-            src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+            src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp`}
           ></Img>
         </Link>
         <Box display="flex" alignItems="center">
@@ -331,6 +333,19 @@ const HeaderContainer = (props) => {
     </>
   );
 };
+
+export async function getStaticProps({ locale }) {
+  console.log("***** LAYOUT HEADER FETCH Layout header fetch");
+  const localeContentUrl = `https://content.codinginenglish.com/header?_locale=${locale}`;
+  const res = await fetch(localeContentUrl);
+  console.log("result of header fetch:", res);
+  const content = await res.json();
+  return {
+    props: {
+      content,
+    },
+  };
+}
 
 export default HeaderContainer;
 

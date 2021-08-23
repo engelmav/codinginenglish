@@ -27,4 +27,5 @@ class Reactor {
   }
 }
 
-export default new Reactor();
+const reactor = new Reactor();
+export default reactor;

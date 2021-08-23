@@ -14,7 +14,7 @@ export const lightGray = "#f6f6f6";
 export const darkGray = "#3d3636";
 export const cieOrange = "#ff3e00";
 
-export const fontFamily = "'Arial', sans-serif";
+export const fontFamily = "'Roboto', sans-serif";
 const font = css`
   font-family: ${fontFamily};
   ${fontColor}

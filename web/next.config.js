@@ -6,9 +6,6 @@ module.exports = (phase, { defaultConfig }) => {
       locales: ["en", "es", "ca-ES"],
       defaultLocale: "en",
     },
-    images: {
-      domains: ["ie-assets.nyc3.digitaloceanspaces.com"],
-    },
     env: {
       ENVIRONMENT: process.env.NODE_ENV,
     },

@@ -9,10 +9,13 @@ const CallbackContent = styled(ContentSection)`
 
 const Callback = ({ authLazy }) => {
   const [error, setError] = useState(null);
+  const [authenticated, setIsAuthenticated] = useState(false);
   useEffect(() => {
     async function init() {
       const auth = await authLazy.create();
+      console.log("Callback.useEffect running auth.checkRoute()")
       auth.checkRoute(Router.router.asPath);
+      setIsAuthenticated(true)
       const url = new URL(document.location.href.replace(/#/g, "?"));
       const authError = url.searchParams.get("error_description");
       if (authError) {
@@ -20,7 +23,7 @@ const Callback = ({ authLazy }) => {
       }
     }
     init();
-  }, []);
+  }, [authenticated]);
 
   return (
     <Main>

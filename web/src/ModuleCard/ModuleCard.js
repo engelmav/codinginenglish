@@ -37,9 +37,9 @@ const ModuleCard = (props) => {
 
   const { CheckoutForm } = props;
   const {
-    name: moduleName,
-    description: moduleDescription,
-    module_sessions: moduleSessions,
+    title: courseTitle,
+    description,
+    course_instances: courseInstances,
   } = props.moduleData;
   return (
     <>
@@ -47,21 +47,21 @@ const ModuleCard = (props) => {
         <Image
           sx={{ "@media screen and (max-width: 500px)": { display: "none" } }}
           src={`${settings.assets}/upcoming-sessions/computer-city-nighttime.png`}
-          alt={moduleName}
+          alt={courseTitle}
           mr={2}
           width="50%"
         />
 
-        <TitleH2 fontWeight="bold" color="primary" textAlign="center">
-          {moduleName}
+        <TitleH2 py={4} fontWeight="bold" color="primary" textAlign="center">
+          {courseTitle}
         </TitleH2>
 
-        <P>{moduleDescription}</P>
+        <P>{description}</P>
         <P>del 20 septiembre al 20 diciembre</P>
-        {moduleSessions.map((ms, idx) => {
+        {courseInstances.map((ms, idx) => {
           return (
             <RegisterLink mt={3} p={2}  key={idx} href="/apply">
-              Solicita una plaza
+              ¡Inscríbeme ahora!
             </RegisterLink>
           );
         })}
@@ -78,7 +78,7 @@ const ModuleCard = (props) => {
             alignSelf="flex-end"
             onClick={() => setDialogOpen(false)}
           />
-          <Title>{moduleName}</Title>
+          <TitleH2>{courseTitle}</TitleH2>
 
           <ContentSection>
             {/* {appStore.authData == null && (
