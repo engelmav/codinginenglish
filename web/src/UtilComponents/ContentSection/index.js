@@ -9,7 +9,6 @@ const ContentSection = styled.article`
   ${font}
   ${space}
   ${typography}
-  font-family: Andale Mono, AndaleMono, monospace;
 `;
 
 

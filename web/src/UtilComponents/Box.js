@@ -7,6 +7,7 @@ import {
   flexbox,
   flexGrow,
   flexWrap,
+  position
 } from "styled-system";
 import { debugBorder } from "./sharedStyles";
 
@@ -21,7 +22,8 @@ export const Box = styled.div(
   flexbox,
   flexGrow,
   flexWrap,
-  debugBorder
+  debugBorder,
+  position
 );
 
-export const boxy = compose(space, color, layout, flexbox, flexGrow, flexWrap);
+export const boxy = compose(space, position, color, layout, flexbox, flexGrow, flexWrap);

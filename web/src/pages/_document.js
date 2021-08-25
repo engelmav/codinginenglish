@@ -6,6 +6,24 @@ class CieDocument extends Document {
     return (
       <Html>
         <Head>
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap"
+            rel="stylesheet"
+          />
+
+          <link
+            href="https://fonts.googleapis.com/css?family=Roboto+Mono&display"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=Roboto&display"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=Noto+Sans&display"
+            rel="stylesheet"
+          />
           <script
             async
             src="https://www.googletagmanager.com/gtag/js?id=UA-199972795-1"

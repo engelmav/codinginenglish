@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { space, flexbox } from "styled-system";
+import { space, flexbox, typography } from "styled-system";
 import { font, fontMonospace, cieOrange, ctaBlue } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
@@ -13,6 +13,7 @@ const commonStyles = css`
   border-radius: 2px;
   color: white;
   cursor: pointer;
+
 `;
 
 const hoverStyles = css`
@@ -23,8 +24,10 @@ const hoverStyles = css`
 const Button = styled.button.attrs((props) => {
   return { ...props };
 })`
+  ${boxy}
   ${space}
   ${commonStyles}
+  font-family: Roboto;
   border: solid #ff3e00;
   border-width: 1px;
   &:disabled,
@@ -62,10 +65,9 @@ const StyledLink = styled.a`
   ${boxy}
   text-align: center;
   color: white;
-  font-weight: 600;
+  ${typography}
   border-radius: 4px;
   background-color: ${ctaBlue};
-  ${fontMonospace}
   text-decoration: none;
   box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 
@@ -74,6 +76,11 @@ const StyledLink = styled.a`
     box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
   }
 `;
+
+StyledLink.defaultProps = {
+  fontSize: [1, 2, 2, 2],
+  padding: [3, 3, 3, 3, 3]
+}
 
 export const RegisterLink = (props) => {
   const { children, href, ...otherProps } = props;

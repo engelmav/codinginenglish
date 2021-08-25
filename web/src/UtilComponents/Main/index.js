@@ -1,13 +1,21 @@
 import styled from 'styled-components';
-import { space } from "styled-system";
+import { boxy } from '../Box';
+import { width } from "styled-system"
 
 
 const Main = styled.main`
-  ${space}
-  margin: 0 auto 30px auto;
-  width: 50%;
-  width: min(90%, 700px);
+  ${boxy}
+  ${width}
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  max-width: 800px;
+  justify-content: center;
 `;
 
+Main.defaultProps = {
+  px: [3],
+  width: ["100%"]
+}
 
 export { Main };

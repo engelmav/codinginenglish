@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
+import { space, width } from "styled-system";
 import {
   debugBorder,
   whenSmallScreen,
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
-import { boxy } from "../UtilComponents";
+import { boxy, Box } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
@@ -52,6 +53,7 @@ const Hamburger = styled.svg`
 `;
 
 const Header = styled.header`
+  ${boxy}
   box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px;
   position: sticky;
   z-index: 1;
@@ -62,7 +64,6 @@ const Header = styled.header`
   display: flex;
   height: 200x;
   flex-wrap: wrap;
-  justify-content: space-between;
   padding: 1rem;
   ${whenSmallScreen`
       ${headerMarginSm}`}
@@ -71,14 +72,63 @@ const Header = styled.header`
 `;
 
 const Img = styled.img`
-  width: auto;
-  height: 70px;
-  cursor: pointer;
+  ${space}
+  ${width}
+  min-width: 180px;
   ${whenSmallScreen`
-      height: 28px; padding-top: 5px;`}
+      max-width: 180px;`}
+  cursor: pointer;
 `;
 
-const NavbarList = styled.ul`
+const Img2 = styled.img`
+  ${boxy}
+  cursor: pointer;
+`;
+
+const LanguageSelectorStyle = styled.div`
+  ${boxy}
+  position: fixed;
+  z-index: 20;
+  background-color: ${darkGray};
+  opacity: 0.97;
+  left: 0;
+  top: 0;
+  margin: 0 auto;
+  color: white;
+  overflow-x: hidden;
+`;
+
+const LangUl = styled.ul``;
+
+const locales = {
+  english: "en",
+  català: "ca-es",
+  español: "es",
+};
+
+const LangSelectModal = ({ closeLanguageSelector }) => {
+  return (
+    <LanguageSelectorStyle
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={["100vh", "100vh", "400px", "400px"]}
+    >
+      <LangUl>
+        {Object.keys(locales).map((localeKey) => (
+          <LI mb={2} fontSize={20} onClick={closeLanguageSelector}>
+            <Link href={Router.pathname} locale={locales[localeKey]}>
+              {localeKey}
+            </Link>
+          </LI>
+        ))}
+      </LangUl>
+    </LanguageSelectorStyle>
+  );
+};
+
+const NavbarUl = styled.ul`
   ${navbarCommonStyle}
   ${whenSmallScreen`
     li {
@@ -103,7 +153,7 @@ const NavbarList = styled.ul`
 
 const Banner = styled.div`
   ${boxy}
-  margin: 0;
+  width: 100%;
   background: yellow;
   display: flex;
   justify-content: center;
@@ -155,11 +205,27 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
+function treatAsUTC(date) {
+  var result = new Date(date);
+  result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+  return result;
+}
+
+function daysBetween(startDate, endDate) {
+  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return Math.floor(
+    (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
+  );
+}
+
 const HeaderContainer = (props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
   const [bannerOpen, setBannerOpen] = useState(true);
   const [inApplyRoute, setInApplyRoute] = useState(false);
+  const [languageSelectorOpen, setLanguageSelectorOpen] = useState(false);
+  const showLanguageSelector = () => setLanguageSelectorOpen(true);
+  const closeLanguageSelector = () => setLanguageSelectorOpen(false);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -182,24 +248,17 @@ const HeaderContainer = (props) => {
   }, [navMenuRef]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
-  const links = [
+  const _links = [
     { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions", ...hideNav },
     { text: "CONÓCENOS", location: "/about-us", ...hideNav },
     { text: "TÉCNICA", location: "/technique", ...hideNav },
   ];
 
-  function treatAsUTC(date) {
-    var result = new Date(date);
-    result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
-    return result;
-  }
-
-  function daysBetween(startDate, endDate) {
-    var millisecondsPerDay = 24 * 60 * 60 * 1000;
-    return Math.floor(
-      (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
-    );
-  }
+  let { links } = props.headerContent;
+  links = links.map((link) => {
+    link.onClick = () => setNavMenu(false);
+    return link;
+  });
 
   return (
     <>
@@ -229,36 +288,64 @@ const HeaderContainer = (props) => {
           <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
         </Banner>
       )}
-      <Header>
+      {languageSelectorOpen && (
+        <LangSelectModal closeLanguageSelector={closeLanguageSelector} />
+      )}
+      <Header
+        justifyContent={["space-between"]}
+      >
         <Link href="/">
           <Img
             loading="lazy"
             alt="cie logo"
             srcSet={`${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
-            sizes="(min-width: 600px) 692px, 282px"
-            src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
+            src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp`}
           ></Img>
         </Link>
-        <NavbarList navMenu={navMenu} ref={navMenuRef}>
-          <LI>
-            <CloseBox size="20" onClick={() => setNavMenu(false)} />
-          </LI>
-          {links.map((link, idx) => (
-            <LI onClick={link.onClick} key={idx}>
-              <Link href={link.location}>{link.text}</Link>
+        <Box display="flex" alignItems="center">
+          <Img2
+            {...{ mr: [3, 3, 0] }}
+            loading="lazy"
+            alt="lang"
+            width="22px"
+            height="22px"
+            src={`${settings.edgeAssets}/icon128px-exported-black.jpg`}
+            onClick={showLanguageSelector}
+          />
+          <NavbarUl navMenu={navMenu} ref={navMenuRef}>
+            <LI>
+              <CloseBox size="20" onClick={() => setNavMenu(false)} />
             </LI>
-          ))}
-          <Login />
-        </NavbarList>
-        <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
-          <rect width="100" height="20"></rect>
-          <rect y="30" width="100" height="20"></rect>
-          <rect y="60" width="100" height="20"></rect>
-        </Hamburger>
+            {links.map((link, idx) => (
+              <LI onClick={link.onClick} key={idx}>
+                <Link href={link.location}>{link.text}</Link>
+              </LI>
+            ))}
+            <Login />
+          </NavbarUl>
+          <Hamburger viewBox="0 0 100 80" onClick={() => setNavMenu(true)}>
+            <rect width="100" height="20"></rect>
+            <rect y="30" width="100" height="20"></rect>
+            <rect y="60" width="100" height="20"></rect>
+          </Hamburger>
+        </Box>
       </Header>
     </>
   );
 };
+
+export async function getStaticProps({ locale }) {
+  console.log("***** LAYOUT HEADER FETCH Layout header fetch");
+  const localeContentUrl = `https://content.codinginenglish.com/header?_locale=${locale}`;
+  const res = await fetch(localeContentUrl);
+  console.log("result of header fetch:", res);
+  const content = await res.json();
+  return {
+    props: {
+      content,
+    },
+  };
+}
 
 export default HeaderContainer;
 

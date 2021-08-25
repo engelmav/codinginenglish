@@ -12,6 +12,7 @@ import {
   CardTitle,
   CardContent,
 } from "../UtilComponents";
+import { Timeline } from "./Timeline";
 import { whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
 import { space } from "styled-system";
@@ -20,6 +21,7 @@ import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import Router from "next/router";
 import ReactGA from "react-ga";
+
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -106,7 +108,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
+const Register = ({ appStoreLazy, authLazy, cieApi }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -114,11 +116,11 @@ const Register = ({ Timeline, appStoreLazy, authLazy, cieApi }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
+
     async function init() {
       const _auth = await authLazy.create();
       setAuth(_auth);
       const _appStore = await appStoreLazy.load();
-      _appStore.setMilestone("Inscripción");
     }
     init();
   }, []);

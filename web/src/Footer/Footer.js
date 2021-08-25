@@ -12,6 +12,7 @@ const StyledFooter = styled.footer`
   background: ${darkGray};
   text-align: center;
   color: white;
+  width: 100%
 `;
 
 const MadeWithLove = styled.i`
