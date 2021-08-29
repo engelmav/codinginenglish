@@ -11,10 +11,10 @@ const Main = styled.main`
   flex-direction: row;
   max-width: 800px;
   justify-content: center;
+  flex: 1;
 `;
 
 Main.defaultProps = {
-  px: [3],
   width: ["100%"]
 }
 

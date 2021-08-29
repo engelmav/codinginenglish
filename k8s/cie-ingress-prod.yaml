@@ -81,6 +81,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: cie-web-nginx-next-service
+          serviceName: cie-web-nginx-next-dev-service
           servicePort: 80
 

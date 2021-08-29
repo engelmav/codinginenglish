@@ -2,11 +2,12 @@
 All templates must confirm to the MailJet API spec described here:
 https://app.mailjet.com/transactional/sendapi
 """
-
+import requests
+import base64
 from jinja2 import Template
 
 
-def _make_template(student_email, student_name, module_name, body_parts):
+def _make_template(student_email, student_name, module_name, body_parts, attachments=None):
     data = {
         'Messages': [
             {
@@ -26,6 +27,8 @@ def _make_template(student_email, student_name, module_name, body_parts):
     }
     for part in body_parts:
         data['Messages'][0][part] = body_parts[part]
+    if attachments:
+        data['Messages'][0]['Attachments']: attachments
     return data
 
 
@@ -87,3 +90,48 @@ def confirm_reg_create_account(
 
     body_parts = _main_part(body, html_body, "ClassRegNoAccount")
     return _make_template(student_email, student_name, module_name, body_parts)
+
+
+def curriculum_request(requester_email):
+    body = Template("¡Hola!,%0A"
+                    "Gracias por tu interés en Coding in English."
+                    "Anexado está el currículo del curso {{course}}."
+                    "Este curso empieza el 20 de septiembre. Programa una reunión ahora para hablar con un instructor y matricularte: https://calendly.com/coding_in_english"
+                    "Sincerely,%0AVincent Caudo Engelmann, Coding in English").render(
+        course="WebApp Development - Basic")
+    html_body = Template("<p>¡Hola!</p>"
+                         "<p>Gracias por tu interés en Coding in English.</p>"
+                         "<p>Anexado está el currículo del curso {{course}}.</p>"
+                         "<p>Este curso empieza el 20 de septiembre. Programa una reunión ahora para hablar con un instructor y matricularte: https://calendly.com/coding_in_english"
+                         "<p>Cordialmente,<br/>Vincent Caudo Engelmann, Coding in English</p>").render(
+        course="WebApp Development - Basic")
+    body_parts = _main_part(body, html_body, "CurriculumRequest")
+    curriculum_resp = requests.get("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/WebAppDevelopment_Basic_CIE_2021_Sep_20.pdf")
+    attachments = [{
+            "ContentType": "application/pdf",
+            "Filename": "WebAppDevelopment-Basic-20Sep2021.pdf",
+            "Base64Content": base64.b64encode(curriculum_resp.content).decode("utf-8")
+        }]
+
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": "support@codinginenglish.com",
+                    "Name": "Vincent"
+                },
+                "To": [
+                    {
+                        "Email": requester_email,
+                        "Name": "TO NAME"
+                    }
+                ],
+                "Subject": f"Coding in English - WebApp Development - Basic",
+            }
+        ]
+    }
+    for part in body_parts:
+        data['Messages'][0][part] = body_parts[part]
+
+    data['Messages'][0]['Attachments'] = attachments
+    return data

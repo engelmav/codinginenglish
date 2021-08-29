@@ -8,7 +8,7 @@ import {
   darkGray,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
-import { boxy, Box } from "../UtilComponents";
+import { ApplyButton, boxy, Box } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { navbarCommonStyle, LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
@@ -16,6 +16,7 @@ import ReactGA from "react-ga";
 import settings from "../settings";
 import Login from "../Login/Login";
 import Router from "next/router";
+import Modal from "../components/Modal"
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -62,13 +63,13 @@ const Header = styled.header`
   max-width: 100%;
   width: 100%;
   display: flex;
-  height: 200x;
   flex-wrap: wrap;
   padding: 1rem;
   ${whenSmallScreen`
       ${headerMarginSm}`}
   align-items: center;
   background-color: ${darkGray};
+  flex-shrink: 2;
 `;
 
 const Img = styled.img`
@@ -85,19 +86,6 @@ const Img2 = styled.img`
   cursor: pointer;
 `;
 
-const LanguageSelectorStyle = styled.div`
-  ${boxy}
-  position: fixed;
-  z-index: 20;
-  background-color: ${darkGray};
-  opacity: 0.97;
-  left: 0;
-  top: 0;
-  margin: 0 auto;
-  color: white;
-  overflow-x: hidden;
-`;
-
 const LangUl = styled.ul``;
 
 const locales = {
@@ -106,27 +94,6 @@ const locales = {
   español: "es",
 };
 
-const LangSelectModal = ({ closeLanguageSelector }) => {
-  return (
-    <LanguageSelectorStyle
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      width="100%"
-      height={["100vh", "100vh", "400px", "400px"]}
-    >
-      <LangUl>
-        {Object.keys(locales).map((localeKey) => (
-          <LI mb={2} fontSize={20} onClick={closeLanguageSelector}>
-            <Link href={Router.pathname} locale={locales[localeKey]}>
-              {localeKey}
-            </Link>
-          </LI>
-        ))}
-      </LangUl>
-    </LanguageSelectorStyle>
-  );
-};
 
 const NavbarUl = styled.ul`
   ${navbarCommonStyle}
@@ -165,32 +132,7 @@ const Banner = styled.div`
       `}
 `;
 
-const ApplyButton = styled.button`
-  padding: 2px;
-  ${fontMonospace}
-  outline: 0;
-  cursor: pointer;
-  background: yellow;
-  color: black;
-  border: 2px black solid;
-  border-radius: 2px;
-  &:focus {
-    outline: none;
-    outline-offset: -4px;
-  }
-  &:hover {
-    color: yellow;
-    background: black;
-  }
-  &:active {
-    transform: scale(0.99);
-  }
-  margin-left: 6px;
-  ${whenSmallScreen`
-      font-size: 10px;
-      margin-right: 6px;
-      `}
-`;
+
 
 export const CloseBanner = styled(FaRegWindowClose)`
   color: black;
@@ -221,7 +163,7 @@ function daysBetween(startDate, endDate) {
 const HeaderContainer = (props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
-  const [bannerOpen, setBannerOpen] = useState(true);
+  const [bannerOpen, setBannerOpen] = useState(false);
   const [inApplyRoute, setInApplyRoute] = useState(false);
   const [languageSelectorOpen, setLanguageSelectorOpen] = useState(false);
   const showLanguageSelector = () => setLanguageSelectorOpen(true);
@@ -248,17 +190,30 @@ const HeaderContainer = (props) => {
   }, [navMenuRef]);
 
   const hideNav = { onClick: () => setNavMenu(false) };
-  const _links = [
-    { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions", ...hideNav },
-    { text: "CONÓCENOS", location: "/about-us", ...hideNav },
-    { text: "TÉCNICA", location: "/technique", ...hideNav },
-  ];
 
   let { links } = props.headerContent;
   links = links.map((link) => {
     link.onClick = () => setNavMenu(false);
     return link;
   });
+
+  const LangOptsBox = styled.div`
+    ${boxy}
+
+  `
+
+  const LangOpts = () =>
+    <LangOptsBox height="100%" display="flex" alignItems="center" justifyContent="center">
+    <LangUl>
+      {Object.keys(locales).map((localeKey) => (
+        <LI mb={2} fontSize={20} onClick={closeLanguageSelector}>
+          <Link href={Router.pathname} locale={locales[localeKey]}>
+            {localeKey}
+          </Link>
+        </LI>
+      ))}
+    </LangUl>
+    </LangOptsBox>
 
   return (
     <>
@@ -289,11 +244,9 @@ const HeaderContainer = (props) => {
         </Banner>
       )}
       {languageSelectorOpen && (
-        <LangSelectModal closeLanguageSelector={closeLanguageSelector} />
+        <Modal onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
       )}
-      <Header
-        justifyContent={["space-between"]}
-      >
+      <Header justifyContent={["space-between"]}>
         <Link href="/">
           <Img
             loading="lazy"

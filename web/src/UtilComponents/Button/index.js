@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
-import { space, flexbox, typography } from "styled-system";
-import { font, fontMonospace, cieOrange, ctaBlue } from "../sharedStyles";
+import { color, space, flexbox, typography } from "styled-system";
+import { font, fontMonospace, cieOrange, ctaBlue, whenSmallScreen } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
 import React from "react";
@@ -13,7 +13,7 @@ const commonStyles = css`
   border-radius: 2px;
   color: white;
   cursor: pointer;
-
+  box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 `;
 
 const hoverStyles = css`
@@ -41,10 +41,13 @@ const Button = styled.button.attrs((props) => {
   &:hover:enabled {
     ${hoverStyles}
   }
+  ${color}
 `;
 Button.defaultProps = {
-  p: 2,
-};
+  fontSize: [1, 2, 2, 2],
+  padding: [3, 3, 3, 3, 3]
+}
+
 
 export const LinkButton = styled.a`
   ${commonStyles}
@@ -59,15 +62,13 @@ export const LinkButton = styled.a`
   }
 `;
 
-
-
 const StyledLink = styled.a`
   ${boxy}
   text-align: center;
   color: white;
   ${typography}
   border-radius: 4px;
-  background-color: ${ctaBlue};
+  background-color: ${cieOrange};
   text-decoration: none;
   box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 
@@ -90,13 +91,31 @@ export const RegisterLink = (props) => {
     </Link>
   );
 };
-// export const RegisterLink = ({ children, href }) => {
-//   return (
-//     <RegisterLinkStyle >
-//       <Link href={href}>{children}</Link>
-//     </RegisterLinkStyle>
-//   );
-// };
+
+export const ApplyButton = styled.button`
+  background-color: rgba(255,255,255, 0);
+  ${typography}
+  ${color}
+  ${flexbox}
+  ${boxy}
+  font-family: Roboto Mono;
+  outline: 0;
+  cursor: pointer;
+  border: 2px black solid;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px yellow, 0 0 1em gray, 1px 1px 1px yellow;
+
+  &:focus {
+    outline: none;
+    outline-offset: -4px;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+  margin-left: 6px;
+`;
+
 
 export const NextRegisterLink = styled(Link);
 

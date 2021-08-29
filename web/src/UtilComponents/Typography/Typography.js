@@ -17,12 +17,13 @@ TitleH1.defaultProps = {
 };
 
 export const H2 = styled.h2`
+  font-family: Roboto Mono;
+  text-align: center;
   ${space}
   ${fontSize}
   ${fontColor}
   ${typography}
-  font-family: Roboto Mono;
-  text-align: center;
+  ${font}
 `;
 H2.defaultProps = {
   mt: 3,
@@ -30,10 +31,26 @@ H2.defaultProps = {
   fontSize: ["30px", "35px", "40px", "50px"],
 };
 
+export const H3 = styled.h3`
+  font-family: Roboto Mono;
+  ${fontColor}
+  ${debugBorder}
+  ${space}
+  ${typography}
+  ${border}
+  ${boxy}
+
+  line-height: 1.5em;
+
+`;
+H3.defaultProps = {
+  mb: 2,
+};
+
 export const TitleH2 = styled.h2`
   ${boxy}
   ${space}
-  ${fontColor}
+
   ${typography}
 
   font-size: max(1.45rem, min(2.0rem, 2.5vw));
@@ -49,7 +66,7 @@ export const P = styled.p`
   ${boxy}
 
   line-height: 1.5em;
-  hyphens: auto;
+
 `;
 
 P.defaultProps = {

@@ -13,8 +13,8 @@ class CieApi {
     ).data;
   }
 
-  async createRegisteredUser(userData) {
-    return this._post("/api/registered-user", userData);
+  async createUserEmail(userData) {
+    return this._post("/api/user-email", userData);
   }
 
   async _get(uri) {

@@ -17,13 +17,13 @@ const GlobalStyle = createGlobalStyle`
 const Layout = (props) => {
   const { children, headerContent } = props;
   return (
-    <div style={{height: "100vh", display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
+    <div style={{height: "100vh", display: "flex", flexDirection: "column"}}>
       <GlobalStyle />
       <Head>
         <title>coding_in_english</title>
       </Head>
       <Header headerContent={headerContent} />
-      <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
+      <div style={{width: "100%", display: "flex", justifyContent: "center", flex: 1}}>
       <Main>
       {children}
       </Main>
