@@ -1,20 +1,18 @@
-import NextSteps from "../../CourseApplications/NextSteps";
 import Layout from "../../components/Layout";
+import Register from "../../CourseApplications/Register"
 import React from "react";
 import { getStaticProps } from "../../cmsLocaleStaticLoader";
 import { authLazy } from "../../auth/AuthLazy";
 import appStoreLazy from "../../stores/AppStoreLazy";
-import { cieApi } from "../../services/cieApi";
 export { getStaticProps };
 
-const NextStepsView = (props) => (
+// export const Register = compose(_Register, { Timeline, appStoreLazy, authLazy, cieApi });
+
+
+const RegisterView = (props) => (
   <Layout {...props}>
-    <NextSteps
-      authLazy={authLazy}
-      appStoreLazy={appStoreLazy}
-      cieApi={cieApi}
-    />
+    <Register authLazy={authLazy} appStoreLazy={appStoreLazy}/>
   </Layout>
 );
 
-export default NextStepsView;
+export default RegisterView;

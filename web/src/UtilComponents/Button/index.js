@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { color, space, flexbox, typography } from "styled-system";
+import { border, color, space, flexbox, typography } from "styled-system";
 import { font, fontMonospace, cieOrange, ctaBlue, whenSmallScreen } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
@@ -9,6 +9,7 @@ const commonStyles = css`
   ${font}
   ${space}
   ${flexbox}
+  ${typography}
   background-color: ${cieOrange};
   border-radius: 2px;
   color: white;
@@ -44,8 +45,8 @@ const Button = styled.button.attrs((props) => {
   ${color}
 `;
 Button.defaultProps = {
-  fontSize: [1, 2, 2, 2],
-  padding: [3, 3, 3, 3, 3]
+  fontSize: [1, 1, 1, 1],
+  p: 2
 }
 
 
@@ -92,29 +93,60 @@ export const RegisterLink = (props) => {
   );
 };
 
-export const ApplyButton = styled.button`
-  background-color: rgba(255,255,255, 0);
-  ${typography}
-  ${color}
-  ${flexbox}
-  ${boxy}
+const commonApply = css`
+  box-shadow: 1px 1px 1px yellow, 0 0 1em gray, 1px 1px 1px yellow;
+  
   font-family: Roboto Mono;
-  outline: 0;
-  cursor: pointer;
+  background-color: rgba(255,255,255, 0);
   border: 2px black solid;
   border-radius: 2px;
-  box-shadow: 1px 1px 1px yellow, 0 0 1em gray, 1px 1px 1px yellow;
+  ${color}
+  ${typography}
+  ${flexbox}
+  ${boxy}
+  ${border}
+`
 
+export const ApplyButton = styled.button`
+  ${commonApply}
+  outline: 0;
+  cursor: pointer;
   &:focus {
     outline: none;
     outline-offset: -4px;
   }
-
   &:active {
     transform: scale(0.99);
   }
-  margin-left: 6px;
 `;
+ApplyButton.defaultProps = {
+  py: 3
+}
+
+const StyledApplyLink = styled.a`
+${commonApply}
+  text-align: center;
+  text-decoration: none;
+  &:hover:enabled {
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
+  }
+  &:active {
+    transform: scale(0.99);
+  }
+`;
+StyledApplyLink.defaultProps = {
+  py: 3
+}
+
+export const ApplyLink = (props) => {
+  const { children, href, ...otherProps } = props;
+  return (
+    <Link href={href} passHref>
+      <StyledApplyLink {...otherProps}>{children}</StyledApplyLink>
+    </Link>
+  );
+};
 
 
 export const NextRegisterLink = styled(Link);

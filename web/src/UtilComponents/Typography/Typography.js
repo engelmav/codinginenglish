@@ -8,6 +8,7 @@ export const TitleH1 = styled.h1`
   ${fontSize}
   ${space}
   ${fontColor}
+  ${typography}
   font-family: Roboto Mono;
   font-weight: 700;
 `;

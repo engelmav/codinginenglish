@@ -494,13 +494,13 @@ def create_main_api(publish_message,
                 messages=["Successfully submitted student application."]
             ))
 
-    blacklist = [
+    local_ips = [
         "192.168",
         "127.0.0.1"
     ]
 
-    def ip_blacklisted(addr):
-        for item in blacklist:
+    def is_local_ip_test(addr):
+        for item in local_ips:
             if item in addr:
                 return True
         return False
@@ -510,12 +510,14 @@ def create_main_api(publish_message,
         data = {}
         messages = []
         status = "error"
-        http_x_forwarded_host = request.headers.environ["HTTP_X_FORWARDED_FOR"]
+        environ = request.headers.environ
+        http_x_forwarded_host = environ.get("HTTP_X_FORWARDED_FOR",
+                                            environ.get("REMOTE_ADDR"))
         LOG.info(f"Got http_x_forwarded_host {http_x_forwarded_host}")
         ip_addr = http_x_forwarded_host
 
-        if ip_blacklisted(ip_addr):
-            return jsonify(dict(data={}, status="error", messages=[f"ip {ip_addr} is blacklisted"]))
+        if is_local_ip_test(ip_addr):
+            return jsonify(dict(status="success", data={"city": "LocalCity", "country_name": "LocalCountry"}, messages=[f"{ip_addr} is a local IP"]))
         try:
             resp = requests.get(f"http://api.ipstack.com/{ip_addr}?access_key=1cf9eb6bbf475a26fb0ad4ed4ece272e")
             status = "success"

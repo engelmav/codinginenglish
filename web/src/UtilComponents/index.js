@@ -1,6 +1,6 @@
 import { AutoScaleImage } from "./AutoScaleImage";
 import { Box, boxy } from "./Box";
-import { Button, RegisterLink, ApplyButton } from "./Button";
+import { Button, RegisterLink, ApplyButton, ApplyLink } from "./Button";
 import { TitleH2 } from "./Typography/Typography";
 import { Window } from "./Window";
 import { Spinner } from "./Spinner";
@@ -15,6 +15,7 @@ import { Select } from "./Select/Select";
 export {
   AlertMessage,
   ApplyButton,
+  ApplyLink,
   AutoScaleImage,
   Box,
   boxy,

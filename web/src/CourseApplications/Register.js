@@ -21,6 +21,7 @@ import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import Router from "next/router";
 import ReactGA from "react-ga";
+import { cieApi } from "../services/cieApi"
 
 
 const trackingId = "UA-199972795-1";
@@ -108,7 +109,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStoreLazy, authLazy, cieApi }) => {
+const Register = ({ appStoreLazy, authLazy }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);

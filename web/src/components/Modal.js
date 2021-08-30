@@ -47,7 +47,7 @@ const Modal = ({ children, onClose, styleProps, title }) => {
           <H3 mb={0} fontSize={[2]} color="white">
             {title}
           </H3>
-          <FaRegWindowClose size={25} onClick={onClose} />
+          <FaRegWindowClose data-cy="close-modal-btn" size={25} onClick={onClose} />
         </ModalHeader>
         {children}
       </ModalStyle>

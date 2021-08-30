@@ -6,6 +6,7 @@ import {
   debugBorder,
   whenSmallScreen,
   darkGray,
+  darkGrayRgb,
   fontMonospace,
 } from "../UtilComponents/sharedStyles";
 import { ApplyButton, boxy, Box } from "../UtilComponents";
@@ -17,6 +18,7 @@ import settings from "../settings";
 import Login from "../Login/Login";
 import Router from "next/router";
 import Modal from "../components/Modal"
+import { useAppStore } from "../stores/appStoreReact";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -53,9 +55,10 @@ const Hamburger = styled.svg`
       display: block;`}
 `;
 
-const Header = styled.header`
+const HeaderStyle = styled.header`
   ${boxy}
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px;
+  /* background-color: rgba(darkGrayRgb, 0.9); */
+  /* box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px; */
   position: sticky;
   z-index: 1;
   top: 0;
@@ -94,7 +97,6 @@ const locales = {
   español: "es",
 };
 
-
 const NavbarUl = styled.ul`
   ${navbarCommonStyle}
   ${whenSmallScreen`
@@ -132,8 +134,6 @@ const Banner = styled.div`
       `}
 `;
 
-
-
 export const CloseBanner = styled(FaRegWindowClose)`
   color: black;
   background-color: yellow;
@@ -168,6 +168,14 @@ const HeaderContainer = (props) => {
   const [languageSelectorOpen, setLanguageSelectorOpen] = useState(false);
   const showLanguageSelector = () => setLanguageSelectorOpen(true);
   const closeLanguageSelector = () => setLanguageSelectorOpen(false);
+  // const [height, setHeight] = useState(0)
+  const [headerHeight, setHeaderHeight] = useAppStore();
+  
+  const ref = useRef(null)
+
+  useEffect(() => {
+    setHeaderHeight(ref.current?.clientHeight)
+  }, [])
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -244,9 +252,9 @@ const HeaderContainer = (props) => {
         </Banner>
       )}
       {languageSelectorOpen && (
-        <Modal onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
+        <Modal title="Language" onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
       )}
-      <Header justifyContent={["space-between"]}>
+      <HeaderStyle justifyContent={["space-between"]} ref={ref}>
         <Link href="/">
           <Img
             loading="lazy"
@@ -282,7 +290,7 @@ const HeaderContainer = (props) => {
             <rect y="60" width="100" height="20"></rect>
           </Hamburger>
         </Box>
-      </Header>
+      </HeaderStyle>
     </>
   );
 };

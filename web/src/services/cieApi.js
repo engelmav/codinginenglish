@@ -4,8 +4,8 @@ class CieApi {
   constructor() {
     const axiosConfig = {
       baseURL: "/",
-    }
-    this.axios = axios.create(axiosConfig)
+    };
+    this.axios = axios.create(axiosConfig);
   }
   async initializeUser(userData) {
     return await (
@@ -17,8 +17,8 @@ class CieApi {
     return this._post("/api/user-email", userData);
   }
 
-  async _get(uri) {
-    // TODO: handle exceptions
+  async _get(uri, params) {
+    return (await this.axios.get(uri, { params })).data;
   }
 
   async _post(uri, payload) {
@@ -64,7 +64,8 @@ class CieApi {
   }
 
   async rocketchatLogin(username) {
-    return (await this.axios.post(`/api/rocketchat/do-login`, { username })).data;
+    return (await this.axios.post(`/api/rocketchat/do-login`, { username }))
+      .data;
   }
 
   async updateUser(userId, userData) {
@@ -78,7 +79,8 @@ class CieApi {
   }
 
   async submitApp(appData) {
-    const res = (await this.axios.post(`/api/student-application`, appData)).data;
+    const res = (await this.axios.post(`/api/student-application`, appData))
+      .data;
     return res;
   }
 

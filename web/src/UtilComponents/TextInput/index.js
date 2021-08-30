@@ -51,10 +51,24 @@ const ButtonDiv = styled.div`
     transform: translateX(2px);
   }
 `;
+
+const ZIndexWrapper = styled.div`
+    z-index: 2;
+`
 export const ClearableTextInput = (props) => {
   useEffect(() => {}, [props.value]);
-  const { id, name, onChange, value } = props;
+  const { id, name, onChange, value, button } = props;
   const { onClear, ...remainingProps } = props; // don't pass onClear to text field
+  let derivedButton;
+  if (button){
+    derivedButton = <ZIndexWrapper>{button}</ZIndexWrapper>
+  } else {
+    derivedButton = <div onClick={onClear}>
+    <FaTimesCircle />
+  </div>
+  }
+    
+ 
   return (
     <ButtonDiv>
       <TextInput
@@ -64,9 +78,7 @@ export const ClearableTextInput = (props) => {
         {...remainingProps}
         onChange={onChange}
       />
-      <div onClick={onClear}>
-        <FaTimesCircle />
-      </div>
+      {derivedButton}
     </ButtonDiv>
   );
 };

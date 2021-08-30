@@ -14,15 +14,22 @@ import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
 import { fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
+import { cieApi } from "../services/cieApi";
+import EmailForm from "../components/EmailForm";
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
 const ApplicationSchema = Yup.object().shape({
-  fullName: Yup.string()
+  "given-name": Yup.string()
     .min(2, "Muy corto!")
     .max(50, "Muy largo!")
     .required("Requerido"),
+  "family-name": Yup.string()
+    .min(2, "Muy corto!")
+    .max(50, "Muy largo!")
+    .required("Requerido"),
+  email: Yup.string().email().required("Requerido"),
   programmingLevel: Yup.string().required(
     "Favor de seleccionar tu nivel de experiencia con la programación"
   ),
@@ -76,32 +83,32 @@ const setupFormik = (appStore) => {
       ? field.initialValue
       : "";
   });
-  initialValues["location"] = appStore.userLocation || "";
-  initialValues["fullName"] = appStore.lastName
-    ? appStore.firstName + " " + appStore.lastName
-    : appStore.firstName;
+  initialValues["location"] = "";
+  initialValues["fullName"] = "";
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
-  const [appStore, setAppStore] = useState(null);
+export const BasicCourseForm = ({ cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
+  const [emailCaptured, setEmailCaptured] = useState(false);
+
+  const getUserLocation = async () => {
+    try {
+      const resp = await cieApi.getUserLocation();
+      console.log(resp);
+      const locationData = resp.data;
+      const { city, country_name } = locationData;
+      return `${city}, ${country_name}`;
+    } catch (e) {
+      console.log(e);
+      console.log("error getting location data");
+    }
+  };
 
   useEffect(() => {
     async function init() {
-      const _appStore = await appStoreLazy.load();
-      setAppStore(_appStore);
-      try {
-        const resp = await cieApi.getUserLocation();
-        const locationData = resp.data;
-        const { city, country_name } = locationData;
-        if (!!city && !!country_name)
-          _appStore.userLocation = `${city}, ${country_name}`;
-      } catch {
-        console.log("Unable to get location.");
-      }
-      const _formikData = setupFormik(_appStore);
+      const _formikData = setupFormik();
       setFormikData(_formikData);
     }
     init();
@@ -109,10 +116,11 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
 
   return (
     <>
+
+      {!emailCaptured && <><EmailForm containerStyles={{background: "white"}} submitBtnText="Empieza mi inscripción"/></>}
       {appComplete ? (
         <P>
-          Gracias por completar la solicitud! Te contactaremos dentro de 2 días
-          para hablar de los próximos pasos.
+          Hemos recibido tu inscripción. Te contactaremos dentro de 2 días para hablar de los próximos pasos.
         </P>
       ) : (
         <>
@@ -121,11 +129,9 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
               validationSchema={ApplicationSchema}
               initialValues={formikData.initialValues}
               onSubmit={async (values, actions) => {
-                values.email = appStore.email;
                 await cieApi.submitApp(values);
                 setAppComplete(true);
                 actions.setSubmitting(false);
-                appStore.userApplied = true;
               }}
             >
               {({
@@ -150,8 +156,9 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             {field.title}
                           </FieldLabel>
                           <TextInput
+                            data-cy={fieldName}
                             mb={2}
-                            autocomplete="false"
+                            autoComplete={fieldName}
                             type="text"
                             id={fieldName}
                             name={fieldName}
@@ -176,6 +183,8 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             {field.title}
                           </FieldLabel>
                           <TextInput
+                            data-cy={fieldName}
+                            autoComplete={true}
                             mb={2}
                             type="email"
                             id={fieldName}
@@ -203,6 +212,8 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                               return (
                                 <MultiLabel key={idx}>
                                   <Field
+                                    data-cy={fieldName}
+                                    mb={2}
                                     type="radio"
                                     name={fieldName}
                                     value={choice}
@@ -224,7 +235,12 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                           {field.choices.map((choice, idx) => {
                             return (
                               <MultiLabel key={idx}>
-                                <Field type="checkbox" name={choice} />
+                                <Field
+                                  data-cy={fieldName}
+                                  mb={2}
+                                  type="checkbox"
+                                  name={choice}
+                                />
                                 {choice}
                               </MultiLabel>
                             );
@@ -239,6 +255,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                             {field.title}
                           </FieldLabel>
                           <TextInput
+                            data-cy={fieldName}
                             as="textarea"
                             name={fieldName}
                             value={values[field.fieldName]}
@@ -268,8 +285,20 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                       Ciudad y país. (Lo necesitamos para saber tu zona horaria)
                     </FieldLabel>
                     <ClearableTextInput
-                      id={"location"}
-                      name={"location"}
+                      data-cy="location"
+                      button={
+                        <Button
+                          onClick={async () => {
+                            const loc = await getUserLocation();
+                            setFieldValue("location", loc);
+                          }}
+                          padding={0}
+                        >
+                          Find me!
+                        </Button>
+                      }
+                      id="location"
+                      name="location"
                       onFocus={() => {
                         ReactGA.event({
                           category: "applyFieldFocus",
@@ -280,7 +309,7 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                         console.log(e);
                         handleChange(e);
                       }}
-                      value={values["location"] || appStore.userLocation || ""}
+                      value={values["location"]}
                       onClear={() => {
                         setFieldValue("location", " ", false);
                       }}
@@ -306,8 +335,9 @@ export const BasicCourseForm = ({ appStoreLazy, cieApi }) => {
                         });
                       }}
                     >
-                      Envía mi solicitud
+                      ¡Inscríbeme!
                     </Button>
+                    <P mt={3} textAlign="center" fontStyle="italic">(Te contactaremos sobre los próxmios pasos de admisión.)</P>
                   </Box>
                 </Form>
               )}

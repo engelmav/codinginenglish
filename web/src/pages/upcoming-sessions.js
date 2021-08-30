@@ -3,12 +3,15 @@ import UpcomingSessions from "../UpcomingSessions";
 import Layout from "../components/Layout";
 import settings from "../settings";
 import getContent from "../cms";
+import { AppStoreProvider } from "../stores/appStoreReact";
 
 const UpcomingSessionsPage = (props) => {
   return (
+    <AppStoreProvider>
     <Layout {...props}>
       <UpcomingSessions {...props} />
     </Layout>
+    </AppStoreProvider>
   );
 };
 
