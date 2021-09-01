@@ -16,9 +16,9 @@ import { fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 import { cieApi } from "../services/cieApi";
 import EmailForm from "../components/EmailForm";
+import settings from "../settings"
 
-const trackingId = "UA-199972795-1";
-ReactGA.initialize(trackingId);
+ReactGA.initialize(settings.gaTrackingId);
 
 const ApplicationSchema = Yup.object().shape({
   "given-name": Yup.string()
@@ -29,7 +29,6 @@ const ApplicationSchema = Yup.object().shape({
     .min(2, "Muy corto!")
     .max(50, "Muy largo!")
     .required("Requerido"),
-  email: Yup.string().email().required("Requerido"),
   programmingLevel: Yup.string().required(
     "Favor de seleccionar tu nivel de experiencia con la programación"
   ),
@@ -76,7 +75,7 @@ const Error = styled(P)`
   color: #ff0033;
 `;
 
-const setupFormik = (appStore) => {
+const setupFormik = () => {
   const initialValues = {};
   basicCourseForm.forEach((field) => {
     initialValues[field.fieldName] = field.initialValue
@@ -88,10 +87,17 @@ const setupFormik = (appStore) => {
   return { initialValues, basicCourseForm };
 };
 
+const HappyAlert = styled.div`
+  background-color: yellow;
+  box-shadow: 1px 1px 1px yellow, 0 0 1em yellow, 1px 1px 1px yellow;
+  ${boxy}
+  border: 3px dashed black;
+`
+
 export const BasicCourseForm = ({ cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
-  const [emailCaptured, setEmailCaptured] = useState(false);
+  const [capturedEmail, setCapturedEmail] = useState(null);
 
   const getUserLocation = async () => {
     try {
@@ -114,21 +120,37 @@ export const BasicCourseForm = ({ cieApi }) => {
     init();
   }, []);
 
+  const handleCaptureEmail = (email) => {
+    cieApi.createUserEmail({ email: email, status: "startedRegistration" });
+    setCapturedEmail(email)
+  }
+
   return (
     <>
-
-      {!emailCaptured && <><EmailForm containerStyles={{background: "white"}} submitBtnText="Empieza mi inscripción"/></>}
+      {!capturedEmail && (
+        <>
+          <EmailForm
+            containerStyles={{ background: "white", width: "100%", maxWidth:"600px"}}
+            submitBtnText="Empieza mi inscripción"
+            onFinishSubmitEmail={handleCaptureEmail}
+          />
+        </>
+      )}
       {appComplete ? (
-        <P>
-          Hemos recibido tu inscripción. Te contactaremos dentro de 2 días para hablar de los próximos pasos.
+        <HappyAlert p="3">
+        <P mb="0">
+          ¡Hemos recibido tu inscripción¡ Te contactaremos dentro de 2 días para
+          hablar de los próximos pasos.
         </P>
+        </HappyAlert>
       ) : (
         <>
-          {formikData && (
+          {formikData && capturedEmail && (
             <Formik
               validationSchema={ApplicationSchema}
               initialValues={formikData.initialValues}
               onSubmit={async (values, actions) => {
+                values.email = capturedEmail;
                 await cieApi.submitApp(values);
                 setAppComplete(true);
                 actions.setSubmitting(false);
@@ -292,9 +314,10 @@ export const BasicCourseForm = ({ cieApi }) => {
                             const loc = await getUserLocation();
                             setFieldValue("location", loc);
                           }}
-                          padding={0}
+                          bg="black"
+                          p="1px"
                         >
-                          Find me!
+                          Find me
                         </Button>
                       }
                       id="location"
@@ -331,13 +354,16 @@ export const BasicCourseForm = ({ cieApi }) => {
                       onClick={() => {
                         ReactGA.event({
                           category: "appliedCat",
-                          action: `userApplied`,
+                          action: `userRegistered`,
+                          label: "userRegistered"
                         });
                       }}
                     >
                       ¡Inscríbeme!
                     </Button>
-                    <P mt={3} textAlign="center" fontStyle="italic">(Te contactaremos sobre los próxmios pasos de admisión.)</P>
+                    <P mt={3} textAlign="center" fontStyle="italic">
+                      (Te contactaremos sobre los próxmios pasos de admisión.)
+                    </P>
                   </Box>
                 </Form>
               )}

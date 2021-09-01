@@ -16,7 +16,7 @@ const ModalStyle = styled.div`
   ${flexbox}
 `;
 
-ModalStyle.defaultProps = { mt: 4, mx: 3 }
+ModalStyle.defaultProps = { mt: 4, mx: 3 };
 
 const ModalHeader = styled.div`
   ${boxy}
@@ -37,17 +37,36 @@ const Background = styled.div`
   background: rgba(${darkGrayRgb}, 0.5);
   width: 100vw;
   height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 `;
+
+const CloseBox = styled(FaRegWindowClose)`
+${boxy}
+`
+
 
 const Modal = ({ children, onClose, styleProps, title }) => {
   return (
     <Background>
-      <ModalStyle {...styleProps} display="flex" flexDirection="column">
+      <ModalStyle
+        display="flex"
+        flexDirection="column"
+        mt={[6]}
+        {...styleProps}
+      >
         <ModalHeader>
           <H3 mb={0} fontSize={[2]} color="white">
             {title}
           </H3>
-          <FaRegWindowClose data-cy="close-modal-btn" size={25} onClick={onClose} />
+
+          <CloseBox
+            data-cy="close-modal-btn"
+            size={25}
+            onClick={onClose}
+            ml="3"
+          />
         </ModalHeader>
         {children}
       </ModalStyle>

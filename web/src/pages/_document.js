@@ -6,7 +6,11 @@ class CieDocument extends Document {
     return (
       <Html>
         <Head>
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="true"
+          />
           <link
             href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap"
             rel="stylesheet"
@@ -42,8 +46,39 @@ class CieDocument extends Document {
               `,
             }}
           />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+              var _iub = _iub || [];
+              _iub.csConfiguration = {
+                consentOnContinuedBrowsing: false,
+                lang: "en",
+                siteId: 2336209,
+                cookiePolicyId: 48905763,
+                cookiePolicyUrl: "https://www.iubenda.com/privacy-policy/48905763",
+                banner: {
+                  acceptButtonDisplay: true,
+                  customizeButtonDisplay: true,
+                  position: "float-top-center",
+                  rejectButtonDisplay: true,
+                },
+              };`,
+            }}
+          />
+          <script
+            type="text/javascript"
+            src="http://cdn.iubenda.com/cs/iubenda_cs.js"
+            charset="UTF-8"
+            async
+          ></script>
+          <script
+            type="text/javascript"
+            src="https://cdn.iubenda.com/iubenda.js"
+            charset="UTF-8"
+            async
+          ></script>
         </Head>
-        <body>
+        <body style={{ margin: 0, boxSizing: "border-box" }}>
           <Main />
           <NextScript />
         </body>

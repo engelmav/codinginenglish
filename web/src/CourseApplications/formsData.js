@@ -10,11 +10,6 @@ export const basicCourseForm = [
     fieldType: "shortAnswer",
   },
   {
-    fieldName: "email",
-    title: "Email",
-    fieldType: "email",
-  },
-  {
     fieldName: "programmingLevel",
     title: "Nivel de programación",
     fieldType: "multipleChoice",

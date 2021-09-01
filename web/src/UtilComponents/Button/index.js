@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { border, color, space, flexbox, typography } from "styled-system";
+import { border, color, space, flexbox, typography, background, backgroundColor, boxShadow } from "styled-system";
 import { font, fontMonospace, cieOrange, ctaBlue, whenSmallScreen } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
@@ -10,6 +10,7 @@ const commonStyles = css`
   ${space}
   ${flexbox}
   ${typography}
+  ${background}
   background-color: ${cieOrange};
   border-radius: 2px;
   color: white;
@@ -28,6 +29,7 @@ const Button = styled.button.attrs((props) => {
   ${boxy}
   ${space}
   ${commonStyles}
+  
   font-family: Roboto;
   border: solid #ff3e00;
   border-width: 1px;
@@ -93,11 +95,8 @@ export const RegisterLink = (props) => {
   );
 };
 
-const commonApply = css`
-  box-shadow: 1px 1px 1px yellow, 0 0 1em gray, 1px 1px 1px yellow;
-  
+const commonApply = css`  
   font-family: Roboto Mono;
-  background-color: rgba(255,255,255, 0);
   border: 2px black solid;
   border-radius: 2px;
   ${color}

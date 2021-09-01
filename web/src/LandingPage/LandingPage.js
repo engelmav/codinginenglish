@@ -17,7 +17,7 @@ import styled from "styled-components";
 import { cieOrange } from "../UtilComponents/sharedStyles";
 import Modal from "../components/Modal";
 import { BiChevronDownCircle } from "@react-icons/all-files/bi/BiChevronDownCircle";
-import { typography, flexbox, layout } from "styled-system";
+import { typography, flexbox, layout, background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
 
@@ -86,25 +86,34 @@ const Section = ({
         >
           <ApplyButton
             {...applyProps}
+            mr={[0, 2, 2, 3, 4]}
             bg="white"
-            onClick={() => setCurricModal(true)}
+            onClick={() => {
+              setCurricModal(true);
+              ReactGA.event({
+                category: "landingPage",
+                action: buttonData[1].gaAction,
+                label: buttonData[1].gaLabel,
+              });
+            }}
           >
-            Envíame el currículo
+            {buttonData[1].buttonText}
           </ApplyButton>
           <ApplyLink
+            backgroundColor="black"
             href="/apply"
             {...applyProps}
             backgroundColor={cieOrange}
             color="white"
             onClick={() => {
               ReactGA.event({
-                category: "registration",
-                action: "clickedRegister",
-                label: buttonData.gaLabel,
+                category: "landingPage",
+                action: buttonData[0].gaAction,
+                label: buttonData[0].gaLabel,
               });
             }}
           >
-            {buttonData.buttonText}
+            {buttonData[0].buttonText}
           </ApplyLink>
         </Box>
       )}
@@ -113,6 +122,7 @@ const Section = ({
 };
 
 const CallTag = styled.p`
+  font-family: Roboto;
   ${typography}
   color: white;
   text-shadow: 0.8px 0.5px 0.5px black, 0 0 1em black; //, 0 0 0.1em yellow;
@@ -121,17 +131,20 @@ const CallTag = styled.p`
 const HeroBg = styled.div`
   height: 100vh;
   width: 100vw;
+
+  max-width: 100%;
   top: 0;
   position: absolute;
-  z-index: -20;
+  z-index: -2;
   background-size: cover;
-  background-image: url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-sm.webp");
+  ${background}
 `;
 
 const applyProps = {
   fontSize: [1],
   mb: 3,
   width: "100%",
+  maxWidth: "300px",
   py: 3,
 };
 
@@ -147,31 +160,44 @@ const LandingPage = (props) => {
       {isMobileSize && <MobileMain>mobileSize</MobileMain>}
       {!isMobileSize && (
         <>
-          <HeroBg></HeroBg>
+          <HeroBg
+            backgroundImage={[
+              'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-sm.webp")',
+              null,
+              'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp")',
+            ]}
+          ></HeroBg>
           <HeroContent
             display="flex"
             flexDirection="column"
             textAlign="center"
             headerHeight={headerHeight}
           >
-            <TitleH1 fontSize={[5]} my={[0, 5, 5, 5]}>
+            <TitleH1 fontSize={[5, 6, 7]} my={[0]}>
               {content.title}
             </TitleH1>
-            <CallTag color="white" fontSize={[3, 3, 3, 4, 5]}>
+            <CallTag color="white" fontSize={[3, 4, 4, 5, 5]}>
               {content.subtitle}
             </CallTag>
             <Box
-              px={4}
+              px={(5, null, null, 0)}
+              pl="5"
+              pr="5"
               display="flex"
               alignItems="space-evenly"
+              width="100%"
               flexWrap="wrap"
+              justifyContent="center"
             >
               <ApplyButton
                 data-cy="hero-curric-btn"
                 onClick={() => setCurricModal(true)}
                 {...applyProps}
+                mr={[0, 2, 2, 3, 4]}
+                backgroundColor="black"
+                color="yellow"
               >
-                Envíame el currículo
+                {landingPageContent.heroCta1}
               </ApplyButton>
               <ApplyLink
                 href="/apply"
@@ -180,7 +206,7 @@ const LandingPage = (props) => {
                 backgroundColor="yellow"
                 color="black"
               >
-                Inscríbeme
+                {landingPageContent.heroCta2}
               </ApplyLink>
             </Box>
             <Box justifySelf="end">
@@ -216,10 +242,10 @@ const LandingPage = (props) => {
       )}
       {curricModal && (
         <Modal
-          title="Envíame el currículo!"
+          title={content.Modal1.title}
           onClose={() => setCurricModal(false)}
         >
-          <CurriculumForm />
+          <CurriculumForm content={content.Modal1}/>
         </Modal>
       )}
     </>

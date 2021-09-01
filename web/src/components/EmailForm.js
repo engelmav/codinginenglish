@@ -4,21 +4,18 @@ import {
   AlertMessage,
   TextInput,
   Button,
-  Main,
   Box,
   boxy,
 } from "../UtilComponents";
 import { darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
-import { flexbox, space, background } from "styled-system";
+import { flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
-import Router from "next/router";
 import ReactGA from "react-ga";
-import { cieApi } from "../services/cieApi";
+import settings from "../settings"
 
-const trackingId = "UA-199972795-1";
-ReactGA.initialize(trackingId);
+ReactGA.initialize(settings.gaTrackingId);
 
 const emailSchema = yup.object({ email: yup.string().email() });
 
@@ -32,8 +29,9 @@ const SignInContainer = styled.div`
 
 SignInContainer.defaultProps = {};
 
-const RegisterOptsCard = styled.div`
+const EmailFormContainer = styled.div`
   ${boxy}
+  ${layout}
   background-color: ${darkGray};
   ${background}
   display: flex;
@@ -41,8 +39,6 @@ const RegisterOptsCard = styled.div`
   flex-direction: column;
   align-self: center;
   justify-content: center;
-  max-width: 600px;
-  border-radius: 0px;
   ${whenSmallScreen`
     width: 100%;
   `}
@@ -54,21 +50,21 @@ const EmailForm = ({
   blurb,
   submitBtnText,
   styleProps,
+  successView,
+  onFinishSubmitEmail,
   containerStyles,
+  confirmRetry = false,
 }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
-  const [auth, setAuth] = useState(null);
 
   useEffect(() => {
     async function init() {}
     init();
   }, []);
 
-  const createUserEmail = (userEmail) =>
-    cieApi.createUserEmail({ email: userEmail });
 
   const handleSubmitEmail = async (event) => {
     event.stopPropagation();
@@ -91,21 +87,17 @@ const EmailForm = ({
     handleSetEmailSubmitted();
   };
   const handleSetEmailSubmitted = async () => {
-    createUserEmail(email);
-    ReactGA.event({
-      category: "register",
-      action: "emailRegistration",
-      label: "emailCaptured",
-    });
+    onCaptureEmail && onCaptureEmail(email)
     setIsSending(true);
     setTimeout(async function () {
       setIsSending(false);
       setEmailSubmitted(true);
+      onFinishSubmitEmail && onFinishSubmitEmail(email);
     }, 1500);
   };
   return (
     <>
-      <RegisterOptsCard {...containerStyles}>
+      <EmailFormContainer {...containerStyles}>
         {image && (
           <Box alignSelf="center" mb={3} mt={4}>
             {image}
@@ -113,25 +105,23 @@ const EmailForm = ({
         )}
 
         {blurb && blurb}
-        <div>
+        <>
           {emailSubmitted ? (
             <>
-              <P data-cy="curric-confirmation-text" color="white">
-                ¡Enviado! Por favor verifica tu correo electrónico (de{" "}
-                <b>{email}</b>) para un correo de nosotros. Incluirá un enlace
-                para acceder al currículo.
-              </P>
-              <P color="white">
-                No lo ves?{" "}
-                <Button
-                  m={1}
-                  onClick={() => {
-                    setEmailSubmitted(false);
-                  }}
-                >
-                  Intenta otra vez
-                </Button>
-              </P>
+              {successView || <></>}
+              {confirmRetry && (
+                <P color="white">
+                  No lo ves?{" "}
+                  <Button
+                    m={1}
+                    onClick={() => {
+                      setEmailSubmitted(false);
+                    }}
+                  >
+                    Intenta otra vez
+                  </Button>
+                </P>
+              )}
             </>
           ) : (
             <Box
@@ -182,8 +172,8 @@ const EmailForm = ({
               )}
             </Box>
           )}
-        </div>
-      </RegisterOptsCard>
+        </>
+      </EmailFormContainer>
     </>
   );
 };

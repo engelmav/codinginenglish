@@ -324,9 +324,11 @@ def create_main_api(publish_message,
     def create_user_email():
         req = request.get_json()
         email = req.get("email")
-        _user = user_service.create_user(email, status="curriculum-email")
-        curriculum_req_content = curriculum_request(email)
-        res = send_email(curriculum_req_content)
+        status = req.get("status")
+        _user = user_service.create_user(email, status=status)
+        if status == "curriculumDownload":
+            curriculum_req_content = curriculum_request(email)
+            _ = send_email(curriculum_req_content)
         return make_response(dict(messages=["Created registered user"], status="success"), 200)
 
     @app.route('/api/users', methods=['POST'])

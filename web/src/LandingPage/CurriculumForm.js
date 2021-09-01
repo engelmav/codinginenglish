@@ -1,8 +1,22 @@
 import React from "react";
-import EmailForm from "../components/EmailForm"
-import { P}  from "../UtilComponents/Typography/Typography"
+import EmailForm from "../components/EmailForm";
+import { P } from "../UtilComponents/Typography/Typography";
+import { cieApi } from "../services/cieApi";
+import settings from "../settings"
+import ReactGA from "react-ga"
 
-const CurriculumForm = () => {
+ReactGA.initialize(settings.gaTrackingId);
+
+const handleCapturedEmail = (userEmail) => {
+  ReactGA.event({
+    category: "register",
+    action: "emailRegistration",
+    label: "emailCaptured",
+  });
+  cieApi.createUserEmail({ email: userEmail, status: "curriculumDownload" });
+};
+
+const CurriculumForm = (content) => {
   return (
     <EmailForm
       image={
@@ -13,13 +27,19 @@ const CurriculumForm = () => {
       }
       blurb={
         <P color="white" mb={3} textAlign="center">
-          Consigue las dos competencias más cotizadas del mundo. Al mismo.
+          {content.modalContent}
         </P>
       }
-      containerStyles={{p:[3, 4, 4, 4], pt:0}}
-      submitBtnText="Envíamelo!"
+      containerStyles={{ p: [3, 4, 4, 4], pt: 0 }}
+      submitBtnText={content.buttonText}
+      successView={
+        <P data-cy="curric-confirmation-text" color="white">
+          ¡Enviado! Por favor verifica tu correo electrónico para ver un correo
+          de nosotros. El currículo estará anexado.
+        </P>
+      }
       styleProps={{ mt: [0], pt: 0, alignSelf: "center" }}
-      onCaptureEmail={() => "do stuff"}
+      onCaptureEmail={handleCapturedEmail}
     />
   );
 };

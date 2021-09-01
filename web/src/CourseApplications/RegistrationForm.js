@@ -33,7 +33,7 @@ const RegistrationForm = ({ appStoreLazy, cieApi }) => {
       <Container
         display="flex"
         flexDirection="column"
-        justifyContent="center"
+        justifyContent="flex-start"
         alignItems="center"
         textAlign="center"
         ml="3"

@@ -252,7 +252,7 @@ const HeaderContainer = (props) => {
         </Banner>
       )}
       {languageSelectorOpen && (
-        <Modal title="Language" onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
+        <Modal styleProps={{maxWidth: "600px"}} title="Language" onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
       )}
       <HeaderStyle justifyContent={["space-between"]} ref={ref}>
         <Link href="/">

@@ -22,6 +22,7 @@ export async function getStaticProps(params) {
     locale = "en"
   }
   const headerContent = await getContent(locale, "header");
+  const footerContent = await getContent(locale, "footer")
   let cieModules = [];
   try {
     const coursesUrl = `${settings.cmsUrl}/courses`;
@@ -40,7 +41,7 @@ export async function getStaticProps(params) {
     console.log(ex.stack);
   }
 
-  return { props: { cieModules, headerContent } };
+  return { props: { cieModules, headerContent, footerContent } };
 }
 
 export default UpcomingSessionsPage;

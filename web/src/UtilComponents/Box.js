@@ -23,7 +23,8 @@ export const Box = styled.div(
   flexGrow,
   flexWrap,
   debugBorder,
-  position
+  position,
+  layout
 );
 
 export const boxy = compose(space, position, color, layout, flexbox, flexGrow, flexWrap);

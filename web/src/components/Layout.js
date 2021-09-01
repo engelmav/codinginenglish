@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const Layout = (props) => {
-  const { children, headerContent } = props;
+  const { children, headerContent, footerContent } = props;
   return (
     <div style={{height: "100vh", display: "flex", flexDirection: "column"}}>
       <GlobalStyle />
@@ -28,7 +28,7 @@ const Layout = (props) => {
       {children}
       </Main>
       </div>
-      <Footer headerContent={headerContent} />
+      <Footer footerContent={footerContent} />
     </div>
   );
 };
