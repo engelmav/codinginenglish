@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { border, color, space, flexbox, typography, background, backgroundColor, boxShadow } from "styled-system";
-import { font, fontMonospace, cieOrange, ctaBlue, whenSmallScreen } from "../sharedStyles";
+import { font, fontMonospace, cieOrange, darkGray, ctaBlue, whenSmallScreen, cieYellowAnalogous } from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
 import React from "react";
@@ -23,33 +23,6 @@ const hoverStyles = css`
   box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 `;
 
-const Button = styled.button.attrs((props) => {
-  return { ...props };
-})`
-  ${boxy}
-  ${space}
-  ${commonStyles}
-  
-  font-family: Roboto;
-  border: solid #ff3e00;
-  border-width: 1px;
-  &:disabled,
-  &[disabled] {
-    border: 1px solid #999999;
-    background-color: #cccccc;
-    color: #666666;
-    &:hover {
-    }
-  }
-  &:hover:enabled {
-    ${hoverStyles}
-  }
-  ${color}
-`;
-Button.defaultProps = {
-  fontSize: [1, 1, 1, 1],
-  p: 2
-}
 
 
 export const LinkButton = styled.a`
@@ -106,7 +79,7 @@ const commonApply = css`
   ${border}
 `
 
-export const ApplyButton = styled.button`
+export const Button = styled.button`
   ${commonApply}
   outline: 0;
   cursor: pointer;
@@ -118,8 +91,11 @@ export const ApplyButton = styled.button`
     transform: scale(0.99);
   }
 `;
-ApplyButton.defaultProps = {
-  py: 3
+Button.defaultProps = {
+  bg: cieOrange,
+  py: 3,
+  color: cieYellowAnalogous,
+  borderColor:darkGray
 }
 
 const StyledApplyLink = styled.a`
@@ -149,5 +125,3 @@ export const ApplyLink = (props) => {
 
 
 export const NextRegisterLink = styled(Link);
-
-export { Button };

@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  AlertMessage,
-  TextInput,
-  Button,
-  Box,
-  boxy,
-} from "../UtilComponents";
+import { AlertMessage, TextInput, Button, Box, boxy } from "../UtilComponents";
 import { darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
 import { flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import ReactGA from "react-ga";
-import settings from "../settings"
+import settings from "../settings";
+import GoogleLoginComponent from "../components/GoogleSignUpBtn";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -44,14 +39,39 @@ const EmailFormContainer = styled.div`
   `}
 `;
 
+const Divider = styled(P)`
+  ${space}
+  font-family: "Roboto Mono";
+  display: flex;
+  align-items: center;
+  &:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    margin-right: 1em;
+    box-shadow: 0 0.5px 0 black;
+  }
+  &:after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    margin-left: 1em;
+    box-shadow: 0 0.5px 0 black;
+  }
+`;
+
 const EmailForm = ({
   onCaptureEmail,
   image,
   blurb,
+  blurbAfterEmailField,
+  buttonStyles,
+  showGoogleSignin,
   submitBtnText,
   styleProps,
   successView,
   onFinishSubmitEmail,
+  onGoogleSignin,
   containerStyles,
   confirmRetry = false,
 }) => {
@@ -64,7 +84,6 @@ const EmailForm = ({
     async function init() {}
     init();
   }, []);
-
 
   const handleSubmitEmail = async (event) => {
     event.stopPropagation();
@@ -86,14 +105,19 @@ const EmailForm = ({
     }
     handleSetEmailSubmitted();
   };
+
   const handleSetEmailSubmitted = async () => {
-    onCaptureEmail && onCaptureEmail(email)
+    onCaptureEmail && onCaptureEmail(email);
     setIsSending(true);
     setTimeout(async function () {
       setIsSending(false);
       setEmailSubmitted(true);
       onFinishSubmitEmail && onFinishSubmitEmail(email);
     }, 1500);
+  };
+
+  const handleGoogleLogin = async (googleUser) => {
+    onGoogleSignin(googleUser);
   };
   return (
     <>
@@ -130,11 +154,18 @@ const EmailForm = ({
               flexDirection="column"
               onSubmit={handleSubmitEmail}
             >
+              {showGoogleSignin && (
+                <>
+                  <GoogleLoginComponent onLogin={handleGoogleLogin} />
+                  <Divider mt={2} mb={2}>
+                    o
+                  </Divider>
+                </>
+              )}
               <TextInput
                 data-cy="email-input"
                 autoComplete="email"
                 p={3}
-                mb={3}
                 width="100%"
                 placeholder={"email"}
                 value={email}
@@ -143,6 +174,7 @@ const EmailForm = ({
                   setEmail(e.target.value);
                 }}
               />
+              {blurbAfterEmailField && blurbAfterEmailField}
               {invalidEmail && (
                 <AlertMessage
                   fontSize={1}
@@ -152,14 +184,13 @@ const EmailForm = ({
                 />
               )}
               {!isSending && (
-                <Button type="submit">
+                <Button mt="2" {...buttonStyles} type="submit">
                   <P
                     color="white"
                     alignSelf="center"
                     fontSize={[2]}
                     mb={0}
-                    mx="1px"
-                    p="1px"
+
                   >
                     {submitBtnText}
                   </P>

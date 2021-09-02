@@ -324,8 +324,10 @@ def create_main_api(publish_message,
     def create_user_email():
         req = request.get_json()
         email = req.get("email")
+        firstname = req.get("firstname")
+        lastname = req.get("lastname")
         status = req.get("status")
-        _user = user_service.create_user(email, status=status)
+        _user = user_service.create_user(email, first_name=firstname, last_name=lastname, status=status)
         if status == "curriculumDownload":
             curriculum_req_content = curriculum_request(email)
             _ = send_email(curriculum_req_content)

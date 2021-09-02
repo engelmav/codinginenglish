@@ -16,7 +16,8 @@ import { fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 import { cieApi } from "../services/cieApi";
 import EmailForm from "../components/EmailForm";
-import settings from "../settings"
+import settings from "../settings";
+import { HappyAlert } from "../components/Alerts";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -87,13 +88,6 @@ const setupFormik = () => {
   return { initialValues, basicCourseForm };
 };
 
-const HappyAlert = styled.div`
-  background-color: yellow;
-  box-shadow: 1px 1px 1px yellow, 0 0 1em yellow, 1px 1px 1px yellow;
-  ${boxy}
-  border: 3px dashed black;
-`
-
 export const BasicCourseForm = ({ cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
@@ -121,27 +115,69 @@ export const BasicCourseForm = ({ cieApi }) => {
   }, []);
 
   const handleCaptureEmail = (email) => {
+    ReactGA.event({
+      category: "leadCat",
+      action: "clickedStartReg",
+      label: "emailCapturedLabel",
+    });
     cieApi.createUserEmail({ email: email, status: "startedRegistration" });
-    setCapturedEmail(email)
-  }
+    setCapturedEmail(email);
+  };
+  const handleGoogleSignin = (googleUser) => {
+    let profile = googleUser.getBasicProfile();
+    console.log("profile:", profile);
+    console.log("Token || " + googleUser.getAuthResponse().id_token);
+    console.log("ID: " + profile.getId());
+    const firstname = profile.getGivenName();
+    const lastname = profile.getFamilyName();
+    const email = profile.getEmail();
+    ReactGA.event({
+      category: "leadCat",
+      action: "clickedGoogleSignin",
+      label: "emailCapturedLabel",
+    });
+    cieApi.createUserEmail({
+      email,
+      firstname,
+      lastname,
+      status: "startedRegistration",
+    });
+    const newFormikData = Object.assign({}, formikData);
+    newFormikData.initialValues["given-name"] = firstname;
+    newFormikData.initialValues["family-name"] = lastname;
+    setFormikData(newFormikData);
+    setCapturedEmail(email);
+  };
 
   return (
     <>
       {!capturedEmail && (
         <>
           <EmailForm
-            containerStyles={{ background: "white", width: "100%", maxWidth:"600px"}}
+            showGoogleSignin={true}
+            blurbAfterEmailField={
+              <P fontSize="1" mb="0" mt="1" textAlign="center">
+                Después de tu inscripción, te contactaremos para programar una
+                reunión.
+              </P>
+            }
+            containerStyles={{
+              background: "white",
+              width: "100%",
+              maxWidth: "600px",
+            }}
             submitBtnText="Empieza mi inscripción"
             onFinishSubmitEmail={handleCaptureEmail}
+            onGoogleSignin={handleGoogleSignin}
           />
         </>
       )}
       {appComplete ? (
         <HappyAlert p="3">
-        <P mb="0">
-          ¡Hemos recibido tu inscripción¡ Te contactaremos dentro de 2 días para
-          hablar de los próximos pasos.
-        </P>
+          <P mb="0">
+            ¡Hemos recibido tu inscripción¡ Te contactaremos dentro de 2 días
+            programar la reunión.
+          </P>
         </HappyAlert>
       ) : (
         <>
@@ -354,16 +390,13 @@ export const BasicCourseForm = ({ cieApi }) => {
                       onClick={() => {
                         ReactGA.event({
                           category: "appliedCat",
-                          action: `userRegistered`,
-                          label: "userRegistered"
+                          action: `userClickedRegister`,
+                          label: "appliedLabel",
                         });
                       }}
                     >
                       ¡Inscríbeme!
                     </Button>
-                    <P mt={3} textAlign="center" fontStyle="italic">
-                      (Te contactaremos sobre los próxmios pasos de admisión.)
-                    </P>
                   </Box>
                 </Form>
               )}

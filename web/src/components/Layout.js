@@ -24,7 +24,7 @@ const Layout = (props) => {
       </Head>
       <Header headerContent={headerContent} />
       <div style={{width: "100%", display: "flex", justifyContent: "center", flex: 1}}>
-      <Main>
+      <Main pb="5">
       {children}
       </Main>
       </div>

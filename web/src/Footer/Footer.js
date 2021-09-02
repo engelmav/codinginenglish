@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { navbarCommonStyle, LI } from "../Navbar";
-import { darkGray } from "../UtilComponents/sharedStyles";
+import { cieOrange, darkGray } from "../UtilComponents/sharedStyles";
 import { useRouter } from "next/router";
+import { Box, boxy } from "../UtilComponents";
+import { P } from "../UtilComponents/Typography/Typography";
 
 const StyledFooter = styled.footer`
   display: flex;
@@ -14,49 +16,38 @@ const StyledFooter = styled.footer`
   text-align: center;
   color: white;
   width: 100%;
-`;
-
-const MadeWithLove = styled.i`
-  padding: 20px;
+  ${boxy}
 `;
 
 const NavbarFooter = styled.ul`
   ${navbarCommonStyle};
   flex-direction: column;
-  padding-bottom: 20px;
+  ${boxy}
+`;
+
+const A = styled.a`
+  color: ${cieOrange}
 `;
 
 export const Footer = (props) => {
-  console.log("Footer props:", props);
   const links = [
     { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions" },
     { text: "CONÓCENOS", location: "/about-us" },
     { text: "TÉCNICA", location: "/technique" },
   ];
-  const [policyId, setPolicyId] = useState(null);
-  const [title, setTitle] = useState(null);
 
   const router = useRouter();
   useEffect(() => {
-    console.log("router.locale is", router.locale);
-    if (["es", "es-CA", "es-ca"].includes(router.locale)) {
-      setPolicyId("12197597");
-      setTitle("Política de privacidad");
-    } else {
-      setTitle("Privacy Policy");
-
-      setPolicyId("48905763");
-    }
     var s = document.createElement("script");
     let tag = document.getElementsByTagName("script")[0];
 
     s.src = "https://cdn.iubenda.com/iubenda.js";
 
     tag.parentNode.insertBefore(s, tag);
-  }, [router.locale]);
+
+  }, []);
   return (
-    <StyledFooter>
-      <MadeWithLove>Made with love in Encinitas, California.</MadeWithLove>
+    <StyledFooter p="3">
       <NavbarFooter>
         {links.map((link, idx) => (
           <LI key={idx}>
@@ -64,29 +55,29 @@ export const Footer = (props) => {
           </LI>
         ))}
       </NavbarFooter>
+      <P mt="3" color="white">
+        Coding in English
+      </P>
+      <P mb="0" color="white">
+        All inquiries:{" "}
+        <A href="mailto:support@codinginenglish.com">
+          support@codinginenglish.com
+        </A>
+      </P>
+      <P mb="3" color="white">
+        45 Glen Ct North Plainfield, NJ 07063 EEUU
+      </P>
       {props.footerContent.legalLinks.map((link) => (
-        <a
-          href={link.link}
-          className="iubenda-white iubenda-embed"
-          title={link.title}
-        >
-          {link.title}
-        </a>
+        <Box pb="1">
+          <a
+            href={link.link}
+            className="iubenda-white iubenda-embed"
+            title={link.title}
+          >
+            {link.title}
+          </a>
+        </Box>
       ))}
-      {/* <a
-        href={`https://www.iubenda.com/privacy-policy/${policyId}`}
-        className="iubenda-white iubenda-embed"
-        title={title}
-      >
-        {title}
-      </a>
-      <a
-        href={`https://www.iubenda.com/privacy-policy/${policyId}/cookie-policy`}
-        className="iubenda-white iubenda-embed "
-        title="Cookie Policy "
-      >
-        Cookie Policy
-      </a> */}
     </StyledFooter>
   );
 };

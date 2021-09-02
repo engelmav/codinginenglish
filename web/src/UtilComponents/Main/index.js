@@ -4,14 +4,15 @@ import { width } from "styled-system"
 
 
 const Main = styled.main`
-  ${boxy}
-  ${width}
+
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   max-width: 800px;
   justify-content: center;
   flex: 1;
+  ${boxy}
+  ${width}
 `;
 
 Main.defaultProps = {

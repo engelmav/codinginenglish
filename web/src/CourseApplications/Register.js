@@ -74,26 +74,7 @@ const GoogleBtn = styled.button`
   }
 `;
 
-const Divider = styled(P)`
-  ${space}
-  font-family: "Roboto Mono";
-  display: flex;
-  align-items: center;
-  &:before {
-    content: "";
-    flex: 1;
-    height: 1px;
-    margin-right: 1em;
-    box-shadow: 0 0.5px 0 black;
-  }
-  &:after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    margin-left: 1em;
-    box-shadow: 0 0.5px 0 black;
-  }
-`;
+
 
 const RegisterOptsCard = styled(Card)`
   ${boxy}

@@ -5,7 +5,7 @@ const AppContext = createContext();
 function useAppStore() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new error(`useAppStore must be used within AppStoreProvider`);
+    throw new Error(`useAppStore must be used within AppStoreProvider`);
   }
   return context;
 }

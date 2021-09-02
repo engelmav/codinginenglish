@@ -1,25 +1,30 @@
 import React, { useEffect, useState } from "react";
 import {
-  ApplyButton,
   ApplyLink,
   AutoScaleImage,
-  Main,
-  ContentSection,
   Box,
   boxy,
   Button,
+  ContentSection,
 } from "../UtilComponents";
-import { TitleH1, H2, P } from "../UtilComponents/Typography/Typography";
+import { TitleH1, H2, P, PH } from "../UtilComponents/Typography/Typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import ReactGA from "react-ga";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components";
-import { cieOrange } from "../UtilComponents/sharedStyles";
+import {
+  cieOrange,
+  lightCieOrangeBg,
+  ciePurpleTemp,
+  darkGray
+} from "../UtilComponents/sharedStyles";
 import Modal from "../components/Modal";
 import { BiChevronDownCircle } from "@react-icons/all-files/bi/BiChevronDownCircle";
 import { typography, flexbox, layout, background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
+import EmailForm from "../components/EmailForm";
+import {HappyAlert} from "../components/Alerts"
 
 const CurriculumForm = dynamic(() => import("./CurriculumForm"));
 
@@ -42,9 +47,17 @@ const HeroContent = styled.div`
     props.headerHeight ? `calc(100vh - ${props.headerHeight}px)` : "100vh"};
 `;
 
+const contentSectionStyles = {
+p: 4
+};
+
+
+const h2Styles = { pt: 0, mt: 0, mt: 4, mb: 4, color: darkGray };
+
 const Section = ({
   sectionTitle,
   sectionContent,
+  idx,
   imageData,
   buttonData,
   settings,
@@ -58,11 +71,15 @@ const Section = ({
     maxWidth = "500px";
     minWidth = "280px";
   }
+  let contentSectionStyleProps = {};
+  let headerProps = {};
+  if (idx % 2 === 0) {
+    contentSectionStyleProps.bg = lightCieOrangeBg;
+    headerProps.color = "#922400"
+  }
   return (
-    <ContentSection mt={[1, 5, 5, 5]} mb={4}>
+    <ContentSection {...contentSectionStyles} {...contentSectionStyleProps} width="100%">
       <AutoScaleImage
-        mt={5}
-        mb={3}
         maxWidth={maxWidth}
         minWidth={minWidth}
         className={className}
@@ -72,7 +89,7 @@ const Section = ({
         srcSet={`${settings.edgeAssets}${imageData.small}, ${settings.edgeAssets}${imageData.large}`}
         src={`${settings.edgeAssets}${imageData.src}`}
       />
-      <H2>{sectionTitle}</H2>
+      <H2 {...h2Styles} {...headerProps}>{sectionTitle}</H2>
       <ReactMarkdown components={{ p: P }}>{sectionContent}</ReactMarkdown>
       {buttonData && (
         <Box
@@ -84,10 +101,11 @@ const Section = ({
           flexWrap="wrap"
           justifyContent="center"
         >
-          <ApplyButton
+          <Button
             {...applyProps}
             mr={[0, 2, 2, 3, 4]}
-            bg="white"
+            bg={"white"}
+            color={darkGray}
             onClick={() => {
               setCurricModal(true);
               ReactGA.event({
@@ -98,12 +116,12 @@ const Section = ({
             }}
           >
             {buttonData[1].buttonText}
-          </ApplyButton>
+          </Button>
           <ApplyLink
-            backgroundColor="black"
+            bg="black"
             href="/apply"
             {...applyProps}
-            backgroundColor={cieOrange}
+            bg={cieOrange}
             color="white"
             onClick={() => {
               ReactGA.event({
@@ -168,6 +186,7 @@ const LandingPage = (props) => {
             ]}
           ></HeroBg>
           <HeroContent
+            px={[3, 2, 3, 0, 0]}
             display="flex"
             flexDirection="column"
             textAlign="center"
@@ -179,6 +198,11 @@ const LandingPage = (props) => {
             <CallTag color="white" fontSize={[3, 4, 4, 5, 5]}>
               {content.subtitle}
             </CallTag>
+            <Box>
+              <PH fontSize={[2, 3, 3, 3, 4]} fontWeight="bold">
+                <span className="half_background">{content.subsubtitle}</span>
+              </PH>
+            </Box>
             <Box
               px={(5, null, null, 0)}
               pl="5"
@@ -189,17 +213,32 @@ const LandingPage = (props) => {
               flexWrap="wrap"
               justifyContent="center"
             >
-              <ApplyButton
+              <Button
+                border="yellow"
                 data-cy="hero-curric-btn"
-                onClick={() => setCurricModal(true)}
+                onClick={() => {
+                  setCurricModal(true);
+                  ReactGA.event({
+                    category: "landingPage",
+                    action: "openCurriculumModal",
+                    label: "heroCtaCurricBtn",
+                  });
+                }}
                 {...applyProps}
                 mr={[0, 2, 2, 3, 4]}
-                backgroundColor="black"
+                bg="black"
                 color="yellow"
               >
                 {landingPageContent.heroCta1}
-              </ApplyButton>
+              </Button>
               <ApplyLink
+                onClick={() =>
+                  ReactGA.event({
+                    category: "landingPage",
+                    action: "goToRegisterPage",
+                    label: "heroCtaRegisterBtn",
+                  })
+                }
                 href="/apply"
                 data-cy="hero-reg-btn"
                 {...applyProps}
@@ -217,11 +256,39 @@ const LandingPage = (props) => {
           {content.Section.map((section, idx) => (
             <Section
               key={idx}
+              idx={idx}
               {...section}
               settings={settings}
               setCurricModal={setCurricModal}
             />
           ))}
+          <ContentSection
+            mt={[1, 4, 4, 4]}
+            mb={4}
+            pt="3"
+            p="4"
+            px="4"
+            bg={lightCieOrangeBg}
+          >
+            <H2 {...h2Styles}>Get Notified</H2>
+            <P mb="4" color="#370E00">
+              No pierdas la oportunidad de cambiar tu vida, tu ingreso, y tu
+              creatividad.</P>
+            <P mb="4" color="#370E00"> Inscríbete para recibir notificaciones sobre clases
+              de muestra, nuevas clases, y nuestro newsletter con consejos de
+              aprendizaje sobre la programación e inglés, y para saber más de
+              nosotros.
+            </P>
+            <EmailForm
+              submitBtnText="¡Manténme informado!"
+              containerStyles={{
+                background: "transparent",
+                width: "100%",
+                maxWidth: "400px",
+              }}
+              successView={<HappyAlert><P textAlign="center">Estarás notificado de nuevos acontecimientos en Coding in English</P></HappyAlert>}
+            />
+          </ContentSection>
           <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
             <P>
               «Como estudiante extranjero, aprender sobre cualquier materia… era
@@ -242,10 +309,11 @@ const LandingPage = (props) => {
       )}
       {curricModal && (
         <Modal
+          styleProps={{ mt: [3, 5, 5, 6] }}
           title={content.Modal1.title}
           onClose={() => setCurricModal(false)}
         >
-          <CurriculumForm content={content.Modal1}/>
+          <CurriculumForm content={content.Modal1} />
         </Modal>
       )}
     </>

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { whenSmallScreen, darkGray, lightGray } from "../sharedStyles";
 import { Box, boxy } from "../Box";
-import { typography, fontColor } from 'styled-system'
+import { typography, color } from 'styled-system'
 
 export const Card = styled.div`
   ${boxy}
@@ -13,7 +13,7 @@ export const CardTitle = styled.h1`
   ${boxy}
   text-transform: uppercase;
   font-weight: 800;
-  ${fontColor}
+  ${color}
   ${typography}
 `;
 

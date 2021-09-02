@@ -9,16 +9,18 @@ ReactGA.initialize(settings.gaTrackingId);
 
 const handleCapturedEmail = (userEmail) => {
   ReactGA.event({
-    category: "register",
-    action: "emailRegistration",
-    label: "emailCaptured",
+    category: "leadCat",
+    action: "clickedSendCurric",
+    label: "emailCapturedLabel",
   });
   cieApi.createUserEmail({ email: userEmail, status: "curriculumDownload" });
 };
 
-const CurriculumForm = (content) => {
+const CurriculumForm = ({content}) => {
+  console.log("CurriculumForm content:", content)
   return (
     <EmailForm
+    showGoogleSignin={false}
       image={
         <img
           width="60px"
