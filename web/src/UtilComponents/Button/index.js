@@ -70,8 +70,8 @@ export const RegisterLink = (props) => {
 
 const commonApply = css`  
   font-family: Roboto Mono;
-  border: 2px black solid;
-  border-radius: 2px;
+  border: 1px ${cieOrange} solid;
+  border-radius: 5px;
   ${color}
   ${typography}
   ${flexbox}
@@ -111,14 +111,17 @@ ${commonApply}
   }
 `;
 StyledApplyLink.defaultProps = {
-  py: 3
+  py: 3,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
 }
 
 export const ApplyLink = (props) => {
   const { children, href, ...otherProps } = props;
   return (
     <Link href={href} passHref>
-      <StyledApplyLink {...otherProps}>{children}</StyledApplyLink>
+      <StyledApplyLink {...otherProps}><p>{children}</p></StyledApplyLink>
     </Link>
   );
 };

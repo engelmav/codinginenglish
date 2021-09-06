@@ -27,7 +27,6 @@ SignInContainer.defaultProps = {};
 const EmailFormContainer = styled.div`
   ${boxy}
   ${layout}
-  background-color: ${darkGray};
   ${background}
   display: flex;
   flex-wrap: wrap;
@@ -122,11 +121,7 @@ const EmailForm = ({
   return (
     <>
       <EmailFormContainer {...containerStyles}>
-        {image && (
-          <Box alignSelf="center" mb={3} mt={4}>
-            {image}
-          </Box>
-        )}
+        {image && image}
 
         {blurb && blurb}
         <>
@@ -149,10 +144,8 @@ const EmailForm = ({
             </>
           ) : (
             <Box
-              as="form"
               display="flex"
               flexDirection="column"
-              onSubmit={handleSubmitEmail}
             >
               {showGoogleSignin && (
                 <>
@@ -167,7 +160,7 @@ const EmailForm = ({
                 autoComplete="email"
                 p={3}
                 width="100%"
-                placeholder={"email"}
+                placeholder="jose.arcadia@codinginenglish.com"
                 value={email}
                 onChange={(e) => {
                   setInvalidEmail(false);
@@ -184,16 +177,8 @@ const EmailForm = ({
                 />
               )}
               {!isSending && (
-                <Button mt="2" {...buttonStyles} type="submit">
-                  <P
-                    color="white"
-                    alignSelf="center"
-                    fontSize={[2]}
-                    mb={0}
-
-                  >
-                    {submitBtnText}
-                  </P>
+                <Button color="white" mt="2" {...buttonStyles} type="button" onClick={handleSubmitEmail}>
+                  {submitBtnText}
                 </Button>
               )}
               {isSending && (

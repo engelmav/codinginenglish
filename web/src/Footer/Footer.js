@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { navbarCommonStyle, LI } from "../Navbar";
@@ -6,6 +6,7 @@ import { cieOrange, darkGray } from "../UtilComponents/sharedStyles";
 import { useRouter } from "next/router";
 import { Box, boxy } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
+import { useAppStore } from "../stores/appStoreReact";
 
 const StyledFooter = styled.footer`
   display: flex;
@@ -26,18 +27,21 @@ const NavbarFooter = styled.ul`
 `;
 
 const A = styled.a`
-  color: ${cieOrange}
+  color: ${cieOrange};
 `;
 
 export const Footer = (props) => {
+  const store = useAppStore();
   const links = [
     { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions" },
     { text: "CONÓCENOS", location: "/about-us" },
     { text: "TÉCNICA", location: "/technique" },
   ];
-
-  const router = useRouter();
+  const footerRef = useRef();
   useEffect(() => {
+    store.handleSetFooterHeight(footerRef.current?.offsetTop)
+    store.setFooterRef(footerRef)
+    console.log("footerRef:", footerRef)
     var s = document.createElement("script");
     let tag = document.getElementsByTagName("script")[0];
 
@@ -46,8 +50,9 @@ export const Footer = (props) => {
     tag.parentNode.insertBefore(s, tag);
 
   }, []);
+  
   return (
-    <StyledFooter p="3">
+    <StyledFooter p="3" ref={footerRef}>
       <NavbarFooter>
         {links.map((link, idx) => (
           <LI key={idx}>

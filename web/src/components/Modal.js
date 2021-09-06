@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Box, boxy } from "../UtilComponents";
 import { P, H3 } from "../UtilComponents/Typography/Typography";
-import { darkGrayRgb } from "../UtilComponents/sharedStyles";
+import { darkGray, darkGrayRgb } from "../UtilComponents/sharedStyles";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import { flexbox } from "styled-system";
 
@@ -19,11 +19,12 @@ const ModalStyle = styled.div`
 ModalStyle.defaultProps = { mt: 4, mx: 3 };
 
 const ModalHeader = styled.div`
+  background-color: #ffff;
   ${boxy}
   display: flex;
   align-items: space-between;
   justify-content: space-between;
-  border-bottom: 1px gray solid;
+  border-bottom: 1px ${darkGray} solid;
 `;
 ModalHeader.defaultProps = {
   p: 3,
@@ -44,6 +45,7 @@ const Background = styled.div`
 
 const CloseBox = styled(FaRegWindowClose)`
 ${boxy}
+color: ${darkGray}
 `
 
 
@@ -57,10 +59,9 @@ const Modal = ({ children, onClose, styleProps, title }) => {
         {...styleProps}
       >
         <ModalHeader>
-          <H3 mb={0} fontSize={[2]} color="white">
+          <H3 textAlign="center" mb={0} fontSize={[2]} color={darkGray}>
             {title}
           </H3>
-
           <CloseBox
             data-cy="close-modal-btn"
             size={25}

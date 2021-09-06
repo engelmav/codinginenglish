@@ -14,7 +14,7 @@ const ContentSection = styled.article`
   ${color}
 `;
 ContentSection.defaultProps = {
-  px: [3, 2, 3, 0, 0],
+
 };
 
 export { ContentSection };

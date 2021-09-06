@@ -16,7 +16,7 @@ import {
   cieOrange,
   lightCieOrangeBg,
   ciePurpleTemp,
-  darkGray
+  darkGray,
 } from "../UtilComponents/sharedStyles";
 import Modal from "../components/Modal";
 import { BiChevronDownCircle } from "@react-icons/all-files/bi/BiChevronDownCircle";
@@ -24,7 +24,7 @@ import { typography, flexbox, layout, background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
 import EmailForm from "../components/EmailForm";
-import {HappyAlert} from "../components/Alerts"
+import { HappyAlert } from "../components/Alerts";
 
 const CurriculumForm = dynamic(() => import("./CurriculumForm"));
 
@@ -39,18 +39,16 @@ const HeroContent = styled.div`
   ${boxy}
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+
   ${flexbox}
   ${typography}
   ${layout}
-  height: ${(props) =>
-    props.headerHeight ? `calc(100vh - ${props.headerHeight}px)` : "100vh"};
 `;
 
 const contentSectionStyles = {
-p: 4
+  py: 5,
+  px: [4],
 };
-
 
 const h2Styles = { pt: 0, mt: 0, mt: 4, mb: 4, color: darkGray };
 
@@ -75,10 +73,13 @@ const Section = ({
   let headerProps = {};
   if (idx % 2 === 0) {
     contentSectionStyleProps.bg = lightCieOrangeBg;
-    headerProps.color = "#922400"
   }
   return (
-    <ContentSection {...contentSectionStyles} {...contentSectionStyleProps} width="100%">
+    <ContentSection
+      {...contentSectionStyles}
+      {...contentSectionStyleProps}
+      width="100%"
+    >
       <AutoScaleImage
         maxWidth={maxWidth}
         minWidth={minWidth}
@@ -89,12 +90,13 @@ const Section = ({
         srcSet={`${settings.edgeAssets}${imageData.small}, ${settings.edgeAssets}${imageData.large}`}
         src={`${settings.edgeAssets}${imageData.src}`}
       />
-      <H2 {...h2Styles} {...headerProps}>{sectionTitle}</H2>
+      <H2 {...h2Styles} {...headerProps}>
+        {sectionTitle}
+      </H2>
       <ReactMarkdown components={{ p: P }}>{sectionContent}</ReactMarkdown>
       {buttonData && (
         <Box
           mt={[3, 4, 4, 5]}
-          px={4}
           width="100%"
           display="flex"
           alignItems="center"
@@ -103,7 +105,6 @@ const Section = ({
         >
           <Button
             {...applyProps}
-            mr={[0, 2, 2, 3, 4]}
             bg={"white"}
             color={darkGray}
             onClick={() => {
@@ -141,29 +142,35 @@ const Section = ({
 
 const CallTag = styled.p`
   font-family: Roboto;
+  ${boxy}
   ${typography}
   color: white;
-  text-shadow: 0.8px 0.5px 0.5px black, 0 0 1em black; //, 0 0 0.1em yellow;
+  /* text-shadow: 0.8px 0.5px 0.5px black, 0 0 1em black; */
 `;
 
 const HeroBg = styled.div`
-  height: 100vh;
   width: 100vw;
+  height: auto;
 
   max-width: 100%;
-  top: 0;
-  position: absolute;
-  z-index: -2;
   background-size: cover;
   ${background}
+  ${boxy}
+`;
+
+const MainCtaButtons = styled.div`
+  ${boxy}
+  position: fixed;
+  bottom: 0;
+  background-color: ${darkGray};
 `;
 
 const applyProps = {
-  fontSize: [1],
-  mb: 3,
-  width: "100%",
-  maxWidth: "300px",
-  py: 3,
+  fontSize: [1, 2],
+  minWidth: "200px",
+  m: 2,
+  p: 2,
+  py: 2,
 };
 
 const LandingPage = (props) => {
@@ -171,87 +178,103 @@ const LandingPage = (props) => {
   const content = landingPageContent;
   const [isMobileSize, setIsMobileSize] = useState(false);
   const [curricModal, setCurricModal] = useState(false);
-  const [headerHeight] = useAppStore();
+  const store = useAppStore();
+
+  const handleScroll = () => {
+    // console.log("store.footerHeight", store.footerHeight)
+    // if (window.pageYOffset < store.footerHeight) {
+    //   console.log("window.pageYOffset < store.footerHeight", window.pageYOffset);
+    // } else {
+    //   // do the other thing
+    // }
+  };
+  const handleIntersection = () => {};
+  const options = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+  useEffect(() => {
+    // window.addEventListener("scroll", handleScroll);
+    // return () => window.removeEventListener("scroll", handleScroll);
+    const observer = new IntersectionObserver(handleIntersection, options);
+    if (store.footerRef?.current) observer.observe(store.footerRef.current);
+  }, []);
 
   return (
     <>
       {isMobileSize && <MobileMain>mobileSize</MobileMain>}
       {!isMobileSize && (
         <>
+          {/* <MainCtaButtons display="flex" maxWidth="600px" width="100%">
+            <Button
+              border="yellow"
+              data-cy="hero-curric-btn"
+              onClick={() => {
+                setCurricModal(true);
+                ReactGA.event({
+                  category: "landingPage",
+                  action: "openCurriculumModal",
+                  label: "heroCtaCurricBtn",
+                });
+              }}
+              {...applyProps}
+              bg="black"
+              color="yellow"
+            >
+              {landingPageContent.heroCta1}
+            </Button>
+            <ApplyLink
+              onClick={() =>
+                ReactGA.event({
+                  category: "landingPage",
+                  action: "goToRegisterPage",
+                  label: "heroCtaRegisterBtn",
+                })
+              }
+              href="/apply"
+              data-cy="hero-reg-btn"
+              {...applyProps}
+              backgroundColor="yellow"
+              color="black"
+            >
+              {landingPageContent.heroCta2}
+            </ApplyLink>
+          </MainCtaButtons> */}
           <HeroBg
+
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
             backgroundImage={[
-              'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-sm.webp")',
+              'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/home/liberty-tower-400px.webp")',
               null,
               'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp")',
             ]}
-          ></HeroBg>
-          <HeroContent
-            px={[3, 2, 3, 0, 0]}
-            display="flex"
-            flexDirection="column"
-            textAlign="center"
-            headerHeight={headerHeight}
           >
-            <TitleH1 fontSize={[5, 6, 7]} my={[0]}>
-              {content.title}
-            </TitleH1>
-            <CallTag color="white" fontSize={[3, 4, 4, 5, 5]}>
-              {content.subtitle}
-            </CallTag>
-            <Box>
-              <PH fontSize={[2, 3, 3, 3, 4]} fontWeight="bold">
-                <span className="half_background">{content.subsubtitle}</span>
-              </PH>
-            </Box>
-            <Box
-              px={(5, null, null, 0)}
-              pl="5"
-              pr="5"
+            <HeroContent
               display="flex"
-              alignItems="space-evenly"
-              width="100%"
-              flexWrap="wrap"
-              justifyContent="center"
+              flexDirection="column"
+              textAlign="center"
+              headerHeight={store.headerHeight}
             >
-              <Button
-                border="yellow"
-                data-cy="hero-curric-btn"
-                onClick={() => {
-                  setCurricModal(true);
-                  ReactGA.event({
-                    category: "landingPage",
-                    action: "openCurriculumModal",
-                    label: "heroCtaCurricBtn",
-                  });
-                }}
-                {...applyProps}
-                mr={[0, 2, 2, 3, 4]}
-                bg="black"
-                color="yellow"
+              <TitleH1
+                textAlign="center"
+                fontSize={[5, 6, 7]}
+                color="#ffff"
+                my={0}
+                mt="4"
               >
-                {landingPageContent.heroCta1}
-              </Button>
-              <ApplyLink
-                onClick={() =>
-                  ReactGA.event({
-                    category: "landingPage",
-                    action: "goToRegisterPage",
-                    label: "heroCtaRegisterBtn",
-                  })
-                }
-                href="/apply"
-                data-cy="hero-reg-btn"
-                {...applyProps}
-                backgroundColor="yellow"
-                color="black"
-              >
-                {landingPageContent.heroCta2}
-              </ApplyLink>
-            </Box>
-            <Box justifySelf="end">
-              <BiChevronDownCircle size={45} color="white" />
-            </Box>
-          </HeroContent>
+                {content.title}
+              </TitleH1>
+              <CallTag mt="5" color="white" fontSize={[3, 4, 4, 5, 5]}>
+                {content.subtitle}
+              </CallTag>
+              <Box mt="5" mb="4">
+                <BiChevronDownCircle size={45} color="white" />
+              </Box>
+            </HeroContent>
+          </HeroBg>
 
           {content.Section.map((section, idx) => (
             <Section
@@ -273,11 +296,13 @@ const LandingPage = (props) => {
             <H2 {...h2Styles}>Get Notified</H2>
             <P mb="4" color="#370E00">
               No pierdas la oportunidad de cambiar tu vida, tu ingreso, y tu
-              creatividad.</P>
-            <P mb="4" color="#370E00"> Inscríbete para recibir notificaciones sobre clases
-              de muestra, nuevas clases, y nuestro newsletter con consejos de
-              aprendizaje sobre la programación e inglés, y para saber más de
-              nosotros.
+              creatividad.
+            </P>
+            <P mb="4" color="#370E00">
+              {" "}
+              Inscríbete para recibir notificaciones sobre clases de muestra,
+              nuevas clases, y nuestro newsletter con consejos de aprendizaje
+              sobre la programación e inglés, y para saber más de nosotros.
             </P>
             <EmailForm
               submitBtnText="¡Manténme informado!"
@@ -286,7 +311,14 @@ const LandingPage = (props) => {
                 width: "100%",
                 maxWidth: "400px",
               }}
-              successView={<HappyAlert><P textAlign="center">Estarás notificado de nuevos acontecimientos en Coding in English</P></HappyAlert>}
+              successView={
+                <HappyAlert>
+                  <P textAlign="center">
+                    Estarás notificado de nuevos acontecimientos en Coding in
+                    English
+                  </P>
+                </HappyAlert>
+              }
             />
           </ContentSection>
           <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">

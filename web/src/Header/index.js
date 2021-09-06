@@ -168,13 +168,13 @@ const HeaderContainer = (props) => {
   const [languageSelectorOpen, setLanguageSelectorOpen] = useState(false);
   const showLanguageSelector = () => setLanguageSelectorOpen(true);
   const closeLanguageSelector = () => setLanguageSelectorOpen(false);
-  // const [height, setHeight] = useState(0)
-  const [headerHeight, setHeaderHeight] = useAppStore();
-  
+
+
+  const store = useAppStore();
   const ref = useRef(null)
 
   useEffect(() => {
-    setHeaderHeight(ref.current?.clientHeight)
+    store.handleSetHeaderHeight(ref.current?.clientHeight)
   }, [])
 
   const detectBackgroundClickAndCloseNav = (event) => {

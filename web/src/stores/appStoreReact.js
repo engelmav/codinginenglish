@@ -12,13 +12,31 @@ function useAppStore() {
 
 function AppStoreProvider(props) {
   const [headerHeight, setHeaderHeight] = useState(null);
+  const [footerHeight, setFooterHeight] = useState(null);
+  const [footerRef, setFooterRef] = useState(null);
   const handleSetHeaderHeight = (height) => {
-    console.log("setting headerHeight to", height)
-    setHeaderHeight(height)
-  }
+    console.log("setting headerHeight to", height);
+    setHeaderHeight(height);
+  };
 
-  const value = useMemo(() => [headerHeight, handleSetHeaderHeight], [headerHeight]);
-  return <AppContext.Provider value={value} {...props} />;
+  const handleSetFooterHeight = (height) => {
+    console.log("setting footerHeight to", height);
+    setFooterHeight(height);
+  };
+  const providerValue = useMemo(
+    () => ({
+      headerHeight,
+      handleSetHeaderHeight,
+      footerHeight,
+      handleSetFooterHeight,
+      footerRef,
+      setFooterRef
+    }),
+    headerHeight,
+    footerHeight,
+    footerRef
+  );
+  return <AppContext.Provider value={providerValue} {...props} />;
 }
 
 export { AppStoreProvider, useAppStore };

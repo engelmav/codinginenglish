@@ -33,11 +33,11 @@ const GImage = styled.img`
   width: 2.8em;
 `;
 
-const GoogleLoginComponent = ({ onLogin }) => {
+const GoogleLoginComponent = ({ onLogin, buttonStyles }) => {
   return (
     <GoogleLogin
       render={(renderProps) => (
-        <GoogleBtn p={[1, null, 0]} type="button" onClick={renderProps.onClick}>
+        <GoogleBtn p={[1, null, 0]} {...buttonStyles} type="button" onClick={renderProps.onClick}>
           <GImage
             height="90%"
             className="google-icon"

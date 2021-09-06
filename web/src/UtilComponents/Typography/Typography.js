@@ -13,7 +13,7 @@ export const TitleH1 = styled.h1`
   font-family: Roboto Mono;
   ${fontSize}
   ${space}
-  ${fontColor}
+  ${color}
   ${typography}
 
   font-weight: 700;
@@ -41,10 +41,11 @@ H2.defaultProps = {
 
 export const H3 = styled.h3`
   font-family: Roboto Mono;
+  ${typography}
   ${fontColor}
   ${debugBorder}
   ${space}
-  ${typography}
+
   ${border}
   ${boxy}
 

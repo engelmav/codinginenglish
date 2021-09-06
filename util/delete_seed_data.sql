@@ -1,1 +1,0 @@
-select * from student_applications sa ;
