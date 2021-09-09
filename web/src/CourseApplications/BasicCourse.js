@@ -206,6 +206,7 @@ export const BasicCourseForm = ({ cieApi, containerStyles }) => {
     const newFormikData = Object.assign({}, formikData);
     newFormikData.initialValues["given-name"] = firstname;
     newFormikData.initialValues["family-name"] = lastname;
+    console.log("Set")
     setFormikData(newFormikData);
     setCapturedEmail(email);
   };
@@ -285,7 +286,7 @@ export const BasicCourseForm = ({ cieApi, containerStyles }) => {
                               bg: lightCieOrangeBg,
                               width: "100%",
                             }}
-                            submitBtnText="Empieza mi inscripción"
+                            submitBtnText="Continúa con Google"
                             onFinishSubmitEmail={handleCaptureEmail}
                             onGoogleSignin={handleGoogleSignin}
                           />

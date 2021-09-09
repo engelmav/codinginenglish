@@ -4,11 +4,11 @@ import { width } from "styled-system"
 
 
 const Main = styled.main`
-
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  max-width: 800px;
+
   justify-content: center;
   flex: 1;
   ${boxy}

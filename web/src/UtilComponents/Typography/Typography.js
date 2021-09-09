@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { typography, space, border, fontSize, color } from "styled-system";
+import { typography, space, border, fontSize, color, fontFamily } from "styled-system";
 import { boxy } from "../Box";
 import {
   font,
@@ -65,6 +65,7 @@ export const TitleH2 = styled.h2`
 `;
 
 export const P = styled.p`
+${fontFamily}
   ${font}
   ${fontColor}
   ${debugBorder}

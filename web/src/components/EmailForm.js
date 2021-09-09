@@ -160,7 +160,7 @@ const EmailForm = ({
                 autoComplete="email"
                 p={3}
                 width="100%"
-                placeholder="jose.arcadia@codinginenglish.com"
+                placeholder="nombre@dominio.com"
                 value={email}
                 onChange={(e) => {
                   setInvalidEmail(false);

@@ -1,6 +1,23 @@
 import styled, { css } from "styled-components";
-import { border, color, space, flexbox, typography, background, backgroundColor, boxShadow } from "styled-system";
-import { font, fontMonospace, cieOrange, darkGray, ctaBlue, whenSmallScreen, cieYellowAnalogous } from "../sharedStyles";
+import {
+  border,
+  color,
+  space,
+  flexbox,
+  typography,
+  background,
+  backgroundColor,
+  boxShadow,
+} from "styled-system";
+import {
+  font,
+  fontMonospace,
+  cieOrange,
+  darkGray,
+  ctaBlue,
+  whenSmallScreen,
+  cieYellowAnalogous,
+} from "../sharedStyles";
 import { boxy } from "../Box";
 import Link from "next/link";
 import React from "react";
@@ -22,8 +39,6 @@ const hoverStyles = css`
   color: rgba(255, 255, 255, 1);
   box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
 `;
-
-
 
 export const LinkButton = styled.a`
   ${commonStyles}
@@ -56,8 +71,8 @@ const StyledLink = styled.a`
 
 StyledLink.defaultProps = {
   fontSize: [1, 2, 2, 2],
-  padding: [3, 3, 3, 3, 3]
-}
+  padding: [3, 3, 3, 3, 3],
+};
 
 export const RegisterLink = (props) => {
   const { children, href, ...otherProps } = props;
@@ -68,16 +83,16 @@ export const RegisterLink = (props) => {
   );
 };
 
-const commonApply = css`  
+const commonApply = css`
   font-family: Roboto Mono;
   border: 1px ${cieOrange} solid;
   border-radius: 5px;
+  ${boxy}
   ${color}
   ${typography}
-  ${flexbox}
-  ${boxy}
+  ${flexbox} 
   ${border}
-`
+`;
 
 export const Button = styled.button`
   ${commonApply}
@@ -95,11 +110,11 @@ Button.defaultProps = {
   bg: cieOrange,
   py: 3,
   color: cieYellowAnalogous,
-  borderColor:darkGray
-}
+  borderColor: darkGray,
+};
 
 const StyledApplyLink = styled.a`
-${commonApply}
+  ${commonApply}
   text-align: center;
   text-decoration: none;
   &:hover:enabled {
@@ -111,20 +126,20 @@ ${commonApply}
   }
 `;
 StyledApplyLink.defaultProps = {
-  py: 3,
   display: "flex",
   justifyContent: "center",
-  alignItems: "center"
-}
+  alignItems: "center",
+};
 
 export const ApplyLink = (props) => {
   const { children, href, ...otherProps } = props;
   return (
     <Link href={href} passHref>
-      <StyledApplyLink {...otherProps}><p>{children}</p></StyledApplyLink>
+      <StyledApplyLink {...otherProps}>
+        <p>{children}</p>
+      </StyledApplyLink>
     </Link>
   );
 };
-
 
 export const NextRegisterLink = styled(Link);

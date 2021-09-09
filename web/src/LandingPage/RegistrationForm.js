@@ -83,7 +83,7 @@ const setupFormik = (appStore) => {
   return { initialValues, basicCourseForm };
 };
 
-export const RegistrationForm = ({ appStoreLazy, cieApi }) => {
+export const RegistrationForm = ({ cieApi }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
 

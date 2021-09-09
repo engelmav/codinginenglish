@@ -6,6 +6,8 @@ class CieDocument extends Document {
     return (
       <Html>
         <Head>
+        <meta property="og:image" content="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/cie-facebook-profile-pic-500px.png" />
+        
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"

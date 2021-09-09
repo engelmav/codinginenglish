@@ -4,7 +4,7 @@ import { Footer } from "../Footer/Footer";
 import Head from "next/head";
 import { Main } from "../UtilComponents"
 
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -14,10 +14,16 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const AppContainer = styled.div`
+  width: 100vw;
+  min-width: 100%;
+  height: 100vh;
+`
+
 const Layout = (props) => {
   const { children, headerContent, footerContent } = props;
   return (
-    <div style={{height: "100vh", display: "flex", flexDirection: "column"}}>
+    <AppContainer>
       <GlobalStyle />
       <Head>
         <title>coding_in_english</title>
@@ -29,7 +35,7 @@ const Layout = (props) => {
       </Main>
       </div>
       <Footer footerContent={footerContent} />
-    </div>
+    </AppContainer>
   );
 };
 export default Layout;
