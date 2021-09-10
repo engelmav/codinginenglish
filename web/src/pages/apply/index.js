@@ -20,4 +20,8 @@ const RegistrationView = (props) => (
   </AppStoreProvider>
 );
 
+
+
+
+
 export default RegistrationView;

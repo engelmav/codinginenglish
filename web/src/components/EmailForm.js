@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AlertMessage, TextInput, Button, Box, boxy } from "../UtilComponents";
-import { darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
+import { cieOrange, darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
 import { flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
@@ -71,6 +71,7 @@ const EmailForm = ({
   successView,
   onFinishSubmitEmail,
   onGoogleSignin,
+  googleBtnText,
   containerStyles,
   confirmRetry = false,
 }) => {
@@ -132,6 +133,7 @@ const EmailForm = ({
                 <P color="white">
                   No lo ves?{" "}
                   <Button
+                    border="none"
                     m={1}
                     onClick={() => {
                       setEmailSubmitted(false);
@@ -149,7 +151,7 @@ const EmailForm = ({
             >
               {showGoogleSignin && (
                 <>
-                  <GoogleLoginComponent onLogin={handleGoogleLogin} />
+                  <GoogleLoginComponent onLogin={handleGoogleLogin} buttonText={googleBtnText}/>
                   <Divider mt={2} mb={2}>
                     o
                   </Divider>
@@ -177,7 +179,7 @@ const EmailForm = ({
                 />
               )}
               {!isSending && (
-                <Button color="white" mt="2" {...buttonStyles} type="button" onClick={handleSubmitEmail}>
+                <Button border="none" color="white" mt="2" {...buttonStyles} type="button" onClick={handleSubmitEmail}>
                   {submitBtnText}
                 </Button>
               )}

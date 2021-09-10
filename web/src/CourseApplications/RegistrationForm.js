@@ -32,10 +32,10 @@ const RegistrationForm = ({ cieApi }) => {
           Basic Course
         </H2>
 
-        <P mt="3" fontSize="1" fontStyle="italic" textAlign="center">
+        <P color="white" mt="3" fontSize="1" fontStyle="italic" textAlign="center">
           Plazas limitadas. Inscríbete ahora.
         </P>
-        <Box p="3" mt="3" backgroundColor={lightCieOrangeBg}>
+        <Box p="3" mt="3">
           <BasicCourseForm cieApi={cieApi} containerStyles={{bg: "transparent"}}/>
         </Box>
       </Container>

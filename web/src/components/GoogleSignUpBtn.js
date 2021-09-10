@@ -33,7 +33,7 @@ const GImage = styled.img`
   width: 2.8em;
 `;
 
-const GoogleLoginComponent = ({ onLogin, buttonStyles }) => {
+const GoogleLoginComponent = ({ onLogin, buttonStyles, buttonText }) => {
   return (
     <GoogleLogin
       render={(renderProps) => (
@@ -43,11 +43,11 @@ const GoogleLoginComponent = ({ onLogin, buttonStyles }) => {
             className="google-icon"
             src="https://cie-assets.nyc3.digitaloceanspaces.com/btn_google_dark_normal_ios.svg"
           />
-          <p>Inscríbeme con Google</p>
+          <p>{buttonText}</p>
         </GoogleBtn>
       )}
       clientId="528855637927-k112im793kk6l423ctbbfveg3thhs6uv.apps.googleusercontent.com"
-      buttonText="Inscríbeme con Google"
+      buttonText={buttonText}
       onSuccess={onLogin}
       onFailure={(res) => console.log("google login failed:", res)}
       cookiePolicy={"single_host_origin"}

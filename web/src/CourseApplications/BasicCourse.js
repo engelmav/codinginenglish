@@ -7,7 +7,6 @@ import {
   ClearableTextInput,
   TextInput,
   Button,
-  Title,
 } from "../UtilComponents";
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
@@ -15,7 +14,6 @@ import * as Yup from "yup";
 import {
   cieOrange,
   fontFamily,
-  lightCieOrangeBg,
 } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 import { cieApi } from "../services/cieApi";
@@ -53,7 +51,7 @@ const ApplicationSchema = Yup.object().shape({
 
 const BasicCourseContainer = styled.div`
   ${boxy}
-  background-color:${lightCieOrangeBg};
+  overflow-y: scroll;
 `;
 
 const Field = styled(_Field)`
@@ -152,7 +150,7 @@ const setupFormik = () => {
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ cieApi, containerStyles }) => {
+export const BasicCourseForm = ({ containerStyles }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
   const [capturedEmail, setCapturedEmail] = useState(null);
@@ -276,17 +274,17 @@ export const BasicCourseForm = ({ cieApi, containerStyles }) => {
                         <Box maxWidth="300px">
                           <EmailForm
                             showGoogleSignin={true}
+                            googleBtnText="Continúa con Google"
                             blurbAfterEmailField={
-                              <P fontSize="1" mb="0" mt="1" textAlign="center">
+                              <P color="white" fontSize="1" mb="0" mt="1" textAlign="center">
                                 Después de tu inscripción, te contactaremos para
                                 programar una reunión.
                               </P>
                             }
                             containerStyles={{
-                              bg: lightCieOrangeBg,
                               width: "100%",
                             }}
-                            submitBtnText="Continúa con Google"
+                            submitBtnText="Continúa con mi email"
                             onFinishSubmitEmail={handleCaptureEmail}
                             onGoogleSignin={handleGoogleSignin}
                           />

@@ -1,22 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { layout, position } from "styled-system";
 import { Box, boxy } from "../UtilComponents";
 import { P, H3 } from "../UtilComponents/Typography/Typography";
 import { darkGray, darkGrayRgb } from "../UtilComponents/sharedStyles";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import { flexbox } from "styled-system";
 
-const ModalStyle = styled.div`
-  ${boxy}
+const ModalContainer = styled.div`
   color: white;
   overflow-x: hidden;
   flex-direction: column;
   background: rgba(${darkGrayRgb}, 1);
   box-shadow: 0px 0px 3px gray, 0 0 3px gray, 0px 0px 3px gray;
+  ${boxy}
   ${flexbox}
+  ${layout}
+  ${position}
 `;
 
-ModalStyle.defaultProps = { mt: 4, mx: 3 };
+ModalContainer.defaultProps = { mt: 4, mx: 3 };
 
 const ModalHeader = styled.div`
   background-color: #ffff;
@@ -31,34 +34,56 @@ ModalHeader.defaultProps = {
 };
 
 const Background = styled.div`
-  position: fixed;
+  position: absolute;
   z-index: 20;
   left: 0;
   top: 0;
+  ${position}
   background: rgba(${darkGrayRgb}, 0.5);
   width: 100vw;
-  height: 100vh;
+  height: 100%;
+  min-height: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
 `;
 
 const CloseBox = styled(FaRegWindowClose)`
-${boxy}
-color: ${darkGray}
-`
+  ${boxy}
+  color: ${darkGray};
+`;
 
+const ContentContainer = styled.div`
+  ${layout}
+  overflow-y: scroll;
+`;
 
-const Modal = ({ children, onClose, styleProps, title }) => {
+const Modal = ({
+  backgroundStyles,
+  children,
+  contentContainerStyles,
+  headerStyles,
+  onClose,
+  modalStyles,
+  title,
+}) => {
+  const [yPos, setYPos] = useState(0);
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    setYPos(window.scrollY);
+    console.log("")
+    return () => (document.body.style.overflow = "unset");
+  });
   return (
-    <Background>
-      <ModalStyle
+    <Background top={yPos} {...backgroundStyles}>
+      <ModalContainer
         display="flex"
         flexDirection="column"
         mt={[6]}
-        {...styleProps}
+        
+        {...modalStyles}
       >
-        <ModalHeader>
+        <ModalHeader {...headerStyles}>
           <H3 textAlign="center" mb={0} fontSize={[2]} color={darkGray}>
             {title}
           </H3>
@@ -69,8 +94,10 @@ const Modal = ({ children, onClose, styleProps, title }) => {
             ml="3"
           />
         </ModalHeader>
-        {children}
-      </ModalStyle>
+        <ContentContainer {...contentContainerStyles}>
+          {children}
+        </ContentContainer>
+      </ModalContainer>
     </Background>
   );
 };

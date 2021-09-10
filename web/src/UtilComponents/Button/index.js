@@ -87,6 +87,7 @@ const commonApply = css`
   font-family: Roboto Mono;
   border: 1px ${cieOrange} solid;
   border-radius: 5px;
+  font-weight: 600;
   ${boxy}
   ${color}
   ${typography}

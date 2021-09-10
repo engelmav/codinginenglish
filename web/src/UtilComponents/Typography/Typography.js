@@ -28,7 +28,6 @@ export const H2 = styled.h2`
   text-transform: uppercase;
   ${space}
   ${fontSize}
-  ${fontColor}
   ${typography}
   ${color}
 `;
@@ -37,6 +36,7 @@ H2.defaultProps = {
   mb: 2,
   fontSize: ["20px", "25px", "30px", "40px"],
   textAlign: "center",
+  color: fontColor
 };
 
 export const H3 = styled.h3`
@@ -99,6 +99,25 @@ Ol.defaultProps = {
   p: 3,
 };
 export { Ol };
+
+export const Ul = styled.ul`
+  margin-left: 1em;
+  
+
+  li {
+    list-style-type: "✓";
+    padding: .6em 0 0 .2em;
+    position: relative;
+    margin-left: 20px;
+
+  }
+  li::marker {
+    font-size: 2.0em; /* or whatever */
+    color: ${cieOrange};
+    
+  }
+
+`;
 
 export const PH = styled.p`
   .half_background {

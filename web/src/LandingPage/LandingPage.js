@@ -4,10 +4,9 @@ import {
   AutoScaleImage,
   Box,
   boxy,
-  Button,
   ContentSection,
 } from "../UtilComponents";
-import { TitleH1, H2, P, PH } from "../UtilComponents/Typography/Typography";
+import { TitleH1, H2, P, Ul } from "../UtilComponents/Typography/Typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import ReactGA from "react-ga";
 import ReactMarkdown from "react-markdown";
@@ -18,12 +17,17 @@ import {
   darkGray,
 } from "../UtilComponents/sharedStyles";
 import Modal from "../components/Modal";
-import { typography, flexbox, layout, background, boxShadow } from "styled-system";
+import {
+  typography,
+  flexbox,
+  layout,
+  background,
+  boxShadow,
+} from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
-import EmailForm from "../components/EmailForm";
-import { HappyAlert } from "../components/Alerts";
-import { cieApi } from "../services/cieApi";
+import { MailingList } from "../components/MailingList"
+import { HeroBg } from "../components/HeroBg"
 
 const CurriculumForm = dynamic(() => import("./CurriculumForm"));
 
@@ -79,7 +83,7 @@ const Section = ({
   let maxWidth = "230px";
   let minWidth = null;
   let className = "img";
-  if (imageData.alt === "Software Stack") {
+  if (["Software Stack", "Get Jobs"].includes(imageData.alt)) {
     maxWidth = "500px";
     minWidth = "280px";
   }
@@ -104,7 +108,9 @@ const Section = ({
         <H2 {...h2Styles} {...headerProps}>
           {sectionTitle}
         </H2>
-        <ReactMarkdown components={{ p: P }}>{sectionContent}</ReactMarkdown>
+        <ReactMarkdown components={{ p: P, ul: Ul }}>
+          {sectionContent}
+        </ReactMarkdown>
         {buttonData && (
           <Box
             mt={[3, 4, 4, 5]}
@@ -117,7 +123,8 @@ const Section = ({
             <ApplyLink
               bg="black"
               href={buttonData[0].href}
-              {...buttonProps}
+              minWidth="250px"
+              p="3"
               bg={cieOrange}
               border={`1px solid ${cieOrange}`}
               color="white"
@@ -138,55 +145,10 @@ const Section = ({
   );
 };
 
-const HeroBg = styled.div`
-  width: 100vw;
-  height: 35%;
-
-  max-width: 100%;
-  background-size: cover;
-  ${background}
-  ${boxy}
-  h1 {
-    text-shadow: 0.8px 0.5px 0.5px black, 0 0 1em black;
-  }
-`;
-
-const buttonProps = {
-  fontSize: [1, 2],
-  minWidth: "250px",
-  m: 2,
-  p: 2,
-  py: 2,
-};
-
 const SuscribeContentSection = (
-  <SectionBg bg={lightCieOrangeBg}>
+  <SectionBg>
     <ContentSection mt={[1, 4, 4, 4]} mb={4} pt="3" p="4" px="4">
-      <H2 {...h2Styles}>Manténte al tanto</H2>
-      <P mb="4" color="#370E00">
-        {" "}
-        Recibe notificaciones sobre clases de muestra, nuevas clases, y nuestro
-        newsletter con consejos de aprendizaje sobre la programación e inglés, y
-        para saber más de nosotros.
-      </P>
-      <EmailForm
-        submitBtnText="¡Manténme informado!"
-        containerStyles={{
-          background: "transparent",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-        onCaptureEmail={(email) =>
-          cieApi.createUserEmail({ email, status: "subscribeForUpdates" })
-        }
-        successView={
-          <HappyAlert>
-            <P textAlign="center">
-              Estarás notificado de nuevos acontecimientos en Coding in English
-            </P>
-          </HappyAlert>
-        }
-      />
+      <MailingList headerStyles={h2Styles}/>
     </ContentSection>
   </SectionBg>
 );
@@ -196,7 +158,7 @@ const Strong = styled.span`
 
   background: linear-gradient(to left, yellow, yellow 100%);
   background-position: 0 100%;
-  background-size: 100% .1em;
+  background-size: 100% 0.1em;
   background-repeat: repeat-x;
 `;
 
@@ -251,7 +213,7 @@ const LandingPage = (props) => {
             <TitleH1
               px="2"
               textAlign="center"
-              fontSize={[5, 6, 7]}
+              fontSize={[4, 6, 7]}
               color="white"
               my="4"
             >
@@ -259,40 +221,59 @@ const LandingPage = (props) => {
             </TitleH1>
           </HeroContent>
         </HeroBg>
-        <Box p="4" display="flex" flexDirection="column" alignItems="center" justifyContent="space-between" flex="1">
-          <Box display="flex" flexDirection="column" flex="1" justifyContent="center">
-          <ReactMarkdown
-            children={content.subtitle}
-            components={{
-              p: ({ node, ...props }) => (
-                <P color="white" fontSize={[3, 4, 4, 5, 5]} pb="4 "{...props} />
-              ),
-              strong: ({ node, ...props }) => (
-                <Strong {...props} />
-              ),
-            }}
-          />
-</Box>
-          <Box display="flex" flexDirection="column" flex="1" justifyContent="center">
-          <P color="white" textAlign="center" mb="0" fontSize={[3, 4, 4, 5, 5]}>
-            Prepárate.
-          </P>
+        <Box
+          p="4"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="space-between"
+          flex="1"
+        >
+          <Box
+            display="flex"
+            flexDirection="column"
+            flex="1"
+            justifyContent="center"
+          >
+            <ReactMarkdown
+              children={content.subtitle}
+              components={{
+                p: ({ node, ...props }) => (
+                  <P
+                    color="white"
+                    textAlign="center"
+                    fontSize={[3, 4, 4, 5, 5]}
+                    pb="0"
+                    mb="0"
+                    {...props}
+                  />
+                ),
+                strong: ({ node, ...props }) => <Strong {...props} />,
+              }}
+            />
+          </Box>
+          <Box
+            display="flex"
+            flexDirection="column"
+            flex="1"
+            justifyContent="space-evenly"
+          >
+            <P color="white" textAlign="center">Alcanza la carrera de más crecimiento mundial.</P>
             <ApplyLink
               justifySelf="flex-end"
               minWidth="250px"
               p="3"
               bg={cieOrange}
-              href="#sections"
+              href="#learnmore"
               color="white"
               border="none"
             >
               Saber cómo
             </ApplyLink>
-
           </Box>
         </Box>
       </AboveFold>
-      <div style={{width: "100%"}} id="sections">
+      <div style={{ width: "100%" }} id="learnmore">
         {content.Section.map((section, idx) => (
           <Section
             key={idx}

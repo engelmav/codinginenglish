@@ -13,6 +13,7 @@ const ContentSection = styled.article`
   ${backgroundColor}
   ${color}
   
+  
 `;
 ContentSection.defaultProps = {
   maxWidth: "800px"

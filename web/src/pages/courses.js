@@ -5,6 +5,7 @@ import settings from "../settings";
 import getContent from "../cms";
 import { AppStoreProvider } from "../stores/appStoreReact";
 
+
 const UpcomingSessionsPage = (props) => {
   return (
     <AppStoreProvider>
