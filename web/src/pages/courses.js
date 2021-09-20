@@ -1,17 +1,15 @@
 import React from "react";
 import UpcomingSessions from "../UpcomingSessions";
 import Layout from "../components/Layout";
-import settings from "../settings";
 import getContent from "../cms";
 import { AppStoreProvider } from "../stores/appStoreReact";
 
-
-const UpcomingSessionsPage = (props) => {
+const Courses = (props) => {
   return (
     <AppStoreProvider>
-    <Layout {...props}>
-      <UpcomingSessions {...props} />
-    </Layout>
+      <Layout {...props}>
+        <UpcomingSessions {...props} />
+      </Layout>
     </AppStoreProvider>
   );
 };
@@ -19,30 +17,24 @@ const UpcomingSessionsPage = (props) => {
 // This gets called on every request
 export async function getStaticProps(params) {
   let locale = params?.locale;
-  if (locale === undefined || locale === null){
-    locale = "en"
+  if (locale === undefined || locale === null) {
+    locale = "en";
   }
   const headerContent = await getContent(locale, "header");
-  const footerContent = await getContent(locale, "footer")
-  let cieModules = [];
-  try {
-    const coursesUrl = `${settings.cmsUrl}/courses`;
-    const result = await fetch(coursesUrl);
-
-    const data = await result.json();
-    if (data === null || data === undefined) {
-      console.log(
-        "*** WARNING: null or undefined result of getUpcomingModulesAndSessions() in getServerSideProps()"
-      );
-    } else {
-      cieModules = data;
-    }
-  } catch (ex) {
-    console.log("Failed to retrieve scheduledSessions.");
-    console.log(ex.stack);
-  }
-
-  return { props: { cieModules, headerContent, footerContent } };
+  const footerContent = await getContent(locale, "footer");
+  const mailingListComponentContent = await getContent(
+    locale,
+    "mailing-list-component"
+  );
+  const cieModules = await getContent(locale, "courses");
+  return {
+    props: {
+      cieModules,
+      headerContent,
+      footerContent,
+      mailingListComponentContent,
+    },
+  };
 }
 
-export default UpcomingSessionsPage;
+export default Courses;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ApplyLink,
   AutoScaleImage,
@@ -6,7 +6,7 @@ import {
   boxy,
   ContentSection,
 } from "../UtilComponents";
-import { TitleH1, H2, P, Ul } from "../UtilComponents/Typography/Typography";
+import { H2, P, TitleH1, Ul } from "../UtilComponents/Typography/Typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import ReactGA from "react-ga";
 import ReactMarkdown from "react-markdown";
@@ -17,31 +17,17 @@ import {
   darkGray,
 } from "../UtilComponents/sharedStyles";
 import Modal from "../components/Modal";
-import {
-  typography,
-  flexbox,
-  layout,
-  background,
-  boxShadow,
-} from "styled-system";
+import { background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
-import { MailingList } from "../components/MailingList"
-import { HeroBg } from "../components/HeroBg"
+import { Hero } from "../components/Hero";
+import useInView from "react-cool-inview";
 
 const CurriculumForm = dynamic(() => import("./CurriculumForm"));
+const MailingList = dynamic(() => import("../components/MailingList"));
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
-
-const HeroContent = styled.div`
-  ${boxy}
-  display: flex;
-  flex-direction: column;
-  ${flexbox}
-  ${typography}
-  ${layout}
-`;
 
 const iphoneXHeight = "812px";
 const AboveFold = styled.div`
@@ -49,13 +35,13 @@ const AboveFold = styled.div`
   display: flex;
   flex-direction: column;
   ${boxy}
-  max-height: calc(${iphoneXHeight} - ${({ headerHeight }) => headerHeight}px);
   width: 100%; // prevents overflow from 100vw higher up
   background: ${darkGray};
 `;
 
 const SectionBg = styled.div`
   ${boxy}
+  ${background}
 `;
 SectionBg.defaultProps = {
   display: "flex",
@@ -64,7 +50,8 @@ SectionBg.defaultProps = {
 };
 
 const contentSectionStyles = {
-  py: 5,
+  py: 4,
+  pt: 5,
   px: [4],
 };
 
@@ -77,7 +64,6 @@ const Section = ({
   imageData,
   buttonData,
   settings,
-  setCurricModal,
 }) => {
   // temporary hack till we normalize the 3-tech image.
   let maxWidth = "230px";
@@ -91,6 +77,10 @@ const Section = ({
   let headerProps = {};
   if (idx % 2 === 0) {
     contentSectionStyleProps.bg = lightCieOrangeBg;
+  } else {
+    headerProps.color = "white";
+    contentSectionStyleProps.background =
+      "linear-gradient(to bottom, #7927b2, #fb3182)";
   }
   return (
     <SectionBg {...contentSectionStyleProps}>
@@ -108,9 +98,32 @@ const Section = ({
         <H2 {...h2Styles} {...headerProps}>
           {sectionTitle}
         </H2>
-        <ReactMarkdown components={{ p: P, ul: Ul }}>
-          {sectionContent}
-        </ReactMarkdown>
+        <ReactMarkdown
+          children={sectionContent}
+          components={{
+            p: ({ node, ...props }) => (
+              <P
+                {...headerProps}
+                fontSize={[2, 2, 2, 3, 3]}
+                pb="0"
+                mb="4"
+                {...props}
+              />
+            ),
+            h2: ({ node, ...props }) => (
+              <H2
+                {...headerProps}
+                background="yellow"
+                mb="2"
+                textAlign="left"
+                {...props}
+              />
+            ),
+            ul: ({ node, ...props }) => (
+              <Ul {...headerProps} mb="2" textAlign="left" {...props} />
+            ),
+          }}
+        />
         {buttonData && (
           <Box
             mt={[3, 4, 4, 5]}
@@ -121,13 +134,11 @@ const Section = ({
             justifyContent="center"
           >
             <ApplyLink
-              bg="black"
               href={buttonData[0].href}
               minWidth="250px"
               p="3"
-              bg={cieOrange}
-              border={`1px solid ${cieOrange}`}
-              color="white"
+              bg="yellow"
+              color="black"
               onClick={() => {
                 ReactGA.event({
                   category: "landingPage",
@@ -145,14 +156,6 @@ const Section = ({
   );
 };
 
-const SuscribeContentSection = (
-  <SectionBg>
-    <ContentSection mt={[1, 4, 4, 4]} mb={4} pt="3" p="4" px="4">
-      <MailingList headerStyles={h2Styles}/>
-    </ContentSection>
-  </SectionBg>
-);
-
 const Strong = styled.span`
   /* font-weight: 600; */
 
@@ -163,71 +166,44 @@ const Strong = styled.span`
 `;
 
 const LandingPage = (props) => {
-  const { settings, landingPageContent } = props;
+  const { settings, landingPageContent, mailingListComponentContent } = props;
   const content = landingPageContent;
   const [isMobileSize, setIsMobileSize] = useState(false);
   const [curricModal, setCurricModal] = useState(false);
   const store = useAppStore();
 
-  const handleScroll = () => {
-    // console.log("store.footerHeight", store.footerHeight)
-    // if (window.pageYOffset < store.footerHeight) {
-    //   console.log("window.pageYOffset < store.footerHeight", window.pageYOffset);
-    // } else {
-    //   // do the other thing
-    // }
-  };
-  const handleIntersection = () => {};
-  const options = {
-    root: null,
-    rootMargin: "0px",
-    threshold: 1.0,
-  };
-  useEffect(() => {
-    // window.addEventListener("scroll", handleScroll);
-    // return () => window.removeEventListener("scroll", handleScroll);
-    const observer = new IntersectionObserver(handleIntersection, options);
-    if (store.footerRef?.current) observer.observe(store.footerRef.current);
-  }, []);
+  const { observe, inView } = useInView();
 
   return (
     <>
       <AboveFold headerHeight={store.headerHeight}>
-        <HeroBg
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          backgroundImage={[
-            'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/home/nyc-sunrise-400x154px.webp")',
-            null,
-            'url("https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp")',
-          ]}
-        >
-          <HeroContent
-            display="flex"
-            textAlign="center"
-            justifyContent="center"
-            headerHeight={store.headerHeight}
-            height={["auto", null, 400]}
-          >
-            <TitleH1
-              px="2"
-              textAlign="center"
-              fontSize={[4, 6, 7]}
-              color="white"
-              my="4"
-            >
-              {content.title}
-            </TitleH1>
-          </HeroContent>
-        </HeroBg>
+        {/* <Hero
+          heroHeight={["35%", "60%"]}
+          heroText={content.title}
+          imageSrc="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp"
+          imageSrcSet="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/home/nyc-sunrise-400x154px.webp 720w, https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp 1920w"
+        /> */}
         <Box
+          display="flex"
+          width="100%"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          height="45%"
+        >
+          <TitleH1 fontSize={[4, 6, 7]} textAlign="center" color="white">
+            {content.title}
+          </TitleH1>
+          <TitleH1>🚀</TitleH1>
+        </Box>
+        <Box
+          height="55%"
           p="4"
           display="flex"
           flexDirection="column"
           alignItems="center"
           justifyContent="space-between"
-          flex="1"
+          background="linear-gradient(to bottom, #7927b2, #fb3182)"
         >
           <Box
             display="flex"
@@ -258,17 +234,27 @@ const LandingPage = (props) => {
             flex="1"
             justifyContent="space-evenly"
           >
-            <P color="white" textAlign="center">Alcanza la carrera de más crecimiento mundial.</P>
+            <P color="white" textAlign="center">
+              {content.subsubtitle}
+            </P>
             <ApplyLink
               justifySelf="flex-end"
               minWidth="250px"
               p="3"
               bg={cieOrange}
               href="#learnmore"
-              color="white"
+              color="black"
               border="none"
+              bg="yellow"
+              onClick={() => {
+                ReactGA.event({
+                  category: "landingPage",
+                  action: "clicked See How",
+                  label: "See how button",
+                });
+              }}
             >
-              Saber cómo
+              {content.heroCta1}
             </ApplyLink>
           </Box>
         </Box>
@@ -283,25 +269,35 @@ const LandingPage = (props) => {
             setCurricModal={setCurricModal}
           />
         ))}
-        {SuscribeContentSection}
       </div>
-
-      <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-        <P>
-          «Como estudiante extranjero, aprender sobre cualquier materia… era muy
-          duro. Para aprender, primero necesitaba comprender una herramienta
-          básica: el inglés».
-        </P>
-        <footer>
-          —Takeishi Kimoto,{" "}
-          <cite>
-            <a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-              ¿De verdad es tan importante saber inglés para aprender
-              programación?
-            </a>
-          </cite>
-        </footer>
-      </BlockQuote>
+      <Box mt="4" maxWidth="400px">
+        <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
+          <P>
+            «Como estudiante extranjero, aprender sobre cualquier materia… era
+            muy duro. Para aprender, primero necesitaba comprender una
+            herramienta básica: el inglés».
+          </P>
+          <footer>
+            —Takeishi Kimoto,{" "}
+            <cite>
+              <a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
+                ¿De verdad es tan importante saber inglés para aprender
+                programación?
+              </a>
+            </cite>
+          </footer>
+        </BlockQuote>
+      </Box>
+      <SectionBg ref={observe}>
+        <ContentSection mb="5" px="4" maxWidth="550px">
+          {inView && (
+            <MailingList
+              headerStyles={h2Styles}
+              content={mailingListComponentContent}
+            />
+          )}
+        </ContentSection>
+      </SectionBg>
       {curricModal && (
         <Modal
           styleProps={{ mt: [3, 5, 5, 6] }}

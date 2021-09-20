@@ -33,7 +33,7 @@ const A = styled.a`
 export const Footer = (props) => {
   const store = useAppStore();
   const links = [
-    { text: "PRÓXIMAS_SESIONES", location: "/upcoming-sessions" },
+    { text: "curso", location: "/courses" },
     { text: "CONÓCENOS", location: "/about-us" },
     { text: "TÉCNICA", location: "/technique" },
   ];
@@ -72,8 +72,8 @@ export const Footer = (props) => {
       <P mb="3" color="white">
         45 Glen Ct North Plainfield, NJ 07063 EEUU
       </P>
-      {props.footerContent.legalLinks.map((link) => (
-        <Box pb="1">
+      {props.footerContent.legalLinks.map((link, idx) => (
+        <Box pb="1" key={idx}>
           <a
             href={link.link}
             className="iubenda-white iubenda-embed"

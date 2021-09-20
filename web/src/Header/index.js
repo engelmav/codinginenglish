@@ -213,8 +213,8 @@ const HeaderContainer = (props) => {
   const LangOpts = () =>
     <LangOptsBox height="100%" display="flex" alignItems="center" justifyContent="center">
     <LangUl>
-      {Object.keys(locales).map((localeKey) => (
-        <LI mb={2} fontSize={20} onClick={closeLanguageSelector}>
+      {Object.keys(locales).map((localeKey, idx) => (
+        <LI mb={2} fontSize={20} onClick={closeLanguageSelector} key={idx}>
           <Link href={Router.pathname} locale={locales[localeKey]}>
             {localeKey}
           </Link>

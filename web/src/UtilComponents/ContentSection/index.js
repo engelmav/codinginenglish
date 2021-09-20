@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { font } from "../sharedStyles";
-import { typography, space, flexbox, layout, backgroundColor, color } from "styled-system";
+import { typography, space, flexbox, layout, backgroundColor, color, background } from "styled-system";
 
 const ContentSection = styled.article`
   display: flex;
@@ -11,6 +11,7 @@ const ContentSection = styled.article`
   ${typography}
   ${layout}
   ${backgroundColor}
+  ${background}
   ${color}
   
   

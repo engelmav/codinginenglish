@@ -9,6 +9,11 @@ module.exports = (phase, { defaultConfig }) => {
     env: {
       ENVIRONMENT: process.env.NODE_ENV,
     },
+    // images: {
+    //   domains: ["cie-assets.nyc3.cdn.digitaloceanspaces.com"],
+    //   deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    //   imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // },
     webpack: (config, options) => {
       config.plugins = config.plugins || [];
       const definePlugin = new options.webpack.DefinePlugin({
@@ -26,6 +31,7 @@ module.exports = (phase, { defaultConfig }) => {
       config.plugins.push(definePlugin);
       return config;
     },
+
   };
   return Object.assign(defaultConfig, customConfig);
 };

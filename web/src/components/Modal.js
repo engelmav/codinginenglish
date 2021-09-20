@@ -71,16 +71,13 @@ const Modal = ({
   useEffect(() => {
     document.body.style.overflow = "hidden";
     setYPos(window.scrollY);
-    console.log("")
     return () => (document.body.style.overflow = "unset");
-  });
+  }, []);
   return (
     <Background top={yPos} {...backgroundStyles}>
       <ModalContainer
         display="flex"
-        flexDirection="column"
-        mt={[6]}
-        
+        flexDirection="column"   
         {...modalStyles}
       >
         <ModalHeader {...headerStyles}>

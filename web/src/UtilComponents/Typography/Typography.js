@@ -1,22 +1,30 @@
 import styled from "styled-components";
-import { typography, space, border, fontSize, color, fontFamily } from "styled-system";
+import {
+  compose,
+  typography,
+  space,
+  shadow,
+  border,
+  fontSize,
+  color,
+  fontFamily,
+  position
+} from "styled-system";
 import { boxy } from "../Box";
 import {
   font,
   fontColor,
   debugBorder,
-  darkGray,
   cieOrange,
 } from "../sharedStyles";
 
+export const textStyles = compose(fontSize, space, color, shadow, typography);
+
 export const TitleH1 = styled.h1`
   font-family: Roboto Mono;
-  ${fontSize}
-  ${space}
-  ${color}
-  ${typography}
-
   font-weight: 700;
+  ${textStyles}
+  ${position}
 `;
 
 TitleH1.defaultProps = {
@@ -26,26 +34,22 @@ TitleH1.defaultProps = {
 export const H2 = styled.h2`
   font-family: Roboto Mono;
   text-transform: uppercase;
-  ${space}
-  ${fontSize}
-  ${typography}
-  ${color}
+  ${textStyles}
 `;
 H2.defaultProps = {
   mt: 3,
   mb: 2,
   fontSize: ["20px", "25px", "30px", "40px"],
   textAlign: "center",
-  color: fontColor
+  color: fontColor,
 };
 
 export const H3 = styled.h3`
   font-family: Roboto Mono;
-  ${typography}
+  ${textStyles}
   ${fontColor}
   ${debugBorder}
   ${space}
-
   ${border}
   ${boxy}
 
@@ -56,16 +60,13 @@ H3.defaultProps = {
 };
 
 export const TitleH2 = styled.h2`
+  font-size: max(1.45rem, min(2rem, 2.5vw));
   ${boxy}
-  ${space}
-
-  ${typography}
-
-  font-size: max(1.45rem, min(2.0rem, 2.5vw));
+  ${textStyles}
 `;
 
 export const P = styled.p`
-${fontFamily}
+  ${fontFamily}
   ${font}
   ${fontColor}
   ${debugBorder}
@@ -85,8 +86,7 @@ const Ol = styled.ol`
   ${font}
   ${fontColor}
   ${debugBorder}
-  ${space}
-  ${typography}
+  ${textStyles}
 
   line-height: 1.5em;
   height: auto;
@@ -101,22 +101,19 @@ Ol.defaultProps = {
 export { Ol };
 
 export const Ul = styled.ul`
+  ${textStyles}
   margin-left: 1em;
-  
 
   li {
     list-style-type: "✓";
-    padding: .6em 0 0 .2em;
+    padding: 0.6em 0 0 0.2em;
     position: relative;
     margin-left: 20px;
-
   }
   li::marker {
-    font-size: 2.0em; /* or whatever */
+    font-size: 2em; /* or whatever */
     color: ${cieOrange};
-    
   }
-
 `;
 
 export const PH = styled.p`

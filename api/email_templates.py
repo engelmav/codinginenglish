@@ -96,13 +96,13 @@ def curriculum_request(requester_email):
     body = Template("¡Hola!,%0A"
                     "Gracias por tu interés en Coding in English."
                     "Anexado está el currículo del curso {{course}}."
-                    "Este curso empieza el 20 de septiembre. Programa una reunión ahora para hablar con un instructor y matricularte: https://calendly.com/coding_in_english"
+                    "El próximo curso empieza el 4 de enero 2022."
                     "Sincerely,%0AVincent Caudo Engelmann, Coding in English").render(
         course="WebApp Development - Basic")
     html_body = Template("<p>¡Hola!</p>"
                          "<p>Gracias por tu interés en Coding in English.</p>"
                          "<p>Anexado está el currículo del curso {{course}}.</p>"
-                         "<p>Este curso empieza el 20 de septiembre. Programa una reunión ahora para hablar con un instructor y matricularte: https://calendly.com/coding_in_english"
+                         "<p>El próximo curso empieza el 4 de enero 2022."
                          "<p>Cordialmente,<br/>Vincent Caudo Engelmann, Coding in English</p>").render(
         course="WebApp Development - Basic")
     body_parts = _main_part(body, html_body, "CurriculumRequest")

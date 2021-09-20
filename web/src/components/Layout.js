@@ -18,7 +18,7 @@ const AppContainer = styled.div`
   width: 100vw;
   min-width: 100%;
   max-width: 100%;
-  height: 100vh;
+  min-height: 100vh;
 `;
 
 const Layout = (props) => {
@@ -38,7 +38,7 @@ const Layout = (props) => {
           flex: 1,
         }}
       >
-        <Main pb="5">{children}</Main>
+        <Main>{children}</Main>
       </div>
       <Footer footerContent={footerContent} />
     </AppContainer>

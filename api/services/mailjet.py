@@ -12,5 +12,4 @@ mailjet = Client(auth=(api_key, api_secret), version='v3.1')
 
 
 def send_mail(populated_template):
-    LOG.info(f"Sending email: {populated_template}")
     return mailjet.send.create(data=populated_template)

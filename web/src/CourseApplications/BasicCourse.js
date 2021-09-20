@@ -11,10 +11,7 @@ import {
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
-import {
-  cieOrange,
-  fontFamily,
-} from "../UtilComponents/sharedStyles";
+import { cieOrange, fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 import { cieApi } from "../services/cieApi";
 import EmailForm from "../components/EmailForm";
@@ -51,7 +48,6 @@ const ApplicationSchema = Yup.object().shape({
 
 const BasicCourseContainer = styled.div`
   ${boxy}
-  overflow-y: scroll;
 `;
 
 const Field = styled(_Field)`
@@ -63,6 +59,7 @@ const MultiLabel = styled.label`
   font-family: ${fontFamily};
   display: flex;
   align-items: center;
+  ${({ disabled }) => (disabled ? "text-decoration: line-through" : "")};
   input {
     height: 1.3em;
     width: 1.3em;
@@ -96,10 +93,9 @@ const MultiLabel = styled.label`
       transparent
     );
   }
-
 `;
 
-    /* input[type="checkbox"]:checked + span::before {
+/* input[type="checkbox"]:checked + span::before {
     content: '\2713';
     display: block;
     text-align: center;
@@ -108,7 +104,6 @@ const MultiLabel = styled.label`
     left: 0.7rem;
     top: 0.2rem; 
     }*/
-
 
 MultiLabel.defaultProps = {
   mb: 2,
@@ -150,7 +145,7 @@ const setupFormik = () => {
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ containerStyles }) => {
+export const BasicCourseForm = ({ containerStyles, completedText }) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
   const [capturedEmail, setCapturedEmail] = useState(null);
@@ -178,9 +173,9 @@ export const BasicCourseForm = ({ containerStyles }) => {
 
   const handleCaptureEmail = (email) => {
     ReactGA.event({
-      category: "leadCat",
+      category: "registration",
       action: "clickedStartReg",
-      label: "emailCapturedLabel",
+      label: "reg email capture",
     });
     cieApi.createUserEmail({ email: email, status: "startedRegistration" });
     setCapturedEmail(email);
@@ -190,21 +185,20 @@ export const BasicCourseForm = ({ containerStyles }) => {
     const firstname = profile.getGivenName();
     const lastname = profile.getFamilyName();
     const email = profile.getEmail();
-    ReactGA.event({
-      category: "registration",
-      action: "clickedGoogleSignin",
-      label: "emailCapturedLabel",
-    });
     cieApi.createUserEmail({
       email,
       firstname,
       lastname,
       status: "startedRegistration",
     });
+    ReactGA.event({
+      category: "registration",
+      action: "clickedGoogleSignin",
+      label: "emailCapturedLabel",
+    });
     const newFormikData = Object.assign({}, formikData);
     newFormikData.initialValues["given-name"] = firstname;
     newFormikData.initialValues["family-name"] = lastname;
-    console.log("Set")
     setFormikData(newFormikData);
     setCapturedEmail(email);
   };
@@ -215,7 +209,7 @@ export const BasicCourseForm = ({ containerStyles }) => {
         <HappyAlert p="3">
           <P mb="0">
             ¡Hemos recibido tu inscripción¡ Te contactaremos dentro de 2 días
-            programar la reunión.
+            para programar una reunión.
           </P>
         </HappyAlert>
       ) : (
@@ -249,34 +243,47 @@ export const BasicCourseForm = ({ containerStyles }) => {
                     flexDirection="column"
                     mb={2}
                   >
-                    {["20 September 2021", "04 January 2022"].map(
-                      (choice, idx) => {
-                        return (
-                          <MultiLabel key={idx}>
-                            <Field
-                              className="styled-radio"
-                              data-cy={"when-field"}
-                              mb={2}
-                              type="radio"
-                              name={"startDate"}
-                              value={choice}
-                            />
-                            {choice}
-                          </MultiLabel>
-                        );
-                      }
-                    )}
+                    {[
+                      "20 September 2021",
+                      "04 January 2022",
+                      "1 February 2022",
+                    ].map((choice, idx) => {
+                      return (
+                        <MultiLabel
+                          key={idx}
+                          disabled={choice === "20 September 2021"}
+                        >
+                          <Field
+                            className="styled-radio"
+                            data-cy={"when-field"}
+                            disabled={choice === "20 September 2021"}
+                            mb={2}
+                            type="radio"
+                            name={"startDate"}
+                            value={choice}
+                          />
+                          {choice}
+                        </MultiLabel>
+                      );
+                    })}
                     {errors["startDate"] && (
-                              <Error>{errors["startDate"]}</Error>
-                            )}
+                      <Error>{errors["startDate"]}</Error>
+                    )}
                     {!capturedEmail && (
                       <>
                         <Box maxWidth="300px">
                           <EmailForm
+                            gaCategory="registration"
                             showGoogleSignin={true}
                             googleBtnText="Continúa con Google"
                             blurbAfterEmailField={
-                              <P color="white" fontSize="1" mb="0" mt="1" textAlign="center">
+                              <P
+                                color="white"
+                                fontSize="1"
+                                mb="0"
+                                mt="1"
+                                textAlign="center"
+                              >
                                 Después de tu inscripción, te contactaremos para
                                 programar una reunión.
                               </P>

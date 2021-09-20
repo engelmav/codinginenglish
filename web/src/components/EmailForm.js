@@ -43,19 +43,20 @@ const Divider = styled(P)`
   font-family: "Roboto Mono";
   display: flex;
   align-items: center;
+  color: white;
   &:before {
     content: "";
     flex: 1;
     height: 1px;
     margin-right: 1em;
-    box-shadow: 0 0.5px 0 black;
+    box-shadow: 0 0.5px 0 white;
   }
   &:after {
     content: "";
     flex: 1;
     height: 1px;
     margin-left: 1em;
-    box-shadow: 0 0.5px 0 black;
+    box-shadow: 0 0.5px 0 white;
   }
 `;
 
@@ -73,6 +74,7 @@ const EmailForm = ({
   onGoogleSignin,
   googleBtnText,
   containerStyles,
+  gaCategory,
   confirmRetry = false,
 }) => {
   const [email, setEmail] = useState("");
@@ -97,7 +99,7 @@ const EmailForm = ({
     } catch {
       setInvalidEmail(true);
       ReactGA.event({
-        category: "register",
+        category: gaCategory,
         action: "emailRegistration",
         label: "emailValidationFailed",
       });
