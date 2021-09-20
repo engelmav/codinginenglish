@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { flexbox, space } from "styled-system";
 import React from "react";
 
+
 const AutoScaleImageStyle = styled.img`
   ${flexbox}
   ${space}

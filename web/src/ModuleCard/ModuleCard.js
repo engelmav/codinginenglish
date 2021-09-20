@@ -1,102 +1,132 @@
-import { ContentSection, Title, RegisterLink } from "../UtilComponents";
-import { cieOrange, fontMonospace } from "../UtilComponents/sharedStyles";
-import { P, TitleH2 } from "../UtilComponents/Typography/Typography";
-import { CloseBox } from "../UtilComponents/CloseBox/CloseBox";
-// import { toLocalTime } from "../util";
-import Dialog from "@material-ui/core/Dialog";
-import { useMediaQuery } from "@material-ui/core";
+import { Box, boxy, Button, ContentSection } from "../UtilComponents";
+import { P, H2, Ul, TitleH1 } from "../UtilComponents/Typography/Typography";
+import React, { useState } from "react";
+import Modal from "../components/Modal";
+import dynamic from "next/dynamic";
+import ReactMarkdown from "react-markdown";
 import styled from "styled-components";
-import { Flex, Text, Image } from "rebass";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import settings from "../settings";
+import { background } from "styled-system";
+import remarkGfm from "remark-gfm";
+import useInView from "react-cool-inview";
+import { darkGray } from "../UtilComponents/sharedStyles";
 
+const RegistrationForm = dynamic(() =>
+  import("../CourseApplications/RegistrationForm")
+);
 
-const CardBox = styled(Flex)`
+const MailingList = dynamic(() => import("../components/MailingList"));
+
+const SectionBg = styled.div`
+  ${boxy}
+  ${background}
+  display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.2);
-  transition: 0.2s;
-  :hover {
-    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
-  }
 `;
 
-const DialogContent = styled(Flex)`
-  flex-direction: column;
-  height: 100%;
+const Hero = styled.div`
+  ${boxy}
+  background-color: ${darkGray};
 `;
 
 const ModuleCard = (props) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [fullScreen, setFullScreen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState(null);
-  const isFullscreen = useMediaQuery("(max-width: 40em)");
-  useEffect(() => setFullScreen(isFullscreen), []);
-
-  const { CheckoutForm } = props;
+  const [registerModal, setRegisterModal] = useState(false);
   const {
     title: courseTitle,
     description,
     course_instances: courseInstances,
   } = props.moduleData;
+  const { observe, inView } = useInView();
+  const { mailingListComponentContent } = props;
   return (
     <>
-      <CardBox sx={{ borderRadius: 15 }} p={20} mb={20}>
-        <Image
-          sx={{ "@media screen and (max-width: 500px)": { display: "none" } }}
-          src={`${settings.assets}/upcoming-sessions/computer-city-nighttime.png`}
-          alt={courseTitle}
-          mr={2}
-          width="50%"
-        />
-
-        <TitleH2 py={4} fontWeight="bold" color="primary" textAlign="center">
-          {courseTitle}
-        </TitleH2>
-
-        <P>{description}</P>
-        <P>del 20 septiembre al 20 diciembre</P>
-        {courseInstances.map((ms, idx) => {
-          return (
-            <RegisterLink mt={3} p={2}  key={idx} href="/apply">
-              ¡Inscríbeme ahora!
-            </RegisterLink>
-          );
-        })}
-      </CardBox>
-
-      <Dialog
-        open={dialogOpen}
-        onBackdropClick={() => setDialogOpen(false)}
-        fullScreen={fullScreen}
+      <Hero p="3" width="100%" >
+        <TitleH1 color="white" textAlign="center">WebApp Development - Basic</TitleH1>
+        <TitleH1 textAlign="center">💻</TitleH1>
+      </Hero>
+      <SectionBg
+        width="100%"
+        background="linear-gradient(to bottom, #7927b2, #fb3182)"
       >
-        <DialogContent flexDirection="column" p={20}>
-          <CloseBox
-            size="30"
-            alignSelf="flex-end"
-            onClick={() => setDialogOpen(false)}
+        <ContentSection px="3" pt={[0, 5]} pb={[4, 5]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            children={description}
+            components={{
+              p: ({ node, ...props }) => (
+                <P
+                  color="white"
+                  fontSize={[2, 2, 2, 3, 3]}
+                  pb="0"
+                  mb="4"
+                  {...props}
+                />
+              ),
+              h2: ({ node, ...props }) => (
+                <H2
+                  color="white"
+                  background="yellow"
+                  mb="2"
+                  textAlign="left"
+                  {...props}
+                />
+              ),
+              ul: ({ node, ...props }) => (
+                <Ul
+                  color="white"
+                  background="yellow"
+                  mb="2"
+                  textAlign="left"
+                  {...props}
+                />
+              ),
+            }}
           />
-          <TitleH2>{courseTitle}</TitleH2>
+          <Button
+            border="none"
+            bg="yellow"
+            color="black"
+            alignSelf="center"
+            maxWidth="500px"
+            minWidth="200px"
+            mt={3}
+            p={2}
+            fontSize={[1, 2, 4]}
+            onClick={() => setRegisterModal(true)}
+          >
+            Inscríbeme
+          </Button>
+        </ContentSection>
+      </SectionBg>
 
-          <ContentSection>
-            {/* {appStore.authData == null && (
-              <>
-                <P>Already registered as a student? Sign in!</P>
-                <P>
-                  Otherwise, register for this class as a guest. You can create
-                  a student profile later.
-                </P>
-              </>
-            )} */}
-          </ContentSection>
-          {/* <CheckoutForm
-            // sessionData={sessionData}
-            onCloseClick={() => setDialogOpen(false)}
-          /> */}
-        </DialogContent>
-      </Dialog>
+      <SectionBg ref={observe}>
+        <ContentSection
+          mt={[1, 4, 4, 4]}
+          mb={4}
+          pt="3"
+          p="4"
+          px="4"
+          maxWidth="550px"
+        >
+          {inView && <MailingList content={mailingListComponentContent} />}
+        </ContentSection>
+      </SectionBg>
+      {registerModal && (
+        <Modal
+          backgroundStyles={{ p: 20 }}
+          modalStyles={{
+            mt: 0,
+            mx: 0,
+            flex: 1,
+            height: ["100vh", null, "80%"],
+            width: ["60px"],
+          }}
+          containerStyles={{ overflowY: "scroll" }}
+          title="Inscripción"
+          onClose={() => setRegisterModal(false)}
+        >
+          <RegistrationForm />
+        </Modal>
+      )}
     </>
   );
 };

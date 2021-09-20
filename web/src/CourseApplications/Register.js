@@ -21,6 +21,7 @@ import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import Router from "next/router";
 import ReactGA from "react-ga";
+import { cieApi } from "../services/cieApi"
 
 
 const trackingId = "UA-199972795-1";
@@ -73,26 +74,7 @@ const GoogleBtn = styled.button`
   }
 `;
 
-const Divider = styled(P)`
-  ${space}
-  font-family: "Roboto Mono";
-  display: flex;
-  align-items: center;
-  &:before {
-    content: "";
-    flex: 1;
-    height: 1px;
-    margin-right: 1em;
-    box-shadow: 0 0.5px 0 black;
-  }
-  &:after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    margin-left: 1em;
-    box-shadow: 0 0.5px 0 black;
-  }
-`;
+
 
 const RegisterOptsCard = styled(Card)`
   ${boxy}
@@ -108,7 +90,7 @@ const RegisterOptsCard = styled(Card)`
   `}
 `;
 
-const Register = ({ appStoreLazy, authLazy, cieApi }) => {
+const Register = ({ appStoreLazy, authLazy }) => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);

@@ -7,9 +7,11 @@ export async function getStaticProps(params) {
     locale = "en"
   }
   const headerContent = await getContent(locale, "header");
+  const footerContent = await getContent(locale, "footer");
   return {
     props: {
       headerContent,
+      footerContent
     },
   };
 }

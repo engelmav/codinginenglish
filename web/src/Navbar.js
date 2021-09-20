@@ -1,10 +1,8 @@
 import { css } from "styled-components";
-import {
-  debugBorder,
-} from "./UtilComponents/sharedStyles";
+import { debugBorder } from "./UtilComponents/sharedStyles";
 import styled from "styled-components";
 import { boxy } from "./UtilComponents";
-import { typography } from "styled-system"
+import { typography } from "styled-system";
 
 
 export const navbarCommonStyle = css`

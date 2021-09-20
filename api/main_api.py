@@ -20,6 +20,7 @@ import logging
 
 from rest_schema import Schema
 from services.rocketchat import RocketChatService
+from email_templates import curriculum_request
 
 import requests
 
@@ -47,7 +48,8 @@ def create_main_api(publish_message,
                     aula_service: AulaDataService,
                     rc_service: RocketChatService,
                     blueprints,
-                    websocket_manager: WebsocketManager):
+                    websocket_manager: WebsocketManager,
+                    send_email):
 
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
@@ -318,14 +320,17 @@ def create_main_api(publish_message,
         rocketchat_auth_token = auth0_login_resp.get("data").get("authToken")
         return rc_user_id, rocketchat_auth_token
 
-    @app.route("/api/registered-user", methods=["POST"])
-    def add_registered_user():
-        """This is a user with only an email address, before they hit the auth0 callback url (initialize_user)"""
+    @app.route("/api/user-email", methods=["POST"])
+    def create_user_email():
         req = request.get_json()
         email = req.get("email")
-        # TODO: turn this into a generic /api/partial-user endpoint
-        # status = req.get("status")
-        _user = user_service.create_user(email, status="registered")
+        firstname = req.get("firstname")
+        lastname = req.get("lastname")
+        status = req.get("status")
+        _user = user_service.create_user(email, first_name=firstname, last_name=lastname, status=status)
+        if status == "curriculumDownload":
+            curriculum_req_content = curriculum_request(email)
+            _ = send_email(curriculum_req_content)
         return make_response(dict(messages=["Created registered user"], status="success"), 200)
 
     @app.route('/api/users', methods=['POST'])
@@ -493,13 +498,13 @@ def create_main_api(publish_message,
                 messages=["Successfully submitted student application."]
             ))
 
-    blacklist = [
+    local_ips = [
         "192.168",
         "127.0.0.1"
     ]
 
-    def ip_blacklisted(addr):
-        for item in blacklist:
+    def is_local_ip_test(addr):
+        for item in local_ips:
             if item in addr:
                 return True
         return False
@@ -509,12 +514,14 @@ def create_main_api(publish_message,
         data = {}
         messages = []
         status = "error"
-        http_x_forwarded_host = request.headers.environ["HTTP_X_FORWARDED_FOR"]
+        environ = request.headers.environ
+        http_x_forwarded_host = environ.get("HTTP_X_FORWARDED_FOR",
+                                            environ.get("REMOTE_ADDR"))
         LOG.info(f"Got http_x_forwarded_host {http_x_forwarded_host}")
         ip_addr = http_x_forwarded_host
 
-        if ip_blacklisted(ip_addr):
-            return jsonify(dict(data={}, status="error", messages=[f"ip {ip_addr} is blacklisted"]))
+        if is_local_ip_test(ip_addr):
+            return jsonify(dict(status="success", data={"city": "LocalCity", "country_name": "LocalCountry"}, messages=[f"{ip_addr} is a local IP"]))
         try:
             resp = requests.get(f"http://api.ipstack.com/{ip_addr}?access_key=1cf9eb6bbf475a26fb0ad4ed4ece272e")
             status = "success"

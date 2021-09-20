@@ -1,7 +1,12 @@
 export const basicCourseForm = [
   {
-    fieldName: "fullName",
+    fieldName: "given-name",
     title: "Nombre",
+    fieldType: "shortAnswer",
+  },
+  {
+    fieldName: "family-name",
+    title: "Apellido",
     fieldType: "shortAnswer",
   },
   {

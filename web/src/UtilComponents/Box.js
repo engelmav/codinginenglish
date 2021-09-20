@@ -1,5 +1,8 @@
 import styled from "styled-components";
 import {
+  background,
+  backgroundColor,
+  border,
   compose,
   space,
   color,
@@ -16,6 +19,9 @@ export const Box = styled.div(
     boxSizing: "border-box",
     minWidth: 0,
   },
+  background,
+  backgroundColor,
+  border,
   space,
   color,
   layout,
@@ -23,7 +29,8 @@ export const Box = styled.div(
   flexGrow,
   flexWrap,
   debugBorder,
-  position
+  position,
+  layout
 );
 
 export const boxy = compose(space, position, color, layout, flexbox, flexGrow, flexWrap);

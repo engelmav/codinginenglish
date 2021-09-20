@@ -3,7 +3,7 @@ from database.models import model_factory
 from main_api import create_main_api
 from database.mysql_session import mysql_session
 from database.providers import base_provider
-from events import create_message_publisher, StudentSessionService, MessagingBackend, WebsocketManager
+from events import create_message_publisher, StudentSessionService, WebsocketManager
 import redis
 from simplekv.memory.redisstore import RedisStore
 
@@ -13,6 +13,7 @@ from rest_schema import schema_factory
 from services.auth import AuthService
 from services.cie import UserService, ModuleService
 from services.rocketchat import RocketChatService
+from services.mailjet import send_mail
 
 
 """
@@ -59,6 +60,7 @@ app = create_main_api(
     aula_service,
     rc_service,
     blueprints,
-    websocket_manager
+    websocket_manager,
+    send_mail
 )
 

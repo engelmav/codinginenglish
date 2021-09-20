@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cie-web-next-dev-deployment
+  labels:
+    app: cie-web-next-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cie-web-next-dev
+  template:
+    metadata:
+      labels:
+        app: cie-web-next-dev
+    spec:
+      containers:
+      - name: cie-web-next-dev
+        image: vengelmann/cie-web-next-dev
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-web-next-dev-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: cie-web-next-dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cie-web-next-nginx-dev-deployment
+  labels:
+    app: cie-web-next-nginx-dev-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cie-web-next-nginx-dev-deployment
+  template:
+    metadata:
+      labels:
+        app: cie-web-next-nginx-dev-deployment
+    spec:
+      containers:
+      - name: cie-web-next-nginx-dev-deployment
+        image: vengelmann/nginx-next-dev
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-web-nginx-next-dev-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: cie-web-next-nginx-dev-deployment
