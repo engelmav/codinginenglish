@@ -24,6 +24,14 @@ from email_templates import curriculum_request
 
 import requests
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("debug.log"),
+        logging.StreamHandler()
+    ]
+)
 LOG = logging.getLogger(__name__)
 FRONTEND_LOG = logging.getLogger("web")
 app = Flask(__name__)
@@ -546,6 +554,7 @@ def create_main_api(publish_message,
             FRONTEND_LOG.info(log_message)
         elif level == "ERROR":
             FRONTEND_LOG.error(log_message)
+        return jsonify({})
 
 
     @app.route("/api/site-map")

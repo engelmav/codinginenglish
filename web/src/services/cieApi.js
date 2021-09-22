@@ -92,8 +92,8 @@ class CieApi {
     return this._get("/api/applicant-location");
   }
 
-  async log(message, level = "info") {
-    return await this.post("/api/log", { data: { message, level } });
+  async log(message, level = "INFO") {
+    return await this._post("/api/log", { data: { message, level } });
   }
 }
 

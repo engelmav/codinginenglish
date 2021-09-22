@@ -20,8 +20,9 @@ import Modal from "../components/Modal";
 import { background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
-import { Hero } from "../components/Hero";
 import useInView from "react-cool-inview";
+import { styled as compiledStyled } from "@compiled/react";
+
 
 const CurriculumForm = dynamic(() => import("./CurriculumForm"));
 const MailingList = dynamic(() => import("../components/MailingList"));
@@ -156,9 +157,7 @@ const Section = ({
   );
 };
 
-const Strong = styled.span`
-  /* font-weight: 600; */
-
+const Strong = compiledStyled.span`
   background: linear-gradient(to left, yellow, yellow 100%);
   background-position: 0 100%;
   background-size: 100% 0.1em;
@@ -184,12 +183,13 @@ const LandingPage = (props) => {
           imageSrcSet="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/home/nyc-sunrise-400x154px.webp 720w, https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp 1920w"
         /> */}
         <Box
+          px="2"
           display="flex"
           width="100%"
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          height="45%"
+          flex="1"
         >
           <TitleH1 fontSize={[4, 6, 7]} textAlign="center" color="white">
             {content.title}
@@ -197,8 +197,8 @@ const LandingPage = (props) => {
           <TitleH1>🚀</TitleH1>
         </Box>
         <Box
-          height="55%"
-          p="4"
+          flex="1"
+          p="2"
           display="flex"
           flexDirection="column"
           alignItems="center"
@@ -232,7 +232,7 @@ const LandingPage = (props) => {
             display="flex"
             flexDirection="column"
             flex="1"
-            justifyContent="space-evenly"
+            justifyContent="center"
           >
             <P color="white" textAlign="center">
               {content.subsubtitle}
