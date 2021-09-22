@@ -9,6 +9,7 @@ import * as yup from "yup";
 import ReactGA from "react-ga";
 import settings from "../settings";
 import GoogleLoginComponent from "../components/GoogleSignUpBtn";
+import { cieApi } from "../services/cieApi";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -103,6 +104,7 @@ const EmailForm = ({
         action: "emailRegistration",
         label: "emailValidationFailed",
       });
+      cieApi.log(`email validation failed for email ${email}`)
       return;
     }
     handleSetEmailSubmitted();

@@ -29,9 +29,12 @@ module.exports = (phase, { defaultConfig }) => {
         config.optimization.minimize = false;
       }
       config.plugins.push(definePlugin);
+      config.module.rules.push({
+        test: /\.js$/,
+        use: ["@compiled/webpack-loader"],
+      });
       return config;
     },
-
   };
   return Object.assign(defaultConfig, customConfig);
 };

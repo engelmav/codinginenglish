@@ -5,6 +5,7 @@ import { space, width } from "styled-system";
 import {
   debugBorder,
   whenSmallScreen,
+  sm,
   darkGray,
   darkGrayRgb,
   fontMonospace,
@@ -17,8 +18,11 @@ import ReactGA from "react-ga";
 import settings from "../settings";
 import Login from "../Login/Login";
 import Router from "next/router";
-import Modal from "../components/Modal"
+import Modal from "../components/Modal";
 import { useAppStore } from "../stores/appStoreReact";
+import { HeaderImage } from "../components/HeaderImage"
+import { styled as compiledStyled } from "@compiled/react";
+
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -55,33 +59,25 @@ const Hamburger = styled.svg`
       display: block;`}
 `;
 
-const HeaderStyle = styled.header`
+/* background-color: rgba(darkGrayRgb, 0.9); */
+/* box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px; */
+/*
   ${boxy}
-  /* background-color: rgba(darkGrayRgb, 0.9); */
-  /* box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 4px 0px; */
+
+*/
+const HeaderStyle = compiledStyled.header`
   position: sticky;
   z-index: 1;
   top: 0;
-  ${debugBorder}
+  background-color: ${darkGray};
   max-width: 100%;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   padding: 1rem;
-  ${whenSmallScreen`
-      ${headerMarginSm}`}
-  align-items: center;
-  background-color: ${darkGray};
   flex-shrink: 2;
-`;
-
-const Img = styled.img`
-  ${space}
-  ${width}
-  min-width: 180px;
-  ${whenSmallScreen`
-      max-width: 180px;`}
-  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const Img2 = styled.img`
@@ -89,7 +85,7 @@ const Img2 = styled.img`
   cursor: pointer;
 `;
 
-const LangUl = styled.ul``;
+const LangUl = compiledStyled.ul``;
 
 const locales = {
   english: "en",
@@ -120,20 +116,6 @@ const NavbarUl = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
-const Banner = styled.div`
-  ${boxy}
-  width: 100%;
-  background: yellow;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  ${whenSmallScreen`
-      font-size: 12px;
-      padding-left: 3px;
-  padding-right: 3px;
-      `}
-`;
-
 export const CloseBanner = styled(FaRegWindowClose)`
   color: black;
   background-color: yellow;
@@ -160,6 +142,27 @@ function daysBetween(startDate, endDate) {
   );
 }
 
+const LangOptsBox = compiledStyled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LangOpts = ({closeLanguageSelector}) => (
+  <LangOptsBox>
+    <LangUl>
+      {Object.keys(locales).map((localeKey, idx) => (
+        <LI mb={2} fontSize={20} onClick={closeLanguageSelector} key={idx}>
+          <Link href={Router.pathname} locale={locales[localeKey]}>
+            {localeKey}
+          </Link>
+        </LI>
+      ))}
+    </LangUl>
+  </LangOptsBox>
+);
+
 const HeaderContainer = (props) => {
   const [navMenu, setNavMenu] = useState(false);
   const navMenuRef = useRef(null);
@@ -169,13 +172,12 @@ const HeaderContainer = (props) => {
   const showLanguageSelector = () => setLanguageSelectorOpen(true);
   const closeLanguageSelector = () => setLanguageSelectorOpen(false);
 
-
   const store = useAppStore();
-  const ref = useRef(null)
+  const ref = useRef(null);
 
   useEffect(() => {
-    store.handleSetHeaderHeight(ref.current?.clientHeight)
-  }, [])
+    store.handleSetHeaderHeight(ref.current?.clientHeight);
+  }, []);
 
   const detectBackgroundClickAndCloseNav = (event) => {
     if (navMenuRef.current && navMenuRef.current.contains(event.target)) {
@@ -204,24 +206,6 @@ const HeaderContainer = (props) => {
     link.onClick = () => setNavMenu(false);
     return link;
   });
-
-  const LangOptsBox = styled.div`
-    ${boxy}
-
-  `
-
-  const LangOpts = () =>
-    <LangOptsBox height="100%" display="flex" alignItems="center" justifyContent="center">
-    <LangUl>
-      {Object.keys(locales).map((localeKey, idx) => (
-        <LI mb={2} fontSize={20} onClick={closeLanguageSelector} key={idx}>
-          <Link href={Router.pathname} locale={locales[localeKey]}>
-            {localeKey}
-          </Link>
-        </LI>
-      ))}
-    </LangUl>
-    </LangOptsBox>
 
   return (
     <>
@@ -252,16 +236,22 @@ const HeaderContainer = (props) => {
         </Banner>
       )}
       {languageSelectorOpen && (
-        <Modal styleProps={{maxWidth: "600px"}} title="Language" onClose={()=>setLanguageSelectorOpen(false)}><LangOpts /></Modal>
+        <Modal
+          styleProps={{ maxWidth: "600px" }}
+          title="Language"
+          onClose={() => setLanguageSelectorOpen(false)}
+        >
+          <LangOpts closeLanguageSelector={closeLanguageSelector}/>
+        </Modal>
       )}
-      <HeaderStyle justifyContent={["space-between"]} ref={ref}>
+      <HeaderStyle ref={ref}>
         <Link href="/">
-          <Img
+          <HeaderImage
             loading="lazy"
             alt="cie logo"
             srcSet={`${settings.assets}/CIE_Logo_Horizontal_transparent_282w.webp 282w, ${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp 1920w`}
             src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp`}
-          ></Img>
+          ></HeaderImage>
         </Link>
         <Box display="flex" alignItems="center">
           <Img2
