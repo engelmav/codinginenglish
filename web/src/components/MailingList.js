@@ -51,7 +51,7 @@ const makeLi = ({ node, ...props }) => <RobotListItem {...props} />;
 const MailingList = ({ headerStyles, content }) => {
   return (
     <>
-      <H2 {...headerStyles}>Manténte al tanto</H2>
+      <H2 {...headerStyles}>{content.title}</H2>
       <ReactMarkdown
         components={{
           p: makeP,
@@ -63,7 +63,7 @@ const MailingList = ({ headerStyles, content }) => {
         {content.blurb}
       </ReactMarkdown>
       <EmailForm
-        submitBtnText="¡Manténme informado!"
+        submitBtnText={content.submitButtonText}
         containerStyles={{
           background: "transparent",
           width: "100%",

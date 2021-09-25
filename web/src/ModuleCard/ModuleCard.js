@@ -36,7 +36,7 @@ const ModuleCard = (props) => {
     course_instances: courseInstances,
   } = props.moduleData;
   const { observe, inView } = useInView();
-  const { mailingListComponentContent } = props;
+  const { mailingListComponentContent, localizedCommon } = props;
   return (
     <>
       <Hero p="3" width="100%" >
@@ -93,7 +93,7 @@ const ModuleCard = (props) => {
             fontSize={[1, 2, 4]}
             onClick={() => setRegisterModal(true)}
           >
-            Inscríbeme
+            {localizedCommon.registerImperative}
           </Button>
         </ContentSection>
       </SectionBg>
