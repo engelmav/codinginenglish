@@ -22,6 +22,7 @@ export async function getStaticProps(params) {
   }
   const headerContent = await getContent(locale, "header");
   const footerContent = await getContent(locale, "footer");
+  const localizedCommon = await getContent(locale, "common");
   const mailingListComponentContent = await getContent(
     locale,
     "mailing-list-component"
@@ -33,6 +34,7 @@ export async function getStaticProps(params) {
       headerContent,
       footerContent,
       mailingListComponentContent,
+      localizedCommon
     },
   };
 }

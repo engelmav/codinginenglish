@@ -266,23 +266,19 @@ const LandingPage = (props) => {
             idx={idx}
             {...section}
             settings={settings}
-            setCurricModal={setCurricModal}
           />
         ))}
       </div>
       <Box mt="4" maxWidth="400px">
         <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
           <P>
-            «Como estudiante extranjero, aprender sobre cualquier materia… era
-            muy duro. Para aprender, primero necesitaba comprender una
-            herramienta básica: el inglés».
+            {content.quote[0].quoteText}
           </P>
           <footer>
             —Takeishi Kimoto,{" "}
             <cite>
-              <a href="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-                ¿De verdad es tan importante saber inglés para aprender
-                programación?
+              <a href={content.quote[0].sourceLink}>
+                {content.quote[0].sourceLinkText}
               </a>
             </cite>
           </footer>
@@ -298,15 +294,7 @@ const LandingPage = (props) => {
           )}
         </ContentSection>
       </SectionBg>
-      {curricModal && (
-        <Modal
-          styleProps={{ mt: [3, 5, 5, 6] }}
-          title={content.Modal1.title}
-          onClose={() => setCurricModal(false)}
-        >
-          <CurriculumForm content={content.Modal1} />
-        </Modal>
-      )}
+
     </>
   );
 };

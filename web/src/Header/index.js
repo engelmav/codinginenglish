@@ -20,9 +20,8 @@ import Login from "../Login/Login";
 import Router from "next/router";
 import Modal from "../components/Modal";
 import { useAppStore } from "../stores/appStoreReact";
-import { HeaderImage } from "../components/HeaderImage"
+import { HeaderImage } from "../components/HeaderImage";
 import { styled as compiledStyled } from "@compiled/react";
-
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
@@ -116,7 +115,7 @@ const NavbarUl = styled.ul`
       navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
 `;
 
-export const CloseBanner = styled(FaRegWindowClose)`
+export const CloseBanner = compiledStyled(FaRegWindowClose)`
   color: black;
   background-color: yellow;
   cursor: pointer;
@@ -129,19 +128,6 @@ export const CloseBanner = styled(FaRegWindowClose)`
   margin-left: auto;
 `;
 
-function treatAsUTC(date) {
-  var result = new Date(date);
-  result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
-  return result;
-}
-
-function daysBetween(startDate, endDate) {
-  var millisecondsPerDay = 24 * 60 * 60 * 1000;
-  return Math.floor(
-    (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
-  );
-}
-
 const LangOptsBox = compiledStyled.div`
   height: 100%;
   display: flex;
@@ -149,16 +135,27 @@ const LangOptsBox = compiledStyled.div`
   justify-content: center;
 `;
 
-const LangOpts = ({closeLanguageSelector}) => (
+const LangOpts = ({ closeLanguageSelector }) => (
   <LangOptsBox>
     <LangUl>
-      {Object.keys(locales).map((localeKey, idx) => (
-        <LI mb={2} fontSize={20} onClick={closeLanguageSelector} key={idx}>
-          <Link href={Router.pathname} locale={locales[localeKey]}>
-            {localeKey}
-          </Link>
-        </LI>
-      ))}
+      {Object.keys(locales).map((localeKey, idx) => {
+        const hrefObj = {
+          pathname: Router.pathname,
+          query: Router.query.slug && { slug: Router.query.slug },
+          locale: locales[localeKey],
+        }
+
+        return (
+          <LI mb={2} fontSize={20} onClick={closeLanguageSelector} key={idx}>
+            <Link
+              href={hrefObj}
+              locale={locales[localeKey]}
+            >
+              {localeKey}
+            </Link>
+          </LI>
+        );
+      })}
     </LangUl>
   </LangOptsBox>
 );
@@ -198,9 +195,6 @@ const HeaderContainer = (props) => {
         detectBackgroundClickAndCloseNav
       );
   }, [navMenuRef]);
-
-  const hideNav = { onClick: () => setNavMenu(false) };
-
   let { links } = props.headerContent;
   links = links.map((link) => {
     link.onClick = () => setNavMenu(false);
@@ -209,39 +203,13 @@ const HeaderContainer = (props) => {
 
   return (
     <>
-      {bannerOpen && !inApplyRoute && (
-        <Banner p={[1, 2, 2, 2]}>
-          <P mb={0}>
-            El curso <i>WebApp Development - Basic</i>
-            {` empieza en ${daysBetween(
-              new Date(),
-              new Date("9/20/2021 12:00 AM")
-            )} días.`}
-          </P>
-          <Link href="/apply">
-            <ApplyButton
-              onClick={() => {
-                ReactGA.event({
-                  category: "register",
-                  action: "clickedYellowBanner",
-                  label: "solicitaUnaPlaza",
-                });
-                setBannerOpen(false);
-              }}
-            >
-              ¡Inscríbete ahora!
-            </ApplyButton>
-          </Link>
-          <CloseBanner size="25" onClick={() => setBannerOpen(false)} />
-        </Banner>
-      )}
       {languageSelectorOpen && (
         <Modal
           styleProps={{ maxWidth: "600px" }}
           title="Language"
           onClose={() => setLanguageSelectorOpen(false)}
         >
-          <LangOpts closeLanguageSelector={closeLanguageSelector}/>
+          <LangOpts closeLanguageSelector={closeLanguageSelector} />
         </Modal>
       )}
       <HeaderStyle ref={ref}>
@@ -286,7 +254,6 @@ const HeaderContainer = (props) => {
 };
 
 export async function getStaticProps({ locale }) {
-  console.log("***** LAYOUT HEADER FETCH Layout header fetch");
   const localeContentUrl = `https://content.codinginenglish.com/header?_locale=${locale}`;
   const res = await fetch(localeContentUrl);
   console.log("result of header fetch:", res);
@@ -299,25 +266,3 @@ export async function getStaticProps({ locale }) {
 }
 
 export default HeaderContainer;
-
-/**
- 
-
-          {/* {appStore.authData && ( this would make us load appStore right away..rethink
-              <>
-                <LI>
-                  <Link href="/my-dashboard">my_dashboard</Link>
-                </LI>
-                <LI>
-                  <Link href="/class">in_session!</Link>
-                </LI>
-              </>
-            )} 
-            <li>
-
-        
-
-
-      </Header>
-
- */

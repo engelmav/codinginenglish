@@ -30,9 +30,6 @@ const CallbackView = (props) => {
         setError(authError);
       }
     }
-    console.log(
-      "***********CallbackView running init() and auth.checkRoute***********"
-    );
     init();
   }, []);
 

@@ -1,7 +1,13 @@
 import styled from "styled-components";
 import { flexbox, space } from "styled-system";
-import React from "react";
+import React, { useRef, useState } from "react";
+import { useIntersection } from "../lib/useIntersectionObserver";
+import { styled as compiledStyled } from "@compiled/react"
 
+const ImgContainer = compiledStyled.div`
+  display: flex;
+  justify-content: center;
+`
 
 const AutoScaleImageStyle = styled.img`
   ${flexbox}
@@ -11,15 +17,22 @@ const AutoScaleImageStyle = styled.img`
 
 export const AutoScaleImage = (props) => {
   const { width, height, maxWidth, minWidth, mt, mb, sizes } = props;
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef();
+  useIntersection(imgRef, () => setIsInView(true));
   return (
-    <AutoScaleImageStyle
-      mt={mt}
-      mb={mb}
-      style={{ maxWidth, minWidth }}
-      width={width}
-      height={height}
-      sizes={sizes}
-      {...props}
-    />
+    <ImgContainer ref={imgRef}>
+      {isInView && (
+        <AutoScaleImageStyle
+          mt={mt}
+          mb={mb}
+          style={{ maxWidth, minWidth }}
+          width={width}
+          height={height}
+          sizes={sizes}
+          {...props}
+        />
+      )}
+    </ImgContainer>
   );
 };

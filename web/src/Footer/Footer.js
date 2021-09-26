@@ -64,13 +64,13 @@ export const Footer = (props) => {
         Coding in English
       </P>
       <P mb="0" color="white">
-        All inquiries:{" "}
+        Inquiries:{" "}
         <A href="mailto:support@codinginenglish.com">
           support@codinginenglish.com
         </A>
       </P>
       <P mb="3" color="white">
-        45 Glen Ct North Plainfield, NJ 07063 EEUU
+        45 Glen Ct North Plainfield, NJ 07063 USA
       </P>
       {props.footerContent.legalLinks.map((link, idx) => (
         <Box pb="1" key={idx}>

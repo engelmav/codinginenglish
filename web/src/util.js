@@ -62,4 +62,18 @@ export async function toLocalTime(dt) {
   return localDt;
 }
 
+function treatAsUTC(date) {
+  var result = new Date(date);
+  result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+  return result;
+}
+
+function daysBetween(startDate, endDate) {
+  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return Math.floor(
+    (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay
+  );
+}
+
+
 export { browserDetect, hasActiveSession, isInSession };
