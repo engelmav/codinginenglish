@@ -75,4 +75,5 @@ function daysBetween(startDate, endDate) {
   );
 }
 
+
 export { browserDetect, hasActiveSession, isInSession };
