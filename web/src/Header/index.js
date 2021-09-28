@@ -1,18 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import styled, { css } from "styled-components";
-import { space, width } from "styled-system";
-import {
-  debugBorder,
-  whenSmallScreen,
-  sm,
-  darkGray,
-  darkGrayRgb,
-  fontMonospace,
-} from "../UtilComponents/sharedStyles";
-import { ApplyButton, boxy, Box } from "../UtilComponents";
-import { P } from "../UtilComponents/Typography/Typography";
-import { navbarCommonStyle, LI } from "../Navbar";
+
+import { LI } from "../Navbar";
 import { FaRegWindowClose } from "@react-icons/all-files/fa/FaRegWindowClose";
 import ReactGA from "react-ga";
 import settings from "../settings";
@@ -26,36 +15,28 @@ import { styled as compiledStyled } from "@compiled/react";
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
-const headerMarginSm = css`
-  padding: 1rem;
-`;
 
-const CloseBox = styled(FaRegWindowClose)`
+const CloseBox = compiledStyled(FaRegWindowClose)`
   display: none;
   color: white;
-  background-color: ${darkGray};
   align-self: flex-end;
   cursor: pointer;
   transition: 0.2s;
   :hover {
-    background-color: ${darkGray};
     color: white;
   }
-  ${whenSmallScreen`
-      display: block;`}
+
 `;
-const Hamburger = styled.svg`
+const Hamburger = compiledStyled.svg`
   height: 20px;
   width: 20px;
   display: none;
   rect {
     fill: white;
-    stroke: ${darkGray};
     stroke-width: 10px;
   }
   cursor: pointer;
-  ${whenSmallScreen`
-      display: block;`}
+
 `;
 
 /* background-color: rgba(darkGrayRgb, 0.9); */
@@ -68,7 +49,6 @@ const HeaderStyle = compiledStyled.header`
   position: sticky;
   z-index: 1;
   top: 0;
-  background-color: ${darkGray};
   max-width: 100%;
   width: 100%;
   display: flex;
@@ -79,8 +59,7 @@ const HeaderStyle = compiledStyled.header`
   justify-content: space-between;
 `;
 
-const Img2 = styled.img`
-  ${boxy}
+const Img2 = compiledStyled.img`
   cursor: pointer;
 `;
 
@@ -92,27 +71,8 @@ const locales = {
   español: "es",
 };
 
-const NavbarUl = styled.ul`
-  ${navbarCommonStyle}
-  ${whenSmallScreen`
-    li {
-      margin-bottom: 2rem;
-      padding-right: 0;
-      margin-right: 0;
-    }
-    position: fixed;
-    right: -10px;
-    z-index: 1;
-    top: 0;
-    height: 100%;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-end;
-    ${headerMarginSm}
-    background-color: ${darkGray};
-    transition: 0.1s ease-out;
-    transform: ${({ navMenu }) =>
-      navMenu ? `translateX(-10px)` : `translateX(100%)`};`}
+const NavbarUl = compiledStyled.ul`
+
 `;
 
 export const CloseBanner = compiledStyled(FaRegWindowClose)`
@@ -221,7 +181,7 @@ const HeaderContainer = (props) => {
             src={`${settings.assets}/CIE_Logo_Horizontal_transparent_490w.webp`}
           ></HeaderImage>
         </Link>
-        <Box display="flex" alignItems="center">
+        <div display="flex" alignItems="center">
           <Img2
             {...{ mr: [3, 3, 0] }}
             loading="lazy"
@@ -247,7 +207,7 @@ const HeaderContainer = (props) => {
             <rect y="30" width="100" height="20"></rect>
             <rect y="60" width="100" height="20"></rect>
           </Hamburger>
-        </Box>
+        </div>
       </HeaderStyle>
     </>
   );

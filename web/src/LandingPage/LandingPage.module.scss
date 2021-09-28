@@ -1,0 +1,45 @@
+// Extra Small (mobile)
+$below-xs: "max-width:480px";
+$above-xs: "min-width:481px";
+
+// Small (tablet)
+$below-s: "max-width:768px";
+$above-s: "min-width:769px";
+
+// Medium (landscape tablet)
+$below-m: "max-width:960px";
+$above-m: "min-width:961px";
+
+// Large (content max-width)
+$below-l: "max-width:1120px";
+$above-l: "min-width:1121px";
+
+$portrait: "orientation: portrait";
+$landscape: "orientation: landscape";
+$retina: "min-resolution: 192dpi";
+
+$color-primary: #0070f3;	
+
+@function below( $size-px ) {
+  @return "max-width: #{$size-px}";
+}
+
+@function above( $size-px ) {
+  @return "min-width: #{$size-px}";
+}
+
+h1 {
+  color: red;
+  
+  @media ($above-s) and ($below-m) {
+    color: red;
+  }
+  @media ($below-m) and ($landscape) {
+    color: yellow;
+  }
+
+  @media (below(300px)) {
+    font-size: 14px;
+  }
+}
+

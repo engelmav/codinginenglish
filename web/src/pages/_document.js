@@ -1,5 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import React from "react";
+import { getCssText } from "../stitches.config";
 
 const iubendaConfig = `<script type="text/javascript">
 var _iub = _iub || [];
@@ -17,7 +18,10 @@ class CieDocument extends Document {
             property="og:image"
             content="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/cie-facebook-profile-pic-500px.png"
           />
-
+          <style
+            id="stitches"
+            dangerouslySetInnerHTML={{ __html: getCssText() }}
+          />
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"
