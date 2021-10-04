@@ -8,8 +8,31 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { AppStoreProvider } from "../../../stores/appStoreReact";
 import getContent from "../../../cms";
+import { H1, Title, smFont } from "../../../components/typography";
+import { styled } from "@linaria/react";
+import remarkGfm from "remark-gfm";
+import { LinkButton } from "../../../components/widgets";
+import { AutoScaleImage } from "../../../UtilComponents";
+import { MdArticle } from "../../../components/markdown"
+import * as colors from "../../../components/colors";
+import Link from "next/link"
 
-export default function Post(props) {
+const BlogCta = styled(LinkButton)`
+  align-self: center;
+  justify-self: center;
+`;
+
+
+
+const Author = styled.em`
+  color: ${colors.darkGray};
+`;
+
+const makeCta = ({ node, ...props }) => (
+  <BlogCta href={props.href}>{props.children[0]}</BlogCta>
+);
+
+function Post(props) {
   const { postData: postDataList } = props;
   const postData = postDataList[0];
   return (
@@ -17,17 +40,26 @@ export default function Post(props) {
       <Layout {...props}>
         <BlogLayout>
           <Head>
-            <title>{postData.title}</title>
+            <Title>{postData.title}</Title>
           </Head>
-          <article>
+          <MdArticle>
             <h1 className={utilStyles.headingXl}>{postData.title}</h1>
             <div className={utilStyles.lightText}>
+              <Author><Link href={postData.bioLink}>{postData.author}</Link></Author>
               <Date dateString={postData.date} />
             </div>
-            <ReactMarkdown escapeHtml={false} rehypePlugins={[rehypeRaw]}>
+            <ReactMarkdown
+              components={{
+                h1: H1,
+                img: AutoScaleImage,
+                cta: makeCta,
+              }}
+              rehypePlugins={[rehypeRaw]}
+              remarkPlugins={[remarkGfm]}
+            >
               {postData.body}
             </ReactMarkdown>
-          </article>
+          </MdArticle>
         </BlogLayout>
       </Layout>
     </AppStoreProvider>
@@ -71,3 +103,5 @@ export async function getStaticProps(context) {
     },
   };
 }
+
+export default Post;

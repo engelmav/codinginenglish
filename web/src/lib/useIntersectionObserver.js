@@ -39,5 +39,5 @@ export function useIntersection(elem, callback) {
       listenerCallbacks.delete(target);
       observer.unobserve(target);
     };
-  }, []);
+  }, [elem, callback]);
 }

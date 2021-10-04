@@ -1,3 +1,5 @@
+const withLinaria = require('next-linaria');
+
 const isProd = process.env.NODE_ENV === "production";
 module.exports = (phase, { defaultConfig }) => {
   const customConfig = {
@@ -36,5 +38,5 @@ module.exports = (phase, { defaultConfig }) => {
       return config;
     },
   };
-  return Object.assign(defaultConfig, customConfig);
+  return withLinaria(Object.assign(defaultConfig, customConfig));
 };

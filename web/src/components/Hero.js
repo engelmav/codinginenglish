@@ -13,7 +13,7 @@ export const Hero = ({ imageSrc, imageSrcSet, heroText, heroHeight }) => {
   const [currentSrc, setCurrentSrc] = useState(null);
   useEffect(() => {
     console.log("image source:", currentSrc);
-  }, []);
+  }, [currentSrc]);
   return (
     <Box
       backgroundColor={darkGray}

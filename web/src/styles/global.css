@@ -13,18 +13,11 @@ body {
 }
 
 a {
-  color: #0070f3;
+
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-}
 
-img {
-  max-width: 100%;
-  display: block;
-}
 
 .iframe-container {
   position: relative;
@@ -35,7 +28,6 @@ img {
   }
 }
 .responsive-iframe {
-
   top: 0;
   left: 0;
   bottom: 0;
