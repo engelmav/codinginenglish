@@ -57,8 +57,8 @@ const FAQ = (props) => {
   return (
     <AppStoreProvider>
       <Layout {...props}>
-        <FaqTitle>{faqContent.title}</FaqTitle>
-        <AutoScaleImage src="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/faq/question.png" />
+        <FaqTitle>{"Schedule an admissions interview"}</FaqTitle>
+        <AutoScaleImage src="" />
         <MdArticle>
           <ReactMarkdown
             rehypePlugins={[rehypeRaw]}
@@ -70,42 +70,21 @@ const FAQ = (props) => {
               // cta: makeCta,
             }}
           >
-            {faqContent.FaqContent}
+            {"Content"}
           </ReactMarkdown>
+
+          <div
+            className="calendly-inline-widget"
+            data-url="https://calendly.com/coding_in_english/15min?hide_event_type_details=1&hide_gdpr_banner=1"
+            style={{width: "100%", minWidth: "320px", height:"630px"}}
+          ></div>
+          <script
+            type="text/javascript"
+            src="https://assets.calendly.com/assets/external/widget.js"
+            async
+          ></script>
         </MdArticle>
       </Layout>
-      {dialogOpen && (
-        <Modal
-          title="Content and Language Integrated Learning"
-          modalStyles={{
-            width: "100%",
-            height: "90%",
-            backgroundColor: "white",
-          }}
-          hasScroll={false}
-          contentContainerStyles={{ width: "100%", height: "90%" }}
-          onClose={() => setDialogOpen(false)}
-        >
-          <iframe
-            style={{ height: "100%", width: "100%" }}
-            id="wiki"
-            src="https://en.wikipedia.org/wiki/Content_and_language_integrated_learning"
-          ></iframe>
-        </Modal>
-      )}
-      {subscribeOpen && (
-        <Modal
-          title="Subscribe"
-          modalStyles={{}}
-          contentContainerStyles={{}}
-          onClose={() => setSubscribeOpen(false)}
-          hasScroll={false}
-        >
-          <div style={{ display: "flex", flexDirection: "column", padding: "30px" }}>
-            <MailingList content={mailingListComponentContent} />
-          </div>
-        </Modal>
-      )}
     </AppStoreProvider>
   );
 };
@@ -123,10 +102,9 @@ export async function getStaticProps(params) {
     locale,
     "mailing-list-component"
   );
-  const faqContent = await getContent(locale, "faq");
+
   return {
     props: {
-      faqContent,
       headerContent,
       footerContent,
       mailingListComponentContent,

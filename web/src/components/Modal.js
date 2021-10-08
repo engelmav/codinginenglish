@@ -55,13 +55,14 @@ const CloseBox = styled(FaRegWindowClose)`
 
 const ContentContainer = styled.div`
   ${layout}
-  overflow-y: scroll;
+  overflow-y: ${(props => props.hasScroll ? "scroll": "none")};
 `;
 
 const Modal = ({
   backgroundStyles,
   children,
   contentContainerStyles,
+  hasScroll = true,
   headerStyles,
   onClose,
   modalStyles,
@@ -91,7 +92,7 @@ const Modal = ({
             ml="3"
           />
         </ModalHeader>
-        <ContentContainer {...contentContainerStyles}>
+        <ContentContainer hasScroll={hasScroll} {...contentContainerStyles}>
           {children}
         </ContentContainer>
       </ModalContainer>

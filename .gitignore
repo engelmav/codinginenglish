@@ -13,3 +13,4 @@ secrets.json
 node_modules/
 venv/
 dist/
+.linaria-cache/
