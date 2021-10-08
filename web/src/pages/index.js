@@ -20,14 +20,15 @@ export async function getStaticProps(params) {
   }
   const landingPageContent = await getContent(locale, "landing-page");
   const headerContent = await getContent(locale, "header");
-  const footerContent = await getContent(locale, "footer")
+  const footerContent = await getContent(locale, "footer");
   const mailingListComponentContent = await getContent(locale, "mailing-list-component")
   return {
     props: {
       landingPageContent,
       headerContent,
       footerContent,
-      mailingListComponentContent
+      mailingListComponentContent,
+      locale
     },
   };
 }

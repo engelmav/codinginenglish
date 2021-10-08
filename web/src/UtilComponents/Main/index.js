@@ -7,9 +7,10 @@ const Main = styled.main`
   max-width: 100%;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
+  flex-direction: column;
 
   justify-content: center;
+  align-items: center;
   flex: 1;
   ${boxy}
   ${width}

@@ -1,5 +1,4 @@
 import Head from "next/head";
-import BlogLayout, { siteTitle } from "../../components/BlogLayout";
 import Layout from "../../components/Layout";
 import utilStyles from "../../styles/utils.module.css";
 import Link from "next/link";
@@ -7,6 +6,18 @@ import Date from "../../components/date";
 import React from "react";
 import { AppStoreProvider } from "../../stores/appStoreReact";
 import getContent from "../../cms";
+import { Article } from "../../components/layout";
+import { H1 } from "../../components/typography";
+
+import { styled } from "@linaria/react"
+
+const BlogArticle = styled(Article)`
+  padding-top: 40px;
+`
+
+const BlogTitle = styled(H1)`
+  padding-top: 40px;
+`
 
 export default function BlogHome(props) {
   const { blogHomeContent, allPostsData } = props;
@@ -14,16 +25,11 @@ export default function BlogHome(props) {
   return (
     <AppStoreProvider>
       <Layout {...props}>
-        <BlogLayout home>
-          <Head>
-            <title>{siteTitle}</title>
-          </Head>
-          <section className={utilStyles.headingMd}>
+        <BlogTitle>Coding in English Blog</BlogTitle>
+            <BlogArticle>
+
             <p>{blogHomeContent.blurb}</p>
-          </section>
-          <section
-            className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}
-          >
+         
             <h2 className={utilStyles.headingLg}>
               {blogHomeContent.entriesTitle}
             </h2>
@@ -43,8 +49,7 @@ export default function BlogHome(props) {
                   );
                 })}
             </ul>
-          </section>
-        </BlogLayout>
+            </BlogArticle>
       </Layout>
     </AppStoreProvider>
   );

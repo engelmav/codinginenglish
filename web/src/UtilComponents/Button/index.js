@@ -8,6 +8,7 @@ import {
   background,
   backgroundColor,
   boxShadow,
+  layout,
 } from "styled-system";
 import {
   font,
@@ -116,8 +117,10 @@ Button.defaultProps = {
 
 const StyledApplyLink = styled.a`
   ${commonApply}
+  font-size: .9em;
   text-align: center;
   text-decoration: none;
+  width: 250px;
   &:hover:enabled {
     color: rgba(255, 255, 255, 1);
     box-shadow: 0 5px 15px rgba(145, 92, 182, 0.4);
@@ -130,6 +133,9 @@ StyledApplyLink.defaultProps = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  alignSelf: "center",
+  width: "250px",
+  p: 2
 };
 
 export const ApplyLink = (props) => {

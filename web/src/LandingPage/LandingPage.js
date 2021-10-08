@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ApplyLink,
   AutoScaleImage,
@@ -16,21 +16,18 @@ import {
   lightCieOrangeBg,
   darkGray,
 } from "../UtilComponents/sharedStyles";
-import Modal from "../components/Modal";
 import { background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
-import useInView from "react-cool-inview";
 import { styled as compiledStyled } from "@compiled/react";
+import { useIntersection } from "../lib/useIntersectionObserver";
 
-
-const CurriculumForm = dynamic(() => import("./CurriculumForm"));
 const MailingList = dynamic(() => import("../components/MailingList"));
+const FreshPosts = dynamic(() => import("../components/FreshPosts"));
 
 const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
-const iphoneXHeight = "812px";
 const AboveFold = styled.div`
   height: calc(100vh - ${({ headerHeight }) => headerHeight}px);
   display: flex;
@@ -137,7 +134,7 @@ const Section = ({
             <ApplyLink
               href={buttonData[0].href}
               minWidth="250px"
-              p="3"
+    
               bg="yellow"
               color="black"
               onClick={() => {
@@ -165,13 +162,16 @@ const Strong = compiledStyled.span`
 `;
 
 const LandingPage = (props) => {
-  const { settings, landingPageContent, mailingListComponentContent } = props;
+  const { settings, landingPageContent, mailingListComponentContent, locale } = props;
   const content = landingPageContent;
-  const [isMobileSize, setIsMobileSize] = useState(false);
-  const [curricModal, setCurricModal] = useState(false);
   const store = useAppStore();
 
-  const { observe, inView } = useInView();
+  const [postsInView, setPostsInView] = useState(false);
+  const [mailingListInView, setMailingListInView] = useState(false);
+  const freshPostsRef = useRef();
+  const mailingListRef = useRef();
+  useIntersection(freshPostsRef, () => setPostsInView(true));
+  useIntersection(mailingListRef, () => setMailingListInView(true));
 
   return (
     <>
@@ -239,8 +239,6 @@ const LandingPage = (props) => {
             </P>
             <ApplyLink
               justifySelf="flex-end"
-              minWidth="250px"
-              p="3"
               bg={cieOrange}
               href="#learnmore"
               color="black"
@@ -261,19 +259,12 @@ const LandingPage = (props) => {
       </AboveFold>
       <div style={{ width: "100%" }} id="learnmore">
         {content.Section.map((section, idx) => (
-          <Section
-            key={idx}
-            idx={idx}
-            {...section}
-            settings={settings}
-          />
+          <Section key={idx} idx={idx} {...section} settings={settings} />
         ))}
       </div>
       <Box mt="4" maxWidth="400px">
         <BlockQuote cite="https://medium.com/@lnuk2009jp/is-english-language-really-that-important-in-learning-programming-812a78be79b5">
-          <P>
-            {content.quote[0].quoteText}
-          </P>
+          <P>{content.quote[0].quoteText}</P>
           <footer>
             —Takeishi Kimoto,{" "}
             <cite>
@@ -284,9 +275,10 @@ const LandingPage = (props) => {
           </footer>
         </BlockQuote>
       </Box>
-      <SectionBg ref={observe}>
+      <SectionBg ref={freshPostsRef}>{postsInView && <FreshPosts locale={locale} title={content.postsTitle} />}</SectionBg>
+      <SectionBg ref={mailingListRef}>
         <ContentSection mb="5" px="4" maxWidth="550px">
-          {inView && (
+          {mailingListInView && (
             <MailingList
               headerStyles={h2Styles}
               content={mailingListComponentContent}
@@ -294,7 +286,6 @@ const LandingPage = (props) => {
           )}
         </ContentSection>
       </SectionBg>
-
     </>
   );
 };
