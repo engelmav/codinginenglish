@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import {
   background,
-  backgroundColor,
   border,
   compose,
   space,
@@ -20,7 +19,6 @@ export const Box = styled.div(
     minWidth: 0,
   },
   background,
-  backgroundColor,
   border,
   space,
   color,

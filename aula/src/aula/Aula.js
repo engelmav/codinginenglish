@@ -3,16 +3,17 @@ import Iframe from "react-iframe";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import * as S from "./styles";
-import { Window, Button } from "../UtilComponents";
+import { Window, Button } from "components";
 import { Rnd } from "react-rnd";
-import { observer } from "mobx-react";
 
 import { readSocketDataAnd } from "../messaging";
-import { Link } from "react-router-dom";
 import { ReadAndDo } from "../messaging";
+import { browserDetect} from "../util"
 const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 
-const VideoCall = React.lazy(() => /* webpackChunkName: "Videoconference" */ import("../VideoConference"));
+const VideoCall = React.lazy(() =>
+  /* webpackChunkName: "Videoconference" */ import("../VideoConference")
+);
 
 const ChatSignIn = (props) => {
   const divRef = useRef(null);
@@ -51,10 +52,7 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
         );
       }
       const { partial } = await import("lodash");
-      const handleWebsocketEvent = partial(
-        readSocketDataAnd,
-        sendSlideCommand
-      );
+      const handleWebsocketEvent = partial(readSocketDataAnd, sendSlideCommand);
       const slidesIframe = divRef.current.firstElementChild;
       slidesSocket.addEventListener("message", handleWebsocketEvent);
     }
@@ -67,7 +65,6 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
   );
 };
 
-@observer
 class Aula extends Component {
   constructor(props) {
     super(props);
@@ -160,14 +157,12 @@ class Aula extends Component {
   }
 
   async componentDidMount() {
-    const { browserDetect } = await import("../util");
-    this.setState({browserDetect})
     // dependency of PopupActivity
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = "https://unpkg.com/gifler@0.1.0/gifler.min.js";
     script.async = true;
     document.body.appendChild(script);
-    
+
     this.configureActiveSession();
   }
 
@@ -248,7 +243,6 @@ class Aula extends Component {
       prezzieLink,
       videoChannel,
       onTop,
-      browserDetect,
       isWindowDragging,
 
       roomChangeNotification,
@@ -277,14 +271,18 @@ class Aula extends Component {
     return (
       <S.ClassroomContainer>
         <S.ClassroomHeader>
-          <Link to="/">
+          <a href="http://www.codinginenglish.com">
             <img
               style={{ height: "40px", display: "inline" }}
               alt="cie logo"
               src={`${settings.assets}/cie-logo-horizontal-black.png`}
-            ></img>
-          </Link>
-          <S.RoomStatus><S.GroupIcon />{appStore.currentRoom || "main"}</S.RoomStatus>
+            />
+          </a>
+
+          <S.RoomStatus>
+            <S.GroupIcon />
+            {appStore.currentRoom || "main"}
+          </S.RoomStatus>
           <S.Taskbar>
             {!slidesWindow && (
               <Button mr={2} onClick={this.toggleSlides}>
@@ -416,11 +414,11 @@ class Aula extends Component {
           >
             <Window title="Video" onClose={toggleVideo} />
             {isWindowDragging && <S.CoverWindowOnDrag />}
-              <VideoCall
-                key={videoChannel}
-                participantName={appStore.firstName}
-                videoChannel={videoChannel}
-              />
+            <VideoCall
+              key={videoChannel}
+              participantName={appStore.firstName}
+              videoChannel={videoChannel}
+            />
           </Rnd>
         )}
 

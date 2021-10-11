@@ -4,8 +4,6 @@ const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
-const ASSET_PATH = process.env.ASSET_PATH || "/";
-var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
 var outputPath = path.resolve(__dirname, "../build");
 
 module.exports = function (env) {
@@ -23,7 +21,6 @@ module.exports = function (env) {
     }),
   ];
 
-
   if (environment === "production") {
     const compressionPlugin = new CompressionWebpackPlugin();
     plugins.push(compressionPlugin);
@@ -40,15 +37,23 @@ module.exports = function (env) {
     },
     resolve: {
       fallback: { crypto: false },
+      alias: {
+        components: path.resolve(__dirname, "../web/src/UtilComponents"),
+      },
     },
     module: {
       rules: [
         {
           test: /\.js$|jsx/,
           exclude: /(node_modules|bower_components)/,
-          use: {
-            loader: "babel-loader",
-          },
+          use: [
+            {
+              loader: "babel-loader",
+            },
+            {
+              loader: "@compiled/webpack-loader",
+            },
+          ],
         },
         {
           test: /\.css$/,
@@ -105,14 +110,5 @@ module.exports = function (env) {
     config.optimization.minimize = true;
     config.optimization.minimizer = [new TerserPlugin()];
   }
-  if (env.spaces) {
-    config.output.publicPath = doSpacesUrl;
-  } else {
-    config.output.publicPath = "/";
-  }
-  if (env.keycdn) {
-    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/";
-  }
-  console.log("*** publicPath set to", config.output.publicPath);
   return config;
 };

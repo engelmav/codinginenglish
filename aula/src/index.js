@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { render } from "react-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { useAuth0 } from "@auth0/auth0-react";
-
+import { Aula } from "./aula/Aula"
 
 const LoginButton = () => {
-  const { loginWithRedirect } = useAuth0();
-
-  return <button onClick={() => loginWithRedirect()}>Log In</button>;
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  useState(false);
+  return (
+    <>
+      <button
+        onClick={() =>
+          isAuthenticated ? logout() : loginWithRedirect()
+        }
+      >
+        {isAuthenticated ? "Logout" : "Login"}
+      </button>
+      {isAuthenticated && <Aula />}
+    </>
+  );
 };
 const App = () => {
   return (
@@ -17,15 +28,9 @@ const App = () => {
       redirectUri={window.location.origin}
     >
       <LoginButton />
-      <div>app</div>
     </Auth0Provider>
   );
 };
-
-
-
-
-
 
 const rootElement = document.getElementById("react-app");
 render(<App />, rootElement);
