@@ -1,11 +1,8 @@
 const path = require("path");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const zopfli = require("@gfx/zopfli");
 
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
@@ -21,26 +18,14 @@ module.exports = function (env) {
       __DEV_SERVER__: JSON.stringify(env.DEV_SERVER),
     }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "../public", "index.html"),
-      favicon: path.resolve(__dirname, "../public", "favicon.ico"),
+      template: path.resolve(__dirname, "./public", "index.html"),
+      favicon: path.resolve(__dirname, "./public", "favicon.ico"),
     }),
   ];
 
-  if (environment !== "production") {
-    plugins.push(new BundleAnalyzerPlugin());
-  }
 
   if (environment === "production") {
-    compressionOpts = {
-      compressionOptions: {
-        numiterations: 15,
-      },
-      algorithm(input, compressionOptions, callback) {
-        return zopfli.gzip(input, compressionOptions, callback);
-      },
-    };
     const compressionPlugin = new CompressionWebpackPlugin();
-    console.log("*** Adding compressionPlugin");
     plugins.push(compressionPlugin);
   }
   if (env.spaces) {
@@ -73,7 +58,6 @@ module.exports = function (env) {
     },
     devServer: {
       historyApiFallback: true,
-      contentBase: path.resolve(__dirname, "../build"),
       open: true,
       compress: true,
       hot: true,
