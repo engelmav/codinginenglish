@@ -29,7 +29,7 @@ const trackingId = "UA-199972795-1";
 ReactGA.initialize(trackingId);
 
 const AboveFold = styled.div`
-  height: calc(100vh - ${({ headerHeight }) => headerHeight}px);
+  min-height: calc(100vh - ${({ headerHeight }) => headerHeight}px);
   display: flex;
   flex-direction: column;
   ${boxy}
@@ -48,9 +48,8 @@ SectionBg.defaultProps = {
 };
 
 const contentSectionStyles = {
-  py: 4,
+  p: 4,
   pt: 5,
-  px: [4],
 };
 
 const h2Styles = { pt: 0, mt: 0, mt: 4, mb: 4, color: darkGray };
@@ -123,18 +122,12 @@ const Section = ({
           }}
         />
         {buttonData && (
-          <Box
-            mt={[3, 4, 4, 5]}
-            width="100%"
-            display="flex"
-            alignItems="center"
-            flexWrap="wrap"
-            justifyContent="center"
-          >
+
             <ApplyLink
+              mt={[3, 4, 4, 5]}
               href={buttonData[0].href}
               minWidth="250px"
-    
+              p="3"
               bg="yellow"
               color="black"
               onClick={() => {
@@ -147,7 +140,6 @@ const Section = ({
             >
               {buttonData[0].buttonText}
             </ApplyLink>
-          </Box>
         )}
       </ContentSection>
     </SectionBg>
@@ -176,14 +168,8 @@ const LandingPage = (props) => {
   return (
     <>
       <AboveFold headerHeight={store.headerHeight}>
-        {/* <Hero
-          heroHeight={["35%", "60%"]}
-          heroText={content.title}
-          imageSrc="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp"
-          imageSrcSet="https://cie-assets.nyc3.cdn.digitaloceanspaces.com/home/nyc-sunrise-400x154px.webp 720w, https://cie-assets.nyc3.cdn.digitaloceanspaces.com/nyc-sunrise-vertical-1280px.webp 1920w"
-        /> */}
         <Box
-          px="2"
+          p="3"
           display="flex"
           width="100%"
           flexDirection="column"
@@ -198,12 +184,12 @@ const LandingPage = (props) => {
         </Box>
         <Box
           flex="1"
-          p="2"
           display="flex"
           flexDirection="column"
           alignItems="center"
           justifyContent="space-between"
           background="linear-gradient(to bottom, #7927b2, #fb3182)"
+          p="4"
         >
           <Box
             display="flex"
@@ -233,13 +219,16 @@ const LandingPage = (props) => {
             flexDirection="column"
             flex="1"
             justifyContent="center"
+            maxWidth="500px"
+            width="100%"
           >
-            <P color="white" textAlign="center">
+            <P pt="4" color="white" textAlign="center">
               {content.subsubtitle}
             </P>
             <ApplyLink
               justifySelf="flex-end"
-              bg={cieOrange}
+              minWidth="250px"
+              p="3"
               href="#learnmore"
               color="black"
               border="none"
