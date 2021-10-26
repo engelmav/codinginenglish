@@ -20,6 +20,7 @@ import {
   cieYellowAnalogous,
 } from "../sharedStyles";
 import { boxy } from "../Box";
+import Link from "next/link"
 
 import React from "react";
 

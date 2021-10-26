@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AlertMessage, TextInput, Button, Box, boxy } from "../UtilComponents";
-import { cieOrange, darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
+import {
+  cieOrange,
+  darkGray,
+  whenSmallScreen,
+} from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
 import { flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
@@ -10,6 +14,7 @@ import ReactGA from "react-ga";
 import settings from "../settings";
 import GoogleLoginComponent from "../components/GoogleSignUpBtn";
 import { cieApi } from "../services/cieApi";
+import FacebookLogin from "react-facebook-login";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -73,6 +78,7 @@ const EmailForm = ({
   successView,
   onFinishSubmitEmail,
   onGoogleSignin,
+  fbBtnText,
   googleBtnText,
   containerStyles,
   gaCategory,
@@ -104,7 +110,7 @@ const EmailForm = ({
         action: "emailRegistration",
         label: "emailValidationFailed",
       });
-      cieApi.log(`email validation failed for email ${email}`)
+      cieApi.log(`email validation failed for email ${email}`);
       return;
     }
     handleSetEmailSubmitted();
@@ -123,6 +129,10 @@ const EmailForm = ({
   const handleGoogleLogin = async (googleUser) => {
     onGoogleSignin(googleUser);
   };
+  const handleFacebookLogin = async (fbLogin) => {
+    console.log(fbLogin);
+  };
+  const handleInstaLoginFail = async (err) => console.log(err);
   return (
     <>
       <EmailFormContainer {...containerStyles}>
@@ -149,13 +159,23 @@ const EmailForm = ({
               )}
             </>
           ) : (
-            <Box
-              display="flex"
-              flexDirection="column"
-            >
+            <Box display="flex" flexDirection="column">
               {showGoogleSignin && (
                 <>
-                  <GoogleLoginComponent onLogin={handleGoogleLogin} buttonText={googleBtnText}/>
+                  <Box mb="2">
+                    <GoogleLoginComponent
+                      onLogin={handleGoogleLogin}
+                      buttonText={googleBtnText}
+                    />
+                  </Box>
+
+                  <FacebookLogin
+                    appId="168871810428685"
+                    autoLoad={true}
+                    fields="name,email,picture"
+                    
+                    callback={handleFacebookLogin}
+                  />
                   <Divider mt={2} mb={2}>
                     o
                   </Divider>
@@ -183,7 +203,14 @@ const EmailForm = ({
                 />
               )}
               {!isSending && (
-                <Button border="none" color="white" mt="2" {...buttonStyles} type="button" onClick={handleSubmitEmail}>
+                <Button
+                  border="none"
+                  color="white"
+                  mt="2"
+                  {...buttonStyles}
+                  type="button"
+                  onClick={handleSubmitEmail}
+                >
                   {submitBtnText}
                 </Button>
               )}

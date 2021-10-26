@@ -13,7 +13,8 @@ module.exports = function (env) {
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
-      __DEV_SERVER__: JSON.stringify(env.DEV_SERVER),
+      DEV_SERVER: JSON.stringify(env.DEV_SERVER),
+      SERVER_MODE: false,
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "./public", "index.html"),
@@ -39,6 +40,7 @@ module.exports = function (env) {
       fallback: { crypto: false },
       alias: {
         components: path.resolve(__dirname, "../web/src/UtilComponents"),
+        settings: path.resolve(__dirname, "../web/src/settings"),
       },
     },
     module: {

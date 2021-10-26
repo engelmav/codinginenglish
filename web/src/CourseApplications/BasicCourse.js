@@ -244,7 +244,7 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
                     mb={2}
                   >
                     {[
-                      "20 September 2021",
+
                       "04 January 2022",
                       "1 February 2022",
                     ].map((choice, idx) => {
@@ -276,9 +276,10 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
                             gaCategory="registration"
                             showGoogleSignin={true}
                             googleBtnText="Continúa con Google"
+                            instaBtnText="Continúa con Instagram"
                             blurbAfterEmailField={
                               <P
-                                color="white"
+                                color="black"
                                 fontSize="1"
                                 mb="0"
                                 mt="1"
