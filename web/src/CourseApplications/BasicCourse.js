@@ -21,6 +21,7 @@ import { HappyAlert } from "../components/Alerts";
 ReactGA.initialize(settings.gaTrackingId);
 
 const ApplicationSchema = Yup.object().shape({
+  email: Yup.string().email(),
   startDate: Yup.string().required("Por favor elige una fecha de inicio."),
   "given-name": Yup.string()
     .min(2, "Muy corto!")
@@ -95,16 +96,6 @@ const MultiLabel = styled.label`
   }
 `;
 
-/* input[type="checkbox"]:checked + span::before {
-    content: '\2713';
-    display: block;
-    text-align: center;
-    color: #4285f4;
-    position: absolute;
-    left: 0.7rem;
-    top: 0.2rem; 
-    }*/
-
 MultiLabel.defaultProps = {
   mb: 2,
 };
@@ -145,10 +136,14 @@ const setupFormik = () => {
   return { initialValues, basicCourseForm };
 };
 
-export const BasicCourseForm = ({ containerStyles, completedText }) => {
+export const BasicCourseForm = ({
+  containerStyles,
+  dividerStyles,
+  completedText,
+}) => {
   const [appComplete, setAppComplete] = useState(false);
   const [formikData, setFormikData] = useState(false);
-  const [capturedEmail, setCapturedEmail] = useState(null);
+  const [origEmail, setOrigEmail] = useState(null);
 
   const getUserLocation = async () => {
     try {
@@ -178,37 +173,55 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
       label: "reg email capture",
     });
     cieApi.createUserEmail({ email: email, status: "startedRegistration" });
-    setCapturedEmail(email);
+    setOrigEmail(email);
+    const newFormikData = Object.assign({}, formikData);
+    newFormikData.initialValues["email"] = email;
+    setFormikData(newFormikData);
   };
   const handleGoogleSignin = (googleUser) => {
     let profile = googleUser.getBasicProfile();
     const firstname = profile.getGivenName();
     const lastname = profile.getFamilyName();
     const email = profile.getEmail();
+    ReactGA.event({
+      category: "registration",
+      action: "clickedGoogleSignin",
+      label: "emailCapturedLabel",
+    });
+    createAndUpdateUserData(firstname, lastname, email);
+  };
+
+  const handleFacebookSignin = (fbAuthResp) => {
+    const { first_name, last_name, email } = fbAuthResp;
+    ReactGA.event({
+      category: "registration",
+      action: "clicked fb signin",
+      label: "email captured",
+    });
+    createAndUpdateUserData(first_name, last_name, email);
+  };
+
+  const createAndUpdateUserData = (firstname, lastname, email) => {
     cieApi.createUserEmail({
       email,
       firstname,
       lastname,
       status: "startedRegistration",
     });
-    ReactGA.event({
-      category: "registration",
-      action: "clickedGoogleSignin",
-      label: "emailCapturedLabel",
-    });
     const newFormikData = Object.assign({}, formikData);
     newFormikData.initialValues["given-name"] = firstname;
     newFormikData.initialValues["family-name"] = lastname;
+    newFormikData.initialValues["email"] = email;
     setFormikData(newFormikData);
-    setCapturedEmail(email);
-  };
+    setOrigEmail(email);
+  }
 
   return (
     <BasicCourseContainer {...containerStyles}>
       {appComplete ? (
         <HappyAlert p="3">
           <P mb="0">
-            ¡Hemos recibido tu inscripción¡ Te contactaremos dentro de 2 días
+            ¡Hemos recibido tu solicitud! Te contactaremos dentro de 2 días
             para programar una reunión.
           </P>
         </HappyAlert>
@@ -219,7 +232,7 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
               validationSchema={ApplicationSchema}
               initialValues={formikData.initialValues}
               onSubmit={async (values, actions) => {
-                values.email = capturedEmail;
+                values.origEmail = origEmail;
                 await cieApi.submitApp(values);
                 setAppComplete(true);
                 actions.setSubmitting(false);
@@ -236,70 +249,46 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
                 setFieldValue,
               }) => (
                 <Form onSubmit={handleSubmit}>
-                  <FieldLabel htmlFor={"startDate"}>Start Date</FieldLabel>
-                  <Box
-                    maxWidth="300px"
-                    display="flex"
-                    flexDirection="column"
-                    mb={2}
-                  >
-                    {[
-                      "20 September 2021",
-                      "04 January 2022",
-                      "1 February 2022",
-                    ].map((choice, idx) => {
-                      return (
-                        <MultiLabel
-                          key={idx}
-                          disabled={choice === "20 September 2021"}
-                        >
-                          <Field
-                            className="styled-radio"
-                            data-cy={"when-field"}
-                            disabled={choice === "20 September 2021"}
-                            mb={2}
-                            type="radio"
-                            name={"startDate"}
-                            value={choice}
-                          />
-                          {choice}
-                        </MultiLabel>
-                      );
-                    })}
+                  <Box display="flex" flexDirection="column" mb={2}>
+                    <FieldLabel htmlFor={"startDate"}>Elige una fecha de inicio</FieldLabel>
+                    {["04 January 2022", "1 February 2022"].map(
+                      (choice, idx) => {
+                        return (
+                          <MultiLabel key={idx}>
+                            <Field
+                              className="styled-radio"
+                              data-cy={"when-field"}
+                              mb={2}
+                              type="radio"
+                              name={"startDate"}
+                              value={choice}
+                            />
+                            {choice}
+                          </MultiLabel>
+                        );
+                      }
+                    )}
                     {errors["startDate"] && (
                       <Error>{errors["startDate"]}</Error>
                     )}
-                    {!capturedEmail && (
+                    {!origEmail && (
                       <>
-                        <Box maxWidth="300px">
+                        <Box display="flex" justifyContent="center">
                           <EmailForm
                             gaCategory="registration"
                             showGoogleSignin={true}
                             googleBtnText="Continúa con Google"
-                            blurbAfterEmailField={
-                              <P
-                                color="white"
-                                fontSize="1"
-                                mb="0"
-                                mt="1"
-                                textAlign="center"
-                              >
-                                Después de tu inscripción, te contactaremos para
-                                programar una reunión.
-                              </P>
-                            }
-                            containerStyles={{
-                              width: "100%",
-                            }}
+                            dividerStyles={dividerStyles}
                             submitBtnText="Continúa con mi email"
                             onFinishSubmitEmail={handleCaptureEmail}
                             onGoogleSignin={handleGoogleSignin}
+                            onFacebookSignin={handleFacebookSignin}
                           />
                         </Box>
                       </>
                     )}
                   </Box>
-                  {capturedEmail && (
+                  {origEmail && (
                     <>
                       {formikData.basicCourseForm.map((field, idx) => {
                         const { fieldName } = field;
@@ -356,7 +345,8 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
                                   });
                                 }}
                                 onChange={handleChange}
-                                value={values[fieldName] || ""}
+                                value={values[field.fieldName] || ""}
+                                // value={values[fieldName] || ""}
                               />
                             </>
                           );
@@ -498,7 +488,7 @@ export const BasicCourseForm = ({ containerStyles, completedText }) => {
                             });
                           }}
                         >
-                          ¡Inscríbeme!
+                          Solicita mi plaza
                         </Button>
                       </Box>
                     </>

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { AlertMessage, TextInput, Button, Box, boxy } from "../UtilComponents";
-import { cieOrange, darkGray, whenSmallScreen } from "../UtilComponents/sharedStyles";
+import {
+  cieOrange,
+  darkGray,
+  whenSmallScreen,
+} from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
-import { flexbox, space, background, layout } from "styled-system";
+import { color, flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import ReactGA from "react-ga";
 import settings from "../settings";
 import GoogleLoginComponent from "../components/GoogleSignUpBtn";
 import { cieApi } from "../services/cieApi";
+import { FacebookLoginBtn } from "./FacebookSignupBtn";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -41,23 +46,30 @@ const EmailFormContainer = styled.div`
 
 const Divider = styled(P)`
   ${space}
+  color: white;
+  ${color}
   font-family: "Roboto Mono";
   display: flex;
   align-items: center;
-  color: white;
+
   &:before {
     content: "";
     flex: 1;
     height: 1px;
     margin-right: 1em;
     box-shadow: 0 0.5px 0 white;
+    background: white;
+    ${background};
   }
   &:after {
+    ${color}
     content: "";
     flex: 1;
     height: 1px;
     margin-left: 1em;
     box-shadow: 0 0.5px 0 white;
+    background: white;
+    ${background}
   }
 `;
 
@@ -65,16 +77,16 @@ const EmailForm = ({
   onCaptureEmail,
   image,
   blurb,
-  blurbAfterEmailField,
   buttonStyles,
   showGoogleSignin,
   submitBtnText,
-  styleProps,
   successView,
   onFinishSubmitEmail,
   onGoogleSignin,
+  onFacebookSignin,
   googleBtnText,
   containerStyles,
+  dividerStyles,
   gaCategory,
   confirmRetry = false,
 }) => {
@@ -104,7 +116,7 @@ const EmailForm = ({
         action: "emailRegistration",
         label: "emailValidationFailed",
       });
-      cieApi.log(`email validation failed for email ${email}`)
+      cieApi.log(`email validation failed for email ${email}`);
       return;
     }
     handleSetEmailSubmitted();
@@ -123,9 +135,12 @@ const EmailForm = ({
   const handleGoogleLogin = async (googleUser) => {
     onGoogleSignin(googleUser);
   };
+  const handleFacebookLogin = async (fbLoginResp) => {
+    onFacebookSignin(fbLoginResp)
+  };
   return (
     <>
-      <EmailFormContainer {...containerStyles}>
+      <EmailFormContainer width="255px" {...containerStyles}>
         {image && image}
 
         {blurb && blurb}
@@ -149,14 +164,24 @@ const EmailForm = ({
               )}
             </>
           ) : (
-            <Box
-              display="flex"
-              flexDirection="column"
-            >
+            <Box display="flex" flexDirection="column">
               {showGoogleSignin && (
                 <>
-                  <GoogleLoginComponent onLogin={handleGoogleLogin} buttonText={googleBtnText}/>
-                  <Divider mt={2} mb={2}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="space-evenly"
+                  >
+                    <Box mb="2">
+                      <GoogleLoginComponent
+                        onLogin={handleGoogleLogin}
+                        buttonText={googleBtnText}
+                      />
+                    </Box>
+                    <FacebookLoginBtn onLogin={handleFacebookLogin} />
+                  </Box>
+                  <Divider {...dividerStyles} mt={2} mb={2}>
                     o
                   </Divider>
                 </>
@@ -173,7 +198,6 @@ const EmailForm = ({
                   setEmail(e.target.value);
                 }}
               />
-              {blurbAfterEmailField && blurbAfterEmailField}
               {invalidEmail && (
                 <AlertMessage
                   fontSize={1}
@@ -183,7 +207,14 @@ const EmailForm = ({
                 />
               )}
               {!isSending && (
-                <Button border="none" color="white" mt="2" {...buttonStyles} type="button" onClick={handleSubmitEmail}>
+                <Button
+                  border="none"
+                  color="white"
+                  mt="2"
+                  {...buttonStyles}
+                  type="button"
+                  onClick={handleSubmitEmail}
+                >
                   {submitBtnText}
                 </Button>
               )}

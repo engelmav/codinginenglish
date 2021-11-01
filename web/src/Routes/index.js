@@ -24,7 +24,6 @@ class Routes extends Component {
       appStore,
       AboutUs,
       CallbackRoute,
-      Classroom,
       CollabEditor,
       MyDashboard,
       UpcomingSessions,
@@ -43,7 +42,6 @@ class Routes extends Component {
           path="/my-dashboard"
           component={(props) => <MyDashboard />}
         />
-        <Route exact path="/class" component={(props) => <Classroom />} />
         <Route exact path="/technique" component={() => <Technique />} />
         <Route
           path="/callback"

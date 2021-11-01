@@ -1,14 +1,9 @@
 const path = require("path");
 const webpack = require("webpack");
-const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const zopfli = require("@gfx/zopfli");
 
-const ASSET_PATH = process.env.ASSET_PATH || "/";
-var doSpacesUrl = "https://cie-assets.nyc3.cdn.digitaloceanspaces.com/js/";
 var outputPath = path.resolve(__dirname, "../build");
 
 module.exports = function (env) {
@@ -18,29 +13,17 @@ module.exports = function (env) {
     new webpack.DefinePlugin({
       __VERSION__: JSON.stringify("1.0.0." + Date.now()),
       __ENVIRONMENT__: JSON.stringify(environment),
-      __DEV_SERVER__: JSON.stringify(env.DEV_SERVER),
+      DEV_SERVER: JSON.stringify(env.DEV_SERVER),
+      SERVER_MODE: false,
     }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "../public", "index.html"),
-      favicon: path.resolve(__dirname, "../public", "favicon.ico"),
+      template: path.resolve(__dirname, "./public", "index.html"),
+      favicon: path.resolve(__dirname, "./public", "favicon.ico"),
     }),
   ];
 
-  if (environment !== "production") {
-    plugins.push(new BundleAnalyzerPlugin());
-  }
-
   if (environment === "production") {
-    compressionOpts = {
-      compressionOptions: {
-        numiterations: 15,
-      },
-      algorithm(input, compressionOptions, callback) {
-        return zopfli.gzip(input, compressionOptions, callback);
-      },
-    };
     const compressionPlugin = new CompressionWebpackPlugin();
-    console.log("*** Adding compressionPlugin");
     plugins.push(compressionPlugin);
   }
   if (env.spaces) {
@@ -55,15 +38,24 @@ module.exports = function (env) {
     },
     resolve: {
       fallback: { crypto: false },
+      alias: {
+        components: path.resolve(__dirname, "../web/src/UtilComponents"),
+        settings: path.resolve(__dirname, "../web/src/settings"),
+      },
     },
     module: {
       rules: [
         {
           test: /\.js$|jsx/,
           exclude: /(node_modules|bower_components)/,
-          use: {
-            loader: "babel-loader",
-          },
+          use: [
+            {
+              loader: "babel-loader",
+            },
+            {
+              loader: "@compiled/webpack-loader",
+            },
+          ],
         },
         {
           test: /\.css$/,
@@ -73,7 +65,6 @@ module.exports = function (env) {
     },
     devServer: {
       historyApiFallback: true,
-      contentBase: path.resolve(__dirname, "../build"),
       open: true,
       compress: true,
       hot: true,
@@ -121,14 +112,5 @@ module.exports = function (env) {
     config.optimization.minimize = true;
     config.optimization.minimizer = [new TerserPlugin()];
   }
-  if (env.spaces) {
-    config.output.publicPath = doSpacesUrl;
-  } else {
-    config.output.publicPath = "/";
-  }
-  if (env.keycdn) {
-    config.output.publicPath = "https://keycdncie-19e8e.kxcdn.com/";
-  }
-  console.log("*** publicPath set to", config.output.publicPath);
   return config;
 };

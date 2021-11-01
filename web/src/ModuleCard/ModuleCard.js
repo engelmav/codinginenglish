@@ -1,20 +1,18 @@
-import { Box, boxy, Button, ContentSection } from "../UtilComponents";
+import { boxy, ContentSection } from "../UtilComponents";
 import { P, H2, Ul, TitleH1 } from "../UtilComponents/Typography/Typography";
-import React, { useState } from "react";
-import Modal from "../components/Modal";
+import React, { useState, useRef } from "react";
+
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components";
 import { background } from "styled-system";
 import remarkGfm from "remark-gfm";
-import useInView from "react-cool-inview";
 import { darkGray } from "../UtilComponents/sharedStyles";
+import { useIntersection } from "../lib/useIntersectionObserver";
 
 const RegistrationForm = dynamic(() =>
   import("../CourseApplications/RegistrationForm")
 );
-
-const MailingList = dynamic(() => import("../components/MailingList"));
 
 const SectionBg = styled.div`
   ${boxy}
@@ -29,18 +27,20 @@ const Hero = styled.div`
 `;
 
 const ModuleCard = (props) => {
-  const [registerModal, setRegisterModal] = useState(false);
+  const [registrationComponent, setRegistrationComponent] = useState(false);
   const {
     title: courseTitle,
     description,
     course_instances: courseInstances,
   } = props.moduleData;
-  const { observe, inView } = useInView();
-  const { mailingListComponentContent, localizedCommon } = props;
+  const registrationRef = useRef();
+  useIntersection(registrationRef, () => setRegistrationComponent(true));
   return (
     <>
-      <Hero p="3" width="100%" >
-        <TitleH1 color="white" textAlign="center">WebApp Development - Basic</TitleH1>
+      <Hero p="3" width="100%">
+        <TitleH1 color="white" textAlign="center">
+          WebApp Development - Basic
+        </TitleH1>
         <TitleH1 textAlign="center">💻</TitleH1>
       </Hero>
       <SectionBg
@@ -72,6 +72,7 @@ const ModuleCard = (props) => {
               ),
               ul: ({ node, ...props }) => (
                 <Ul
+                  markerColor="yellow"
                   color="white"
                   background="yellow"
                   mb="2"
@@ -81,52 +82,23 @@ const ModuleCard = (props) => {
               ),
             }}
           />
-          <Button
-            border="none"
-            bg="yellow"
-            color="black"
-            alignSelf="center"
-            maxWidth="500px"
-            minWidth="200px"
-            mt={3}
-            p={2}
-            fontSize={[1, 2, 4]}
-            onClick={() => setRegisterModal(true)}
-          >
-            {localizedCommon.registerImperative}
-          </Button>
         </ContentSection>
       </SectionBg>
-
-      <SectionBg ref={observe}>
-        <ContentSection
-          mt={[1, 4, 4, 4]}
-          mb={4}
-          pt="3"
-          p="4"
-          px="4"
-          maxWidth="550px"
-        >
-          {inView && <MailingList content={mailingListComponentContent} />}
-        </ContentSection>
+      <SectionBg width="100%" ref={registrationRef}>
+        {registrationComponent && (
+          <ContentSection px="3" pt={[0, 5]} pb={[4, 5]}>
+            <H2 color="black" mb="3" mt="4" textAlign="center">
+              Solicita una plaza
+            </H2>
+            <P>
+              La cantidad máxima de estudiantes es 8 por clase, porque se requiere mucha interacción con el instructor.
+            </P>
+            <RegistrationForm
+              dividerStyles={{ color: "black", background: "black" }}
+            />
+          </ContentSection>
+        )}
       </SectionBg>
-      {registerModal && (
-        <Modal
-          backgroundStyles={{ p: 20 }}
-          modalStyles={{
-            mt: 0,
-            mx: 0,
-            flex: 1,
-            height: ["100vh", null, "80%"],
-            width: ["60px"],
-          }}
-          containerStyles={{ overflowY: "scroll" }}
-          title="Inscripción"
-          onClose={() => setRegisterModal(false)}
-        >
-          <RegistrationForm />
-        </Modal>
-      )}
     </>
   );
 };

@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Box, boxy } from "../UtilComponents/Box";
-import { Card, CardTitle, Button } from "../UtilComponents";
-import { H2, P, TitleH1 } from "../UtilComponents/Typography/Typography";
+import React from "react";
+import { boxy } from "../UtilComponents/Box";
 import styled from "styled-components";
-import { cieOrange, lightCieOrangeBg } from "../UtilComponents/sharedStyles";
 import { BasicCourseForm } from "./BasicCourse";
 
 import ReactGA from "react-ga";
@@ -15,7 +12,8 @@ const Container = styled.div`
   ${boxy}
 `;
 
-const RegistrationForm = ({ cieApi }) => {
+/* for the love of god, remove this layer and lift BasicCourseForm directly into the courses page. */
+const RegistrationForm = ({ cieApi, dividerStyles }) => {
   return (
     <>
       <Container
@@ -24,20 +22,17 @@ const RegistrationForm = ({ cieApi }) => {
         justifyContent="space-evenly"
         alignItems="center"
         textAlign="center"
+        p="3"
       >
-        <TitleH1 mt={[3, 3, 4, 4, 5]} textAlign="center">
-          WebApp Development
-        </TitleH1>
-        <H2 color={cieOrange} mt={[3]}>
-          Basic Course
-        </H2>
-
-        <P color="white" mt="3" fontSize="1" fontStyle="italic" textAlign="center">
-          Plazas limitadas. Inscríbete ahora.
-        </P>
-        <Box p="3" mt="3">
-          <BasicCourseForm cieApi={cieApi} containerStyles={{bg: "transparent"}}/>
-        </Box>
+        <BasicCourseForm
+          cieApi={cieApi}
+          dividerStyles={dividerStyles}
+          containerStyles={{
+            bg: "transparent",
+            width: "100%",
+            maxWidth: "600px",
+          }}
+        />
       </Container>
     </>
   );

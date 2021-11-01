@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { AppStoreProvider } from "../../../stores/appStoreReact";
 import getContent from "../../../cms";
-import { H1, Title, smFont } from "../../../components/typography";
+import { H1, Title } from "../../../components/typography";
 import { styled } from "@linaria/react";
 import remarkGfm from "remark-gfm";
 import { LinkButton } from "../../../components/widgets";

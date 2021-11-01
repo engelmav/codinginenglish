@@ -105,14 +105,14 @@ export const Ul = styled.ul`
   margin-left: 1em;
 
   li {
-    list-style-type: "✓";
-    padding: 0.6em 0 0 0.2em;
+    list-style-type:"➤";
+    padding: 0.2em 0 0 0.6em;
     position: relative;
     margin-left: 20px;
   }
   li::marker {
-    font-size: 2em; /* or whatever */
-    color: ${cieOrange};
+    font-size: 1.0em; /* or whatever */
+    color: ${props => props.markerColor ?  props.markerColor: cieOrange};
   }
 `;
 
