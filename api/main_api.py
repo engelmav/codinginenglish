@@ -496,7 +496,12 @@ def create_main_api(publish_message,
         )
         student_app.add()
         email = app_json.get("email")
-        user = models.User.query.filter_by(email=email).one()
+        orig_email = app_json.get("origEmail")
+        computed_email = email
+        if email != orig_email:
+            computed_email = orig_email
+        user = models.User.query.filter_by(email=computed_email).one()
+        user.email = email
         user.status = "applied"
         user.add()
         LOG.info(f"application stored successfully")
