@@ -1,4 +1,5 @@
 export const basicCourseForm = [
+  { fieldName: "email", title: "Email", fieldType: "email" },
   {
     fieldName: "given-name",
     title: "Nombre",
@@ -33,8 +34,7 @@ export const basicCourseForm = [
   },
   {
     fieldName: "whenAttend",
-    title:
-      "¿Qué hora prefieres asistir a una clase de dos horas?",
+    title: "¿Qué hora prefieres asistir a una clase de dos horas?",
     fieldType: "checkboxes",
     choices: [
       "En la mañana (6:00 - 11:00)",
@@ -42,6 +42,5 @@ export const basicCourseForm = [
       "En la noche (15:00 - 22:00)",
       "Ninguno",
     ],
-  }
+  },
 ];
-
