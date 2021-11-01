@@ -7,14 +7,14 @@ import {
   whenSmallScreen,
 } from "../UtilComponents/sharedStyles";
 import { P, Ol } from "../UtilComponents/Typography/Typography";
-import { flexbox, space, background, layout } from "styled-system";
+import { color, flexbox, space, background, layout } from "styled-system";
 import { Spinner } from "../UtilComponents";
 import * as yup from "yup";
 import ReactGA from "react-ga";
 import settings from "../settings";
 import GoogleLoginComponent from "../components/GoogleSignUpBtn";
 import { cieApi } from "../services/cieApi";
-import FacebookLogin from "react-facebook-login";
+import { FacebookLoginBtn } from "./FacebookSignupBtn";
 
 ReactGA.initialize(settings.gaTrackingId);
 
@@ -46,23 +46,30 @@ const EmailFormContainer = styled.div`
 
 const Divider = styled(P)`
   ${space}
+  color: white;
+  ${color}
   font-family: "Roboto Mono";
   display: flex;
   align-items: center;
-  color: white;
+
   &:before {
     content: "";
     flex: 1;
     height: 1px;
     margin-right: 1em;
     box-shadow: 0 0.5px 0 white;
+    background: white;
+    ${background};
   }
   &:after {
+    ${color}
     content: "";
     flex: 1;
     height: 1px;
     margin-left: 1em;
     box-shadow: 0 0.5px 0 white;
+    background: white;
+    ${background}
   }
 `;
 
@@ -70,17 +77,16 @@ const EmailForm = ({
   onCaptureEmail,
   image,
   blurb,
-  blurbAfterEmailField,
   buttonStyles,
   showGoogleSignin,
   submitBtnText,
-  styleProps,
   successView,
   onFinishSubmitEmail,
   onGoogleSignin,
-  fbBtnText,
+  onFacebookSignin,
   googleBtnText,
   containerStyles,
+  dividerStyles,
   gaCategory,
   confirmRetry = false,
 }) => {
@@ -129,13 +135,12 @@ const EmailForm = ({
   const handleGoogleLogin = async (googleUser) => {
     onGoogleSignin(googleUser);
   };
-  const handleFacebookLogin = async (fbLogin) => {
-    console.log(fbLogin);
+  const handleFacebookLogin = async (fbLoginResp) => {
+    onFacebookSignin(fbLoginResp)
   };
-  const handleInstaLoginFail = async (err) => console.log(err);
   return (
     <>
-      <EmailFormContainer {...containerStyles}>
+      <EmailFormContainer width="255px" {...containerStyles}>
         {image && image}
 
         {blurb && blurb}
@@ -162,21 +167,21 @@ const EmailForm = ({
             <Box display="flex" flexDirection="column">
               {showGoogleSignin && (
                 <>
-                  <Box mb="2">
-                    <GoogleLoginComponent
-                      onLogin={handleGoogleLogin}
-                      buttonText={googleBtnText}
-                    />
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="space-evenly"
+                  >
+                    <Box mb="2">
+                      <GoogleLoginComponent
+                        onLogin={handleGoogleLogin}
+                        buttonText={googleBtnText}
+                      />
+                    </Box>
+                    <FacebookLoginBtn onLogin={handleFacebookLogin} />
                   </Box>
-
-                  <FacebookLogin
-                    appId="168871810428685"
-                    autoLoad={true}
-                    fields="name,email,picture"
-                    
-                    callback={handleFacebookLogin}
-                  />
-                  <Divider mt={2} mb={2}>
+                  <Divider {...dividerStyles} mt={2} mb={2}>
                     o
                   </Divider>
                 </>
@@ -193,7 +198,6 @@ const EmailForm = ({
                   setEmail(e.target.value);
                 }}
               />
-              {blurbAfterEmailField && blurbAfterEmailField}
               {invalidEmail && (
                 <AlertMessage
                   fontSize={1}

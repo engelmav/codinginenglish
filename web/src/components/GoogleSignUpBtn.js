@@ -5,7 +5,8 @@ import GoogleLogin from "react-google-login";
 
 const GoogleBtn = styled.button`
   ${boxy}
-  width: 100%;
+  height: 50px;
+  width: 255px;
   border-width: 0px;
   color: white;
   background: #4285f4;
@@ -37,7 +38,11 @@ const GoogleLoginComponent = ({ onLogin, buttonStyles, buttonText }) => {
   return (
     <GoogleLogin
       render={(renderProps) => (
-        <GoogleBtn {...buttonStyles} type="button" onClick={renderProps.onClick}>
+        <GoogleBtn
+          {...buttonStyles}
+          type="button"
+          onClick={renderProps.onClick}
+        >
           <GImage
             height="90%"
             className="google-icon"

@@ -43,7 +43,7 @@ const ButtonDiv = styled.div`
     right: 11px;
     z-index: 2;
     border: none;
-    top: 10px;
+    top: 4px;
     height: 30px;
     cursor: pointer;
     color: ${darkGray};
