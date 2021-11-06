@@ -57,7 +57,7 @@ export const LinkButton = styled.a`
 
 
 const commonApply = css`
-  font-family: Roboto Mono;
+  font-family: Arial, Helvetica, sans-serif;
   border: 1px ${cieOrange} solid;
   border-radius: 5px;
   font-weight: 600;

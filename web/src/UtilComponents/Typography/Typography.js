@@ -8,20 +8,15 @@ import {
   fontSize,
   color,
   fontFamily,
-  position
+  position,
 } from "styled-system";
 import { boxy } from "../Box";
-import {
-  font,
-  fontColor,
-  debugBorder,
-  cieOrange,
-} from "../sharedStyles";
+import { font, fontColor, debugBorder, cieOrange } from "../sharedStyles";
 
 export const textStyles = compose(fontSize, space, color, shadow, typography);
 
 export const TitleH1 = styled.h1`
-  font-family: Roboto Mono;
+  font-family: Lato;
   font-weight: 700;
   ${textStyles}
   ${position}
@@ -32,8 +27,7 @@ TitleH1.defaultProps = {
 };
 
 export const H2 = styled.h2`
-  font-family: Roboto Mono;
-  text-transform: uppercase;
+  font-family: Arial, Helvetica, sans-serif;
   ${textStyles}
 `;
 H2.defaultProps = {
@@ -100,19 +94,26 @@ Ol.defaultProps = {
 };
 export { Ol };
 
+export const Li = styled.li`
+  ${fontSize}
+  font-family: Lato;
+  list-style-type: "➤";
+  padding: 0.2em 0 0 0.6em;
+  position: relative;
+  margin-left: 20px;
+`;
+
+Li.defaultProps = {
+  fontSize: [2, 2, 2, 3, 3],
+};
+
 export const Ul = styled.ul`
   ${textStyles}
   margin-left: 1em;
 
-  li {
-    list-style-type:"➤";
-    padding: 0.2em 0 0 0.6em;
-    position: relative;
-    margin-left: 20px;
-  }
-  li::marker {
-    font-size: 1.0em; /* or whatever */
-    color: ${props => props.markerColor ?  props.markerColor: cieOrange};
+  ${Li}::marker {
+    font-size: 1em; /* or whatever */
+    color: ${(props) => (props.markerColor ? props.markerColor : cieOrange)};
   }
 `;
 

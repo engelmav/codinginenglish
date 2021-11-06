@@ -5,6 +5,7 @@
   "dependencies": {
     "@compiled/react": "^0.7.0",
     "@compiled/webpack-loader": "^0.6.16",
+    "@fontsource/lato": "^4.5.0",
     "@fontsource/roboto": "^4.5.0",
     "@fontsource/roboto-mono": "^4.5.0",
     "@linaria/react": "^3.0.0-beta.13",

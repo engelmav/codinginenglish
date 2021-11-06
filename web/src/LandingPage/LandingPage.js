@@ -7,6 +7,7 @@ import {
   ContentSection,
 } from "../UtilComponents";
 import { H2, P, TitleH1, Ul } from "../UtilComponents/Typography/Typography";
+import { Strong, Title } from "../components/typography"
 import BlockQuote from "../UtilComponents/BlockQuote";
 import ReactGA from "react-ga";
 import ReactMarkdown from "react-markdown";
@@ -19,7 +20,6 @@ import {
 import { background } from "styled-system";
 import dynamic from "next/dynamic";
 import { useAppStore } from "../stores/appStoreReact";
-import { styled as compiledStyled } from "@compiled/react";
 import { useIntersection } from "../lib/useIntersectionObserver";
 
 const MailingList = dynamic(() => import("../components/MailingList"));
@@ -34,7 +34,6 @@ const AboveFold = styled.div`
   flex-direction: column;
   ${boxy}
   width: 100%; // prevents overflow from 100vw higher up
-  background: ${darkGray};
 `;
 
 const SectionBg = styled.div`
@@ -122,7 +121,6 @@ const Section = ({
           }}
         />
         {buttonData && (
-
             <ApplyLink
               mt={[3, 4, 4, 5]}
               href={buttonData[0].href}
@@ -146,12 +144,6 @@ const Section = ({
   );
 };
 
-const Strong = compiledStyled.span`
-  background: linear-gradient(to left, yellow, yellow 100%);
-  background-position: 0 100%;
-  background-size: 100% 0.1em;
-  background-repeat: repeat-x;
-`;
 
 const LandingPage = (props) => {
   const { settings, landingPageContent, mailingListComponentContent, locale } = props;
@@ -169,41 +161,47 @@ const LandingPage = (props) => {
     <>
       <AboveFold headerHeight={store.headerHeight}>
         <Box
-          p="3"
+          p="4"
           display="flex"
           width="100%"
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-          flex="1"
+
         >
-          <TitleH1 fontSize={[4, 6, 7]} textAlign="center" color="white">
-            {content.title}
-          </TitleH1>
-          <TitleH1>🚀</TitleH1>
+          <ReactMarkdown
+              children={content.title}
+              components={{
+                p: ({ node, ...props }) => (
+                  <TitleH1 color="black" {...props}/>
+                ),
+                strong: ({ node, ...props }) => <Strong {...props} />,
+              }}
+            />
         </Box>
         <Box
-          flex="1"
+          
           display="flex"
           flexDirection="column"
           alignItems="center"
-          justifyContent="space-between"
-          background="linear-gradient(to bottom, #7927b2, #fb3182)"
+          
           p="4"
+          pt="0"
         >
           <Box
             display="flex"
             flexDirection="column"
             flex="1"
             justifyContent="center"
+            pb="4"
           >
             <ReactMarkdown
-              children={content.subtitle}
+              children={`${content.subsubtitle} ${content.subtitle}`}
               components={{
                 p: ({ node, ...props }) => (
                   <P
-                    color="white"
-                    textAlign="center"
+                    color="black"
+                    textAlign="left"
                     fontSize={[3, 4, 4, 5, 5]}
                     pb="0"
                     mb="0"
@@ -217,22 +215,20 @@ const LandingPage = (props) => {
           <Box
             display="flex"
             flexDirection="column"
-            flex="1"
+            
             justifyContent="center"
             maxWidth="500px"
             width="100%"
           >
-            <P pt="4" color="white" textAlign="center">
-              {content.subsubtitle}
-            </P>
+
             <ApplyLink
-              justifySelf="flex-end"
+              
               minWidth="250px"
               p="3"
-              href="#learnmore"
-              color="black"
+              href="/courses"
+              color="white"
               border="none"
-              bg="yellow"
+              bg={cieOrange}
               onClick={() => {
                 ReactGA.event({
                   category: "landingPage",
@@ -246,7 +242,7 @@ const LandingPage = (props) => {
           </Box>
         </Box>
       </AboveFold>
-      <div style={{ width: "100%" }} id="learnmore">
+      <div style={{ width: "100%" }}>
         {content.Section.map((section, idx) => (
           <Section key={idx} idx={idx} {...section} settings={settings} />
         ))}
