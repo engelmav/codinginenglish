@@ -23,7 +23,7 @@ export const lightCieOrangeBg = "#FFF1ED";
 export const cieYellowAnalogous = "#FFEA00";
 export const ciePurpleTemp = "#801F80";
 
-export const fontFamily = "'Roboto', sans-serif";
+export const fontFamily = "Lato, sans-serif";
 const font = css`
   font-family: ${fontFamily};
   ${fontColor}

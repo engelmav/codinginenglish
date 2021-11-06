@@ -3,7 +3,7 @@ import * as colors from "./colors"
 import { fontSize } from "./responsive";
 
 
-const headerFont = "Roboto Mono";
+const headerFont = "Lato";
 export const smFont = ".8em";
 
 const color = {
@@ -26,10 +26,17 @@ export const H2 = styled.h2`
 
 export const Title = styled.title`
   font-family: ${headerFont};
-  ${color}
+  color: ${props => props.color}
 `;
 
 export const UL = styled.ul`
   list-style-type: none;
   margin: 0;
 `
+export const Strong = styled.span`
+  /* background: linear-gradient(to left, yellow, yellow 100%);
+  background-position: 0 50%;
+  background-size: 100% 0.8em;
+  background-repeat: repeat-x; */
+  color: ${colors.cieOrange};
+`;

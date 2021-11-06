@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import "@fontsource/roboto-mono";
 import "@fontsource/roboto";
+import "@fontsource/lato";
 import '../styles/global.css'
 function App({ Component, pageProps }) {
   const router = useRouter();

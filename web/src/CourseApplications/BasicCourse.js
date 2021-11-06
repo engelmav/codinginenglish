@@ -57,7 +57,7 @@ const Field = styled(_Field)`
 
 const MultiLabel = styled.label`
   ${boxy}
-  font-family: ${fontFamily};
+  font-family: Lato;
   display: flex;
   align-items: center;
   ${({ disabled }) => (disabled ? "text-decoration: line-through" : "")};
@@ -108,7 +108,7 @@ Field.defaultProps = {
 const FieldLabel = styled.label`
   ${boxy}
   font-weight: bolder;
-  font-family: Roboto Mono;
+  font-family: Lato;
 `;
 FieldLabel.defaultProps = {
   mb: 1,

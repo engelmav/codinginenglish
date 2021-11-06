@@ -1,9 +1,9 @@
 import { boxy, ContentSection } from "../UtilComponents";
-import { P, H2, Ul, TitleH1 } from "../UtilComponents/Typography/Typography";
+import { P, H2, Ul, Li, TitleH1 } from "../UtilComponents/Typography/Typography";
 import React, { useState, useRef } from "react";
-
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
+import { MdArticle } from "../components/markdown";
 import styled from "styled-components";
 import { background } from "styled-system";
 import remarkGfm from "remark-gfm";
@@ -23,7 +23,6 @@ const SectionBg = styled.div`
 
 const Hero = styled.div`
   ${boxy}
-  background-color: ${darkGray};
 `;
 
 const ModuleCard = (props) => {
@@ -38,16 +37,15 @@ const ModuleCard = (props) => {
   return (
     <>
       <Hero p="3" width="100%">
-        <TitleH1 color="white" textAlign="center">
-          WebApp Development - Basic
+        <TitleH1 color={darkGray} textAlign="center">
+          Full Stack Development Essentials
         </TitleH1>
-        <TitleH1 textAlign="center">💻</TitleH1>
       </Hero>
       <SectionBg
         width="100%"
         background="linear-gradient(to bottom, #7927b2, #fb3182)"
       >
-        <ContentSection px="3" pt={[0, 5]} pb={[4, 5]}>
+        <MdArticle borderColor="white" fontColor="white" headerColor="white">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             children={description}
@@ -57,7 +55,7 @@ const ModuleCard = (props) => {
                   color="white"
                   fontSize={[2, 2, 2, 3, 3]}
                   pb="0"
-                  mb="4"
+                  mb="1"
                   {...props}
                 />
               ),
@@ -80,9 +78,14 @@ const ModuleCard = (props) => {
                   {...props}
                 />
               ),
+              li: ({ node, ...props }) => (
+                <Li
+                  {...props}
+                />
+              ),
             }}
           />
-        </ContentSection>
+        </MdArticle>
       </SectionBg>
       <SectionBg width="100%" ref={registrationRef}>
         {registrationComponent && (
@@ -91,7 +94,8 @@ const ModuleCard = (props) => {
               Solicita una plaza
             </H2>
             <P>
-              La cantidad máxima de estudiantes es 8 por clase, porque se requiere mucha interacción con el instructor.
+              La cantidad máxima de estudiantes es 8 por clase, porque se
+              requiere mucha interacción con el instructor.
             </P>
             <RegistrationForm
               dividerStyles={{ color: "black", background: "black" }}
