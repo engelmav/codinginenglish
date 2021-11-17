@@ -58,6 +58,7 @@ const Field = styled(_Field)`
 const MultiLabel = styled.label`
   ${boxy}
   font-family: Lato;
+  font-size: 0.8em;
   display: flex;
   align-items: center;
   ${({ disabled }) => (disabled ? "text-decoration: line-through" : "")};
@@ -135,6 +136,14 @@ const setupFormik = () => {
   initialValues["startDate"] = "";
   return { initialValues, basicCourseForm };
 };
+
+const Note = styled.span`
+  color: gray;
+  font-size: 0.8em;
+  font-weight: 700;
+  padding-left: 5px;
+`;
+
 
 export const BasicCourseForm = ({
   containerStyles,
@@ -214,15 +223,15 @@ export const BasicCourseForm = ({
     newFormikData.initialValues["email"] = email;
     setFormikData(newFormikData);
     setOrigEmail(email);
-  }
+  };
 
   return (
     <BasicCourseContainer {...containerStyles}>
       {appComplete ? (
         <HappyAlert p="3">
           <P mb="0">
-            ¡Hemos recibido tu solicitud! Te contactaremos dentro de 2 días
-            para programar una reunión.
+            ¡Hemos recibido tu solicitud! Te contactaremos dentro de 2 días para
+            programar una reunión.
           </P>
         </HappyAlert>
       ) : (
@@ -250,24 +259,28 @@ export const BasicCourseForm = ({
               }) => (
                 <Form onSubmit={handleSubmit}>
                   <Box display="flex" flexDirection="column" mb={2}>
-                    <FieldLabel htmlFor={"startDate"}>Elige una fecha de inicio</FieldLabel>
-                    {["04 January 2022", "1 February 2022"].map(
-                      (choice, idx) => {
-                        return (
-                          <MultiLabel key={idx}>
-                            <Field
-                              className="styled-radio"
-                              data-cy={"when-field"}
-                              mb={2}
-                              type="radio"
-                              name={"startDate"}
-                              value={choice}
-                            />
-                            {choice}
-                          </MultiLabel>
-                        );
-                      }
-                    )}
+                    <FieldLabel htmlFor={"startDate"}>
+                      Elige una fecha de inicio
+                    </FieldLabel>
+                    {[
+                      ["04 Jan 2022", " (13 solicitudes)"],
+                      ["1 Feb 2022", " (13 solicitudes)"],
+                    ].map((choice, idx) => {
+                      return (
+                        <MultiLabel key={idx}>
+                          <Field
+                            className="styled-radio"
+                            data-cy={"when-field"}
+                            mb={2}
+                            type="radio"
+                            name={"startDate"}
+                            value={choice[0]}
+                          />
+                          {choice[0]}
+                          <Note>{choice[1]}</Note>
+                        </MultiLabel>
+                      );
+                    })}
                     {errors["startDate"] && (
                       <Error>{errors["startDate"]}</Error>
                     )}
