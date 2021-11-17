@@ -263,8 +263,8 @@ export const BasicCourseForm = ({
                       Elige una fecha de inicio
                     </FieldLabel>
                     {[
-                      ["04 Jan 2022", " (8 solicitudes)"],
-                      ["1 Feb 2022", " (11 solicitudes)"],
+                      ["04 Jan 2022", " (13 solicitudes)"],
+                      ["1 Feb 2022", " (13 solicitudes)"],
                     ].map((choice, idx) => {
                       return (
                         <MultiLabel key={idx}>

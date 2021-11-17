@@ -6,8 +6,8 @@ import {
   boxy,
   ContentSection,
 } from "../UtilComponents";
-import { H2, P, TitleH1, Ul } from "../UtilComponents/Typography/Typography";
-import { Strong, Title } from "../components/typography"
+import { H2, Li, P, TitleH1, Ul } from "../UtilComponents/Typography/Typography";
+import { Strong, Title } from "../components/typography";
 import BlockQuote from "../UtilComponents/BlockQuote";
 import ReactGA from "react-ga";
 import ReactMarkdown from "react-markdown";
@@ -34,6 +34,8 @@ const AboveFold = styled.div`
   flex-direction: column;
   ${boxy}
   width: 100%; // prevents overflow from 100vw higher up
+  max-width: 800px;
+  justify-content: space-evenly;
 `;
 
 const SectionBg = styled.div`
@@ -116,15 +118,32 @@ const Section = ({
               />
             ),
             ul: ({ node, ...props }) => (
-              <Ul {...headerProps} mb="2" textAlign="left" {...props} />
+              <Ul {...headerProps} 
+              markerColor={cieOrange}
+              color="black"
+              background="yellow"
+              mb="2"
+              textAlign="left"
+              {...props} />
+            ),
+            li: ({ node, ...props }) => (
+              <Li {...props} />
             ),
           }}
         />
         {buttonData && (
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
             <ApplyLink
               mt={[3, 4, 4, 5]}
               href={buttonData[0].href}
+              maxWidth="500px"
               minWidth="250px"
+              width="100%"
               p="3"
               bg="yellow"
               color="black"
@@ -138,15 +157,16 @@ const Section = ({
             >
               {buttonData[0].buttonText}
             </ApplyLink>
+          </Box>
         )}
       </ContentSection>
     </SectionBg>
   );
 };
 
-
 const LandingPage = (props) => {
-  const { settings, landingPageContent, mailingListComponentContent, locale } = props;
+  const { settings, landingPageContent, mailingListComponentContent, locale } =
+    props;
   const content = landingPageContent;
   const store = useAppStore();
 
@@ -164,27 +184,23 @@ const LandingPage = (props) => {
           p="4"
           display="flex"
           width="100%"
+          maxWidth
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
-
         >
           <ReactMarkdown
-              children={content.title}
-              components={{
-                p: ({ node, ...props }) => (
-                  <TitleH1 color="black" {...props}/>
-                ),
-                strong: ({ node, ...props }) => <Strong {...props} />,
-              }}
-            />
+            children={content.title}
+            components={{
+              p: ({ node, ...props }) => <TitleH1 color="black" {...props} />,
+              strong: ({ node, ...props }) => <Strong {...props} />,
+            }}
+          />
         </Box>
         <Box
-          
           display="flex"
           flexDirection="column"
           alignItems="center"
-          
           p="4"
           pt="0"
         >
@@ -215,14 +231,11 @@ const LandingPage = (props) => {
           <Box
             display="flex"
             flexDirection="column"
-            
             justifyContent="center"
             maxWidth="500px"
             width="100%"
           >
-
             <ApplyLink
-              
               minWidth="250px"
               p="3"
               href="/courses"
@@ -232,7 +245,7 @@ const LandingPage = (props) => {
               onClick={() => {
                 ReactGA.event({
                   category: "landingPage",
-                  action: "clicked See How",
+                  action: "clicked See Course",
                   label: "See how button",
                 });
               }}
@@ -260,7 +273,11 @@ const LandingPage = (props) => {
           </footer>
         </BlockQuote>
       </Box>
-      <SectionBg ref={freshPostsRef}>{postsInView && <FreshPosts locale={locale} title={content.postsTitle} />}</SectionBg>
+      <SectionBg ref={freshPostsRef}>
+        {postsInView && (
+          <FreshPosts locale={locale} title={content.postsTitle} />
+        )}
+      </SectionBg>
       <SectionBg ref={mailingListRef}>
         <ContentSection mb="5" px="4" maxWidth="550px">
           {mailingListInView && (
