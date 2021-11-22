@@ -40,3 +40,7 @@ export const Strong = styled.span`
   background-repeat: repeat-x; */
   color: ${colors.cieOrange};
 `;
+
+export const Th = styled.th`
+  font-Size: 14px;
+`
