@@ -56,7 +56,7 @@
     "n": "^7.3.1",
     "nanoid": "^3.1.23",
     "navigator": "^1.0.1",
-    "next": "^11.0.1",
+    "next": "^11.1.3",
     "next-http-proxy-middleware": "^1.0.10",
     "next-linaria": "^0.11.0",
     "npm": "^7.20.0",
