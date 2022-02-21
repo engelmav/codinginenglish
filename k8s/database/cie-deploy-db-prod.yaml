@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cie-db
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: cie-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cie-db
+spec:
+  serviceName: cie-db
+  selector:
+    matchLabels:
+      app: cie-db
+  template:
+    metadata:
+      labels:
+        app: cie-db
+    spec:
+      containers:
+      - image: mysql/mysql-server:8.0
+        name: cie-db
+        envFrom:
+        - secretRef:
+            name: cie-db-user-creds
+        ports:
+        - containerPort: 3306
+          name: cie-db
+        volumeMounts:
+        - name: mysql-pvc-do
+          mountPath: /var/lib/mysql
+      # volumes:
+      # - name: mysql-persistent-storage
+      #   persistentVolumeClaim:
+      #     claimName: mysql-pvc-do
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-pvc-do
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: do-block-storage
+---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mysql-pv-do
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: do-block-storage
+#   capacity:
+#     storage: 5Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: "/mnt/data"
+#   claimRef:
+#     name: mysql-pvc-do
+---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mysql-pvc-do
+# spec:
+#   storageClassName: do-block-storage
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
