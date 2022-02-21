@@ -15,33 +15,33 @@ spec:
       targetPort: 8080
 ---
 # PV that supports Tomcat server config/libs
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: guac-pv-volume
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/data"
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: guac-pv-do
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: do-block-storage
+#   capacity:
+#     storage: 5Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: "/mnt/data"
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: guac-pv-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
----
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: guac-pvc-do
+# spec:
+#   storageClassName: do-block-storage
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
+# ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -49,12 +49,13 @@ metadata:
 ---
 # Guacamole Tomcat server deployment
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: cie-guac-admin
   labels:
     app: cie-guac-admin
 spec:
+  serviceName: cie-guac-admin
   replicas: 1
   selector:
     matchLabels:
@@ -85,14 +86,31 @@ spec:
         - containerPort: 8080
           name: cie-guac-admin
         volumeMounts:
-        - name: guac-lib-storage
+        - name: guac-pvc-do #guac-lib-storage
           mountPath: /guac-home/extensions
         - name: guac-settings-storage
           mountPath: /guac-home
       volumes:
-      - name: guac-lib-storage
-        persistentVolumeClaim:
-          claimName: guac-pv-claim
+      # - name: guac-lib-storage
+      #   persistentVolumeClaim:
+      #     claimName: guac-pvc-do
       - name: guac-settings-storage
         configMap:
           name: guac-settings-config
+      initContainers:
+      - name: pgsql-data-permission-fix
+        image: busybox
+        command: ["/bin/chmod","-R","777", "/data"]
+        volumeMounts:
+        - name: guac-pvc-do
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: guac-pvc-do
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: do-block-storage
