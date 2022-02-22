@@ -1,0 +1,1 @@
+Hello guys! I just realized something. I wanted to use the net cost calculator you created, but for my cousin’s store in another state. Over there, his sales tax is 7%! Can you change the program to help him out too?
