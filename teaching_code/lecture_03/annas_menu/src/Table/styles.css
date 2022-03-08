@@ -1,0 +1,19 @@
+.menu-background {
+  display: grid;
+  border-radius: 10px;
+  grid-template-columns: 120px 120px 120px 120px;
+  background: linear-gradient(
+    -45deg,
+    rgba(147, 26, 222, 0.83) 0%,
+    rgba(28, 206, 234, 0.82) 100%
+  );
+}
+
+.header {
+  font-weight: 800;
+}
+
+.cell {
+  margin: -5px;
+  flex: 1;
+}
