@@ -135,3 +135,46 @@ def curriculum_request(requester_email):
 
     data['Messages'][0]['Attachments'] = attachments
     return data
+
+class MessageList:
+    def __init__(self):
+        self.message_list = {
+            "Messages": []
+        }
+    def add_message(self, message):
+        self.message_list["Messages"].append(message)
+
+
+class Message:
+    def __init__(self):
+        self.data = {
+            'Messages': [
+                {
+                    "From": {
+                        "Email": "",
+                        "Name": ""
+                    },
+                    "To": [
+                        {
+                            "Email": "",
+                            "Name": ""
+                        }
+                    ],
+                    "Subject": "",
+                }
+            ]
+        }
+        for part in body_parts:
+            data['Messages'][0][part] = body_parts[part]
+        if attachments:
+            data['Messages'][0]['Attachments']: attachments
+    def add_message(self):
+        pass
+
+    def to(self, to, name):
+        pass
+    def _from(self, _from, name):
+        pass
+    def subject(self, subject):
+        pass
+    
