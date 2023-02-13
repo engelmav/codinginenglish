@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 
-const AppContext = createContext();
+const AppContext = createContext({});
+console.lo
 
 function useAppStore() {
   const context = useContext(AppContext);

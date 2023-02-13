@@ -38,10 +38,10 @@ module.exports = function (env) {
     },
     resolve: {
       fallback: { crypto: false },
-      alias: {
-        components: path.resolve(__dirname, "../web/src/UtilComponents"),
-        settings: path.resolve(__dirname, "../web/src/settings"),
-      },
+      // alias: {
+      //   components: path.resolve(__dirname, "../web/src/UtilComponents"),
+      //   settings: path.resolve(__dirname, "../web/src/settings"),
+      // },
     },
     module: {
       rules: [

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+  },
+  "parserOptions": {
+    "experimentalDecorators": true,
+  },
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
+}
