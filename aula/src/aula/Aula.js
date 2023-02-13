@@ -1,13 +1,13 @@
-import React, { Component, useEffect, useRef } from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import Iframe from "react-iframe";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import * as S from "./styles";
-import { Window, Button } from "components";
+import { Window, Button } from "animo-ui";
 import { Rnd } from "react-rnd";
 import { readSocketDataAnd, ReadAndDo } from "../messaging";
 import { browserDetect } from "../util";
-import settings from "settings";
+import settings from "../settings";
 import { useAppStore } from "./store";
 import InstructorPanel from "../InstructorPanel/InstructorPanel";
 import { PopupActivity } from "../PopupActivity/PopupActivity";
@@ -17,6 +17,7 @@ const VideoCall = React.lazy(() => import("../VideoConference"));
 //   const { InstructorPanel, PopupActivity, websocketManager } = this.props;
 
 const ChatSignIn = (props) => {
+  useEffect(() => {}, [props.rocketChatAuthToken]);
   const divRef = useRef(null);
   const authenticateChat = () => {
     const chatIframe = divRef.current.firstElementChild;
@@ -25,7 +26,7 @@ const ChatSignIn = (props) => {
         this.contentWindow.postMessage(
           {
             externalCommand: "login-with-token",
-            token: props.appStore.rocketchatAuthToken,
+            token: props.rocketchatAuthToken,
           },
           "*"
         );
@@ -67,6 +68,34 @@ const SlidesController = ({ websocketManager, activeSessionId, children }) => {
 };
 
 const Aula = (props) => {
+  const [rocketChatAuthToken, setRocketChatAuthToken] = useState();
+  const [activeSessionSlug, setActiveSessionSlug] = useState();
+
+  const [userId, setUserId] = useState();
+  const [userRole, setUserRole] = useState();
+  const [firstname, setFirstname] = useState();
+
+  const [activeSessionId, setActiveSessionId] = useState();
+  const [currentRoom, setCurrentRoom] = useState("main");
+
+  const [activityPopupWindow, setActivityPopupWindow] = useState(false);
+  const [activityPopupData, setActivityPopupData] = useState();
+  const [guacWindow, setGuacWindow] = useState();
+  const [aulaWebsocket, setAulaWebsocket] = useState();
+  const [chatWindow, setChatWindow] = useState();
+  const [chatChannel, setChatChannel] = useState(); // isn't this the same as currentRoom?
+  const [slidesWindow, setSlidesWindow] = useState();
+  const [videoWindow, setVideoWindow] = useState();
+  const [videoChannel, setVideoChannel] = useState();
+  const [instructorPanel, setInstructorPanel] = useState();
+  const [prezzieLink, setPrezzieLink] = useState();
+  const [onTop, setOnTop] = useState();
+  const [windowDragging, setWindowDragging] = useState(false);
+  const [roomChangeNotification, setRoomChangeNotification] = useState();
+
+  function setChatChannel() {}
+  function setVideoChannel() {}
+
   const slidesWindowRef = React.createRef();
   const chatIframeRef = React.createRef();
 
@@ -76,55 +105,37 @@ const Aula = (props) => {
   const focusGuacViewer = () => {
     if (guacViewer) guacViewer.focus();
   };
-  const appStore = useAppStore();
-  const {
-    aulaWebsocket,
 
-    guacWindow,
-    chatWindow,
-    slidesWindow,
-    videoWindow,
-    popupActivityWindow,
-    instructorPanel,
+  useEffect(() => onMount(), []);
 
-    activityData,
-    chatChannel,
-    prezzieLink,
-    videoChannel,
-    onTop,
-    isWindowDragging,
+  function setChatChannel(name) {
+    setChatChannel(`${name}-${appStore.activeSessionSlug}`);
+  }
 
-    roomChangeNotification,
-  } = appStore;
-  useEffect(() => {
-    onMount();
-  }, []);
-  const setChatChannel = (name) =>
-    appStore.setChatChannel(`${name}-${appStore.activeSessionSlug}`);
-  const setVideoChannel = (name) => {
+  function setVideoChannel(name) {
     appStore.setVideoChannel(
       `${name}-video-${this.props.appStore.activeSessionSlug}`
     );
-  };
+  }
 
   const configureActiveSession = async () => {
-    const { appStore, cieApi, websocketManager } = this.props;
+    const { cieApi, websocketManager } = this.props;
     const activeSessionData = await cieApi.getActiveSessionByUserId(
       appStore.userId
     );
-    const activeSessionId = activeSessionData.data.id;
-    appStore.activeSessionId = activeSessionId;
-    console.log("activeSessionData:", activeSessionData);
+
+    setActiveSessionId(activeSessionData.data.id);
     const { prezzie_link, slug } = activeSessionData.data;
-    appStore.activeSessionSlug = slug;
-    this.setState({ prezzieLink: prezzie_link }, () => {
-      this.setVideoChannel("main");
-      this.setChatChannel("main");
-    });
+
+    setActiveSessionSlug(slug);
+
+    setPrezzieLink(prezzie_link);
+    setVideoChannel("main");
+    setChatChannel("main");
 
     const aulaWebsocket = await websocketManager.createWebsocket(
       `aula-${activeSessionId}`,
-      appStore.userId
+      userId
     );
     const handleAulaMessage = (eventData) => {
       console.log("handleAuthMessage eventData:", eventData);
@@ -173,7 +184,10 @@ const Aula = (props) => {
       document.addEventListener("acceptBreakout", () => {
         this.setVideoChannel(newRoom);
         this.setChatChannel(newRoom);
-        this.setState({ dialogOpen: false, roomChangeNotification: false });
+        this.setState({
+          dialogOpen: false,
+          roomChangeNotification: false,
+        });
       });
 
       openRoomChangePrompt(newRoom);
@@ -244,22 +258,22 @@ const Aula = (props) => {
         </S.RoomStatus>
         <S.Taskbar>
           {!slidesWindow && (
-            <Button mr={2} onClick={this.toggleSlides}>
+            <Button mr={2} onClick={toggleSlides}>
               Slides
             </Button>
           )}
           {!guacWindow && (
-            <Button mr={2} onClick={this.toggleGuac}>
+            <Button mr={2} onClick={toggleGuac}>
               Dev Environment
             </Button>
           )}
           {!chatWindow && (
-            <Button mr={2} onClick={this.toggleChat}>
+            <Button mr={2} onClick={toggleChat}>
               Chat
             </Button>
           )}
           {!videoWindow && (
-            <Button mr={2} onClick={this.toggleVideo}>
+            <Button mr={2} onClick={toggleVideo}>
               Video
             </Button>
           )}
@@ -417,7 +431,9 @@ const Aula = (props) => {
               height="100%"
               scrolling="yes"
               frameborder="10"
-              style={{ zIndex: onTop === guacWindowTop ? 200 : 0 }}
+              style={{
+                zIndex: onTop === guacWindowTop ? 200 : 0,
+              }}
               onClick={() => {
                 this.focusGuacViewer();
                 this.setState({ onTop: guacWindowTop });

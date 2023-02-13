@@ -3,8 +3,6 @@ import { render } from "react-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Aula } from "./aula/Aula";
-import { AppStoreProvider, useAppStore } from "./aula/store";
-
 
 const LoginButton = () => {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
@@ -16,11 +14,7 @@ const LoginButton = () => {
       >
         {isAuthenticated ? "Logout" : "Login"}
       </button>
-      {isAuthenticated && (
-        <AppStoreProvider>
-          <Aula />
-        </AppStoreProvider>
-      )}
+      {isAuthenticated && <Aula />}
     </>
   );
 };

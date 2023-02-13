@@ -11,7 +11,6 @@ import {
 import { P } from "../UtilComponents/Typography/Typography";
 import { basicCourseForm } from "./formsData";
 import * as Yup from "yup";
-import { cieOrange, fontFamily } from "../UtilComponents/sharedStyles";
 import ReactGA from "react-ga";
 import { cieApi } from "../services/cieApi";
 import EmailForm from "../components/EmailForm";
@@ -263,8 +262,8 @@ export const BasicCourseForm = ({
                       Elige una fecha de inicio
                     </FieldLabel>
                     {[
-                      ["04 Jan 2022", " (13 solicitudes)"],
-                      ["1 Feb 2022", " (13 solicitudes)"],
+                      ["1 Feb 2022", " (27 inscritos)"],
+                      ["1 Mar 2022", "(3 inscritos)"],
                     ].map((choice, idx) => {
                       return (
                         <MultiLabel key={idx}>

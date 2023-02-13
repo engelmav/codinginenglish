@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Button, Select, TextInput } from "../UtilComponents";
+import { Button, Select, TextInput } from "animo-ui";
 import { observer } from "mobx-react";
 import { action, computed, makeObservable, observable, toJS } from "mobx";
-import { Box } from "../UtilComponents/Box";
+import { Box } from "animo-ui";
 
 const DataGrid = React.lazy(() =>
   import("@material-ui/data-grid").then((module) => ({
@@ -59,7 +59,7 @@ class InstructorPanelStore {
   setSelectedStudents(students) {
     this.selectedStudents = students;
   }
-  @computed get rooms() {
+  get rooms() {
     return Object.keys(this.aulaConfig?.rooms || {});
   }
   getRoomNameById(roomId) {
@@ -85,7 +85,7 @@ class InstructorPanelStore {
 
     this.aulaConfig = aulaConfig;
   }
-  @computed get studentGridData() {
+  get studentGridData() {
     /**
      * "takes"
      * [ { id: number, studentId: number, roomId: number, vmId: link },]
@@ -120,7 +120,7 @@ class InstructorPanelStore {
     return students;
   }
 
-  @computed get roomGridData() {
+  get roomGridData() {
     /**
      * "takes"
      * [ { id: number, studentId: number, roomId: number, vmId: link },]

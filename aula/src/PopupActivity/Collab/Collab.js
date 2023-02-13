@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import fabric from "fabric";
-import { Button } from "../../UtilComponents";
 import { CanvasObjectCreator } from "../../services/CanvasObjectCreator";
 import * as S from "./styles";
 import { CanvasWebsocketHandler } from "./CanvasWebsocketHandler";
@@ -8,7 +7,7 @@ import { SketchPicker } from "react-color";
 import { computed, observable, makeObservable, toJS } from "mobx";
 import { observer } from "mobx-react";
 import jsonFormat from "json-format";
-import { Box } from "../../UtilComponents/Box";
+import { Box, Button } from "animo-ui";
 
 const Dialog = React.lazy(() => import("@material-ui/core/Dialog"));
 

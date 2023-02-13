@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Button } from "../UtilComponents/Button";
+import { Button } from "animo-ui";
 
 const ActivityBorder = styled.div`
   background: white;

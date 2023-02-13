@@ -23,13 +23,13 @@ spec:
         - name: DATABASE_NAME
           value: "strapi"
         - name: DATABASE_HOST
-          value: "cie-db.default.svc.cluster.local"
+          value: "cie-db"
         - name: DATABASE_PORT
           value: "3306"
         - name: DATABASE_USERNAME
-          value: "strapiuser"
+          value: "contentuser"
         - name: DATABASE_PASSWORD
-          value: "strapiuser"
+          value: "contentuser"
         - name: DATABASE_SSL
           value: "false"
         ports:
