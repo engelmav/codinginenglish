@@ -1,0 +1,66 @@
+.main {
+  display: flex;
+  /* background: yellow; */
+  min-height: 100vh;
+  padding: 20px;
+  flex-grow: 1;
+  position: relative;
+}
+.vid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vw;
+  z-index: -1;
+}
+.item {
+  border: 1px solid black;
+  background-color: aqua;
+  flex-grow: 1;
+  margin: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contentbar {
+  background-color: aqua;
+  flex-grow: 1;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  /* align-items: end;*/
+  justify-content: space-between;
+  padding: 40px;
+  border-radius: 10px;
+  background-color: #fdfaec;
+  opacity: 85%;
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+  .grid {
+    grid-template-columns: repeat(2, 50%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .vercelLogo {
+    filter: invert(1);
+  }
+
+  .logo,
+  .thirteen img {
+    filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
