@@ -1,7 +1,7 @@
 .main {
   display: flex;
   /* background: yellow; */
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
   padding: 20px;
   flex-grow: 1;
   position: relative;

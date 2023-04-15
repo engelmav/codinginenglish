@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { P } from "./Typography";
-export function TypewriterText({ children }) {
+export function TypewriterText({ children }: { children: any }) {
   const first_text = "const sayHello = () = {";
   const [text1, setText1] = useState("");
 
