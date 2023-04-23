@@ -2,19 +2,21 @@
   "name": "hello-sanity-nextjs-starter",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "post-update": "yarn upgrade --latest"
+    "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@portabletext/react": "^2.0.0",
+    "axios": "^1.3.6",
     "graphql-request": "^5.1.0",
-    "next": "^13",
+    "next": "latest",
     "next-mdx-remote": "^4.2.0",
     "next-sanity": "^3.1.9",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "latest",
+    "react-dom": "latest"
   },
   "license": "MIT",
   "keywords": [],
