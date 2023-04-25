@@ -1,3 +1,4 @@
 {
-  "/": { "page": "/", "query": { "contentType": "homepage" } }
+  "/": { "page": "/", "query": { "contentType": "homepage" } },
+  "trailingSlash": true
 }
