@@ -1,9 +1,5 @@
 // pages/index.js
 import styled from "@emotion/styled";
-
-import { css } from "@emotion/react";
-import { useState } from "react";
-
 import { P, UL } from "../components/typography";
 import { NewsletterForm } from "../components/newsletter";
 import { Layout } from "../components/Layout";
@@ -13,7 +9,7 @@ const Tagline = styled.div`
   font-weight: 800; /* Extra bold */
   font-size: 3rem;
   color: #ffc107;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Optional: Add a subtle text shadow for better contrast */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   margin-bottom: 1rem;
   margin-top: 1rem;
   margin: 0 auto;
