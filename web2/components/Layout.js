@@ -12,8 +12,6 @@ import {
   MobileNavLink,
   MobileHamburgerButton,
 } from "../components/nav";
-import { P, UL } from "../components/typography";
-import { NewsletterForm } from "../components/newsletter";
 
 const globalStyles = css`
   * {
@@ -84,33 +82,6 @@ const Card = styled.section`
   text-align: center;
 `;
 
-const Heading = styled.h1`
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  color: #333;
-`;
-
-const Subheading = styled.p`
-  margin-bottom: 2rem;
-  font-size: 1.125rem;
-  color: #666;
-`;
-
-const Button = styled.a`
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #0070f3;
-  color: white;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #0059d6;
-  }
-`;
 const Footer = styled.footer`
   display: flex;
   justify-content: center;
@@ -123,9 +94,17 @@ const FooterText = styled.p`
   color: #fff;
 `;
 
+// write navigation links as a list of objects with href and text for "About Us", "Corporate Partnerships", "Events", "News", "Blog"
 
+const navLinks = [
+  { href: "/about-us", text: "About Us" },
+  { href: "/corporate-partnerships", text: "Corporate Partnerships" },
+  { href: "/events", text: "Events" },
+  { href: "/news", text: "News" },
+  { href: "/blog", text: "Blog" },
+];
 
-export function Layout({children}) {
+export function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -139,9 +118,11 @@ export function Layout({children}) {
         <Header>
           <Logo>coding_in_english</Logo>
           <Nav>
-            <NavLink href="/feature1">Feature 1</NavLink>
-            <NavLink href="/feature2">Feature 2</NavLink>
-            <NavLink href="/feature3">Feature 3</NavLink>
+            {navLinks.map((link) => (
+              <NavLink key={link.href} href={link.href}>
+                {link.text}
+              </NavLink>
+            ))}
           </Nav>
           <MobileHamburgerButton onClick={toggleMenu}>
             <svg
@@ -182,12 +163,10 @@ export function Layout({children}) {
             </MobileNavLink>
           </MobileNav>
         </Header>
-        <Main>
-          {children}
-        </Main>
+        <Main>{children}</Main>
         <Footer>
           <FooterText>
-            &copy; {new Date().getFullYear()} Your Company Name
+            &copy; {new Date().getFullYear()} Coding in English
           </FooterText>
         </Footer>
       </PageWrapper>

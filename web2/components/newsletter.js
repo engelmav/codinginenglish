@@ -7,14 +7,18 @@ const FormWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #1a1a1a;
+  background-color: #333333;
   padding: 40px;
+
+  border-radius: 8px;
 `;
 
 const Title = styled.h1`
   color: #ffffff;
   font-size: 2rem;
   margin-bottom: 20px;
+  text-align: center;
+  background-color: transparent;
 `;
 
 const InputWrapper = styled.div`
@@ -23,13 +27,14 @@ const InputWrapper = styled.div`
   width: 100%;
   max-width: 500px;
   gap: 10px;
+  background-color: #333333;
 `;
 
 const FormGroup = styled.div`
   display: flex;
   align-items: stretch;
   width: 100%;
-  background-color: #333333;
+  background-color: transparent;
 `;
 
 const Input = styled.input`
@@ -39,12 +44,14 @@ const Input = styled.input`
   font-size: 1rem;
   width: 100%;
   color: #ffffff;
-  background-color: transparent;
+  background-color: black;
+  border-radius: 5px;
 `;
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #ff5f5f;
+  background-color:#FF4136
+;
   color: #ffffff;
   font-size: 1rem;
   border: none;
@@ -52,7 +59,7 @@ const Button = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
   box-sizing: border-box;
-
+  border-radius: 5px;
   &:hover {
     background-color: #ff8a8a;
   }
@@ -72,11 +79,9 @@ export const NewsletterForm = () => {
 
     try {
       await axios.post("https://cie-edge-functions-engelmav.vercel.app/api/hello", { name, email });
-      // Add any necessary success handling logic here
       setSubmitted(true);
     } catch (error) {
       console.error(error);
-      // Add any necessary error handling logic here
     }
   };
 
