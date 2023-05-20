@@ -2,12 +2,13 @@
 import "../styles.css";
 import "tailwindcss/tailwind.css";
 import { GlobalStyles } from "twin.macro";
+import {Layout} from "../components/Layout";
 
 export default function MyApp({ Component, pageProps }) {
   return (
-    <div>
+    <Layout>
       <GlobalStyles />
       <Component {...pageProps} />
-    </div>
+    </Layout>
   );
 }

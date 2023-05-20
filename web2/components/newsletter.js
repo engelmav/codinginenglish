@@ -9,8 +9,9 @@ const FormWrapper = styled.div`
   align-items: center;
   background-color: #333333;
   padding: 40px;
-
-  border-radius: 8px;
+  @media (max-width: 768px) {
+    margin: 0 -15px; 
+  }
 `;
 
 const Title = styled.h1`

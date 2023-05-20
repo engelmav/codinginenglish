@@ -1,10 +1,37 @@
 import styled from "@emotion/styled";
 
-const textColor = "#fff";
+const textColor = "black";
 
 export const P = styled.p`
   color: ${textColor};
 `;
 
 export const UL = styled.ul`
-  color: ${textColor};`;
+  color: ${textColor};
+`;
+
+export const Title = styled.title`
+  color: ${textColor};
+`;
+
+export const H1 = styled.h1`
+color: ${textColor};
+font-size: 30px;
+  @media (max-width: 768px) {
+    font-size: 30px;
+  }
+`;
+export const H2 = styled.h2`
+color: ${textColor};
+font-size: 18px;
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+`;
+export const H3 = styled.h3`
+  color: ${textColor};
+  font-size: 16px;
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+`;

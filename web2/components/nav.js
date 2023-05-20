@@ -10,9 +10,8 @@ export const Nav = styled.nav`
 export const NavLink = styled.a`
   margin-left: 1rem;
   font-size: 1rem;
-  font-weight: bold;
   text-decoration: none;
-  color: #fff;
+  // color: #fff;
   transition: color 0.3s;
 
   &:hover,
@@ -25,11 +24,14 @@ export const MobileNav = styled.nav`
   display: flex;
   flex-direction: column;
   position: fixed;
+  align-items: center;
+  justify-content: center;
+  border: 3px red solid;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 80%; // Adjust the width of the mobile nav drawer as desired
-  max-width: 200px; // Optional: Set a maximum width for the mobile nav drawer
+  width: 100vw; // Optional: Set a maximum width for the mobile nav drawer
+  height: 100vh;
   background-color: rgba(
     17,
     17,
@@ -47,8 +49,9 @@ export const MobileNav = styled.nav`
 `;
 
 export const MobileNavLink = styled(NavLink)`
-  padding-top: 2rem;
-  padding-left: 2rem;
+
+  font-size: 2rem;
+  color: #fff;
 `;
 
 export const HamburgerButton = styled.button`
@@ -75,8 +78,8 @@ export const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   top: 8px;
   right: 8px;
@@ -86,9 +89,9 @@ export const CloseButton = styled.button`
 `;
 
 export const CloseIcon = styled.svg`
-  width: 24px;
-  height: 24px;
-  stroke: #333;
+  width: 40px;
+  height: 40px;
+  stroke: white;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;

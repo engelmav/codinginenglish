@@ -1,8 +1,8 @@
-// pages/index.js
 import styled from "@emotion/styled";
-
 import { css, Global } from "@emotion/react";
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   CloseButton,
   CloseIcon,
@@ -20,7 +20,7 @@ const globalStyles = css`
     box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Helvetica, Arial, sans-serif;
-    background-color: #111;
+    background-color: EDF2F4;
   }
 
   body {
@@ -41,8 +41,11 @@ const Main = styled.main`
   align-items: center;
   flex-direction: column;
   flex-grow: 1;
-  //   background-color: #f0f2f5;
   width: 100%;
+
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
 `;
 
 const Header = styled.header`
@@ -50,26 +53,15 @@ const Header = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  //   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  //   z-index: 1000;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: rgba(17, 17, 17, 0.8); // Dark background with transparency
-`;
-
-const Logo = styled.h2`
-  //   font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-  margin: 0;
 `;
 
 const Card = styled.section`
@@ -92,15 +84,16 @@ const Footer = styled.footer`
 
 const FooterText = styled.p`
   color: #fff;
+  text-align: center;
 `;
 
-// write navigation links as a list of objects with href and text for "About Us", "Corporate Partnerships", "Events", "News", "Blog"
-
 const navLinks = [
+  { href: "/news", text: "News" },
+  { href: "/events", text: "Events" },
   { href: "/about-us", text: "About Us" },
   { href: "/corporate-partnerships", text: "Corporate Partnerships" },
-  { href: "/events", text: "Events" },
-  { href: "/news", text: "News" },
+  
+  
   { href: "/blog", text: "Blog" },
 ];
 
@@ -116,7 +109,15 @@ export function Layout({ children }) {
       <Global styles={globalStyles} />
       <PageWrapper>
         <Header>
-          <Logo>coding_in_english</Logo>
+          <Link href="/">
+            <Image
+              style={{ width: "300px", height: "auto" }}
+              src="/cie_horizontal_white.jpg"
+              alt="Coding in English"
+              width="1462"
+              height="209"
+            />
+          </Link>
           <Nav>
             {navLinks.map((link) => (
               <NavLink key={link.href} href={link.href}>
@@ -131,7 +132,7 @@ export function Layout({ children }) {
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#fff"
+              stroke="black"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -152,21 +153,20 @@ export function Layout({ children }) {
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </CloseIcon>
             </CloseButton>
-            <MobileNavLink href="/feature1" onClick={toggleMenu}>
-              About Us
-            </MobileNavLink>
-            <MobileNavLink href="/feature2" onClick={toggleMenu}>
-              FAQ
-            </MobileNavLink>
-            <MobileNavLink href="/feature3" onClick={toggleMenu}>
-              Events
-            </MobileNavLink>
+            {navLinks.map((link, idx) => (
+              <MobileNavLink key={idx} href={link.href} onClick={toggleMenu}>
+                {link.text}
+              </MobileNavLink>
+            ))}
+            
           </MobileNav>
         </Header>
         <Main>{children}</Main>
         <Footer>
           <FooterText>
             &copy; {new Date().getFullYear()} Coding in English
+            <br />
+            108 Watchung Ave Plainfield, NJ 07060
           </FooterText>
         </Footer>
       </PageWrapper>
