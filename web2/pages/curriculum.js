@@ -1,13 +1,7 @@
-import { createClient } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
+import { client } from "../util/util";
 
-const client = createClient({
-  projectId: "zkkparnw",
-  dataset: "production",
-  apiVersion: "2022-03-25",
-  useCdn: false,
-});
 
 export default function IndexPage({ sessions }) {
   return (
