@@ -69,9 +69,6 @@ function BlogCard({ post }) {
 const Index = ({ posts }) => {
   return (
     <div>
-      <H1>
-        blog == <i>web log</i>
-      </H1>
       {posts.length > 0 && posts.map((post) => <BlogCard post={post} />)}
     </div>
   );

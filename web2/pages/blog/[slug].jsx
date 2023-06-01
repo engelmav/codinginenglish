@@ -5,7 +5,7 @@ import { H1 } from "../../components/typography";
 const Post = ({ post }) => {
   return (
     <article>
-      <H1>{post?.slug?.current}</H1>
+      <H1>{post?.title}</H1>
       <PortableText value={post?.content} />
     </article>
   );
