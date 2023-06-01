@@ -90,7 +90,7 @@ export default function Index() {
           y uno que pague mejor, si hablas inglés.
           <Q>¿Cuánto cuesta el curso?</Q>
           <p>
-            El costo del curso es dependiente de tu país de residencia.
+            El costo del curso es dependiente de tu país de residencia y otros factores.
             Ofrecemos planes de pago y otros arreglos de acuerdo con tus
             necesidades.
           </p>
@@ -108,7 +108,7 @@ export default function Index() {
             Ofrecemos clases de noche empezando a las 6:30pm y los sábados de
             9am -1pm
           </p>
-          <Q>Y qué pasa con la IA?</Q>
+          <Q>¿Y qué pasa con la IA?</Q>
           <p>
             La inteligencia artificial es parte de las herramientas de trabajo
             que utilizamos. Este curso también forma base de futuros cursos en

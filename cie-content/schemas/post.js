@@ -13,7 +13,11 @@ export default {
       type: "string",
       title: "Author",
     },
-
+    {
+      name: "description",
+      type: "string",
+      title: "Description",
+    },
     {
       name: "content",
       type: "array",
