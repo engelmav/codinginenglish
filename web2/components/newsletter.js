@@ -38,7 +38,7 @@ const FormGroup = styled.div`
   background-color: transparent;
 `;
 
-const Input = styled.input`
+export const Input = styled.input`
   padding: 10px;
   border: none;
   outline: none;
