@@ -3,7 +3,7 @@ import { crossOrigins, ses } from "../../util";
 export default async (req, res) => {
   const xoRes = crossOrigins(res);
   if (req.method === "POST") {
-    const { name, email } = req.body;
+    const { firstName, lastName, companyName, email, message } = req.body;
 
     const params = {
       Destination: {
@@ -13,12 +13,12 @@ export default async (req, res) => {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data: `New subscriber:\nName: ${name}\nEmail: ${email}`,
+            Data: `New partner submission:\nFirst: ${firstName}\nLast: ${lastName}\nEmail: ${email}\nCompany: ${companyName}\nMessage:\n${message}`,
           },
         },
         Subject: {
           Charset: "UTF-8",
-          Data: "New Newsletter Subscriber",
+          Data: "New CIE Partner Request",
         },
       },
       Source: "vincent@codinginenglish.com",

@@ -4,6 +4,7 @@ const textColor = "black";
 
 export const P = styled.p`
   color: ${textColor};
+  padding-bottom: 1em;
 `;
 
 export const UL = styled.ul`
@@ -12,6 +13,7 @@ export const UL = styled.ul`
   li::before {
     content: "➡ ";
     color: #FF4136;
+    
   }
 `;
 
