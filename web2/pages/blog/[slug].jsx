@@ -7,6 +7,11 @@ const Post = ({ post }) => {
     <article>
       <H1>{post?.title}</H1>
       <PortableText value={post?.content} />
+<<<<<<< Updated upstream
+=======
+      <H2Style>Otros Posts</H2Style>
+      {posts?.length > 0 && posts.map((post) => <PostPreview post={post} />)}
+>>>>>>> Stashed changes
     </article>
   );
 };
