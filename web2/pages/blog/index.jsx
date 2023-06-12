@@ -66,11 +66,23 @@ function BlogCard({ post }) {
   );
 }
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  margin: 0 auto;
+  @media (min-width: 768px) {
+    flex-direction: row;
+    // flex-wrap: wrap;
+    // justify-content: space-between;
+  }
+  `
+
 const Index = ({ posts }) => {
   return (
-    <div>
+    <Container>
       {posts.length > 0 && posts.map((post) => <BlogCard post={post} />)}
-    </div>
+    </Container>
   );
 };
 

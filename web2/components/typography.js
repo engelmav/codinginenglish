@@ -1,4 +1,7 @@
-import styled from "@emotion/styled";
+// import styled from "@emotion/styled";
+import tw, { styled } from "twin.macro";
+
+const ButtonTW = tw.button``
 
 const textColor = "black";
 
@@ -21,12 +24,10 @@ export const Title = styled.title`
   color: ${textColor};
 `;
 
-export const H1 = styled.h1`
-  color: ${textColor};
-  font-size: 30px;
-  @media (max-width: 768px) {
-    font-size: 30px;
-  }
+export const H1 = tw.h1`
+
+  text-4xl text-gray-900 sm:text-4xl lg:text-5xl 
+
 `;
 export const H2 = styled.h2`
   color: ${textColor};

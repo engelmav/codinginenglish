@@ -88,13 +88,11 @@ const FooterText = styled.p`
 `;
 
 const navLinks = [
-  { href: "/news", text: "News" },
+  { href: "/blog", text: "Blog" },
   { href: "/events", text: "Events" },
   { href: "/about-us", text: "About Us" },
-  { href: "/corporate-partnerships", text: "Corporate Partnerships" },
-  
-  
-  { href: "/blog", text: "Blog" },
+  { href: "/partners", text: "Partners" },
+
 ];
 
 export function Layout({ children }) {
