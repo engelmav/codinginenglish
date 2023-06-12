@@ -26,7 +26,7 @@ export const MobileNav = styled.nav`
   position: fixed;
   align-items: center;
   justify-content: center;
-  border: 3px red solid;
+  
   top: 0;
   right: 0;
   bottom: 0;

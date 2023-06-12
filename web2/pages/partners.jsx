@@ -8,7 +8,7 @@ import {
   FormGroup,
   TextArea,
   P as PForm
-} from "./../components/forms";
+} from "../components/forms";
 import axios from "axios";
 
 import { useState } from "react";

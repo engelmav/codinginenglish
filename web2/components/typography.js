@@ -1,4 +1,7 @@
-import styled from "@emotion/styled";
+// import styled from "@emotion/styled";
+import tw, { styled } from "twin.macro";
+
+const ButtonTW = tw.button``
 
 const textColor = "black";
 

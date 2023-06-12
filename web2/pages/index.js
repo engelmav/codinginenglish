@@ -1,6 +1,7 @@
-import styled from "@emotion/styled";
 import { P, UL, H1 } from "../components/typography";
 import { NewsletterForm } from "../components/newsletter";
+import tw, { styled} from "twin.macro";
+const ButtonTW = tw.button``
 
 const Tagline = styled.div`
   font-family: "Montserrat", sans-serif;
@@ -100,8 +101,7 @@ export default function Index() {
           </p>
           <Q>¿Cuando comienza el curso? </Q>
           <p>
-            El curso empieza cada 3.5 meses. La próxima apertura es junio 2023.
-            La proxima apertura está en setiembre 2023.
+            El curso empieza cada 3.5 meses. Las próximas aperturas es setiembre 2023.
           </p>
           <Q>¿Cómo es el horario?</Q>{" "}
           <p>
