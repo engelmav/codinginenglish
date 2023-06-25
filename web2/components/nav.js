@@ -42,7 +42,7 @@ export const MobileNav = styled.nav`
   z-index: 999;
   transform: translateX(${({ isOpen }) => (isOpen ? "0" : "100%")});
   transition: transform 0.3s ease-in-out;
-
+  animation: fadeIn 5s;
   @media (min-width: 768px) {
     display: none;
   }

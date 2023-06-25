@@ -1,4 +1,5 @@
 import { P, UL, H1 } from "../components/typography";
+import { ContentSection } from "../components/Layout"
 import { NewsletterForm } from "../components/newsletter";
 import tw, { styled } from "twin.macro";
 const ButtonTW = tw.button``;
@@ -6,6 +7,7 @@ const ButtonTW = tw.button``;
 const FAQSection = tw.div`
   flex flex-col items-center justify-center
 `;
+
 
 const Tagline = styled.div`
   font-family: "Montserrat", sans-serif;
@@ -37,6 +39,7 @@ export default function Index() {
           consigue trabajo.
         </Tagline>
       </div>
+      <ContentSection>
       <P>
         No sólo aprendas inglés. <i>Haz</i> algo con tu inglés - y gana dinero
         como programador de software.{" "}
@@ -59,10 +62,10 @@ export default function Index() {
           ))}
         </UL>
       </div>
-
+      </ContentSection>
       <NewsletterForm />
 
-      <FAQSection>
+      <ContentSection>
         <H1 tw="text-center py-9">Preguntas Más Frecuentes</H1>
         <Q> ¿Qué consigo al ser programador?</Q>
         <p>
@@ -88,19 +91,19 @@ export default function Index() {
         <Q>¿Cuando comienza el curso? </Q>
         <p>
           El curso empieza cada 3.5 meses. Las próximas aperturas es setiembre
-          2023.
+          2023 y enero 2024.
         </p>
         <Q>¿Cómo es el horario?</Q>{" "}
         <p>
           Ofrecemos clases de noche empezando a las 6:30pm y los sábados de 9am
-          -1pm
+          -1 pm EST
         </p>
         <Q>¿Y qué pasa con la IA?</Q>
         <p>
           La inteligencia artificial es parte de las herramientas de trabajo que
           utilizamos. Este curso también forma base de futuros cursos en la IA.
         </p>
-      </FAQSection>
+      </ContentSection>
     </>
   );
 }

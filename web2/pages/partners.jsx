@@ -25,6 +25,13 @@ const Subtitle = styled(H2)`
   padding-bottom: 1em;
 `;
 
+const Container = styled.div`
+  margin: 2em;
+  @media (max-width: 768px) {
+    margin: 1em;
+  }
+`
+
 const centerStyle = { textAlign: "center" };
 export default function CorporatePartnerships() {
   const [submitted, setSubmitted] = useState(false);
@@ -49,7 +56,7 @@ export default function CorporatePartnerships() {
     }
   };
   return (
-    <div>
+    <Container>
       <Title>Why hire from Coding in English?</Title>
       <Subtitle style={centerStyle}>Uniquely Experienced Talent</Subtitle>
       <P>
@@ -123,6 +130,6 @@ export default function CorporatePartnerships() {
           </form>
         )}
       </FormWrapper>
-    </div>
+    </Container>
   );
 }

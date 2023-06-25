@@ -1,6 +1,7 @@
 import { client } from "../../util/util";
 import { PortableText } from "@portabletext/react";
 import { H1, H2 } from "../../components/typography";
+import { ContentSection } from "../../components/Layout";
 import groq from "groq";
 import styled from "@emotion/styled";
 import Link from "next/link";
@@ -27,6 +28,7 @@ const PostPreview = ({ post }) => {
 
 const Post = ({ post, posts }) => {
   return (
+    <ContentSection>
     <article>
       <H1>{post?.title}</H1>
       <PortableText value={post?.content} />
@@ -34,6 +36,7 @@ const Post = ({ post, posts }) => {
       <H2Style>Otros Posts</H2Style>
       {posts?.length > 0 && posts.map((post) => <PostPreview post={post} />)}
     </article>
+    </ContentSection>
   );
 };
 

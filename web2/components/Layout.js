@@ -12,6 +12,7 @@ import {
   MobileNavLink,
   MobileHamburgerButton,
 } from "../components/nav";
+import tw from "twin.macro";
 
 const globalStyles = css`
   * {
@@ -29,6 +30,10 @@ const globalStyles = css`
   }
 `;
 
+export const ContentSection = tw.div`
+  flex flex-col items-center justify-center p-5
+`
+
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -41,11 +46,10 @@ const Main = styled.main`
   align-items: center;
   flex-direction: column;
   flex-grow: 1;
-  width: 100%;
-
-  max-width: 40rem;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  max-width: 800px;
+  align-self: center;
+  // margin: 2rem auto;
+  // padding: 0 1rem;
 `;
 
 const Header = styled.header`

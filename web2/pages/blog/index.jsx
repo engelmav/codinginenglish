@@ -18,6 +18,10 @@ const Card = styled.div`
   border-radius: 5px;
   width: 20em;
   height: 20em;
+  @media (max-width: 768px) {
+    height: auto;
+    width: 90%;
+  }
   padding: 1.5em;
 `;
 
@@ -26,6 +30,9 @@ const CardTitle = styled.h1`
   font-family: "Noto Serif", serif;
   font-size: 2.5em;
   color: white;
+  @media (max-width: 768px) {
+    font-size: 1.5em;
+  }
 `;
 const Description = styled.p`
   // @import url("https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900,900i");
@@ -71,10 +78,16 @@ const Container = styled.div`
   flex-direction: column;
   gap: 2em;
   margin: 0 auto;
-  @media (min-width: 768px) {
-    flex-direction: row;
-    // flex-wrap: wrap;
-    // justify-content: space-between;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  flex-wrap: wrap;
+  flex-direction: row;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
   }
   `
 
@@ -88,7 +101,7 @@ const Index = ({ posts }) => {
 
 export async function getStaticProps() {
   const posts = await client.fetch(groq`
-      *[_type == "post"]
+      *[_type == "post"] | order(_createdAt desc)
     `);
   return {
     props: {
