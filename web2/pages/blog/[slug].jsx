@@ -1,10 +1,10 @@
 import { client } from "../../util/util";
 import { PortableText } from "@portabletext/react";
-import { H1, H2 } from "../../components/typography";
+import { H1, H2, P, Li, UL } from "../../components/typography";
 import { ContentSection } from "../../components/Layout";
 import groq from "groq";
-import styled from "@emotion/styled";
 import Link from "next/link";
+import tw, { styled } from "twin.macro";
 
 const PostPreviewStyle = styled.div`
   display: flex;
@@ -26,16 +26,57 @@ const PostPreview = ({ post }) => {
   );
 };
 
+const Author = styled.p`
+  font-size: 0.8em;
+  color: gray;
+`;
+const PPrime = styled.p`
+  margin-bottom: 30px;
+`;
+const components = {
+  block: {
+    h3: ({ children }) => <H2 tw="pt-5 pb-2">{children}</H2>,
+    span: ({ children }) => (
+      <PPrime className="sdfasd" tw="mb-5">
+        {children}
+      </PPrime>
+    ),
+    bullet: ({ children }) => (
+      <Li style={{ listStyleType: "disclosure-closed" }}>{children}</Li>
+    ),
+    li: ({ children }) => (
+      <Li style={{ listStyleType: "disclosure-closed" }}>{children}</Li>
+    ),
+  },
+  list: {
+    // Ex. 1: customizing common list types
+    bullet: ({ children }) => (
+      <UL tw="ml-5 py-5" className="mt-xl">
+        {children}
+      </UL>
+    ),
+  },
+  p: ({ children }) => (
+    <PPrime className="sdfasd" tw="mb-5">
+      {children}
+    </PPrime>
+  ),
+  bullet: ({ children }) => (
+    <Li style={{ listStyleType: "disclosure-closed" }}>{children}</Li>
+  ),
+};
+
 const Post = ({ post, posts }) => {
   return (
     <ContentSection>
-    <article>
-      <H1>{post?.title}</H1>
-      <PortableText value={post?.content} />
-
-      <H2Style>Otros Posts</H2Style>
-      {posts?.length > 0 && posts.map((post) => <PostPreview post={post} />)}
-    </article>
+      <article>
+        <H1>{post?.title}</H1>
+        <Author tw="py-3">por {post?.author}</Author>
+        <PortableText value={post?.content} components={components} />
+        {/* <p>{JSON.stringify(post, null, 2)}</p> */}
+        <H2Style>Otros Posts</H2Style>
+        {posts?.length > 0 && posts.map((post) => <PostPreview post={post} />)}
+      </article>
     </ContentSection>
   );
 };

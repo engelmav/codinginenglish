@@ -1,13 +1,13 @@
 // import styled from "@emotion/styled";
 import tw, { styled } from "twin.macro";
 
-const ButtonTW = tw.button``
+const ButtonTW = tw.button``;
 
 const textColor = "black";
 
 export const P = styled.p`
   color: ${textColor};
-  padding-bottom: 1em;
+  padding-bottom: 5em;
 `;
 
 export const UL = styled.ul`
@@ -15,8 +15,7 @@ export const UL = styled.ul`
   list-style: none;
   li::before {
     content: "➡ ";
-    color: #FF4136;
-    
+    color: #ff4136;
   }
 `;
 
@@ -42,4 +41,10 @@ export const H3 = styled.h3`
   @media (max-width: 768px) {
     font-size: 16px;
   }
+`;
+
+export const Li = styled.li`
+::before {
+  content: "➡ ";
+  color: #FF4136;
 `;
