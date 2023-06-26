@@ -66,7 +66,7 @@ export default function Index() {
       <NewsletterForm />
 
       <ContentSection>
-        <H1 tw="text-center py-9">Preguntas Más Frecuentes</H1>
+        <H1 tw="text-center pt-9 pb-3">Preguntas Más Frecuentes</H1>
         <Q> ¿Qué consigo al ser programador?</Q>
         <p>
           Ser programador te da la opción de trabajar remotamente, desde tu país
@@ -90,7 +90,7 @@ export default function Index() {
         </p>
         <Q>¿Cuando comienza el curso? </Q>
         <p>
-          El curso empieza cada 3.5 meses. Las próximas aperturas es setiembre
+          El curso empieza cada 3.5 meses. Las próximas aperturas es septiembre
           2023 y enero 2024.
         </p>
         <Q>¿Cómo es el horario?</Q>{" "}

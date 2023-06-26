@@ -7,7 +7,7 @@ const textColor = "black";
 
 export const P = styled.p`
   color: ${textColor};
-  padding-bottom: 5em;
+  padding-bottom: 1em;
 `;
 
 export const UL = styled.ul`
