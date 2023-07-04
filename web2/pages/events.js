@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Button } from "../components/forms"
 import { P, H1, H2, H3 } from "../components/typography";
 import tw, { styled } from "twin.macro";
+import { ContentSection } from "../components/Layout";
 
 const Buttons = styled.div`
   display: flex;
@@ -40,7 +41,7 @@ const EventsPage = () => {
     }
   }, []);
   return (
-    <div>
+    <ContentSection>
       <H1 tw="text-center sm:my-10 lg:my-20">Eventos</H1>
 
       <H2 tw="my-5">
@@ -62,7 +63,7 @@ const EventsPage = () => {
         <EventDate>18 mayo 2023 // 12:00 CET</EventDate>
 
       </Buttons>
-    </div>
+    </ContentSection>
   );
 };
 

@@ -6,9 +6,6 @@ export const FormWrapper = styled.div`
   align-items: center;
   background-color: #333333;
   padding: 30px;
-  // @media (max-width: 768px) {
-  //   margin: 0 -15px;
-  // }
 `;
 export const InputWrapper = styled.div`
   display: flex;

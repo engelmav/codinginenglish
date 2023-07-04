@@ -1,22 +1,43 @@
 import { P, UL, H1 } from "../components/typography";
-import { ContentSection } from "../components/Layout"
+import { ContentSection } from "../components/Layout";
 import { NewsletterForm } from "../components/newsletter";
 import tw, { styled } from "twin.macro";
-const ButtonTW = tw.button``;
-
-const FAQSection = tw.div`
-  flex flex-col items-center justify-center
-`;
-
+import Image from "next/image";
 
 const Tagline = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-family: "Montserrat", sans-serif;
   font-weight: 800; /* Extra bold */
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  margin: 0 auto;
+  height: 100%;
+  font-size: 5em;
+  margin-bottom: 2em;
+  margin-top: 2em;
   text-align: center;
+  position: relative;
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  @media (max-width: 768px) {
+    margin-bottom: 1em;
+    margin-top: 1em;
+    font-size: 1.5em;
+  }
+`;
+const HeroWrapper = styled.div`
+  position: relative;
+  // width: 100vw;
+  // max-width:100%;  /* added */
+  width: 100%;
+  height: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 50%;
+`;
+const ImageWrapper = styled.div`
+  z-index: -1;
 `;
 
 const Q = tw.p`
@@ -26,42 +47,42 @@ const Q = tw.p`
 export default function Index() {
   return (
     <>
-      <div style={{ marginBottom: "2em" }}>
-        <Tagline>
-          aprende a programar.
-          <br />
-          —
-          <br />
-          mejora tu inglés.
-          <br />
-          —
-          <br />
-          consigue trabajo.
-        </Tagline>
-      </div>
-      <ContentSection>
-      <P>
-        No sólo aprendas inglés. <i>Haz</i> algo con tu inglés - y gana dinero
-        como programador de software.{" "}
-      </P>
-      <P>
-        Nuestro curso único te enseña ambas cosas a la vez, y provee consejo,
-        ayuda y orientación profesional para conseguir un trabajo moderno -{" "}
-        <i>sin fronteras.</i>
-      </P>
+      <HeroWrapper>
+        <ImageWrapper>
+          <Image
+            priority
+            src="/coworking-space-hero-mobile.png"
+            alt="Hero image"
+            objectFit="cover"
+            fill={true}
+          />
+        </ImageWrapper>
+        <Tagline>Conviértete en programador fullstack bilingue.</Tagline>
+      </HeroWrapper>
 
-      <div style={{ marginBottom: "2em", marginTop: "1em" }}>
-        <UL>
-          {[
-            "Clases de noche",
-            "Pago flexible",
-            "Ayuda para conseguir trabajo remoto",
-            "No necesitas tu propia computadora",
-          ].map((li) => (
-            <li>{li}</li>
-          ))}
-        </UL>
-      </div>
+      <ContentSection>
+        <P>
+          No sólo aprendas inglés. <i>Haz</i> algo con tu inglés - y gana dinero
+          como programador de software.{" "}
+        </P>
+        <P>
+          Nuestro curso único te enseña ambas cosas a la vez, y provee consejo,
+          ayuda y orientación profesional para conseguir un trabajo moderno -{" "}
+          <i>sin fronteras.</i>
+        </P>
+
+        <div style={{ marginBottom: "2em", marginTop: "1em" }}>
+          <UL>
+            {[
+              "Clases de noche",
+              "Pago flexible",
+              "Ayuda para conseguir trabajo remoto",
+              "No necesitas tu propia computadora",
+            ].map((li, idx) => (
+              <li key={idx}>{li}</li>
+            ))}
+          </UL>
+        </div>
       </ContentSection>
       <NewsletterForm />
 
@@ -75,7 +96,7 @@ export default function Index() {
           de esta profesión La cantidad de trabajo en la programación es,
           prácticamente, sin límite.
         </p>
-        <Q>¿Por qué enseñan inglés</Q>
+        <Q>¿Por qué enseñan inglés?</Q>
         también? Tienes muchísimas más oportunidades de encontrar un trabajo, y
         uno que pague mejor, si hablas inglés.
         <Q>¿Cuánto cuesta el curso?</Q>
