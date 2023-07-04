@@ -60,7 +60,7 @@ export default function Index() {
         <ImageWrapper>
           <Image
             priority
-            src="/coworking-space-hero-mobile.png"
+            src="/coworking-space-hero-1024.png"
             alt="Hero image"
             objectFit="cover"
             fill={true}

@@ -46,7 +46,7 @@ const Main = styled.main`
   align-items: center;
   flex-direction: column;
   flex-grow: 1;
-  max-width: 800px;
+  max-width: 1280px;
   align-self: center;
   // margin: 2rem auto;
   // padding: 0 1rem;
