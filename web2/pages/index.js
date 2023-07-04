@@ -11,24 +11,17 @@ const Tagline = styled.div`
   justify-content: center;
   font-family: "Montserrat", sans-serif;
   font-weight: 800; /* Extra bold */
-  height: 100%;
   font-size: 5em;
-  margin-bottom: 2em;
-  margin-top: 2em;
   text-align: center;
   position: relative;
+  margin: 0;
   color: white;
-  background: rgba(0, 0, 0, 0.4);
   @media (max-width: 768px) {
-    margin-bottom: 1em;
-    margin-top: 1em;
     font-size: 1.5em;
   }
 `;
 const HeroWrapper = styled.div`
   position: relative;
-  // width: 100vw;
-  // max-width:100%;  /* added */
   width: 100%;
   height: 50vw;
   display: flex;
@@ -43,6 +36,22 @@ const ImageWrapper = styled.div`
 const Q = tw.p`
   font-semibold pt-5 md:pt-6 lg:pt-9 pb-1 
 `;
+const TextBg = tw.div`
+  bg-black bg-opacity-40
+  h-full flex flex-col 
+  items-center justify-center
+  w-full
+`;
+
+const Subtitle = styled.div`
+  color: white;
+  font-family: "Montserrat", sans-serif;
+  font-size: 2em;
+  @media (max-width: 768px) {
+    font-size: 1.1em;
+  }
+`;
+
 
 export default function Index() {
   return (
@@ -57,7 +66,10 @@ export default function Index() {
             fill={true}
           />
         </ImageWrapper>
-        <Tagline>Conviértete en programador fullstack bilingue.</Tagline>
+        <TextBg>
+          <Tagline>Conviértete en programador fullstack bilingüe</Tagline>
+          <Subtitle>y consigue un trabajo.</Subtitle>
+        </TextBg>
       </HeroWrapper>
 
       <ContentSection>
