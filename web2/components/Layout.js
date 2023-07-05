@@ -13,6 +13,7 @@ import {
   MobileHamburgerButton,
 } from "../components/nav";
 import tw from "twin.macro";
+import { WhatsApp } from "./svgIcons";
 
 const globalStyles = css`
   * {
@@ -32,7 +33,7 @@ const globalStyles = css`
 
 export const ContentSection = tw.div`
   flex flex-col items-center justify-center p-5
-`
+`;
 
 const PageWrapper = styled.div`
   display: flex;
@@ -86,9 +87,14 @@ const Footer = styled.footer`
   background-color: #333;
 `;
 
-const FooterText = styled.p`
+const FooterText = styled.div`
   color: #fff;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  grid: 10px;
 `;
 
 const navLinks = [
@@ -96,8 +102,32 @@ const navLinks = [
   { href: "/events", text: "Events" },
   { href: "/about-us", text: "About Us" },
   { href: "/partners", text: "Partners" },
-
 ];
+
+// tailwind button component with horizontal flex
+const Button = tw.button`
+
+  flex
+  items-center
+  justify-center
+  px-4
+  py-2
+  mt-3
+
+  border
+  border-transparent
+  text-base
+  font-medium
+  rounded-md
+  shadow-sm
+  text-white
+  bg-blue-600
+  hover:bg-blue-700
+  focus:outline-none
+  focus:ring-2
+  focus:ring-offset-2
+  focus:ring-blue-500
+  `
 
 export function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -160,15 +190,20 @@ export function Layout({ children }) {
                 {link.text}
               </MobileNavLink>
             ))}
-            
           </MobileNav>
         </Header>
         <Main>{children}</Main>
         <Footer>
           <FooterText>
-            &copy; {new Date().getFullYear()} Coding in English
-            <br />
-            108 Watchung Ave Plainfield, NJ 07060
+            <p>&copy; {new Date().getFullYear()} Coding in English</p>
+            
+            <p>108 Watchung Ave Plainfield, NJ 07060</p>
+            
+            <Button
+              onClick={() =>
+                (window.location.href = "https://wa.me/19176557273")
+              }
+            ><WhatsApp/><div style={{paddingLeft: "5px"}}>+1 (917) 655 7273</div></Button>
           </FooterText>
         </Footer>
       </PageWrapper>

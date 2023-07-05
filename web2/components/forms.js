@@ -5,7 +5,11 @@ export const FormWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: #333333;
-  padding: 30px;
+  padding: 5em;
+  @media (max-width: 768px) {
+    padding: 2em;
+  }
+  max-width: 500px;
 `;
 export const InputWrapper = styled.div`
   display: flex;
@@ -54,12 +58,11 @@ export const Button = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
   box-sizing: border-box;
-  border-radius: 5px;
   &:hover {
     background-color: #ff8a8a;
   }
 `;
 
 export const P = styled.p`
-  color: yellow;
+  color: white;
 `;
