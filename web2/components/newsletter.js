@@ -114,7 +114,7 @@ export const NewsletterForm = () => {
       setSubmitState("loading");
       await axios.post(
         "https://cie-edge-functions-engelmav.vercel.app/api/hello",
-        { name: firstName, email }
+        { name: fullName, email }
       );
       setSubmitState("completed");
     } catch (error) {
