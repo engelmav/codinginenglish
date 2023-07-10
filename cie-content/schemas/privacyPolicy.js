@@ -1,5 +1,5 @@
 export default {
-    name: "ptivacyPolicy",
+    name: "privacyPolicy",
     type: "document",
     title: "Privacy Policy",
     fields: [

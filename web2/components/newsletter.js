@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import {
   Button,
@@ -10,6 +10,8 @@ import {
   InputWrapper,
   P,
 } from "./forms";
+import { Modal } from "./modal";
+import { PrivacyModalContent } from "./privacyPolicy";
 
 const SpinnerContainer = styled.div`
   display: flex;
@@ -103,6 +105,7 @@ export const NewsletterForm = () => {
   const [consentRequired, setConsentRequired] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const handleSubmit = async () => {
     if (selectedOption !== "Sí") {
@@ -158,9 +161,7 @@ export const NewsletterForm = () => {
               setSelectedOption={setSelectedOption}
             />
             {submitState === "notStarted" && (
-              <Button onClick={() => handleSubmit()}>
-                Suscríbete
-              </Button>
+              <Button onClick={() => handleSubmit()}>Suscríbete</Button>
             )}
             {submitState === "loading" && (
               <SpinnerContainer>
@@ -172,6 +173,23 @@ export const NewsletterForm = () => {
                 Si deseas recibir noticias, debes aceptar el consentimiento al
                 seleccionar "Sí" o "No"
               </P>
+            )}
+            <div
+              style={{color: "white", cursor: "pointer", fontSize: "0.8em", textAlign: "center"}}
+              onClick={() => {
+                console.log("clicked");
+                setShowPrivacyModal(true);
+              }}
+            >
+              Política de Privacidad
+            </div>
+            {showPrivacyModal && (
+              <Modal
+                onClose={() => setShowPrivacyModal(false)}
+                title="Política de Privacidad"
+              >
+                <PrivacyModalContent />
+              </Modal>
             )}
           </InputWrapper>
         </>

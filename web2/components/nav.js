@@ -88,11 +88,3 @@ export const CloseButton = styled.button`
   cursor: pointer;
 `;
 
-export const CloseIcon = styled.svg`
-  width: 40px;
-  height: 40px;
-  stroke: white;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-`;

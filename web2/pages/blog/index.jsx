@@ -1,7 +1,6 @@
 import Link from "next/link";
 import groq from "groq";
 import { client } from "../../util/util";
-import { H1 } from "../../components/typography";
 import styled from "@emotion/styled";
 
 const Card = styled.div`
@@ -63,7 +62,6 @@ function BlogCard({ post }) {
         <Description>{description}</Description>
       </div>
       <div style={{ display: "flex", alignItems: "space-between" }}>
-
         <div>
           <Author>{author}</Author>
           <Author>{new Date(_createdAt).toDateString()}</Author>
@@ -82,6 +80,7 @@ const Container = styled.div`
   margin-bottom: 2em;
   flex-wrap: wrap;
   flex-direction: row;
+  justify-content: center;
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -89,7 +88,7 @@ const Container = styled.div`
     margin-top: 1em;
     margin-bottom: 1em;
   }
-  `
+`;
 
 const Index = ({ posts }) => {
   return (

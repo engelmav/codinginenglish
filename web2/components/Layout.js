@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CloseButton,
-  CloseIcon,
   Nav,
   NavLink,
   MobileNav,
@@ -13,7 +12,7 @@ import {
   MobileHamburgerButton,
 } from "../components/nav";
 import tw from "twin.macro";
-import { WhatsApp } from "./svgIcons";
+import { WhatsApp, CloseIcon } from "./svgIcons";
 
 const globalStyles = css`
   * {
@@ -98,6 +97,7 @@ const FooterText = styled.div`
 `;
 
 const navLinks = [
+  // { href: "/courses", text: "Courses" },
   { href: "/blog", text: "Blog" },
   { href: "/events", text: "Events" },
   { href: "/about-us", text: "About Us" },
@@ -127,7 +127,7 @@ const Button = tw.button`
   focus:ring-2
   focus:ring-offset-2
   focus:ring-blue-500
-  `
+  `;
 
 export function Layout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -196,14 +196,17 @@ export function Layout({ children }) {
         <Footer>
           <FooterText>
             <p>&copy; {new Date().getFullYear()} Coding in English</p>
-            
+
             <p>108 Watchung Ave Plainfield, NJ 07060</p>
-            
+
             <Button
               onClick={() =>
                 (window.location.href = "https://wa.me/19176557273")
               }
-            ><WhatsApp/><div style={{paddingLeft: "5px"}}>+1 (917) 655 7273</div></Button>
+            >
+              <WhatsApp />
+              <div style={{ paddingLeft: "5px" }}>+1 (917) 655 7273</div>
+            </Button>
           </FooterText>
         </Footer>
       </PageWrapper>
