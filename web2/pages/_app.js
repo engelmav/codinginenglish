@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import * as gtag from "../util/gtag";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import GoogleAnalytics from "../components/googleAnalytics";
+import CookieBanner from "../components/cookies";
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -45,8 +47,10 @@ export default function MyApp({ Component, pageProps }) {
       />
       <Layout>
         <GlobalStyles />
+        <GoogleAnalytics GA_MEASUREMENT_ID="G-ML3KQNS5VX" />
         <Component {...pageProps} />
         <Analytics />
+        <CookieBanner />
       </Layout>
     </>
   );

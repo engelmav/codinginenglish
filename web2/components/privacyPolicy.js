@@ -6,10 +6,9 @@ import { H1, H2, UL } from "./typography";
 export function PrivacyModalContent() {
   const [data, setData] = useState(null);
   useEffect(() => {
-    // Fetch data from Sanity using a GROQ query
     const fetchData = async () => {
       try {
-        const query = `*[_type == "privacyPolicy"]`; // Replace with your own GROQ query
+        const query = `*[_type == "privacyPolicy"]`;
         const result = await client.fetch(query);
         console.log(result);
         setData(result);
