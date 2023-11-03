@@ -1,0 +1,10 @@
+/* Inspired by https://acorn.firefox.com/latest/styles/color-MZHBVuZc#section-semantic-color-palette-c2 */
+.animo-button {
+    background: none;
+    box-shadow: none;
+    padding: 20px;
+    background-color: #0060df;
+    border: 0;
+    color: white;
+    border-radius: 0px;
+}
