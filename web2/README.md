@@ -1,25 +1,28 @@
-# Get started with Sanity and Next.js
+### `npm start`
 
-This project contains a minimal Next.js starter project to list pets on a page. It is used in the [Getting started with Sanity](https://www.sanity.io/docs/getting-started) guide.
+Run local dev.<br>
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.<br>
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.<br>
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.<br>
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.<br>
 
 
-## Set up
+# Documentation
 
-To set up this project locally, you will need to have [Node](https://nodejs.org/en/) installed, then run:
+https://github.com/engelmav/codinginenglish/wiki/Developer's-Environment#frontend-development-setup
 
-```bash
-npm install
-``` 
 
-After that, your dependencies are installed and you can start a development server: 
+# Issues
 
-```bash
-npm run dev
-```
-
-## Connect your content
-
-To learn more about connecting your data to this starter project: 
-
-- [Getting started with Sanity](https://www.sanity.io/docs/getting-started)
-- [Connect your content with Next.js](https://www.sanity.io/docs/connect-your-content-to-next-js)
+https://github.com/engelmav/codinginenglish/labels/guac

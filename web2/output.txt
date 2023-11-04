@@ -1,0 +1,15 @@
+
+> frontend@0.1.0 start /home/vengelmann/repos/codinginenglish/web
+> PORT=8080 DEV_SERVER=1 node scripts/start.js
+
+Building for environment development
+Generated entry list:
+[ '/home/vengelmann/repos/codinginenglish/web/src/index.js' ]
+Starting the development server...
+
+Failed to compile.
+
+./node_modules/@material-ui/data-grid/dist/index-esm.js
+SyntaxError: /home/vengelmann/repos/codinginenglish/web/node_modules/@material-ui/data-grid/dist/index-esm.js: Expected atom at position 4
+    ^(\p{L}|\p{M}\
+        ^

@@ -1,0 +1,38 @@
+.cie-btn {
+    background-color: white;
+    border: 1px solid #ff3e00;
+    color: #ff3e00;
+    padding: 8px;
+    border-radius: 7px;
+}
+  
+.cie-btn:hover {
+    color: white;
+    background-color: #ff3e00;
+}
+
+.cie-btn:disabled,
+.cie-btn[disabled]{
+  background-color: white;
+  color: #ff3e00;
+}
+
+.cie-btn-blk {
+  border: 1px solid black;
+  background-color: black;
+  color: white;
+  padding: 8px;
+  border-radius: 7px;
+}
+  
+
+.cie-btn-blk:disabled,
+.cie-btn[disabled]{
+  border: 1px solid #ff4000;
+  background-color: white;
+  color: #ff3e00;
+}
+
+.m-3 {
+  margin: 3px;
+}
