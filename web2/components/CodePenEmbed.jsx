@@ -6,7 +6,7 @@ export const CodePenEmbed = ({codePenLink}) =>
         height: "800px"
     }}
         title="Lesson 04 - Activity 3"
-        src={codePenLink} frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true" />
+        src={codePenLink}  loading="lazy" allowFullScreen="true" />
 
 
 

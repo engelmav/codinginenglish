@@ -25,10 +25,10 @@ export default function MyApp({ Component, pageProps }) {
   }, [router.events]);
   return (
     <>
-      <Head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+        <Head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
@@ -37,21 +37,21 @@ export default function MyApp({ Component, pageProps }) {
                 page_path: window.location.pathname,
               });
             `,
-          }}
+            }}
+          />
+        </Head>
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
         />
-      </Head>
-      {/* Global Site Tag (gtag.js) - Google Analytics */}
-      <Script
-        strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-      />
-      <Layout>
-        <GlobalStyles />
-        <GoogleAnalytics GA_MEASUREMENT_ID="G-ML3KQNS5VX" />
-        <Component {...pageProps} />
-        <Analytics />
-        <CookieBanner />
-      </Layout>
+        <Layout>
+          <GlobalStyles />
+          <GoogleAnalytics GA_MEASUREMENT_ID="G-ML3KQNS5VX" />
+          <Component {...pageProps} />
+          <Analytics />
+          <CookieBanner />
+        </Layout>
     </>
   );
 }
