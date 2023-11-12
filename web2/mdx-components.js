@@ -66,8 +66,10 @@ export function useMDXComponents(components) {
         }}
       />
     ),
-    a: ({ children }) => (
+    a: ({ href, children, ...rest }) => (
       <a
+        href={href}
+        target="_blank"
         style={{
           textDecoration: "underline solid",
           textDecorationThickness: "4px",
@@ -80,11 +82,35 @@ export function useMDXComponents(components) {
       </a>
     ),
     li: ({ children }) => (
-      <li style={{ "::before": { content: "*", position: "absolute", top: "6px", left: 0 } }}>{children}</li>
+      <li
+        style={{
+          "::before": {
+            content: "*",
+            position: "absolute",
+            top: "6px",
+            left: 0,
+          },
+          listStyleType: "square",
+        }}
+      >
+        {children}
+      </li>
     ),
     ul: ({ children }) => (
-      <ul style={{ listStyleType: "*", position: "relative", padding: "3px 0 2px 25px"}}>{children}</ul>
+      <ul style={{ position: "relative", padding: "3px 0 2px 25px" }}>
+        {children}
+      </ul>
     ),
+    p: ({ children }) => (
+      <p
+        style={{
+          paddingBottom: "4px"
+        }}
+      >
+        {children}
+      </p>
+    ),
+
     ...components,
   };
 }

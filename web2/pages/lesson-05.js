@@ -21,14 +21,17 @@ const FloatingModal = () => {
 
   const modalStyle = {
     position: "fixed",
+    zIndex: 20,
     top: 0,
     left: 0,
-    width: "600px",
+    width: "70%",
     height: "100%",
     background: "white",
     boxShadow: "2px 0px 5px rgba(0, 0, 0, 0.5)",
     transform: isOpen ? "translateX(0)" : "translateX(-100%)",
     transition: "transform 0.3s ease",
+    display: "flex",
+    flexDirection: "column"
   };
 
   const tabStyle = {
@@ -52,6 +55,8 @@ const FloatingModal = () => {
     display: "block",
     margin: "10px",
     padding: "5px 10px",
+    border: "4px solid black",
+    alignSelf: "end"
   };
 
   return (
@@ -68,8 +73,7 @@ const FloatingModal = () => {
             <button style={closeBtnStyle} onClick={() => setIsOpen(false)}>
               Close
             </button>
-            <p>Your modal content goes here</p>
-            <GoogleDoc googleDocLink="https://docs.google.com/document/d/1w0Xj5Pp-uCikVJSZh_19x3Zb1T5YSX9gEy_2HyOVeLU/edit?usp=sharing"/>
+            <GoogleDoc width="100%" height="100%" googleDocLink="https://docs.google.com/document/d/1w0Xj5Pp-uCikVJSZh_19x3Zb1T5YSX9gEy_2HyOVeLU/edit?usp=sharing?embedded=true"/>
           </>
         )}
       </div>
