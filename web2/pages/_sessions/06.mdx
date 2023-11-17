@@ -1,0 +1,206 @@
+import { CodePenEmbed } from "../../components/CodePenEmbed";
+import { GoogleDoc } from "../../components/GoogleDoc";
+// import { AccordionPanel } from "./components/Accordion/Accordion";
+import { FillInBlanks } from "../../components/FillInBlanks/FillInBlanks";
+import {AccordionPanel} from "../../components/Accordion/Accordion"
+
+
+# Session 06 - Student Guide
+
+## Working well, 
+
+[Anna's Pizza Shop JIRA](https://codinginenglish.atlassian.net/jira/your-work)
+
+Welcome to Lesson 6 of Coding in English! Let's review what we did. Then, let's make sure it's done, so we can move the ticket to the Done column!
+
+<AccordionPanel title="[00] TODO: Warm up">
+
+- As a customer I want to see all the items the pizzeria has for sale ________ I can choose what I want to buy
+- Anna wanted an _______ menu, because sometimes she has to add or remove things.
+- You can _______________ through a list of menu items in order to display them in ReactJS. 
+- A _______ helps CSS locate what element you want to style.
+
+
+</AccordionPanel>
+
+<AccordionPanel title="[02] Push back on Anna">
+
+Let's push back on Anna. Sometimes our clients ask a little too much up front and we have to figure out how to split out the work
+and provide them with useful increments.
+
+Let's confirm that our ticket is complete, and send Anna an email.
+
+How can we write that email?
+
+Later we can record this as a voice memo.
+
+Let's look at Anna's email again.
+
+> Hello Coding in English! I am grateful for the UI you created to give our customers their order summary.
+> I realize I might be thinking a little backwards but I think the next step for us is to let customers to be able to choose from a menu.
+
+> Is that something you can do? I hope so! If so, I have some common items I'd like to try out, sort of like an MVP.
+
+> Also I'm not sure how I want my menu items styled. I was thinking we make them a bold font with lines under each one.
+> Or maybe black with a gray background. Let me know which way you decide to go.
+
+> I also want to make it so that I can add my own items to the menu, because sometimes I have to add and remove things.
+
+
+> Thanks!
+
+
+Let's tell Anna this. Hey Anna, in order to edit the menu, I think you would also want to edit the price, right?
+Don't worry, we won't forget about the editing. We'll write a ticket and put it in the backlog. We'll look at
+it next sprint.
+Let me just give you a rough sketch of the price first so that we don't have to go too nuts with the editing.
+
+</AccordionPanel>
+
+
+<AccordionPanel title="[02] In order to add prices, we need to talk about lists and objects">
+
+
+A list in JavaScript
+
+```
+const menuItems = ["pizza", "soda", "calzones"]
+```
+
+</AccordionPanel>
+
+
+
+
+<AccordionPanel title="[01] Lesson 05 Review">
+
+- As a customer I want to see all the items the pizzeria has for sale ________ I can choose what I want to buy
+- Anna wanted an _______ menu, because sometimes she has to add or remove things.
+- You can _______________ through a list of menu items in order to display them in ReactJS. 
+- A _______ helps CSS locate what element you want to style.
+
+</AccordionPanel>
+
+
+<AccordionPanel title="[02.01] Before we listen to a Voicemail from Anna...">
+  Let's get familiar with some vocabulary before we listen to Anna's voicemail.
+  <FillInBlanks
+    questionAnswer={[
+      {
+        question: "When you walk _________, you can crash into a wall!",
+        answer: "backwards",
+      },
+      {
+        question:
+          "The CSS property that changes the _________ color is `background-color`.",
+        answer: "background",
+      },
+      {
+        question:
+          "It's common to use a _________ font style when something is important.",
+        answer: "bold",
+      },
+      {
+        question:
+          "We say ____ __ to express necessity, that we need to do something. For example, I _____ __ eat in order to live!.",
+        answer: "have to",
+      },
+      {
+        question:
+          "The ________ on a menu are all the options that a customer can pick from.",
+        answer: "items",
+      },
+    ]}
+  />
+</AccordionPanel>
+
+<AccordionPanel title="[02.02]  Anna left us a VM">
+
+Anna has left us a voice mail. Let's listen to it and see if we can use our previous exercise to help understand.
+
+---
+
+> Hello Coding in English! I am grateful for the UI you created to give our customers their order summary.
+> I realize I might be thinking a little backwards but I think the next step for us is to let customers to be able to choose from a menu.
+> Is that something you can do? I hope so! If so, I have some common items I'd like to try out, sort of like an MVP.
+> Also I'm not sure how I want my menu items styled. I was thinking we make them a bold font with lines under each one. Or maybe black with a gray background. Let me know which way you decide to go.
+> I also want to make it so that I can add my own items to the menu, because sometimes I have to add and remove things. Thanks.
+
+- Is Anna asking for one thing or two things?
+- Which do you think might be easier - showing a list, or making an editable list?
+- Anna is giving us a choice about something. What is it?
+
+---
+
+{" "}
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube-nocookie.com/embed/VByON3rVQwk?si=zqv1SDBjo0MWmkwZ"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen
+></iframe>
+
+</AccordionPanel>
+## Next...
+
+<AccordionPanel title="[03] Handling Anna's Requirement">
+  How can we make a ticket to capture what Anna wants for her platform?
+
+
+
+Click [here](https://codinginenglish.atlassian.net/jira/software/projects/APS/boards/1) to go to Coding in English JIRA.
+
+
+
+We want to use the Story structure that we used in our last JIRA ticket. This is called "Story Structure"
+
+> 
+
+> AS a `<Customer|Restaurant Owner|>`
+
+> I WANT to see all the items the pizzeria has for sale
+
+> SO THAT I can choose what I want to buy
+
+
+</AccordionPanel>
+
+Something we need to know in order to actually do what Anna wants...
+
+<AccordionPanel title="[04] What is a loop (or map) and how does it work?">
+
+<img
+  style={{ width: "200px", height: "auto" }}
+  src="https://gcdnb.pbrd.co/images/FEosQGkds8y5.png?o=1"
+/>
+
+Some questions to consider.
+
+- Does this picture show something happening repeatedly, or once?
+- What shape do you think of when you hear the word "loop"?
+- If you were to get up and "walk in a loop", what would that look like? Let's try it.
+
+## HERE IS A LOOP!
+
+<CodePenEmbed codePenLink="https://codepen.io/vengelmann/embed/KKJqNdB?default-tab=js&editable=true" />
+
+</AccordionPanel>
+
+
+<AccordionPanel title="[05] Let's create Anna's Pizza Shop's menu...">
+
+
+Using the previous CodePen exercise as an example.
+
+
+<CodePenEmbed codePenLink="https://codepen.io/vengelmann/embed/WNPjEjE?default-tab=js&editable=true" />
+</AccordionPanel>
+
+
+<AccordionPanel title="Previous doc">
+  <GoogleDoc googleDocLink="https://docs.google.com/document/d/e/2PACX-1vRbyWm5h3YJfLUx1gzN1CnMZ3R93sq6gmEe2OHPyyy6qaHEy1bYx604B_NOvJmXtAqtv5tsbOXEz-a7/pub?embedded=true" />
+</AccordionPanel>

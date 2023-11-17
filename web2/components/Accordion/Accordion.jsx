@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 
+
 export const Accordion = ({ accordianData }) => {
   return (
     <div>
@@ -25,10 +26,9 @@ export const AccordionPanel = ({ title, content, children }) => {
         marginBottom: "20px",
         marginTop: "20px",
         padding: "30px",
-        borderBottom: "3px dotted white",
         maxWidth: "1000px",
         minWidth: "1000px",
-        borderRadius: "4px"
+        borderRadius: "10px"
       }}
     >
       <div
