@@ -7,7 +7,7 @@ import { CodePenEmbed } from "../../components/CodePenEmbed";
 import { GoogleDoc } from "../../components/GoogleDoc";
 // import { AccordionPanel } from "./components/Accordion/Accordion";
 import { FillInBlanks } from "../../components/FillInBlanks/FillInBlanks";
-import { CustomComponents } from "./mdxComponents";
+import { CustomComponents } from "../../components/mdxComponents";
 import { FloatingModal } from "../../components/FloatingModal/FloatingModal";
 
 const components = {
