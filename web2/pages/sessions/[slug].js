@@ -26,13 +26,6 @@ export default function PostPage({ source }) {
       <MDXRemote
         components={components}
         {...source}
-        // specifying the custom MDX components
-        // components={{
-        //   h1: H1,
-        //   h2: H2,
-        //   p: P,
-        //   HeroImage,
-        // }}
       />
     </div>
   );
