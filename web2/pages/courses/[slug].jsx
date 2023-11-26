@@ -101,7 +101,6 @@ export async function getStaticProps(context) {
   `,
     { slug }
   );
-  console.log(post);
 
   const posts = await client.fetch(groq`
         *[_type == "post"]

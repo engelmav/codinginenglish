@@ -39,6 +39,12 @@ export async function getStaticProps(ctx) {
   // retrieve the MDX blog post file associated
   // with the specified slug parameter
   console.log("Current directory:", process.cwd());
+  console.log("Files in directory:");
+  fs.readdir(process.cwd(), (err, files) => {
+    files.forEach(file => {
+      console.log(file);
+    });
+  });
   const postFile = fs.readFileSync(`./pages/_sessions/${slug}.mdx`);
 
   // read the MDX serialized content along with the frontmatter
