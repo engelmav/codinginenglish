@@ -9,12 +9,14 @@ import { GoogleDoc } from "../../components/GoogleDoc";
 import { FillInBlanks } from "../../components/FillInBlanks/FillInBlanks";
 import { CustomComponents } from "../../components/mdxComponents";
 import { FloatingModal } from "../../components/FloatingModal/FloatingModal";
+import { Table } from "../../components/Table";
 
 const components = {
   AccordionPanel,
   CodePenEmbed,
   GoogleDoc,
   FillInBlanks,
+  Table,
   ...CustomComponents,
 };
 
@@ -23,10 +25,7 @@ export default function PostPage({ source }) {
     <div>
       {/* <Head><title>{source.frontmatter.title}</title></Head> */}
       <FloatingModal />
-      <MDXRemote
-        components={components}
-        {...source}
-      />
+      <MDXRemote components={components} {...source} />
     </div>
   );
 }

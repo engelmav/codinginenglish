@@ -6,7 +6,7 @@ function FillInBlanks({ questionAnswer }) {
     .map(({ value }) => value);
   return (
     <div style={{ background: "white", color: "black", padding: "30px" }}>
-      <h1 style={{fontSize: "1.5em"}}>Fill in the blanks...</h1>
+      <h1 style={{ fontSize: "1.5em" }}>Fill in the blanks...</h1>
       <div style={{ display: "flex", marginBottom: "30px" }}>
         {answerKey.map((a) => (
           <div
@@ -23,17 +23,19 @@ function FillInBlanks({ questionAnswer }) {
       </div>
       <ol style={{ color: "black" }}>
         {questionAnswer.map((qa) => (
-          <li style={{ marginBottom: "30px",  }}>
+          <li style={{ marginBottom: "30px" }}>
             <span>{qa.question}</span>
-            <input
-              style={{
-                paddingLeft: "4px",
-                border: "2px solid gray",
-                borderRadius: "4",
-                width: "100px"
-              }}
-              type="text"
-            ></input>
+            {qa.answer && (
+              <input
+                style={{
+                  paddingLeft: "4px",
+                  border: "2px solid gray",
+                  borderRadius: "4",
+                  width: "100px",
+                }}
+                type="text"
+              ></input>
+            )}
           </li>
         ))}
       </ol>

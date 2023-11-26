@@ -2,6 +2,7 @@ import { CodePenEmbed } from "../../components/CodePenEmbed";
 import { GoogleDoc } from "../../components/GoogleDoc";
 import { AccordionPanel } from "../../components/Accordion/Accordion";
 import { FillInBlanks } from "../../components/FillInBlanks/FillInBlanks";
+import { Table } from "../../componnents/Table";
 
 # Session 06 - Student Guide
 
@@ -11,12 +12,25 @@ import { FillInBlanks } from "../../components/FillInBlanks/FillInBlanks";
 
 Welcome to Lesson 6 of Coding in English! Let's review what we did. Then, let's make sure it's done, so we can move the ticket to the Done column!
 
-<AccordionPanel title="[00] TODO: Warm up">
+<AccordionPanel title="[00] Warm up: Love or Hate">
 
-- As a customer I want to see all the items the pizzeria has for sale **\_\_\_\_** I can choose what I want to buy
-- Anna wanted an **\_\_\_** menu, because sometimes she has to add or remove things.
-- You can **\*\***\_\_\_**\*\*** through a list of menu items in order to display them in ReactJS.
-- A **\_\_\_** helps CSS locate what element you want to style.
+The teacher will say a few words or ideas. You can put them in either of two categories: Love or hate.
+
+In your notes, make two columns. One column is "love", the other "hate".
+
+Then the teacher will say them!
+
+After the teacher says them, explain why you love or hate these things.
+
+</AccordionPanel>
+
+<AccordionPanel title="[01] Taking a look at Anna's original email">
+
+> Hello Coding in English! I am grateful for the UI you created to give our customers their order summary.
+> I realize I might be thinking a little backwards but I think the next step for us is to let customers to be able to choose from a menu.
+> Is that something you can do? I hope so! If so, I have some common items I'd like to try out, sort of like an MVP.
+> Also I'm not sure how I want my menu items styled. I was thinking we make them a bold font with lines under each one. Or maybe black with a gray background. Let me know which way you decide to go.
+> I also want to make it so that I can add my own items to the menu, because sometimes I have to add and remove things. Thanks.
 
 </AccordionPanel>
 
@@ -45,33 +59,66 @@ Let's look at Anna's email again.
 
 > Thanks!
 
-Let's tell Anna this. Hey Anna, in order to edit the menu, I think you would also want to edit the price, right?
-Don't worry, we won't forget about the editing. We'll write a ticket and put it in the backlog. We'll look at
-it next sprint.
-Let me just give you a rough sketch of the price first so that we don't have to go too nuts with the editing.
+Let's push back in email.
+
+<FillInBlanks
+  questionAnswer={[
+    { question: "Hi Anna," },
+    {
+      question: "I understand that you ________________",
+      answer: "wanted the menu editing feature",
+    },
+    {
+      question: "But it may not ____ to create that feature right now.",
+      answer: "make sense",
+    },
+    {
+      question:
+        "We have _____ a ticket in our backlog to make sure we don’t forget.",
+      answer: "created",
+    },
+    {
+      question:
+        "For now, we suggest the next _____ should be menu item princes.",
+      answer: "feature",
+    },
+    { question: "How _______ that sound to you?", answer: "does" },
+  ]}
+/>
+
+Now let's type up this email, and send it to Anna!
 
 </AccordionPanel>
 
-<AccordionPanel title="[02] In order to add prices, we need to talk about lists and objects">
+<AccordionPanel title="[03] Objects: Add some new objects">
 
-A list in JavaScript
+Now, you are creating a table. Use these fruits to add to an existing table.
 
-```
-const menuItems = ["pizza", "soda", "calzones"]
-```
+<Table
+  data={[
+    { name: "cherry", glycemicIndex: 22 },
+    { name: "grapefruit", glycemicIndex: 25 },
+    { name: "apricot", glycemicIndex: "34" },
+    { name: "apple", glycemicIndex: 39 },
+  ]}
+/>
 
-what would this do?
-menuItems[0]
-
-how about this?
-
-menuItems[1]
-
-Let's try it! Press Control-Shift-I in your browser window and enter this:
-
-```
-const menuItems = ["pizza", "soda", "calzones"]
-```
+<CodePenEmbed codePenLink="https://codepen.io/vengelmann/embed/vYbdGwo?default-tab=js&editable=true" />
 
 </AccordionPanel>
 
+<AccordionPanel title="[04] Using Objects in Arrays">
+
+Use this canvas to practice putting objects in lists.
+
+[Click here](https://excalidraw.com/#room=1e322882807b89ded83c,gt-JlU2DM_JNQ96GP4HMAA)
+
+</AccordionPanel>
+
+<AccordionPanel title="[05] Creating Anna's Menu with Prices!">
+
+Using the completed canvas above, let's create a menu with prices.
+
+<CodePenEmbed codePenLink="https://codepen.io/vengelmann/embed/eYxKQXe?default-tab=js&editable=true" />
+
+</AccordionPanel>
