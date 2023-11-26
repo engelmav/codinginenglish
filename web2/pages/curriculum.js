@@ -77,7 +77,6 @@ export async function getStaticProps() {
   const sessions = await client.fetch(
     `*[_type == "classSession"] | order(name asc)`
   );
-  console.log("returning sessions", sessions);
   return {
     props: {
       sessions,
