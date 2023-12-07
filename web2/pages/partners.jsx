@@ -66,7 +66,7 @@ export default function CorporatePartnerships() {
       </P>
       <Reasons>
         <li>
-          Graduates are well-versed in modern tech tools with high productivity,
+          Graduates are trained in a modern technology stack,
           including React, Python, and Linux
         </li>
         <li>
@@ -74,9 +74,8 @@ export default function CorporatePartnerships() {
           the English-speaking information economy workers
         </li>{" "}
         <li>
-          Graduates have real-world experience from the beginning, thanks to our
-          unique, immersive curriculum. This means they are quick to adapt and
-          understand the trade-offs of tech decisions and product delivery
+          Graduates have experience from the beginning in navigating stakeholder conversations and requirements, diving into existing code bases, and also beginng from scratch. This is thanks to our
+          unique, immersive curriculum. As a result, our graduates can navigate trade-offs, communicate appropriately, and work as a team to deliver software.
         </li>
       </Reasons>{" "}
       <Subtitle style={centerStyle}>Do Good While Increasing Value </Subtitle>
