@@ -48,7 +48,7 @@
     "linaria": "^3.0.0-beta.13",
     "location": "0.0.1",
     "lodash": "^4.17.21",
-    "luxon": "^1.17.2",
+    "luxon": "^1.28.1",
     "mobx": "^6.3.2",
     "mobx-persist": "^0.4.1",
     "mobx-persist-store": "^0.5.30",
